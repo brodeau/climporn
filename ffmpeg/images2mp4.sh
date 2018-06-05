@@ -1,62 +1,102 @@
 #!/bin/bash
 
-#PRESET="veryslow"
-#PRESET="slow"
-PRESET="medium"
-#PRESET="ultrafast"
+# Laurent Brodeau, 2017-2018
 
+# Defaults:
+FIMG="png"
+HEIGHT="1080"
+CODEC="x264"
 FPS=12
+CRF=20
+PRESET="medium"
+FVID="mp4"
 
-#CRF=20
-CRF=18
-#CRF=0
-
-TYPE="mp4"
-#TYPE="webm"
-#TYPE="mov"
-
-
-if [ "${5}" = "" ]; then
-    echo "USAGE: `basename $0` <begining_files> <format (jpg,png,...)> <height video (pixels)> <fps> <crf>"
+usage()
+{
+    echo
+    echo "USAGE: `basename ${0}` -i <common_prefix_image_files> (options)"
+    echo
+    echo "   Available options are:"
+    echo "      -t: format of images (default='${FIMG}')"
+    echo "      -h: height (pixels) of video to create (default='${HEIGHT}')"
+    echo "      -c: codec for video (default='${CODEC})' [x264, x265, ...]"
+    echo "      -f: frame per second (default='${FPS}')"
+    echo "      -C: CRF value, 0 is lossless and 51 worse possible (default='${CRF}') [ffmpeg default=23]"
+    echo "      -p: preset for encoding (default='${PRESET}') [fast, medium, slow, veryslow]"
+    echo "      -v: video format (default='${FVID}') [mp4,webm,...]"
+    echo
     exit
-fi
+}
 
-SCALE="-vf scale='-2:${3}'"
-FPS=${4}
-CRF=${5}
+
+
+
+while getopts i:t:h:c:f:C:p:v:h option; do
+    case $option in
+        i) FPREF=${OPTARG};;
+        t) FIMG=${OPTARG};;
+        h) HEIGHT=${OPTARG};;
+        c) CODEC=${OPTARG};;
+        f) FPS=${OPTARG};;
+        C) CRF=${OPTARG};;
+        p) PRESET=${OPTARG};;
+        v) FVID=${OPTARG};;
+        h)  usage ;;
+        \?) usage ;;
+    esac
+done
+
+if [ "${FPREF}" = "" ]; then usage; fi
+
+
+SCALE="-vf scale='-2:${HEIGHT}'"
+
 
 #Codec stuff
-
-if [ "${TYPE}" = "mp4" ]; then
+if [ "${FVID}" = "mp4" ]; then
     VC="-c:v libx264 -profile:v high444"
-    info="x264_${3}px"
-elif [ "${TYPE}" = "webm" ]; then
+    info="${CODEC}_${HEIGHT}px"
+elif [ "${FVID}" = "webm" ]; then
     VC="-c:v libvpx"
     #VC="-c:v libvpx -pix_fmt yuva420p -metadata:s:v:0 alpha_mode=\"1\""
-    info="vpx_${3}px"
-elif [ "${TYPE}" = "mov" ]; then
+    info="vpx_${HEIGHT}px"
+elif [ "${FVID}" = "mov" ]; then
     VC="-c:v h264_nvenc"
-    info="h264_${3}px"
+    info="h264_${HEIGHT}px"
 else
     echo "Boo!" ; exit
 fi
 
 
 
-fo="movie_${1}_${info}_${FPS}fps_crf${CRF}.${TYPE}"
+fo="movie_${FPREF}_${info}_${FPS}fps_crf${CRF}.${FVID}"
 
 rm -f ${fo}
 
+echo
+echo " fo = ${fo} !!!"
+#exit
+
+echo
+echo "ffmpeg -f image2 -framerate ${FPS} \
+       -pattern_type glob -i '${FPREF}*.${FIMG}' \
+       ${VC} -preset ${PRESET} \
+       -crf ${CRF} -refs 16 ${SCALE} \
+       -pix_fmt yuv420p \
+       ${fo}"
+echo
 
 
 ffmpeg -f image2 -framerate ${FPS} \
-       -pattern_type glob -i "${1}*.${2}" \
+       -pattern_type glob -i "${FPREF}*.${FIMG}" \
        ${VC} -preset ${PRESET} \
        -crf ${CRF} -refs 16 ${SCALE} \
        -pix_fmt yuv420p \
        ${fo}
 
 
+
+echo
 echo
 echo " *** Check ${fo} !!!"
 echo
