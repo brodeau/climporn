@@ -29,6 +29,10 @@ usage()
 }
 
 
+if [ "`ffmpeg -codecs 2>/dev/null | grep libx264`" = "" ]; then
+    echo "Dude! Use a 'ffmpeg' that has 'libx264' support! Sorry..."
+    exit
+fi
 
 
 while getopts i:t:h:c:f:C:p:v:h option; do
