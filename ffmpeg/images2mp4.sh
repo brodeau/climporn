@@ -10,6 +10,7 @@ FPS=12
 CRF=20
 PRESET="medium"
 FVID="mp4"
+NTHRD="1"
 
 usage()
 {
@@ -24,6 +25,7 @@ usage()
     echo "      -C: CRF value, 0 is lossless and 51 worse possible (default='${CRF}') [ffmpeg default=23]"
     echo "      -p: preset for encoding (default='${PRESET}') [fast, medium, slow, veryslow]"
     echo "      -v: video format (default='${FVID}') [mp4,webm,...]"
+    echo "      -n: number of threads (default='${NTHRD}')"
     echo
     exit
 }
@@ -35,7 +37,7 @@ if [ "`ffmpeg -codecs 2>/dev/null | grep libx264`" = "" ]; then
 fi
 
 
-while getopts i:t:h:c:f:C:p:v:h option; do
+while getopts i:t:h:c:f:C:p:v:n:h option; do
     case $option in
         i) FPREF=${OPTARG};;
         t) FIMG=${OPTARG};;
@@ -45,6 +47,7 @@ while getopts i:t:h:c:f:C:p:v:h option; do
         C) CRF=${OPTARG};;
         p) PRESET=${OPTARG};;
         v) FVID=${OPTARG};;
+        n) NTHRD=${OPTARG};;
         h)  usage ;;
         \?) usage ;;
     esac
@@ -82,7 +85,7 @@ echo " fo = ${fo} !!!"
 #exit
 
 echo
-echo "ffmpeg -f image2 -framerate ${FPS} \
+echo "ffmpeg -f image2 -threads ${NTHRD} -framerate ${FPS} \
        -pattern_type glob -i '${FPREF}*.${FIMG}' \
        ${VC} -preset ${PRESET} \
        -crf ${CRF} -refs 16 ${SCALE} \
@@ -91,7 +94,7 @@ echo "ffmpeg -f image2 -framerate ${FPS} \
 echo
 
 
-ffmpeg -f image2 -framerate ${FPS} \
+ffmpeg -f image2 -threads ${NTHRD} -framerate ${FPS} \
        -pattern_type glob -i "${FPREF}*.${FIMG}" \
        ${VC} -preset ${PRESET} \
        -crf ${CRF} -refs 16 ${SCALE} \
