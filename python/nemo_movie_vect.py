@@ -153,7 +153,7 @@ if CNEMO == 'eNATL60':
 
     # Boxes:
     if   CBOX == 'ALL':
-        i1=0   ; j1=0    ; i2=Ni0 ; j2=Nj0  ; rfact_zoom=1440./float(Nj0) ; vcb=[0.6, 0.1, 0.37, 0.018]  ; font_rat=8.*rfact_zoom
+        i1=0   ; j1=0    ; i2=Ni0 ; j2=Nj0  ; rfact_zoom=1440./float(Nj0) ; vcb=[0.61, 0.1, 0.36, 0.018]  ; font_rat=8.*rfact_zoom
         x_clock = 1600 ; y_clock = 200 ; x_logo=2200 ; y_logo=1200
 
     elif   CBOX == 'ALLFR':
@@ -179,6 +179,7 @@ if CNEMO == 'eNATL60':
     elif CBOX == 'Brittany':
         i1=5400; j1=2850; i2=5700 ; j2=3100 ; rfact_zoom=4.   ; vcb=[0.5, 0.875, 0.485, 0.02] ; font_rat=1.*rfact_zoom
         x_clock = 30 ; y_clock = 1040 ; x_logo = 1500 ; y_logo = 16 ; l_annotate_name=False
+        if cfield == 'SST': tmin=7. ;  tmax=13.   ;  df = 1. ; cpal_fld = 'ncview_nrl'
 
     elif CBOX == 'Portrait':
         i1=2760; j1=1000; i2=4870; j2=4000 ; rfact_zoom=1.     ; vcb=[0.59, 0.1, 0.38, 0.018]  ; font_rat=1.*rfact_zoom
@@ -192,6 +193,10 @@ if CNEMO == 'eNATL60':
         i1=3040; j1=2140; i2=i1+1920; j2=j1+1376 ; rfact_zoom=1. ; vcb=[0.59, 0.1, 0.38, 0.018] ; font_rat = 2.
         l_annotate_name=False; l_show_clock=False ; l_add_logo = False
         
+    elif CBOX == 'GrlIcl':
+        i1=3370; j1=3941; i2=5062; j2=Nj0 ; rfact_zoom=1. ; vcb=[0.3, 0.1, 0.38, 0.018] ; font_rat = 2. ; l_annotate_name=False
+        x_clock = 1350 ; y_clock = 750 ; x_logo = 1400 ; y_logo = 16 ; l_save_nc=True
+
     elif CBOX == 'Band':
         i1=5100-1920; j1=2200; i2=5100; j2=j1+1080 ; rfact_zoom=1. ; vcb=[0.59, 0.1, 0.38, 0.018] ; font_rat = 2.           ; l_annotate_name=False
         l_show_clock = False ; l_add_logo = False ; #x_clock = 1420 ; y_clock = 1030 ; x_logo = 1500 ; y_logo = 16
@@ -356,7 +361,10 @@ if l_show_lsm or l_do_crl or l_do_cof or l_do_cspd:
         ff  = id_lsm.variables['gphif'][0,j1:j2,i1:i2]
         ff[:,:] = 2.*romega*nmp.sin(ff[:,:]*nmp.pi/180.0)
         (nj,ni) = nmp.shape(XMSK)
-        id_lsm.close()
+    if l_save_nc:
+        Xlon = id_lsm.variables['gphit'][j1:j2,i1:i2]
+        Xlat = id_lsm.variables['glamt'][j1:j2,i1:i2]
+    id_lsm.close()
 
     print 'Shape Arrays => ni,nj =', ni,nj
 
@@ -515,7 +523,7 @@ for jt in range(jt0,Nt):
     if l_save_nc:
         cf_out = 'nc/'+cv_out+'_NEMO_'+CNEMO+'_'+CBOX+'_'+cday+'_'+chour+'_'+cpal_fld+'.nc'
         print ' Saving in '+cf_out
-        bnc.dump_2d_field(cf_out, Xplot, xlon=[], xlat=[], name=cv_out)
+        bnc.dump_2d_field(cf_out, Xplot, xlon=Xlon, xlat=Xlat, name=cv_out)
         print ''
 
 
