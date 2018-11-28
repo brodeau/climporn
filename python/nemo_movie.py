@@ -78,9 +78,14 @@ x_logo  = 50 ; y_logo  = 50
 
 
 
+if   cv_in in ['somxl010']:
+    cv_out = 'MLD'
+    tmin=0. ;  tmax=1800.  ;  df = 50. ; cpal_fld = 'ncview_hotres' ;     cb_jump = 4
+    cunit = r'MLD (m)'
+    l_show_cb = True
 
 
-if   cv_in in ['sosstsst','tos']:
+elif cv_in in ['sosstsst','tos']:
     cv_out = 'SST'
     tmin=-2 ;  tmax=30.   ;  df = 1. ; cpal_fld = 'ncview_nrl' ;     cb_jump = 2
     #tmin=0. ;  tmax=32.   ;  df = 2. ; cpal_fld = 'viridis'
@@ -100,8 +105,8 @@ elif cv_in == 'sossheig':
     #cpal_fld = 'gray_r' ; tmin=-0.3 ;  tmax=0.3   ;  df = 0.05 ; l_apply_lap = True
     #cpal_fld = 'bone_r' ; tmin=-0.9 ;  tmax=-tmin   ;  df = 0.05 ; l_apply_lap = True ; l_pow_field = True ; pow_field = 2.
     #
-    #cpal_fld = 'RdBu_r' ; tmin=-3. ;  tmax=-tmin   ;  df = 0.5 ;
-    cpal_fld = 'RdBu_r' ; tmin=-1.5 ;  tmax=-tmin   ;  df = 0.5 ; 
+    cpal_fld = 'RdBu_r' ; tmin=-3. ;  tmax=-tmin   ;  df = 0.5 ;
+    #cpal_fld = 'RdBu_r' ; tmin=-1.5 ;  tmax=-tmin   ;  df = 0.5 ; 
     l_show_cb = True ; cb_jump = 1 ; x_logo = 2190 ; y_logo  = 1230
     #
     cunit = r'SSH (m)'
