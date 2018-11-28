@@ -98,16 +98,14 @@ cv_out = CWHAT
 
     
 if cvx_in=='sozocrtx' and cvy_in=='somecrty' and l_do_cof:
-    cpal_fld = 'on2' ; tmin=-0.6 ;  tmax=-tmin ;  df = 0.05
-    #cpal_fld = 'ncview_bw' ; tmin=-0.4 ;  tmax=0.4 ;  df = 0.05
-    cunit = ''
-    cb_jump = 1
+    cpal_fld = 'on2' ; tmin=-0.6 ;  tmax=-tmin ;  df = 0.1 ; cb_jump = 1
+    cunit = r'$\zeta/f$'
 
 elif cvx_in=='sozocrtx' and cvy_in=='somecrty' and l_do_crl:
-    cpal_fld = 'on2' ; tmin=-0.035 ;  tmax=0.035 ;  df = 0.05
+    #cpal_fld = 'on2' ; tmin=-0.035 ;  tmax=0.035 ;  df = 0.05 ; ;  cb_jump = 1
     #cpal_fld = 'ncview_bw' ; tmin=-0.03 ;  tmax=0.03 ;  df = 0.05
-    cpal_fld = 'bone' ; tmin=-0.025 ;  tmax=0.025 ;  df = 0.05
-    cunit = '';  cb_jump = 1
+    cpal_fld = 'bone' ; tmin=-0.025 ;  tmax=0.025 ;  df = 0.05 ; cb_jump = 1
+    cunit = r'$\zeta$'
     l_show_clock = False
     l_add_logo   = False
     l_annotate_name = False
