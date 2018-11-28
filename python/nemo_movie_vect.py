@@ -341,8 +341,7 @@ if l_show_lsm or l_do_crl or l_do_cof or l_do_cspd:
     print ' The mesh_mask has '+str(nb_dim)+' dimmensions!'
     if l_show_lsm:
         cv_msk = 'tmask'
-        if l_do_crl:  cv_msk = 'fmask'
-        if l_do_cspd: cv_msk = 'tmask'
+        if l_do_crl or l_do_cof:  cv_msk = 'fmask'
         print '\n Reading mask as "'+cv_msk+'" in:'; print cv_msk,'\n'
         if nb_dim==4: XMSK = id_lsm.variables[cv_msk][0,0,j1:j2,i1:i2]
         if nb_dim==3: XMSK = id_lsm.variables[cv_msk][0,j1:j2,i1:i2]
