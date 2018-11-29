@@ -184,8 +184,8 @@ if CNEMO == 'eNATL60':
         l_annotate_name=False; l_show_clock=False
 
     elif CBOX == 'EATL':
-        i1=3100; j1=2290; i2=i1+1800; j2=j1+1080 ; rfact_zoom=1. ; vcb=[0.59, 0.1, 0.38, 0.018] ; font_rat = 2.           ; l_annotate_name=False
-        x_clock = 1420 ; y_clock = 1030 ; x_logo = 1500 ; y_logo = 16
+        i1=3100; j1=2160; i2=i1+1920; j2=j1+1200 ; rfact_zoom=1. ; vcb=[0.3, 0.06, 0.38, 0.018] ; font_rat = 2. ; l_annotate_name=False
+        x_clock = 1570 ; y_clock = 1150 ; x_logo = 1620 ; y_logo = 16
 
     elif CBOX == 'EATL2':
         i1=3040; j1=2140; i2=i1+1920; j2=j1+1376 ; rfact_zoom=1. ; vcb=[0.59, 0.1, 0.38, 0.018] ; font_rat = 2.
