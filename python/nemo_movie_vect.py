@@ -177,7 +177,6 @@ if CNEMO == 'eNATL60':
     elif CBOX == 'Brittany':
         i1=5400; j1=2850; i2=5700 ; j2=3100 ; rfact_zoom=4.   ; vcb=[0.5, 0.875, 0.485, 0.02] ; font_rat=1.*rfact_zoom
         x_clock = 30 ; y_clock = 1040 ; x_logo = 1500 ; y_logo = 16 ; l_annotate_name=False
-        if cfield == 'SST': tmin=7. ;  tmax=13.   ;  df = 1. ; cpal_fld = 'ncview_nrl'
 
     elif CBOX == 'Portrait':
         i1=2760; j1=1000; i2=4870; j2=4000 ; rfact_zoom=1.     ; vcb=[0.59, 0.1, 0.38, 0.018]  ; font_rat=1.*rfact_zoom
@@ -188,8 +187,8 @@ if CNEMO == 'eNATL60':
         x_clock = 1570 ; y_clock = 1150 ; x_logo = 1620 ; y_logo = 16
 
     elif CBOX == 'EATL2':
-        i1=3040; j1=2140; i2=i1+1920; j2=j1+1376 ; rfact_zoom=1. ; vcb=[0.59, 0.1, 0.38, 0.018] ; font_rat = 2.
-        l_annotate_name=False; l_show_clock=False ; l_add_logo = False
+        i1=2740; j1=1600; i2=i1+2560; j2=j1+1440 ; rfact_zoom=1. ; vcb=[0.3, 0.06, 0.38, 0.018] ; font_rat = 2.5 ; l_annotate_name=False
+        x_clock = 2140 ; y_clock = 1390 ; x_logo = 2220 ; y_logo = 16
         
     elif CBOX == 'GrlIcl':
         i1=3370; j1=3941; i2=5062; j2=Nj0 ; rfact_zoom=1. ; vcb=[0.3, 0.1, 0.38, 0.018] ; font_rat = 2. ; l_annotate_name=False

@@ -184,8 +184,8 @@ if CNEMO == 'eNATL60':
         x_clock = 1570 ; y_clock = 1150 ; x_logo = 1620 ; y_logo = 16
 
     elif CBOX == 'EATL2':
-        i1=3040; j1=2140; i2=i1+1920; j2=j1+1376 ; rfact_zoom=1. ; vcb=[0.59, 0.1, 0.38, 0.018] ; font_rat = 2.
-        l_annotate_name=False; l_show_clock=False ; l_add_logo = False
+        i1=2740; j1=1600; i2=i1+2560; j2=j1+1440 ; rfact_zoom=1. ; vcb=[0.3, 0.06, 0.38, 0.018] ; font_rat = 2.5 ; l_annotate_name=False
+        x_clock = 2140 ; y_clock = 1390 ; x_logo = 2220 ; y_logo = 16
         
     elif CBOX == 'GrlIcl':
         i1=3370; j1=3941; i2=5062; j2=Nj0 ; rfact_zoom=1. ; vcb=[0.3, 0.1, 0.38, 0.018] ; font_rat = 2. ; l_annotate_name=False
@@ -211,7 +211,6 @@ elif CNEMO == 'NATL60':
     Nj0 = 3454
     #l_pow_field = True ; pow_field = 1.5
     l_do_ice  = False
-    l_show_cb = False
     l_show_clock = False
     cdt = '1h'
     #CBOX = 'zoom1' ; i1 = 1800 ; j1 = 950 ; i2 = i1+1920 ; j2 = j1+1080 ; rfact_zoom = 1. ; vcb=[0.5, 0.875, 0.485, 0.02] ; font_rat = 8.*rfact_zoom ; l_show_lsm = False
