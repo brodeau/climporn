@@ -60,7 +60,10 @@ l_annotate_name = True
 l_show_clock = True
 
 l_add_logo = True
-cf_logo = '/home/brodeau/Dropbox/OceanNext/Graphic_Identity/0LOGO/logo_trans_white_H14_20180917.png'
+cf_logo_on  = '/home/brodeau/util/logos/ocean-next_trans_white_281x191.png'
+l_add_logo_ige = True
+cf_logo_ige = '/home/brodeau/util/logos/IGE_blanc_notext.png'
+
 
 l_save_nc = False ; # save the field we built in a netcdf file !!!
 
@@ -559,10 +562,16 @@ for jt in range(jt0,Nt):
         ax.annotate(CNEMO, xy=(1, 4), xytext=(xl, yl), **cfont_titl)
 
     if l_add_logo:
-        datafile = cbook.get_sample_data(cf_logo, asfileobj=False)
+        datafile = cbook.get_sample_data(cf_logo_on, asfileobj=False)
         im = image.imread(datafile)
         #im[:, :, -1] = 0.5  # set the alpha channel
         fig.figimage(im, x_logo, y_logo, zorder=9)
+        #
+    if l_add_logo_ige:
+        del datafile, im
+        datafile = cbook.get_sample_data(cf_logo_ige, asfileobj=False)
+        im = image.imread(datafile)
+        fig.figimage(im, x_logo+77, y_logo-150., zorder=9)
 
 
     plt.savefig(cfig, dpi=dpi, orientation='portrait', facecolor='k')
