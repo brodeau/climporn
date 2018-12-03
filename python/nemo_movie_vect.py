@@ -63,6 +63,8 @@ l_add_logo = True
 cf_logo_on  = '/home/brodeau/util/logos/ocean-next_trans_white_281x191.png'
 l_add_logo_ige = True
 cf_logo_ige = '/home/brodeau/util/logos/IGE_blanc_notext.png'
+l_add_logo_prace = True
+cf_logo_prace = '/home/brodeau/util/logos/PRACE_blanc.png'
 
 
 l_save_nc = False ; # save the field we built in a netcdf file !!!
@@ -603,7 +605,12 @@ for jt in range(jt0,Nt):
         del datafile, im
         datafile = cbook.get_sample_data(cf_logo_ige, asfileobj=False)
         im = image.imread(datafile)
-        fig.figimage(im, x_logo+77, y_logo-150., zorder=9)
+        fig.figimage(im, x_logo+144, y_logo-150., zorder=9)
+    if l_add_logo_prace:
+        del datafile, im
+        datafile = cbook.get_sample_data(cf_logo_prace, asfileobj=False)
+        im = image.imread(datafile)
+        fig.figimage(im, x_logo-77, y_logo-140., zorder=9)
 
 
     plt.savefig(cfig, dpi=dpi, orientation='portrait', facecolor='k')
