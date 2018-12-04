@@ -120,6 +120,8 @@ elif cvx_in=='sozocrtx' and cvy_in=='somecrty' and l_do_cspd:
     l_save_nc=False
     cpal_fld = 'on2' ; tmin=0. ;  tmax=1.4 ;  df = 0.1
     cunit = 'm/s' ; cb_jump = 1
+    if CBOX == 'Balear': tmin=0. ;  tmax=1.2 ;  df = 0.2 ; cpal_fld = 'ncview_hotres'
+    #if CBOX == 'Balear': tmin=0. ;  tmax=1. ;  df = 0.2
     
 elif cvx_in=='vozocrtx' and cvy_in=='vomecrty' and l_do_cof:
     l_3d_field = True
