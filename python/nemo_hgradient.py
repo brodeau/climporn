@@ -71,7 +71,8 @@ l_save_nc = True ; # save the field we built in a netcdf file !!!
 
 l_apply_lap   = False
 l_apply_hgrad = True
-l_smooth = True
+l_smooth_sst = True
+l_smooth_msk = True
 
 narg = len(sys.argv)
 if narg < 7: print 'Usage: '+sys.argv[0]+' <NEMOCONF> <BOX> <file> <variable> <LSM_file> <YYYYMMDD (start)>'; sys.exit(0)
@@ -505,7 +506,7 @@ for jt in range(jt0,Nt):
         lx = nmp.zeros((nj,ni))
         ly = nmp.zeros((nj,ni))
 
-        if l_smooth:
+        if l_smooth_sst:
             xtmp = nmp.zeros((nj,ni))
             # Smoothing:
             for ii in range(10):
@@ -516,7 +517,7 @@ for jt in range(jt0,Nt):
                 Xplot[:,:] = Xplot[:,:]*TMSK[:,:]
             del xtmp
             print ''
-
+        
         # Zonal gradient on T-points:
         lx[:,1:ni-1] = (Xplot[:,2:ni] - Xplot[:,0:ni-2]) / (XE1U[:,1:ni-1] + XE1U[:,0:ni-2]) * UMSK[:,1:ni-1] * UMSK[:,0:ni-2]
         lx[:,:] = TMSK[:,:]*lx[:,:]
@@ -535,12 +536,41 @@ for jt in range(jt0,Nt):
 
         del lx, ly
 
+        # Smoothing the gradient, not the SST:
+        #if l_smooth:
+        #    xtmp = nmp.zeros((nj,ni))
+        #    # Smoothing:
+        #    for ii in range(10):
+        #        print ' Smooth!!!', ii+1
+        #        xtmp[:,:] = Xplot[:,:]*TMSK[:,:]
+        #        Xplot[1:-1,1:-1] = 0.35*xtmp[1:-1,1:-1] +  ( 0.65*( xtmp[1:-1,2:] + xtmp[2:,1:-1] + xtmp[1:-1,:-2] + xtmp[:-2,1:-1] ) ) \
+        #                           /            nmp.maximum(        TMSK[1:-1,2:] + TMSK[2:,1:-1] + TMSK[1:-1,:-2] + TMSK[:-2,1:-1] , 1.E-6)
+        #        Xplot[:,:] = Xplot[:,:]*TMSK[:,:]
+        #    del xtmp
+        #    print ''
+        
         rfact_aht = nmp.zeros((nj,ni))
-        idx = nmp.where( Xplot > 0.001 )
-        rfact_aht[idx] = 5.*Xplot[idx]*1000.
+        idx = nmp.where( Xplot > 0.001 )    # !!!! lolo
+        rfact_aht[idx] = 8.*Xplot[idx]*1000.  # 8 is arbitrary, we want to be close to factor 10 (to apply to aht_0) where gradient is too strong!!!
+
+
+        # Smoothing the mask:
+        if l_smooth_msk:
+            xtmp = nmp.zeros((nj,ni))
+            # Smoothing:
+            for ii in range(10):
+                print ' Smooth!!!', ii+1
+                xtmp[:,:] = rfact_aht[:,:]*TMSK[:,:]
+                rfact_aht[1:-1,1:-1] = 0.35*xtmp[1:-1,1:-1] +  ( 0.65*( xtmp[1:-1,2:] + xtmp[2:,1:-1] + xtmp[1:-1,:-2] + xtmp[:-2,1:-1] ) ) \
+                                   /            nmp.maximum(        TMSK[1:-1,2:] + TMSK[2:,1:-1] + TMSK[1:-1,:-2] + TMSK[:-2,1:-1] , 1.E-6)
+                rfact_aht[:,:] = rfact_aht[:,:]*TMSK[:,:]
+            del xtmp
+            print ''
+        
+        rfact_aht = nmp.maximum(rfact_aht,  0.0)
+        rfact_aht = nmp.minimum(rfact_aht, 10.0) # nowhere higher than 10 (10 x aht_0)
         bnc.dump_2d_field('rfact_aht.nc', rfact_aht, xlon=Xlon, xlat=Xlat, name='rfact_aht')
-        
-        
+                
         sys.exit(0)
 
         
