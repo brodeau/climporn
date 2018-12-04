@@ -549,9 +549,9 @@ for jt in range(jt0,Nt):
         #    del xtmp
         #    print ''
         
-        rfact_aht = nmp.zeros((nj,ni))
+        rmask_aht = nmp.zeros((nj,ni))
         idx = nmp.where( Xplot > 0.001 )    # !!!! lolo
-        rfact_aht[idx] = 8.*Xplot[idx]*1000.  # 8 is arbitrary, we want to be close to factor 10 (to apply to aht_0) where gradient is too strong!!!
+        rmask_aht[idx] = 8.*Xplot[idx]*1000.  # 8 is arbitrary, we want to be close to factor 10 (to apply to aht_0) where gradient is too strong!!!
 
 
         # Smoothing the mask:
@@ -560,16 +560,16 @@ for jt in range(jt0,Nt):
             # Smoothing:
             for ii in range(10):
                 print ' Smooth!!!', ii+1
-                xtmp[:,:] = rfact_aht[:,:]*TMSK[:,:]
-                rfact_aht[1:-1,1:-1] = 0.35*xtmp[1:-1,1:-1] +  ( 0.65*( xtmp[1:-1,2:] + xtmp[2:,1:-1] + xtmp[1:-1,:-2] + xtmp[:-2,1:-1] ) ) \
+                xtmp[:,:] = rmask_aht[:,:]*TMSK[:,:]
+                rmask_aht[1:-1,1:-1] = 0.35*xtmp[1:-1,1:-1] +  ( 0.65*( xtmp[1:-1,2:] + xtmp[2:,1:-1] + xtmp[1:-1,:-2] + xtmp[:-2,1:-1] ) ) \
                                    /            nmp.maximum(        TMSK[1:-1,2:] + TMSK[2:,1:-1] + TMSK[1:-1,:-2] + TMSK[:-2,1:-1] , 1.E-6)
-                rfact_aht[:,:] = rfact_aht[:,:]*TMSK[:,:]
+                rmask_aht[:,:] = rmask_aht[:,:]*TMSK[:,:]
             del xtmp
             print ''
         
-        rfact_aht = nmp.maximum(rfact_aht,  0.0)
-        rfact_aht = nmp.minimum(rfact_aht, 10.0) # nowhere higher than 10 (10 x aht_0)
-        bnc.dump_2d_field('rfact_aht.nc', rfact_aht, xlon=Xlon, xlat=Xlat, name='rfact_aht')
+        rmask_aht = nmp.maximum(rmask_aht,  0.0)
+        rmask_aht = nmp.minimum(rmask_aht, 10.0) # nowhere higher than 10 (10 x aht_0)
+        bnc.dump_2d_field('rmask_aht.nc', rmask_aht, xlon=Xlon, xlat=Xlat, name='rmask_aht')
                 
         sys.exit(0)
 
