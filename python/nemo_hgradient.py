@@ -35,6 +35,19 @@ import barakuda_tool as bt
 import barakuda_ncio as bnc
 
 
+nb_smooth_sst  = 10
+nb_smooth_mask = 10
+
+rthr_grad_sst = 0.001
+ramp_ahtt     = 15.
+
+
+
+ris2 = 1./nmp.sqrt(2.)
+
+
+
+
 vmn = [ 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ]
 vml = [ 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ]
 
@@ -506,17 +519,7 @@ for jt in range(jt0,Nt):
         lx = nmp.zeros((nj,ni))
         ly = nmp.zeros((nj,ni))
 
-        if l_smooth_sst:
-            xtmp = nmp.zeros((nj,ni))
-            # Smoothing:
-            for ii in range(10):
-                print ' Smooth!!!', ii+1
-                xtmp[:,:] = Xplot[:,:]*TMSK[:,:]
-                Xplot[1:-1,1:-1] = 0.35*xtmp[1:-1,1:-1] +  ( 0.65*( xtmp[1:-1,2:] + xtmp[2:,1:-1] + xtmp[1:-1,:-2] + xtmp[:-2,1:-1] ) ) \
-                                   /            nmp.maximum(        TMSK[1:-1,2:] + TMSK[2:,1:-1] + TMSK[1:-1,:-2] + TMSK[:-2,1:-1] , 1.E-6)
-                Xplot[:,:] = Xplot[:,:]*TMSK[:,:]
-            del xtmp
-            print ''
+        if l_smooth_sst: bt.smoother(Xplot, TMSK, nb_smooth=nb_smooth_sst)
         
         # Zonal gradient on T-points:
         lx[:,1:ni-1] = (Xplot[:,2:ni] - Xplot[:,0:ni-2]) / (XE1U[:,1:ni-1] + XE1U[:,0:ni-2]) * UMSK[:,1:ni-1] * UMSK[:,0:ni-2]
@@ -536,39 +539,20 @@ for jt in range(jt0,Nt):
 
         del lx, ly
 
-        # Smoothing the gradient, not the SST:
-        #if l_smooth:
-        #    xtmp = nmp.zeros((nj,ni))
-        #    # Smoothing:
-        #    for ii in range(10):
-        #        print ' Smooth!!!', ii+1
-        #        xtmp[:,:] = Xplot[:,:]*TMSK[:,:]
-        #        Xplot[1:-1,1:-1] = 0.35*xtmp[1:-1,1:-1] +  ( 0.65*( xtmp[1:-1,2:] + xtmp[2:,1:-1] + xtmp[1:-1,:-2] + xtmp[:-2,1:-1] ) ) \
-        #                           /            nmp.maximum(        TMSK[1:-1,2:] + TMSK[2:,1:-1] + TMSK[1:-1,:-2] + TMSK[:-2,1:-1] , 1.E-6)
-        #        Xplot[:,:] = Xplot[:,:]*TMSK[:,:]
-        #    del xtmp
-        #    print ''
-        
         rmask_aht = nmp.zeros((nj,ni))
-        idx = nmp.where( Xplot > 0.001 )    # !!!! lolo
-        rmask_aht[idx] = 8.*Xplot[idx]*1000.  # 8 is arbitrary, we want to be close to factor 10 (to apply to aht_0) where gradient is too strong!!!
+        idx = nmp.where( Xplot > rthr_grad_sst )
+        rmask_aht[idx] = ramp_ahtt*Xplot[idx]*1000.
 
+        rmask_aht = nmp.maximum(rmask_aht,  0.0)
+        rmask_aht = nmp.minimum(rmask_aht, 18.0) # nowhere higher than 10 (10 x aht_0)        
 
         # Smoothing the mask:
-        if l_smooth_msk:
-            xtmp = nmp.zeros((nj,ni))
-            # Smoothing:
-            for ii in range(10):
-                print ' Smooth!!!', ii+1
-                xtmp[:,:] = rmask_aht[:,:]*TMSK[:,:]
-                rmask_aht[1:-1,1:-1] = 0.35*xtmp[1:-1,1:-1] +  ( 0.65*( xtmp[1:-1,2:] + xtmp[2:,1:-1] + xtmp[1:-1,:-2] + xtmp[:-2,1:-1] ) ) \
-                                   /            nmp.maximum(        TMSK[1:-1,2:] + TMSK[2:,1:-1] + TMSK[1:-1,:-2] + TMSK[:-2,1:-1] , 1.E-6)
-                rmask_aht[:,:] = rmask_aht[:,:]*TMSK[:,:]
-            del xtmp
-            print ''
-        
+        if l_smooth_msk: bt.smoother(rmask_aht, TMSK, nb_smooth=nb_smooth_mask)
+
         rmask_aht = nmp.maximum(rmask_aht,  0.0)
-        rmask_aht = nmp.minimum(rmask_aht, 10.0) # nowhere higher than 10 (10 x aht_0)
+        rmask_aht = nmp.minimum(rmask_aht, 15.0) # nowhere higher than 10 (10 x aht_0)
+
+        
         bnc.dump_2d_field('rmask_aht.nc', rmask_aht, xlon=Xlon, xlat=Xlat, name='rmask_aht')
                 
         sys.exit(0)
