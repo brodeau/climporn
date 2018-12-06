@@ -74,7 +74,7 @@ romega = 2.*nmp.pi/86400.0
 
 
 narg = len(sys.argv)
-if narg < 10: print 'Usage: '+sys.argv[0]+' <NEMOCONF> <BOX> <WHAT (CURL,CURLOF,CSPEED)><fileX> <varX> <fileY> <varY> <LSM_file> <YYYYMMDD (start)>'; sys.exit(0)
+if narg < 10: print 'Usage: '+sys.argv[0]+' <NEMOCONF> <BOX> <WHAT (CURL,CURLOF,CSPEED)> <fileX> <varX> <fileY> <varY> <LSM_file> <YYYYMMDD (start)>'; sys.exit(0)
 CNEMO  = sys.argv[1]
 CBOX   = sys.argv[2]
 CWHAT  = sys.argv[3]

@@ -34,6 +34,7 @@ import barakuda_colmap as bcm
 import barakuda_tool as bt
 import barakuda_ncio as bnc
 
+l_smooth = False
 
 vmn = [ 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ]
 vml = [ 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ]
@@ -42,8 +43,6 @@ fig_type='png'
 dpi = 110
 color_top = 'white'
 #color_top = 'k'
-
-cv_out = 'unknown'
 
 jt0 = 0
 
@@ -69,67 +68,77 @@ cf_logo_prace = '/home/brodeau/util/logos/PRACE_blanc.png'
 
 l_save_nc = False ; # save the field we built in a netcdf file !!!
 
-l_apply_lap = False
+l_apply_lap   = False
+l_apply_hgrad = False
 
 narg = len(sys.argv)
-if narg < 7: print 'Usage: '+sys.argv[0]+' <NEMOCONF> <BOX> <file> <variable> <LSM_file> <YYYYMMDD (start)>'; sys.exit(0)
+if narg < 7: print 'Usage: '+sys.argv[0]+' <NEMOCONF> <BOX> <WHAT (SST, SSH, MLD, LAP_SSH, GRAD_SST)> <file> <LSM_file> <YYYYMMDD (start)>'; sys.exit(0)
 CNEMO  = sys.argv[1]
 CBOX   = sys.argv[2]
-cf_in = sys.argv[3] ; cv_in=sys.argv[4]
-cf_lsm=sys.argv[5]  ; cf_clock0=sys.argv[6]
+CWHAT  = sys.argv[3]
+cf_in = sys.argv[4]
+cf_lsm=sys.argv[5]
+cf_clock0=sys.argv[6]
 
 x_logo  = 50 ; y_logo  = 50
 
 
 
 
-if   cv_in in ['somxl010']:
-    cv_out = 'MLD'
+if   CWHAT == 'MLD':
+    cv_in in ['somxl010']    
     tmin=0. ;  tmax=1800.  ;  df = 50. ; cpal_fld = 'ncview_hotres' ;     cb_jump = 4
     cunit = r'MLD (m)'
     l_show_cb = True
 
-
-elif cv_in in ['sosstsst','tos']:
-    cv_out = 'SST'
+elif CWHAT == 'SST':
+    cv_in = 'sosstsst' ; #in ['sosstsst','tos']:    
     tmin=-2 ;  tmax=30.   ;  df = 1. ; cpal_fld = 'ncview_nrl' ;     cb_jump = 2
     #tmin=0. ;  tmax=32.   ;  df = 2. ; cpal_fld = 'viridis'
     #tmin=4. ;  tmax=20.   ;  df = 1. ; cpal_fld = 'PuBu'
     cunit = r'SST ($^{\circ}$C)'
     l_show_cb = True
 
-elif cv_in == 'sossheig':
-    cv_out = 'SSH'
+elif CWHAT == 'GRAD_SST':
+    cv_in = 'sosstsst'
+    l_apply_hgrad = True
+    l_save_nc = True
+    l_smooth = True ; nb_smooth  = 5
+    tmin=0. ;  tmax=0.001 ;  df = 0.0001 ; cpal_fld = 'ncview_hotres' ; cb_jump = 1
+    #tmin=0. ;  tmax=32.   ;  df = 2. ; cpal_fld = 'viridis'
+    #tmin=4. ;  tmax=20.   ;  df = 1. ; cpal_fld = 'PuBu'
+    cunit = r'$\left|\vec{\nabla}SST\right|$ (K/m)'
+    l_show_cb = True
+    
+elif CWHAT == 'SSH':
+    cv_in == 'sossheig'    
     #cpal_fld = 'ncview_jaisnc'
     #cpal_fld = 'PuBu'
     #cpal_fld = 'RdBu'
     #cpal_fld = 'BrBG'
-    #cpal_fld = 'on3' ; tmin=-1.2 ;  tmax=2.3   ;  df = 0.05 ; l_apply_lap = True
-    #cpal_fld = 'on2' ; tmin=-1.2 ;  tmax=1.2   ;  df = 0.05 ; l_apply_lap = True
-    #cpal_fld = 'coolwarm' ; tmin=-1. ;  tmax=1.   ;  df = 0.05 ; l_apply_lap = True
-    #cpal_fld = 'gray_r' ; tmin=-0.3 ;  tmax=0.3   ;  df = 0.05 ; l_apply_lap = True
     #cpal_fld = 'bone_r' ; tmin=-0.9 ;  tmax=-tmin   ;  df = 0.05 ; l_apply_lap = True ; l_pow_field = True ; pow_field = 2.
-    #
     cpal_fld = 'RdBu_r' ; tmin=-3. ;  tmax=-tmin   ;  df = 0.5 ;
     #cpal_fld = 'RdBu_r' ; tmin=-1.5 ;  tmax=-tmin   ;  df = 0.5 ; 
     l_show_cb = True ; cb_jump = 1 ; x_logo = 2190 ; y_logo  = 1230
-    #
     cunit = r'SSH (m)'
 
-elif cv_in == 'socurloverf':
-    cv_out = 'RV'
-    cpal_fld = 'on2' ; tmin=-1. ;  tmax=1. ;  df = 0.05 ; l_apply_lap = False
-    cunit = ''
-    cb_jump = 1
+elif CWHAT == 'LAP_SSH':
+    cv_in == 'sossheig'
+    l_apply_lap = True
+    #cpal_fld = 'on3' ; tmin=-1.2 ;  tmax=2.3   ;  df = 0.05 ; l_apply_lap = True
+    cpal_fld = 'on2' ; tmin=-1.2 ;  tmax=1.2   ;  df = 0.05 ; 
+    #cpal_fld = 'coolwarm' ; tmin=-1. ;  tmax=1.   ;  df = 0.05 ; l_apply_lap = True
+    #cpal_fld = 'gray_r' ; tmin=-0.3 ;  tmax=0.3   ;  df = 0.05 ; l_apply_lap = True
 
-elif cv_in == 'r':
-    cv_out = 'Amplitude'
+    
+
+elif CWHAT == 'Amplitude':
+    cv_in == 'r'    
     cpal_fld = 'RdBu_r' ; tmin=-0.5 ;  tmax=-tmin   ;  df = 0.1 ; cb_jump = 1
-    #
     cunit = r'Amplitude (m)'
 
-elif cv_in == 'phi':
-    cv_out = 'Phase'
+elif CWHAT == 'Phase':
+    cv_in == 'phi'    
     cpal_fld = 'RdBu_r' ; tmin=-30. ;  tmax=-tmin   ;  df = 5. ; cb_jump = 1
     #
     cunit = r'Phase (deg.)'
@@ -178,7 +187,7 @@ if CNEMO == 'eNATL60':
     elif CBOX == 'Brittany':
         i1=5400; j1=2850; i2=5700 ; j2=3100 ; rfact_zoom=4.   ; vcb=[0.5, 0.875, 0.485, 0.02] ; font_rat=1.*rfact_zoom
         x_clock = 30 ; y_clock = 1040 ; x_logo = 1500 ; y_logo = 16 ; l_annotate_name=False
-        if cv_out == 'SST': tmin=7. ;  tmax=13.   ;  df = 1. ; cpal_fld = 'ncview_nrl'
+        if CWHAT == 'SST': tmin=7. ;  tmax=13.   ;  df = 1. ; cpal_fld = 'ncview_nrl'
 
     elif CBOX == 'Portrait':
         i1=2760; j1=1000; i2=4870; j2=4000 ; rfact_zoom=1.     ; vcb=[0.59, 0.1, 0.38, 0.018]  ; font_rat=1.*rfact_zoom
@@ -195,7 +204,7 @@ if CNEMO == 'eNATL60':
     elif CBOX == 'GrlIcl':
         i1=3370; j1=3941; i2=5062; j2=Nj0 ; rfact_zoom=1. ; vcb=[0.3, 0.1, 0.38, 0.018] ; font_rat = 2. ; l_annotate_name=False
         x_clock = 1350 ; y_clock = 750 ; x_logo = 1400 ; y_logo = 16 ; l_save_nc=True
-        if cv_out == 'SST': tmax = 12.
+        if CWHAT == 'SST': tmax = 12.
 
     elif CBOX == 'Band':
         i1=5100-1920; j1=2200; i2=5100; j2=j1+1080 ; rfact_zoom=1. ; vcb=[0.59, 0.1, 0.38, 0.018] ; font_rat = 2.           ; l_annotate_name=False
@@ -347,23 +356,38 @@ if not l_notime: Nt = len(vtime)
 
 
 
-if l_show_lsm or l_apply_lap:
+if l_show_lsm or l_apply_lap or l_apply_hgrad:
+    cv_msk = 'tmask'
     bt.chck4f(cf_lsm)
     id_lsm = Dataset(cf_lsm)
-    nb_dim = len(id_lsm.variables['tmask'].dimensions)
+    nb_dim = len(id_lsm.variables[cv_msk].dimensions)
     print ' The mesh_mask has '+str(nb_dim)+' dimmensions!'
-    if l_show_lsm:
-        cv_msk = 'tmask'
-        if nb_dim==4: XMSK = id_lsm.variables[cv_msk][0,0,j1:j2,i1:i2]
-        if nb_dim==3: XMSK = id_lsm.variables[cv_msk][0,j1:j2,i1:i2]
-        if nb_dim==2: XMSK = id_lsm.variables[cv_msk][j1:j2,i1:i2]
-        (nj,ni) = nmp.shape(XMSK)
+    print ' *** Reading '+cv_msk+' !'
+    if nb_dim==4: XMSK = id_lsm.variables[cv_msk][0,0,j1:j2,i1:i2]
+    if nb_dim==3: XMSK = id_lsm.variables[cv_msk][0,j1:j2,i1:i2]
+    if nb_dim==2: XMSK = id_lsm.variables[cv_msk][j1:j2,i1:i2]
+    (nj,ni) = nmp.shape(XMSK)
+
     if l_apply_lap:
+        print ' *** Reading e1t and e2t !'
         XE1T2 = id_lsm.variables['e1t'][0,j1:j2,i1:i2]
         XE2T2 = id_lsm.variables['e2t'][0,j1:j2,i1:i2]
-        (nj,ni) = nmp.shape(XE1T2)
         XE1T2 = XE1T2*XE1T2
         XE2T2 = XE2T2*XE2T2
+    if l_apply_hgrad:
+        print ' *** Reading e1u and e2v !'
+        XE1U = id_lsm.variables['e1u'][0,j1:j2,i1:i2]
+        XE2V = id_lsm.variables['e2v'][0,j1:j2,i1:i2]
+        print ' *** Reading umask and vmask !'
+        if nb_dim==4:
+            UMSK = id_lsm.variables['umask'][0,0,j1:j2,i1:i2]
+            VMSK = id_lsm.variables['vmask'][0,0,j1:j2,i1:i2]
+        if nb_dim==3:
+            UMSK = id_lsm.variables['umask'][0,j1:j2,i1:i2]
+            VMSK = id_lsm.variables['vmask'][0,j1:j2,i1:i2]
+        if nb_dim==2:
+            UMSK = id_lsm.variables['umask'][j1:j2,i1:i2]
+            VMSK = id_lsm.variables['vmask'][j1:j2,i1:i2]
     if l_save_nc:
         Xlon = id_lsm.variables['gphit'][j1:j2,i1:i2]
         Xlat = id_lsm.variables['glamt'][j1:j2,i1:i2]
@@ -475,9 +499,10 @@ for jt in range(jt0,Nt):
         Xplot  = id_fld.variables[cv_in][jt,j1:j2,i1:i2] ; # t, y, x
         
     id_fld.close()
-    print "Done!"
+    print "Done!\n"
 
     if l_apply_lap:
+        print ' *** Computing Laplacian of "'+cv_in+'"!'
         lx = nmp.zeros((nj,ni))
         ly = nmp.zeros((nj,ni))
         lx[:,1:ni-1] = 1.E9*(Xplot[:,2:ni] -2.*Xplot[:,1:ni-1] + Xplot[:,0:ni-2])/XE1T2[:,1:ni-1]
@@ -485,13 +510,36 @@ for jt in range(jt0,Nt):
         Xplot[:,:] = lx[:,:] + ly[:,:]
         del lx, ly
 
+    if l_apply_hgrad:
+        print ' *** Computing gradient of "'+cv_in+'"!'
+        lx = nmp.zeros((nj,ni))
+        ly = nmp.zeros((nj,ni))
+
+        if l_smooth: bt.smoother(Xplot, XMSK, nb_smooth=nb_smooth)
+        
+        # Zonal gradient on T-points:
+        lx[:,1:ni-1] = (Xplot[:,2:ni] - Xplot[:,0:ni-2]) / (XE1U[:,1:ni-1] + XE1U[:,0:ni-2]) * UMSK[:,1:ni-1] * UMSK[:,0:ni-2]
+        lx[:,:] = XMSK[:,:]*lx[:,:]
+        #bnc.dump_2d_field('dsst_dx_gridT.nc', lx, xlon=Xlon, xlat=Xlat, name='dsst_dx')
+        # Meridional gradient on T-points:
+        ly[1:nj-1,:] = (Xplot[2:nj,:] - Xplot[0:nj-2,:]) / (XE2V[1:nj-1,:] + XE2V[0:nj-2,:]) * VMSK[1:nj-1,:] * VMSK[0:nj-2,:]
+        ly[:,:] = XMSK[:,:]*ly[:,:]
+        #bnc.dump_2d_field('dsst_dy_gridT.nc', ly, xlon=Xlon, xlat=Xlat, name='dsst_dy')
+        Xplot[:,:] = 0.0
+        # Modulus of vector gradient:        
+        Xplot[:,:] = nmp.sqrt(  lx[:,:]*lx[:,:] + ly[:,:]*ly[:,:] )
+        #bnc.dump_2d_field('mod_grad_sst.nc', Xplot, xlon=Xlon, xlat=Xlat, name='dsst')
+        del lx, ly
+
+
+    print ''
     if not l_show_lsm and jt == jt0: ( nj , ni ) = nmp.shape(Xplot)
     print '  *** dimension of array => ', ni, nj, nmp.shape(Xplot)
 
     if l_save_nc:
-        cf_out = 'nc/'+cv_out+'_NEMO_'+CNEMO+'_'+CBOX+'_'+cday+'_'+chour+'_'+cpal_fld+'.nc'
+        cf_out = 'nc/'+CWHAT+'_NEMO_'+CNEMO+'_'+CBOX+'_'+cday+'_'+chour+'_'+cpal_fld+'.nc'
         print ' Saving in '+cf_out
-        bnc.dump_2d_field(cf_out, Xplot, xlon=Xlon, xlat=Xlat, name=cv_out)
+        bnc.dump_2d_field(cf_out, Xplot, xlon=Xlon, xlat=Xlat, name=CWHAT)
         print ''
 
 
@@ -508,7 +556,7 @@ for jt in range(jt0,Nt):
     del Xplot
 
     # Ice
-    if not cv_out == 'MLD' and l_do_ice:
+    if not CWHAT == 'MLD' and l_do_ice:
         print "Reading record #"+str(jt)+" of "+cv_ice+" in "+cf_ice
         id_ice = Dataset(cf_ice)
         XICE  = id_ice.variables[cv_ice][jt,:,:] ; # t, y, x

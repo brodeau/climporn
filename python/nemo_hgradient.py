@@ -34,9 +34,10 @@ import barakuda_colmap as bcm
 import barakuda_tool as bt
 import barakuda_ncio as bnc
 
-
-nb_smooth_sst  = 10
-nb_smooth_mask = 10
+#l_smooth_sst = True ; nb_smooth_sst  = 10
+#l_smooth_msk = True ; nb_smooth_mask = 10
+l_smooth_sst = False ; nb_smooth_sst  = 10
+l_smooth_msk = False ; nb_smooth_mask = 10
 
 rthr_grad_sst = 0.001
 ramp_ahtt     = 15.
@@ -84,8 +85,6 @@ l_save_nc = True ; # save the field we built in a netcdf file !!!
 
 l_apply_lap   = False
 l_apply_hgrad = True
-l_smooth_sst = True
-l_smooth_msk = True
 
 narg = len(sys.argv)
 if narg < 7: print 'Usage: '+sys.argv[0]+' <NEMOCONF> <BOX> <file> <variable> <LSM_file> <YYYYMMDD (start)>'; sys.exit(0)
@@ -364,27 +363,28 @@ if not l_notime: Nt = len(vtime)
 
 
 if l_show_lsm or l_apply_lap or l_apply_hgrad:
+    cv_msk = 'tmask'
     bt.chck4f(cf_lsm)
     id_lsm = Dataset(cf_lsm)
-    nb_dim = len(id_lsm.variables['tmask'].dimensions)
+    nb_dim = len(id_lsm.variables[cv_msk].dimensions)
     print ' The mesh_mask has '+str(nb_dim)+' dimmensions!'
-    if l_show_lsm:
-        cv_msk = 'tmask'
-        if nb_dim==4: TMSK = id_lsm.variables[cv_msk][0,0,j1:j2,i1:i2]
-        if nb_dim==3: TMSK = id_lsm.variables[cv_msk][0,j1:j2,i1:i2]
-        if nb_dim==2: TMSK = id_lsm.variables[cv_msk][j1:j2,i1:i2]
-        (nj,ni) = nmp.shape(TMSK)
-    if l_apply_lap or l_apply_hgrad:
+    print ' *** Reading '+cv_msk+' !'
+    if nb_dim==4: XMSK = id_lsm.variables[cv_msk][0,0,j1:j2,i1:i2]
+    if nb_dim==3: XMSK = id_lsm.variables[cv_msk][0,j1:j2,i1:i2]
+    if nb_dim==2: XMSK = id_lsm.variables[cv_msk][j1:j2,i1:i2]
+    (nj,ni) = nmp.shape(XMSK)
+
+    if l_apply_lap:
+        print ' *** Reading e1t and e2t !'
         XE1T2 = id_lsm.variables['e1t'][0,j1:j2,i1:i2]
         XE2T2 = id_lsm.variables['e2t'][0,j1:j2,i1:i2]
-        (nj,ni) = nmp.shape(XE1T2)
         XE1T2 = XE1T2*XE1T2
-        XE2T2 = XE2T2*XE2T2                
+        XE2T2 = XE2T2*XE2T2
     if l_apply_hgrad:
         print ' *** Reading e1u and e2v !'
         XE1U = id_lsm.variables['e1u'][0,j1:j2,i1:i2]
         XE2V = id_lsm.variables['e2v'][0,j1:j2,i1:i2]
-        (nj,ni) = nmp.shape(XE1U)
+        print ' *** Reading umask and vmask !'
         if nb_dim==4:
             UMSK = id_lsm.variables['umask'][0,0,j1:j2,i1:i2]
             VMSK = id_lsm.variables['vmask'][0,0,j1:j2,i1:i2]
@@ -519,21 +519,20 @@ for jt in range(jt0,Nt):
         lx = nmp.zeros((nj,ni))
         ly = nmp.zeros((nj,ni))
 
-        if l_smooth_sst: bt.smoother(Xplot, TMSK, nb_smooth=nb_smooth_sst)
+        if l_smooth_sst: bt.smoother(Xplot, XMSK, nb_smooth=nb_smooth_sst)
         
         # Zonal gradient on T-points:
         lx[:,1:ni-1] = (Xplot[:,2:ni] - Xplot[:,0:ni-2]) / (XE1U[:,1:ni-1] + XE1U[:,0:ni-2]) * UMSK[:,1:ni-1] * UMSK[:,0:ni-2]
-        lx[:,:] = TMSK[:,:]*lx[:,:]
+        lx[:,:] = XMSK[:,:]*lx[:,:]
         bnc.dump_2d_field('dsst_dx_gridT.nc', lx, xlon=Xlon, xlat=Xlat, name='dsst_dx')
 
         # Meridional gradient on T-points:
         ly[1:nj-1,:] = (Xplot[2:nj,:] - Xplot[0:nj-2,:]) / (XE2V[1:nj-1,:] + XE2V[0:nj-2,:]) * VMSK[1:nj-1,:] * VMSK[0:nj-2,:]
-        ly[:,:] = TMSK[:,:]*ly[:,:]
+        ly[:,:] = XMSK[:,:]*ly[:,:]
         bnc.dump_2d_field('dsst_dy_gridT.nc', ly, xlon=Xlon, xlat=Xlat, name='dsst_dy')
 
-
-        
-        # Modulus of vector gradient:
+        Xplot[:,:] = 0.0
+        # Modulus of vector gradient:        
         Xplot[:,:] = nmp.sqrt(  lx[:,:]*lx[:,:] + ly[:,:]*ly[:,:] )
         bnc.dump_2d_field('mod_grad_sst.nc', Xplot, xlon=Xlon, xlat=Xlat, name='dsst')
 
@@ -547,7 +546,7 @@ for jt in range(jt0,Nt):
         rmask_aht = nmp.minimum(rmask_aht, 18.0) # nowhere higher than 10 (10 x aht_0)        
 
         # Smoothing the mask:
-        if l_smooth_msk: bt.smoother(rmask_aht, TMSK, nb_smooth=nb_smooth_mask)
+        if l_smooth_msk: bt.smoother(rmask_aht, XMSK, nb_smooth=nb_smooth_mask)
 
         rmask_aht = nmp.maximum(rmask_aht,  0.0)
         rmask_aht = nmp.minimum(rmask_aht, 15.0) # nowhere higher than 10 (10 x aht_0)
@@ -578,7 +577,7 @@ for jt in range(jt0,Nt):
 
     plt.axis([ 0, ni, 0, nj])
 
-    idx_miss = nmp.where( TMSK < 0.001)
+    idx_miss = nmp.where( XMSK < 0.001)
     Xplot[idx_miss] = nmp.nan
 
     cf = plt.imshow(Xplot[:,:], cmap = pal_fld, norm = norm_fld, interpolation='none')
@@ -592,7 +591,7 @@ for jt in range(jt0,Nt):
         id_ice.close()
         print "Done!"
 
-        #XM[:,:] = TMSK[:,:]
+        #XM[:,:] = XMSK[:,:]
         #bt.drown(XICE, XM, k_ew=2, nb_max_inc=10, nb_smooth=10)
         #ci = plt.contourf(XICE[:,:], vcont_ice, cmap = pal_ice, norm = norm_ice) #
 
@@ -602,7 +601,7 @@ for jt in range(jt0,Nt):
 
     #LOLO: rm ???
     if l_show_lsm:
-        clsm = plt.imshow(nmp.ma.masked_where(TMSK>0.0001, TMSK), cmap = pal_lsm, norm = norm_lsm, interpolation='none')
+        clsm = plt.imshow(nmp.ma.masked_where(XMSK>0.0001, XMSK), cmap = pal_lsm, norm = norm_lsm, interpolation='none')
 
     if l_show_cb:
         ax2 = plt.axes(vcb)
