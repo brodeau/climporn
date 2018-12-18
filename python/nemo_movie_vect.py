@@ -66,6 +66,9 @@ cf_logo_ige = '/home/brodeau/util/logos/IGE_blanc_notext.png'
 l_add_logo_prace = True
 cf_logo_prace = '/home/brodeau/util/logos/PRACE_blanc.png'
 
+l_add_topo_land = True ; rof_log = 150.
+cf_topo_land = '/mnt/meom/workdir/brodeau/eNATL60/eNATL60-I/z_ETOPO1_21601x10801-eNATL60_ice.nc'
+
 
 l_save_nc = False ; # save the field we built in a netcdf file !!!
 
@@ -161,6 +164,14 @@ if CNEMO == 'eNATL60':
         i1=0   ; j1=0    ; i2=Ni0 ; j2=Nj0  ; rfact_zoom=1440./float(Nj0) ; vcb=[0.61, 0.1, 0.36, 0.018]  ; font_rat=8.*rfact_zoom
         x_clock = 1600 ; y_clock = 200 ; x_logo=2200 ; y_logo=1200
 
+    elif CBOX == 'EUROPA':
+        i2=6400 ; j2=4000 ; i1=i2-2*1920; j1=j2-2*1080; rfact_zoom=0.5   ; vcb=[0.5, 0.875, 0.485, 0.02] ; font_rat=2.*rfact_zoom
+        x_clock = 30 ; y_clock = 1040 ; x_logo = 1500 ; y_logo = 16 ; l_annotate_name=False
+        
+    elif CBOX == 'EUROPAs':
+        i2=6500 ; j2=3600 ; i1=i2-1920; j1=j2-1080; rfact_zoom=1.  ; vcb=[0.5, 0.875, 0.485, 0.02] ; font_rat=2.*rfact_zoom
+        x_clock = 30 ; y_clock = 1040 ; x_logo = 1500 ; y_logo = 16 ; l_annotate_name=False
+         
     elif   CBOX == 'ALLFR':
         i1=0   ; j1=0    ; i2=Ni0 ; j2=Nj0  ; rfact_zoom=1. ; vcb=[0.59, 0.1, 0.39, 0.018]  ; font_rat=8.*rfact_zoom
         x_clock = 4000 ; y_clock = 200 ; x_logo = 6000 ; y_logo  = 50; l_show_clock=False ; l_annotate_name=False; l_add_logo=False
@@ -374,6 +385,18 @@ if l_show_lsm or l_do_crl or l_do_cof or l_do_cspd:
     print 'Done!\n'
 
 
+if l_add_topo_land:
+    bt.chck4f(cf_topo_land)
+    id_top = Dataset(cf_topo_land)
+    print ' *** Reading "z" into:\n'+cf_topo_land
+    xtopo = id_top.variables['z'][0,j1:j2,i1:i2]
+    id_top.close()
+    if nmp.shape(xtopo) != (nj,ni):
+        print 'ERROR: topo and mask do not agree in shape!'; sys.exit(0)
+    xtopo = xtopo*(1. - XMSK)
+    bnc.dump_2d_field('topo_'+CBOX+'.nc', xtopo, name='z')
+        
+    
 
 params = { 'font.family':'Helvetica Neue',
            'font.weight':    'normal',
@@ -399,9 +422,14 @@ else:
     norm_fld = colors.Normalize(vmin = tmin, vmax = tmax, clip = False)
 
 
-if l_show_lsm:
-    pal_lsm = bcm.chose_colmap('land_dark')
-    norm_lsm = colors.Normalize(vmin = 0., vmax = 1., clip = False)
+if l_show_lsm or l_add_topo_land:
+    if l_add_topo_land:
+        xtopo = nmp.log10(xtopo+rof_log)
+        pal_lsm = bcm.chose_colmap('gray_r')
+        norm_lsm = colors.Normalize(vmin = nmp.log10(-100.+rof_log), vmax = nmp.log10(4000.+rof_log), clip = False)        
+    else:
+        pal_lsm = bcm.chose_colmap('land_dark')
+        norm_lsm = colors.Normalize(vmin = 0., vmax = 1., clip = False)
 
 if l_do_ice:
     pal_ice = bcm.chose_colmap(cpal_ice)
@@ -539,6 +567,10 @@ for jt in range(jt0,Nt):
     idx_miss = nmp.where( XMSK < 0.001)
     Xplot[idx_miss] = nmp.nan
 
+    if l_add_topo_land:
+        idx_miss = nmp.where( XMSK > 0.01)
+        xtopo[idx_miss] = nmp.nan
+    
     cf = plt.imshow(Xplot[:,:], cmap = pal_fld, norm = norm_fld, interpolation='none')
 
     # Ice
@@ -558,8 +590,12 @@ for jt in range(jt0,Nt):
         del XICE
 
     #LOLO: rm ???
-    if l_show_lsm:
-        clsm = plt.imshow(nmp.ma.masked_where(XMSK>0.0001, XMSK), cmap = pal_lsm, norm = norm_lsm, interpolation='none')
+    if l_show_lsm or l_add_topo_land:
+        if l_add_topo_land:
+            clsm = plt.imshow(nmp.ma.masked_where(XMSK>0.0001, xtopo), cmap = pal_lsm, norm = norm_lsm, interpolation='none')
+            plt.contour(XMSK, [0.9], colors='k', linewidths=0.5)
+        else:
+            clsm = plt.imshow(nmp.ma.masked_where(XMSK>0.0001, XMSK), cmap = pal_lsm, norm = norm_lsm, interpolation='none')
 
     if l_show_cb:
         ax2 = plt.axes(vcb)
