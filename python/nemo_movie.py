@@ -65,6 +65,9 @@ cf_logo_ige = '/home/brodeau/util/logos/IGE_blanc_notext.png'
 l_add_logo_prace = True
 cf_logo_prace = '/home/brodeau/util/logos/PRACE_blanc.png'
 
+l_add_topo_land = True
+cf_topo_land = '/mnt/meom/workdir/brodeau/eNATL60/eNATL60-I/z_ETOPO1_21601x10801-eNATL60_ice.nc'
+
 
 l_save_nc = False ; # save the field we built in a netcdf file !!!
 
@@ -164,6 +167,16 @@ if CNEMO == 'eNATL60':
         i1=0   ; j1=0    ; i2=Ni0 ; j2=Nj0  ; rfact_zoom=1440./float(Nj0) ; vcb=[0.61, 0.1, 0.36, 0.018]  ; font_rat=8.*rfact_zoom
         x_clock = 1600 ; y_clock = 200 ; x_logo=2200 ; y_logo=1200
 
+    elif CBOX == 'EUROPA':
+        i2=6400 ; j2=4000 ; i1=i2-2*1920; j1=j2-2*1080; rfact_zoom=0.5   ; vcb=[0.5, 0.875, 0.485, 0.02] ; font_rat=2.*rfact_zoom
+        x_clock = 30 ; y_clock = 1040 ; x_logo = 1500 ; y_logo = 16 ; l_annotate_name=False
+        if CWHAT == 'SST': tmin=0. ;  tmax=25.   ;  df = 1. ; cpal_fld = 'ncview_nrl'
+        
+    elif CBOX == 'EUROPAs':
+        i2=6500 ; j2=3600 ; i1=i2-1920; j1=j2-1080; rfact_zoom=1.  ; vcb=[0.5, 0.875, 0.485, 0.02] ; font_rat=2.*rfact_zoom
+        x_clock = 30 ; y_clock = 1040 ; x_logo = 1500 ; y_logo = 16 ; l_annotate_name=False
+        if CWHAT == 'SST': tmin=6. ;  tmax=18.   ;  df = 1. ; cpal_fld = 'ncview_nrl'
+        
     elif   CBOX == 'ALLFR':
         i1=0   ; j1=0    ; i2=Ni0 ; j2=Nj0  ; rfact_zoom=1. ; vcb=[0.59, 0.1, 0.39, 0.018]  ; font_rat=8.*rfact_zoom
         x_clock = 4000 ; y_clock = 200 ; x_logo = 6000 ; y_logo  = 50; l_show_clock=False ; l_annotate_name=False; l_add_logo=False
