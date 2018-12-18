@@ -74,6 +74,8 @@ l_save_nc = False ; # save the field we built in a netcdf file !!!
 l_apply_lap   = False
 l_apply_hgrad = False
 
+cb_extend = 'both' ;#colorbar extrema
+
 narg = len(sys.argv)
 if narg < 7: print 'Usage: '+sys.argv[0]+' <NEMOCONF> <BOX> <WHAT (SST, SSH, MLD, LAP_SSH, GRAD_SST)> <file> <LSM_file> <YYYYMMDD (start)>'; sys.exit(0)
 CNEMO  = sys.argv[1]
@@ -190,8 +192,9 @@ if CNEMO == 'eNATL60':
         l_annotate_name=False
 
     elif CBOX == 'Med+BS':
-        i1=5400; j1=1530; i2=Ni0 ; j2=3310 ; rfact_zoom=1440./float(j2-j1)   ; vcb=[0.5, 0.875, 0.485, 0.02] ; font_rat=2.*rfact_zoom
-        l_annotate_name=False
+        i1=5400; j1=1530; i2=Ni0 ; j2=3310 ; rfact_zoom=1440./float(j2-j1)   ; vcb=[0.02, 0.05, 0.4, 0.02] ; font_rat=3.*rfact_zoom
+        l_annotate_name=False ; l_add_logo_ige=False ; l_add_logo_prace=False
+        x_clock = 100 ; y_clock = 170 ; x_logo = 2090 ; y_logo  = 10
         if CWHAT == 'SST': tmin=7. ;  tmax=25.   ;  df = 1. ; cpal_fld = 'ncview_nrl'
 
     elif CBOX == 'BlackSea':
@@ -616,7 +619,7 @@ for jt in range(jt0,Nt):
 
     if l_show_cb:
         ax2 = plt.axes(vcb)
-        clb = mpl.colorbar.ColorbarBase(ax2, ticks=vc_fld, cmap=pal_fld, norm=norm_fld, orientation='horizontal', extend='both')
+        clb = mpl.colorbar.ColorbarBase(ax2, ticks=vc_fld, cmap=pal_fld, norm=norm_fld, orientation='horizontal', extend=cb_extend)
         cb_labs = []
         if cb_jump > 1:
             cpt = 0

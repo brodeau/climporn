@@ -74,7 +74,7 @@ l_save_nc = False ; # save the field we built in a netcdf file !!!
 
 romega = 2.*nmp.pi/86400.0
 
-
+cb_extend = 'both' ;#colorbar extrema
 
 narg = len(sys.argv)
 if narg < 10: print 'Usage: '+sys.argv[0]+' <NEMOCONF> <BOX> <WHAT (CURL,CURLOF,CSPEED)> <fileX> <varX> <fileY> <varY> <LSM_file> <YYYYMMDD (start)>'; sys.exit(0)
@@ -97,6 +97,7 @@ elif CWHAT == 'CURLOF':
     l_do_cof = True  ; # do curl/f
 elif CWHAT == 'CSPEED':
     l_do_cspd = True  ; # do current speed
+    cb_extend = 'max' ;#colorbar extrema
 else:
     print ' ERROR: unknow diagnostic "'+CWHAT+'" !!!'
     sys.exit(0)
@@ -125,6 +126,7 @@ elif cvx_in=='sozocrtx' and cvy_in=='somecrty' and l_do_cspd:
     cunit = 'm/s' ; cb_jump = 1
     if CBOX == 'Balear': tmin=0. ;  tmax=1.2 ;  df = 0.2 ; cpal_fld = 'ncview_hotres'
     #if CBOX == 'Balear': tmin=0. ;  tmax=1. ;  df = 0.2
+    if CBOX == 'Med+BS': tmin=0. ;  tmax=4. ;  df = 0.5 ; cpal_fld = 'ncview_hotres'
     
 elif cvx_in=='vozocrtx' and cvy_in=='vomecrty' and l_do_cof:
     l_3d_field = True
@@ -185,8 +187,10 @@ if CNEMO == 'eNATL60':
         l_annotate_name=False
 
     elif CBOX == 'Med+BS':
-        i1=5400; j1=1530; i2=Ni0 ; j2=3310 ; rfact_zoom=1440./float(j2-j1)   ; vcb=[0.5, 0.875, 0.485, 0.02] ; font_rat=2.*rfact_zoom
-        l_annotate_name=False
+        i1=5400; j1=1530; i2=Ni0 ; j2=3310 ; rfact_zoom=1440./float(j2-j1)   ; vcb=[0.02, 0.05, 0.4, 0.02] ; font_rat=3.*rfact_zoom
+        l_annotate_name=False ; l_add_logo_ige=False ; l_add_logo_prace=False
+        x_clock = 100 ; y_clock = 170 ; x_logo = 2090 ; y_logo  = 10
+        if CWHAT == 'SST': tmin=7. ;  tmax=25.   ;  df = 1. ; cpal_fld = 'ncview_nrl'
 
     elif CBOX == 'BlackSea':
         i1=Ni0-1920; j1=3330-1080; i2=Ni0 ; j2=3330 ; rfact_zoom=1.   ; vcb=[0.5, 0.875, 0.485, 0.02] ; font_rat=2.*rfact_zoom
@@ -599,7 +603,7 @@ for jt in range(jt0,Nt):
 
     if l_show_cb:
         ax2 = plt.axes(vcb)
-        clb = mpl.colorbar.ColorbarBase(ax2, ticks=vc_fld, cmap=pal_fld, norm=norm_fld, orientation='horizontal', extend='both')
+        clb = mpl.colorbar.ColorbarBase(ax2, ticks=vc_fld, cmap=pal_fld, norm=norm_fld, orientation='horizontal', extend=cb_extend)
         cb_labs = []
         if cb_jump > 1:
             cpt = 0
