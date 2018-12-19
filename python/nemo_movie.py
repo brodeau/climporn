@@ -77,7 +77,7 @@ l_apply_hgrad = False
 cb_extend = 'both' ;#colorbar extrema
 
 narg = len(sys.argv)
-if narg < 7: print 'Usage: '+sys.argv[0]+' <NEMOCONF> <BOX> <WHAT (SST, SSH, MLD, LAP_SSH, GRAD_SST)> <file> <LSM_file> <YYYYMMDD (start)>'; sys.exit(0)
+if narg < 7: print 'Usage: '+sys.argv[0]+' <NEMOCONF> <BOX> <WHAT (SST, SSH, MLD, SSU, SSV, LAP_SSH, GRAD_SST)> <file> <LSM_file> <YYYYMMDD (start)>'; sys.exit(0)
 CNEMO  = sys.argv[1]
 CBOX   = sys.argv[2]
 CWHAT  = sys.argv[3]
@@ -87,11 +87,11 @@ cf_clock0=sys.argv[6]
 
 x_logo  = 50 ; y_logo  = 50
 
-
+cv_msk = 'tmask'
 
 
 if   CWHAT == 'MLD':
-    cv_in in ['somxl010']    
+    cv_in = 'somxl010'
     tmin=0. ;  tmax=1800.  ;  df = 50. ; cpal_fld = 'ncview_hotres' ;     cb_jump = 4
     cunit = r'MLD (m)'
     l_show_cb = True
@@ -114,9 +114,22 @@ elif CWHAT == 'GRAD_SST':
     #tmin=4. ;  tmax=20.   ;  df = 1. ; cpal_fld = 'PuBu'
     cunit = r'$\left|\vec{\nabla}SST\right|$ (K/m)'
     l_show_cb = True
-    
+
+elif CWHAT == 'SSU':
+    cv_in = 'sozocrtx'
+    tmin=-0.8 ;  tmax=-tmin  ;  df = 0.1 ; cpal_fld = 'bone' ; cb_jump = 1
+    cunit = r'Zonal component of current speed [m/s]'
+    cv_msk = 'umask' ; l_show_cb = True
+
+elif CWHAT == 'SSV':
+    cv_in = 'somecrty'
+    tmin=-1. ;  tmax=-tmin  ;  df = 0.2 ; cpal_fld = 'bone' ; cb_jump = 1
+    cunit = r'Meridional component of current speed [m/s]'
+    cv_msk = 'vmask' ; l_show_cb = True
+
+
 elif CWHAT == 'SSH':
-    cv_in == 'sossheig'    
+    cv_in = 'sossheig'    
     #cpal_fld = 'ncview_jaisnc'
     #cpal_fld = 'PuBu'
     #cpal_fld = 'RdBu'
@@ -128,7 +141,7 @@ elif CWHAT == 'SSH':
     cunit = r'SSH (m)'
 
 elif CWHAT == 'LAP_SSH':
-    cv_in == 'sossheig'
+    cv_in = 'sossheig'
     l_apply_lap = True
     #cpal_fld = 'on3' ; tmin=-1.2 ;  tmax=2.3   ;  df = 0.05 ; l_apply_lap = True
     cpal_fld = 'on2' ; tmin=-1.2 ;  tmax=1.2   ;  df = 0.05 ; 
@@ -138,12 +151,12 @@ elif CWHAT == 'LAP_SSH':
     
 
 elif CWHAT == 'Amplitude':
-    cv_in == 'r'    
+    cv_in = 'r'    
     cpal_fld = 'RdBu_r' ; tmin=-0.5 ;  tmax=-tmin   ;  df = 0.1 ; cb_jump = 1
     cunit = r'Amplitude (m)'
 
 elif CWHAT == 'Phase':
-    cv_in == 'phi'    
+    cv_in = 'phi'    
     cpal_fld = 'RdBu_r' ; tmin=-30. ;  tmax=-tmin   ;  df = 5. ; cb_jump = 1
     #
     cunit = r'Phase (deg.)'
@@ -374,7 +387,6 @@ if not l_notime: Nt = len(vtime)
 
 
 if l_show_lsm or l_apply_lap or l_apply_hgrad or l_add_topo_land:
-    cv_msk = 'tmask'
     bt.chck4f(cf_lsm)
     id_lsm = Dataset(cf_lsm)
     nb_dim = len(id_lsm.variables[cv_msk].dimensions)
