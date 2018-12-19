@@ -192,7 +192,7 @@ if CNEMO == 'eNATL60':
         l_annotate_name=False
 
     elif CBOX == 'Med+BS':
-        i1=5400; j1=1530; i2=Ni0 ; j2=3310 ; rfact_zoom=1440./float(j2-j1)   ; vcb=[0.02, 0.05, 0.4, 0.02] ; font_rat=3.*rfact_zoom
+        i1=5400; j1=1530; i2=Ni0 ; j2=3310 ; rfact_zoom=1440./float(j2-j1)   ; vcb=[0.025, 0.06, 0.4, 0.02] ; font_rat=3.*rfact_zoom
         l_annotate_name=False ; l_add_logo_ige=False ; l_add_logo_prace=False
         x_clock = 100 ; y_clock = 170 ; x_logo = 2090 ; y_logo  = 10
         if CWHAT == 'SST': tmin=7. ;  tmax=25.   ;  df = 1. ; cpal_fld = 'ncview_nrl'
@@ -626,12 +626,12 @@ for jt in range(jt0,Nt):
             for rr in vc_fld:
                 if cpt % cb_jump == 0:
                     if df >= 1.: cb_labs.append(str(int(rr)))
-                    if df <  1.: cb_labs.append(str(round(rr,int(nmp.ceil(nmp.log10(1./df))))))
+                    if df <  1.: cb_labs.append(str(round(rr,int(nmp.ceil(nmp.log10(1./df)))+1) ))
                 else:
                     cb_labs.append(' ')
                 cpt = cpt + 1
         else:
-            for rr in vc_fld: cb_labs.append(str(round(rr,int(nmp.ceil(nmp.log10(1./df))))))
+            for rr in vc_fld: cb_labs.append(str(round(rr,int(nmp.ceil(nmp.log10(1./df)))+1) ))
 
         clb.ax.set_xticklabels(cb_labs, **cfont_clb)
         clb.set_label(cunit, **cfont_clb)
@@ -658,18 +658,19 @@ for jt in range(jt0,Nt):
         im = image.imread(datafile)
         #im[:, :, -1] = 0.5  # set the alpha channel
         fig.figimage(im, x_logo, y_logo, zorder=9)
+        del datafile, im
         #
     if l_add_logo_ige:
-        del datafile, im
         datafile = cbook.get_sample_data(cf_logo_ige, asfileobj=False)
         im = image.imread(datafile)
         fig.figimage(im, x_logo+144, y_logo-150., zorder=9)
-    if l_add_logo_prace:
         del datafile, im
+        #
+    if l_add_logo_prace:
         datafile = cbook.get_sample_data(cf_logo_prace, asfileobj=False)
         im = image.imread(datafile)
         fig.figimage(im, x_logo-77, y_logo-140., zorder=9)
-
+        del datafile, im
 
     plt.savefig(cfig, dpi=dpi, orientation='portrait', facecolor='k')
     print cfig+' created!\n'
