@@ -77,7 +77,7 @@ romega = 2.*nmp.pi/86400.0
 cb_extend = 'both' ;#colorbar extrema
 
 narg = len(sys.argv)
-if narg < 10: print 'Usage: '+sys.argv[0]+' <NEMOCONF> <BOX> <WHAT (CURL,CURLOF,CSPEED)> <fileX> <varX> <fileY> <varY> <LSM_file> <YYYYMMDD (start)>'; sys.exit(0)
+if narg < 10: print 'Usage: '+sys.argv[0]+' <NEMOCONF> <BOX> <WHAT (CURL,CURLOF,CSPEED,TKE)> <fileX> <varX> <fileY> <varY> <LSM_file> <YYYYMMDD (start)>'; sys.exit(0)
 CNEMO  = sys.argv[1]
 CBOX   = sys.argv[2]
 CWHAT  = sys.argv[3]
@@ -89,15 +89,41 @@ x_logo  = 50 ; y_logo  = 50
 
 
 
-l_do_crl=False; l_do_cof=False; l_do_cspd=False ; 
+l_do_crl=False
+l_do_cof=False
+l_do_cspd=False
+l_do_tke=False
+l_do_eke=False
 
 if   CWHAT == 'CURL':
     l_do_crl = True  ; # do curl (relative-vorticity) !!!
+    
 elif CWHAT == 'CURLOF':
     l_do_cof = True  ; # do curl/f
+    
 elif CWHAT == 'CSPEED':
     l_do_cspd = True  ; # do current speed
+    #tmin=0. ; tmax=1.4 ; df = 0.1  ; cpal_fld = 'on2'
+    #tmin=0. ; tmax=2.0 ; df = 0.25 ; cpal_fld = 'on3'
+    tmin=0. ; tmax=1.8 ; df = 0.2 ; cpal_fld = 'on3' ; # Poster full-res!!!
+    l_save_nc=False
+    cunit = 'Surface current speed [m/s]' ; cb_jump = 1
     cb_extend = 'max' ;#colorbar extrema
+
+elif CWHAT == 'TKE':
+    l_do_tke = True
+    tmin=0. ; tmax=3. ; df = 0.25 ; cpal_fld = 'ncview_hotres' ; # Poster full-res!!!
+    l_save_nc=False
+    cunit = r'Turbulent Kinetic Energy [$m^2/s^2$]' ; cb_jump = 1
+    cb_extend = 'max' ;#colorbar extrema
+
+elif CWHAT == 'EKE':
+    l_do_eke = True
+    tmin=0. ; tmax=3. ; df = 0.25 ; cpal_fld = 'ncview_hotres' ; # Poster full-res!!!
+    l_save_nc=True
+    cunit = r'E Kinetic Energy [$m^2/s^2$]' ; cb_jump = 1
+    cb_extend = 'max' ;#colorbar extrema
+    
 else:
     print ' ERROR: unknow diagnostic "'+CWHAT+'" !!!'
     sys.exit(0)
@@ -121,15 +147,11 @@ elif cvx_in=='sozocrtx' and cvy_in=='somecrty' and l_do_crl:
 
 elif cvx_in=='sozocrtx' and cvy_in=='somecrty' and l_do_cspd:
     # Current speed !
-    l_save_nc=False
-    cpal_fld = 'on2' ; tmin=0. ;  tmax=1.4 ;  df = 0.1
-    cunit = 'Surface current speed [m/s]' ; cb_jump = 1
     if CBOX == 'Balear': tmin=0. ;  tmax=1.2 ;  df = 0.2 ; cpal_fld = 'ncview_hotres'
     #if CBOX == 'Balear': tmin=0. ;  tmax=1. ;  df = 0.2
     #if CBOX == 'Med+BS': tmin=0. ;  tmax=4. ;  df = 0.5 ; cpal_fld = 'ncview_hotres'
     if CBOX == 'Med+BS': tmin=0. ;  tmax=1.5 ;  df = 0.25 ; cpal_fld = 'on3'
-    if CBOX == 'ALLFR':  tmin=0. ;  tmax=2.0 ;  df = 0.25 ; cpal_fld = 'on3'
-    
+        
 elif cvx_in=='vozocrtx' and cvy_in=='vomecrty' and l_do_cof:
     l_3d_field = True
     #cpal_fld = 'on2' ; tmin=-1. ;  tmax=1. ;  df = 0.05
@@ -147,9 +169,9 @@ elif cvx_in=='vozocrtx' and cvy_in=='vomecrty' and l_do_crl:
     l_show_clock = False
     l_add_logo   = False
 
-else:
-    print 'ERROR: we do not know cvx_in and cvy_in! ("'+cvx_in+'", "'+cvy_in+'")'
-    sys.exit(0)
+#else:
+#    print 'ERROR: we do not know cvx_in and cvy_in! ("'+cvx_in+'", "'+cvy_in+'")'
+#    sys.exit(0)
 
     
 if CNEMO == 'eNATL60':
@@ -358,7 +380,7 @@ id_fx.close()
 
 Nt = len(vtime)
 
-if l_show_lsm or l_do_crl or l_do_cof or l_do_cspd:
+if l_show_lsm or l_do_crl or l_do_cof or l_do_cspd or l_do_tke or l_do_eke:
     print "\nReading record metrics in "+cf_lsm
     id_lsm = Dataset(cf_lsm)
     nb_dim = len(id_lsm.variables['tmask'].dimensions)
@@ -454,8 +476,40 @@ else:
 
 
 
-ntpd = 24/dt
 
+
+
+
+
+if l_do_eke:
+    Umean = nmp.zeros((nj,ni))
+    Vmean = nmp.zeros((nj,ni))
+    # Need to go for the mean first!!!
+    print '\n Goint for '+str(Nt)+' snaphots to compute the mean first!!!'
+    for jt in range(jt0,Nt):
+        print "Reading record #"+str(jt)+"..."
+        id_fx = Dataset(cfx_in)
+        if not l_3d_field:
+            XFLD  = id_fx.variables[cvx_in][jt,j1:j2,i1:i2] ; # t, y, x
+        else:
+            XFLD  = id_fx.variables[cvx_in][jt,0,j1:j2,i1:i2] ; # t, y, x
+            id_fx.close()
+        id_fy = Dataset(cfy_in)
+        if not l_3d_field:
+            YFLD  = id_fy.variables[cvy_in][jt,j1:j2,i1:i2] ; # t, y, x
+        else:
+            YFLD  = id_fy.variables[cvy_in][jt,0,j1:j2,i1:i2] ; # t, y, x
+            id_fy.close()
+        print "Done!"
+        # On T-points:
+        Umean[:,2:ni] = Umean[:,2:ni] + 0.5*( XFLD[:,1:ni-1] + XFLD[:,2:ni] )/float(Nt)
+        Vmean[2:nj,:] = Vmean[2:nj,:] + 0.5*( YFLD[1:nj-1,:] + YFLD[2:nj,:] )/float(Nt)
+    print ' time averaging done...\n\n'
+
+
+
+    
+ntpd = 24/dt
 
 vm = vmn
 if isleap(int(cyr0)): vm = vml
@@ -466,6 +520,7 @@ jm = int(cmn0)
 
 
 Xplot = nmp.zeros((nj,ni))
+
 
 for jt in range(jt0,Nt):
 
@@ -553,8 +608,29 @@ for jt in range(jt0,Nt):
         ly[2:nj,:] = 0.5*( YFLD[1:nj-1,:] + YFLD[2:nj,:] )
 
         Xplot[:,:] = nmp.sqrt( lx[:,:]*lx[:,:] + ly[:,:]*ly[:,:] ) * XMSK[:,:]
-        
 
+
+    if l_do_tke:
+        print '\nComputing TKE at T-points ...'
+        lx = nmp.zeros((nj,ni))
+        ly = nmp.zeros((nj,ni))
+
+        lx[:,2:ni] = 0.5*( XFLD[:,1:ni-1] + XFLD[:,2:ni] )
+        ly[2:nj,:] = 0.5*( YFLD[1:nj-1,:] + YFLD[2:nj,:] )
+
+        Xplot[:,:] = ( lx[:,:]*lx[:,:] + ly[:,:]*ly[:,:] ) * XMSK[:,:]
+
+    if l_do_eke:
+        print '\nComputing TKE at T-points ...'
+        lx = nmp.zeros((nj,ni))
+        ly = nmp.zeros((nj,ni))
+
+        lx[:,2:ni] = 0.5*( XFLD[:,1:ni-1] + XFLD[:,2:ni] ) - Umean[:,2:ni]
+        ly[2:nj,:] = 0.5*( YFLD[1:nj-1,:] + YFLD[2:nj,:] ) - Vmean[2:nj,:]
+
+        Xplot[:,:] = ( lx[:,:]*lx[:,:] + ly[:,:]*ly[:,:] ) * XMSK[:,:]
+
+        
     del XFLD,YFLD
 
 
