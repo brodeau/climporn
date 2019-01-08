@@ -542,8 +542,7 @@ for jt in range(jt0,Nt):
     if l_notime:
         Xplot  = id_fld.variables[cv_in][j1:j2,i1:i2]
     else:
-        Xplot  = id_fld.variables[cv_in][jt,j1:j2,i1:i2] ; # t, y, x
-        
+        Xplot  = id_fld.variables[cv_in][jt,j1:j2,i1:i2] ; # t, y, x        
     id_fld.close()
     print "Done!\n"
 
