@@ -119,7 +119,7 @@ elif CWHAT == 'TKE':
 
 elif CWHAT == 'EKE':
     l_do_eke = True
-    tmin=0. ; tmax=3. ; df = 0.25 ; cpal_fld = 'ncview_hotres' ; # Poster full-res!!!
+    tmin=0. ; tmax=2. ; df = 0.25 ; cpal_fld = 'ncview_hotres' ; # Poster full-res!!!
     l_save_nc=True
     cunit = r'E Kinetic Energy [$m^2/s^2$]' ; cb_jump = 1
     cb_extend = 'max' ;#colorbar extrema
