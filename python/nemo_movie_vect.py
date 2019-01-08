@@ -119,7 +119,7 @@ elif CWHAT == 'TKE':
 
 elif CWHAT == 'EKE':
     l_do_eke = True
-    tmin=0. ; tmax=2. ; df = 0.25 ; cpal_fld = 'ncview_hotres' ; # Poster full-res!!!
+    tmin=0. ; tmax=1. ; df = 0.1 ; cpal_fld = 'ncview_hotres' ; # Poster full-res!!!
     l_save_nc=True
     cunit = r'E Kinetic Energy [$m^2/s^2$]' ; cb_jump = 1
     cb_extend = 'max' ;#colorbar extrema
@@ -488,18 +488,21 @@ if l_do_eke:
     print '\n Goint for '+str(Nt)+' snaphots to compute the mean first!!!'
     for jt in range(jt0,Nt):
         print "Reading record #"+str(jt)+"..."
+
         id_fx = Dataset(cfx_in)
         if not l_3d_field:
             XFLD  = id_fx.variables[cvx_in][jt,j1:j2,i1:i2] ; # t, y, x
         else:
             XFLD  = id_fx.variables[cvx_in][jt,0,j1:j2,i1:i2] ; # t, y, x
-            id_fx.close()
+        id_fx.close()
+        
         id_fy = Dataset(cfy_in)
         if not l_3d_field:
             YFLD  = id_fy.variables[cvy_in][jt,j1:j2,i1:i2] ; # t, y, x
         else:
             YFLD  = id_fy.variables[cvy_in][jt,0,j1:j2,i1:i2] ; # t, y, x
-            id_fy.close()
+        id_fy.close()
+        
         print "Done!"
         # On T-points:
         Umean[:,2:ni] = Umean[:,2:ni] + 0.5*( XFLD[:,1:ni-1] + XFLD[:,2:ni] )/float(Nt)
@@ -568,7 +571,7 @@ for jt in range(jt0,Nt):
         print 'j1:j2 =', j1,j2
         print 'i1:i2 =', i1,i2
         XFLD  = id_fx.variables[cvx_in][jt,0,j1:j2,i1:i2] ; # t, y, x
-        id_fx.close()
+    id_fx.close()
     print "Done!"
 
     print "Reading record #"+str(jt)+" of "+cvy_in+" in "+cfy_in
@@ -577,59 +580,41 @@ for jt in range(jt0,Nt):
         YFLD  = id_fy.variables[cvy_in][jt,j1:j2,i1:i2] ; # t, y, x
     else:
         YFLD  = id_fy.variables[cvy_in][jt,0,j1:j2,i1:i2] ; # t, y, x
-        id_fy.close()
+    id_fy.close()
     print "Done!"
 
 
+    lx = nmp.zeros((nj,ni))
+    ly = nmp.zeros((nj,ni))
+
     if l_do_crl or l_do_cof:
-
         print '\nComputing curl...'
-        lx = nmp.zeros((nj,ni))
-        ly = nmp.zeros((nj,ni))
-
         lx[:,1:ni-1] =   e2v[:,2:ni]*YFLD[:,2:ni] - e2v[:,1:ni-1]*YFLD[:,1:ni-1]
         ly[1:nj-1,:] = - e1u[2:nj,:]*XFLD[2:nj,:] + e1u[1:nj-1,:]*XFLD[1:nj-1,:]
-
         if l_do_cof: Xplot[:,:] = ( lx[:,:] + ly[:,:] )*XMSK[:,:] / ( e1f[:,:]*e2f[:,:]*ff[:,:] ) # Relative Vorticity...
         if l_do_crl: Xplot[:,:] = ( lx[:,:] + ly[:,:] )*XMSK[:,:] / ( e1f[:,:]*e2f[:,:] ) * 1000. # Curl...
 
-        del lx, ly
-
-        print '... '+cv_out+' computed!\n'
-
-
-
     if l_do_cspd:
         print '\nComputing current speed at T-points ...'
-        lx = nmp.zeros((nj,ni))
-        ly = nmp.zeros((nj,ni))
-
         lx[:,2:ni] = 0.5*( XFLD[:,1:ni-1] + XFLD[:,2:ni] )
         ly[2:nj,:] = 0.5*( YFLD[1:nj-1,:] + YFLD[2:nj,:] )
-
         Xplot[:,:] = nmp.sqrt( lx[:,:]*lx[:,:] + ly[:,:]*ly[:,:] ) * XMSK[:,:]
-
 
     if l_do_tke:
         print '\nComputing TKE at T-points ...'
-        lx = nmp.zeros((nj,ni))
-        ly = nmp.zeros((nj,ni))
-
         lx[:,2:ni] = 0.5*( XFLD[:,1:ni-1] + XFLD[:,2:ni] )
         ly[2:nj,:] = 0.5*( YFLD[1:nj-1,:] + YFLD[2:nj,:] )
-
         Xplot[:,:] = ( lx[:,:]*lx[:,:] + ly[:,:]*ly[:,:] ) * XMSK[:,:]
+
 
     if l_do_eke:
         print '\nComputing TKE at T-points ...'
-        lx = nmp.zeros((nj,ni))
-        ly = nmp.zeros((nj,ni))
-
         lx[:,2:ni] = 0.5*( XFLD[:,1:ni-1] + XFLD[:,2:ni] ) - Umean[:,2:ni]
         ly[2:nj,:] = 0.5*( YFLD[1:nj-1,:] + YFLD[2:nj,:] ) - Vmean[2:nj,:]
-
         Xplot[:,:] = ( lx[:,:]*lx[:,:] + ly[:,:]*ly[:,:] ) * XMSK[:,:]
 
+    del lx, ly
+    print '... '+cv_out+' computed!\n'
         
     del XFLD,YFLD
 
