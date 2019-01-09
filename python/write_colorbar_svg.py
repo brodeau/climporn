@@ -38,7 +38,7 @@ import barakuda_ncio as bnc
 vmn = [ 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ]
 vml = [ 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ]
 
-fig_type='png'
+fig_type='svg'
 dpi = 110
 color_top = 'white'
 #color_top = 'k'
@@ -77,7 +77,7 @@ romega = 2.*nmp.pi/86400.0
 cb_extend = 'both' ;#colorbar extrema
 
 narg = len(sys.argv)
-if narg < 10: print 'Usage: '+sys.argv[0]+' <NEMOCONF> <BOX> <WHAT (CURL,CURLOF,CSPEED,TKE)> <fileX> <varX> <fileY> <varY> <LSM_file> <YYYYMMDD (start)>'; sys.exit(0)
+if narg < 10: print 'Usage: '+sys.argv[0]+' <NEMOCONF> <BOX> <WHAT (CURL,CURLOF,CSPEED)> <fileX> <varX> <fileY> <varY> <LSM_file> <YYYYMMDD (start)>'; sys.exit(0)
 CNEMO  = sys.argv[1]
 CBOX   = sys.argv[2]
 CWHAT  = sys.argv[3]
@@ -89,42 +89,15 @@ x_logo  = 50 ; y_logo  = 50
 
 
 
-l_do_crl=False
-l_do_cof=False
-l_do_cspd=False
-l_do_tke=False
-l_do_eke=False
+l_do_crl=False; l_do_cof=False; l_do_cspd=False ; 
 
 if   CWHAT == 'CURL':
     l_do_crl = True  ; # do curl (relative-vorticity) !!!
-    
 elif CWHAT == 'CURLOF':
     l_do_cof = True  ; # do curl/f
-    
 elif CWHAT == 'CSPEED':
     l_do_cspd = True  ; # do current speed
-    #tmin=0. ; tmax=1.4 ; df = 0.1  ; cpal_fld = 'on2'
-    #tmin=0. ; tmax=2.0 ; df = 0.25 ; cpal_fld = 'on3'
-    tmin=0. ; tmax=1.8 ; df = 0.2 ; cpal_fld = 'on3' ; # Poster full-res!!!
-    l_save_nc=False
-    cunit = 'Surface current speed [m/s]' ; cb_jump = 1
     cb_extend = 'max' ;#colorbar extrema
-
-elif CWHAT == 'TKE':
-    l_do_tke = True ; l_log_field = False
-    tmin=0. ; tmax=3. ; df = 0.25 ; cpal_fld = 'ncview_hotres'
-    #tmin=0. ; tmax=3. ; df = 0.25 ; cpal_fld = 'ncview_helix2'
-    l_save_nc=False
-    cunit = r'Turbulent Kinetic Energy [$m^2/s^2$]' ; cb_jump = 1
-    cb_extend = 'max' ;#colorbar extrema
-
-elif CWHAT == 'EKE':
-    l_do_eke = True
-    tmin=0. ; tmax=1. ; df = 0.1 ; cpal_fld = 'ncview_hotres' ; # Poster full-res!!!
-    l_save_nc=True
-    cunit = r'E Kinetic Energy [$m^2/s^2$]' ; cb_jump = 1
-    cb_extend = 'max' ;#colorbar extrema
-    
 else:
     print ' ERROR: unknow diagnostic "'+CWHAT+'" !!!'
     sys.exit(0)
@@ -148,11 +121,14 @@ elif cvx_in=='sozocrtx' and cvy_in=='somecrty' and l_do_crl:
 
 elif cvx_in=='sozocrtx' and cvy_in=='somecrty' and l_do_cspd:
     # Current speed !
+    l_save_nc=False
+    cpal_fld = 'on2' ; tmin=0. ;  tmax=1.4 ;  df = 0.1
+    cunit = 'Surface current speed [m/s]' ; cb_jump = 1
     if CBOX == 'Balear': tmin=0. ;  tmax=1.2 ;  df = 0.2 ; cpal_fld = 'ncview_hotres'
     #if CBOX == 'Balear': tmin=0. ;  tmax=1. ;  df = 0.2
     #if CBOX == 'Med+BS': tmin=0. ;  tmax=4. ;  df = 0.5 ; cpal_fld = 'ncview_hotres'
     if CBOX == 'Med+BS': tmin=0. ;  tmax=1.5 ;  df = 0.25 ; cpal_fld = 'on3'
-        
+    
 elif cvx_in=='vozocrtx' and cvy_in=='vomecrty' and l_do_cof:
     l_3d_field = True
     #cpal_fld = 'on2' ; tmin=-1. ;  tmax=1. ;  df = 0.05
@@ -170,9 +146,9 @@ elif cvx_in=='vozocrtx' and cvy_in=='vomecrty' and l_do_crl:
     l_show_clock = False
     l_add_logo   = False
 
-#else:
-#    print 'ERROR: we do not know cvx_in and cvy_in! ("'+cvx_in+'", "'+cvy_in+'")'
-#    sys.exit(0)
+else:
+    print 'ERROR: we do not know cvx_in and cvy_in! ("'+cvx_in+'", "'+cvy_in+'")'
+    sys.exit(0)
 
     
 if CNEMO == 'eNATL60':
@@ -200,9 +176,8 @@ if CNEMO == 'eNATL60':
         x_clock = 30 ; y_clock = 1040 ; x_logo = 1500 ; y_logo = 16 ; l_annotate_name=False
          
     elif   CBOX == 'ALLFR':
-        i1=0   ; j1=0    ; i2=Ni0 ; j2=Nj0  ; rfact_zoom=1. ; vcb=[0.6, 0.1, 0.38, 0.018]  ; font_rat=8.*rfact_zoom
-        l_show_cb=True; l_add_logo=False ; l_add_logo_ige=False ; l_add_logo_prace=False ; l_show_clock=False ; l_annotate_name=False
-        ##x_clock = 4000 ; y_clock = 200 ; x_logo = 6000 ; y_logo  = 50; 
+        i1=0   ; j1=0    ; i2=Ni0 ; j2=Nj0  ; rfact_zoom=1. ; vcb=[0.59, 0.1, 0.39, 0.018]  ; font_rat=8.*rfact_zoom
+        x_clock = 4000 ; y_clock = 200 ; x_logo = 6000 ; y_logo  = 50; l_show_clock=False ; l_annotate_name=False; l_add_logo=False
 
     elif   CBOX == 'SALL':
         i1=0   ; j1=0    ; i2=Ni0 ; j2=Nj0  ; rfact_zoom=1080./float(Nj0) ; vcb=[0.59, 0.1, 0.39, 0.018]  ; font_rat=8.*rfact_zoom
@@ -381,7 +356,7 @@ id_fx.close()
 
 Nt = len(vtime)
 
-if l_show_lsm or l_do_crl or l_do_cof or l_do_cspd or l_do_tke or l_do_eke:
+if l_show_lsm or l_do_crl or l_do_cof or l_do_cspd:
     print "\nReading record metrics in "+cf_lsm
     id_lsm = Dataset(cf_lsm)
     nb_dim = len(id_lsm.variables['tmask'].dimensions)
@@ -444,12 +419,12 @@ cfont_titl =  { 'fontname':'Helvetica Neue', 'fontweight':'light', 'fontsize':in
 
 # Colormaps for fields:
 pal_fld = bcm.chose_colmap(cpal_fld)
-if   l_log_field:
-    norm_fld = colors.LogNorm(                   vmin=tmin, vmax=tmax, clip=False)
-elif l_pow_field:
-    norm_fld = colors.PowerNorm(gamma=pow_field, vmin=tmin, vmax=tmax, clip=False)
+if l_log_field:
+    norm_fld = colors.LogNorm(  vmin = tmin, vmax = tmax, clip = False)
+if l_pow_field:
+    norm_fld = colors.PowerNorm(gamma=pow_field, vmin = tmin, vmax = tmax, clip = False)
 else:
-    norm_fld = colors.Normalize(                 vmin=tmin, vmax=tmax, clip=False)
+    norm_fld = colors.Normalize(vmin = tmin, vmax = tmax, clip = False)
 
 
 if l_show_lsm or l_add_topo_land:
@@ -477,43 +452,8 @@ else:
 
 
 
-
-
-
-
-
-if l_do_eke:
-    Umean = nmp.zeros((nj,ni))
-    Vmean = nmp.zeros((nj,ni))
-    # Need to go for the mean first!!!
-    print '\n Goint for '+str(Nt)+' snaphots to compute the mean first!!!'
-    for jt in range(jt0,Nt):
-        print "Reading record #"+str(jt)+"..."
-
-        id_fx = Dataset(cfx_in)
-        if not l_3d_field:
-            XFLD  = id_fx.variables[cvx_in][jt,j1:j2,i1:i2] ; # t, y, x
-        else:
-            XFLD  = id_fx.variables[cvx_in][jt,0,j1:j2,i1:i2] ; # t, y, x
-        id_fx.close()
-        
-        id_fy = Dataset(cfy_in)
-        if not l_3d_field:
-            YFLD  = id_fy.variables[cvy_in][jt,j1:j2,i1:i2] ; # t, y, x
-        else:
-            YFLD  = id_fy.variables[cvy_in][jt,0,j1:j2,i1:i2] ; # t, y, x
-        id_fy.close()
-        
-        print "Done!"
-        # On T-points:
-        Umean[:,2:ni] = Umean[:,2:ni] + 0.5*( XFLD[:,1:ni-1] + XFLD[:,2:ni] )/float(Nt)
-        Vmean[2:nj,:] = Vmean[2:nj,:] + 0.5*( YFLD[1:nj-1,:] + YFLD[2:nj,:] )/float(Nt)
-    print ' time averaging done...\n\n'
-
-
-
-    
 ntpd = 24/dt
+
 
 vm = vmn
 if isleap(int(cyr0)): vm = vml
@@ -524,7 +464,6 @@ jm = int(cmn0)
 
 
 Xplot = nmp.zeros((nj,ni))
-
 
 for jt in range(jt0,Nt):
 
@@ -553,7 +492,7 @@ for jt in range(jt0,Nt):
 
 
 
-    cfig = 'figs/'+cv_out+'_'+CNEMO+'-'+CRUN+'_'+CBOX+'_'+cday+'_'+chour+'_'+cpal_fld+'.'+fig_type
+    cfig = 'COLORBAR_'+cv_out+'_'+CNEMO+'-'+CRUN+'_'+CBOX+'_'+cday+'_'+chour+'_'+cpal_fld+'.'+fig_type
 
     ###### FIGURE ##############
 
@@ -572,7 +511,7 @@ for jt in range(jt0,Nt):
         print 'j1:j2 =', j1,j2
         print 'i1:i2 =', i1,i2
         XFLD  = id_fx.variables[cvx_in][jt,0,j1:j2,i1:i2] ; # t, y, x
-    id_fx.close()
+        id_fx.close()
     print "Done!"
 
     print "Reading record #"+str(jt)+" of "+cvy_in+" in "+cfy_in
@@ -581,42 +520,39 @@ for jt in range(jt0,Nt):
         YFLD  = id_fy.variables[cvy_in][jt,j1:j2,i1:i2] ; # t, y, x
     else:
         YFLD  = id_fy.variables[cvy_in][jt,0,j1:j2,i1:i2] ; # t, y, x
-    id_fy.close()
+        id_fy.close()
     print "Done!"
 
 
-    lx = nmp.zeros((nj,ni))
-    ly = nmp.zeros((nj,ni))
-
     if l_do_crl or l_do_cof:
+
         print '\nComputing curl...'
+        lx = nmp.zeros((nj,ni))
+        ly = nmp.zeros((nj,ni))
+
         lx[:,1:ni-1] =   e2v[:,2:ni]*YFLD[:,2:ni] - e2v[:,1:ni-1]*YFLD[:,1:ni-1]
         ly[1:nj-1,:] = - e1u[2:nj,:]*XFLD[2:nj,:] + e1u[1:nj-1,:]*XFLD[1:nj-1,:]
+
         if l_do_cof: Xplot[:,:] = ( lx[:,:] + ly[:,:] )*XMSK[:,:] / ( e1f[:,:]*e2f[:,:]*ff[:,:] ) # Relative Vorticity...
         if l_do_crl: Xplot[:,:] = ( lx[:,:] + ly[:,:] )*XMSK[:,:] / ( e1f[:,:]*e2f[:,:] ) * 1000. # Curl...
 
+        del lx, ly
+
+        print '... '+cv_out+' computed!\n'
+
+
+
     if l_do_cspd:
         print '\nComputing current speed at T-points ...'
+        lx = nmp.zeros((nj,ni))
+        ly = nmp.zeros((nj,ni))
+
         lx[:,2:ni] = 0.5*( XFLD[:,1:ni-1] + XFLD[:,2:ni] )
         ly[2:nj,:] = 0.5*( YFLD[1:nj-1,:] + YFLD[2:nj,:] )
+
         Xplot[:,:] = nmp.sqrt( lx[:,:]*lx[:,:] + ly[:,:]*ly[:,:] ) * XMSK[:,:]
-
-    if l_do_tke:
-        print '\nComputing TKE at T-points ...'
-        lx[:,2:ni] = 0.5*( XFLD[:,1:ni-1] + XFLD[:,2:ni] )
-        ly[2:nj,:] = 0.5*( YFLD[1:nj-1,:] + YFLD[2:nj,:] )
-        Xplot[:,:] = ( lx[:,:]*lx[:,:] + ly[:,:]*ly[:,:] ) * XMSK[:,:]
-
-
-    if l_do_eke:
-        print '\nComputing TKE at T-points ...'
-        lx[:,2:ni] = 0.5*( XFLD[:,1:ni-1] + XFLD[:,2:ni] ) - Umean[:,2:ni]
-        ly[2:nj,:] = 0.5*( YFLD[1:nj-1,:] + YFLD[2:nj,:] ) - Vmean[2:nj,:]
-        Xplot[:,:] = ( lx[:,:]*lx[:,:] + ly[:,:]*ly[:,:] ) * XMSK[:,:]
-
-    del lx, ly
-    print '... '+cv_out+' computed!\n'
         
+
     del XFLD,YFLD
 
 
@@ -636,35 +572,15 @@ for jt in range(jt0,Nt):
     idx_miss = nmp.where( XMSK < 0.001)
     Xplot[idx_miss] = nmp.nan
 
-    if l_add_topo_land:
-        idx_miss = nmp.where( XMSK > 0.01)
-        xtopo[idx_miss] = nmp.nan
     
-    cf = plt.imshow(Xplot[:,:], cmap = pal_fld, norm = norm_fld, interpolation='none')
+    #cf = plt.imshow(Xplot[:,:], cmap = pal_fld, norm = norm_fld, interpolation='none')
 
-    # Ice
-    if l_do_ice:
-        print "Reading record #"+str(jt)+" of "+cv_ice+" in "+cf_ice
-        id_ice = Dataset(cf_ice)
-        XICE  = id_ice.variables[cv_ice][jt,:,:] ; # t, y, x
-        id_ice.close()
-        print "Done!"
-
-        #XM[:,:] = XMSK[:,:]
-        #bt.drown(XICE, XM, k_ew=2, nb_max_inc=10, nb_smooth=10)
-        #ci = plt.contourf(XICE[:,:], vcont_ice, cmap = pal_ice, norm = norm_ice) #
-
-        pice = nmp.ma.masked_where(XICE < rmin_ice, XICE)
-        ci = plt.imshow(pice, cmap = pal_ice, norm = norm_ice, interpolation='none') ; del pice, ci
-        del XICE
-
-    #LOLO: rm ???
-    if l_show_lsm or l_add_topo_land:
-        if l_add_topo_land:
-            clsm = plt.imshow(nmp.ma.masked_where(XMSK>0.0001, xtopo), cmap = pal_lsm, norm = norm_lsm, interpolation='none')
-            plt.contour(XMSK, [0.9], colors='k', linewidths=0.5)
-        else:
-            clsm = plt.imshow(nmp.ma.masked_where(XMSK>0.0001, XMSK), cmap = pal_lsm, norm = norm_lsm, interpolation='none')
+    #if l_show_lsm or l_add_topo_land:
+    #    if l_add_topo_land:
+    #        clsm = plt.imshow(nmp.ma.masked_where(XMSK>0.0001, xtopo), cmap = pal_lsm, norm = norm_lsm, interpolation='none')
+    #        plt.contour(XMSK, [0.9], colors='k', linewidths=0.5)
+    #    else:
+    #        clsm = plt.imshow(nmp.ma.masked_where(XMSK>0.0001, XMSK), cmap = pal_lsm, norm = norm_lsm, interpolation='none')
 
     if l_show_cb:
         ax2 = plt.axes(vcb)
@@ -697,29 +613,7 @@ for jt in range(jt0,Nt):
 
     #ax.annotate('laurent.brodeau@ocean-next.fr', xy=(1, 4), xytext=(xl+150, 20), **cfont_mail)
 
-    if l_annotate_name:
-        xl = rnxr/20./rfact_zoom
-        yl = rnyr/1.33/rfact_zoom
-        ax.annotate(CNEMO, xy=(1, 4), xytext=(xl, yl), **cfont_titl)
 
-    if l_add_logo:
-        datafile = cbook.get_sample_data(cf_logo_on, asfileobj=False)
-        im = image.imread(datafile)
-        #im[:, :, -1] = 0.5  # set the alpha channel
-        fig.figimage(im, x_logo, y_logo, zorder=9)
-        del datafile, im
-        #
-    if l_add_logo_ige:
-        datafile = cbook.get_sample_data(cf_logo_ige, asfileobj=False)
-        im = image.imread(datafile)
-        fig.figimage(im, x_logo+144, y_logo-150., zorder=9)
-        del datafile, im
-        #
-    if l_add_logo_prace:
-        datafile = cbook.get_sample_data(cf_logo_prace, asfileobj=False)
-        im = image.imread(datafile)
-        fig.figimage(im, x_logo-77, y_logo-140., zorder=9)
-        del datafile, im
 
     plt.savefig(cfig, dpi=dpi, orientation='portrait', facecolor='k')
     print cfig+' created!\n'
