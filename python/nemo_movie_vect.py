@@ -134,7 +134,7 @@ cv_out = CWHAT
 
     
 if cvx_in=='sozocrtx' and cvy_in=='somecrty' and l_do_cof:
-    cpal_fld = 'on2' ; tmin=-0.6 ;  tmax=-tmin ;  df = 0.1 ; cb_jump = 1
+    cpal_fld = 'on2' ; tmin=-1.2 ;  tmax=-tmin ;  df = 0.1 ; cb_jump = 2
     cunit = r'$\zeta/f$'
 
 elif cvx_in=='sozocrtx' and cvy_in=='somecrty' and l_do_crl:
@@ -415,6 +415,9 @@ if l_show_lsm or l_do_crl or l_do_cof or l_do_cspd or l_do_tke or l_do_eke:
     print 'Done!\n'
 
 
+
+idx_land = nmp.where( XMSK < 0.01)
+
 if l_add_topo_land:
     bt.chck4f(cf_topo_land)
     id_top = Dataset(cf_topo_land)
@@ -424,8 +427,10 @@ if l_add_topo_land:
     if nmp.shape(xtopo) != (nj,ni):
         print 'ERROR: topo and mask do not agree in shape!'; sys.exit(0)
     xtopo = xtopo*(1. - XMSK)
-    bnc.dump_2d_field('topo_'+CBOX+'.nc', xtopo, name='z')
-        
+    bnc.dump_2d_field('topo_'+CBOX+'.nc', xtopo, name='z')    
+    xtopo[nmp.where( XMSK > 0.01)] = nmp.nan
+
+    
     
 
 params = { 'font.family':'Helvetica Neue',
@@ -521,6 +526,12 @@ if isleap(int(cyr0)): vm = vml
 
 jd = int(cdd0) - 1
 jm = int(cmn0)
+
+
+
+
+
+
 
 
 Xplot = nmp.zeros((nj,ni))
@@ -629,16 +640,11 @@ for jt in range(jt0,Nt):
 
     
 
-    print "Ploting"
+    print "Ploting"    
 
     plt.axis([ 0, ni, 0, nj])
 
-    idx_miss = nmp.where( XMSK < 0.001)
-    Xplot[idx_miss] = nmp.nan
-
-    if l_add_topo_land:
-        idx_miss = nmp.where( XMSK > 0.01)
-        xtopo[idx_miss] = nmp.nan
+    Xplot[idx_land] = nmp.nan
     
     cf = plt.imshow(Xplot[:,:], cmap = pal_fld, norm = norm_fld, interpolation='none')
 
