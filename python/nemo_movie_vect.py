@@ -52,7 +52,7 @@ i2=0
 j2=0
 l_get_name_of_run = False
 l_show_lsm = True
-l_do_ice  = True
+l_do_ice  = False
 l_show_cb = True
 l_log_field = False
 l_pow_field = False
@@ -180,7 +180,6 @@ if CNEMO == 'eNATL60':
     # Defaults:
     Ni0 = 8354
     Nj0 = 4729
-    l_do_ice  = False
     l_show_clock = True
     x_clock = 1600 ; y_clock = 200 ; x_logo = 2200 ; y_logo  = 50
     cdt = '1h'
@@ -260,7 +259,6 @@ elif CNEMO == 'NATL60':
     Ni0 = 5422
     Nj0 = 3454
     #l_pow_field = True ; pow_field = 1.5
-    l_do_ice  = False
     l_show_clock = False
     cdt = '1h'
     #CBOX = 'zoom1' ; i1 = 1800 ; j1 = 950 ; i2 = i1+1920 ; j2 = j1+1080 ; rfact_zoom = 1. ; vcb=[0.5, 0.875, 0.485, 0.02] ; font_rat = 8.*rfact_zoom ; l_show_lsm = False
@@ -281,7 +279,6 @@ elif CNEMO == 'eNATL4':
     # Defaults:
     Ni0 = 559
     Nj0 = 313
-    l_do_ice  = False
     l_annotate_name = False
     l_show_clock = False
     l_add_logo = False
@@ -430,8 +427,6 @@ if l_add_topo_land:
     bnc.dump_2d_field('topo_'+CBOX+'.nc', xtopo, name='z')    
     xtopo[nmp.where( XMSK > 0.01)] = nmp.nan
 
-    
-    
 
 params = { 'font.family':'Helvetica Neue',
            'font.weight':    'normal',
@@ -640,7 +635,7 @@ for jt in range(jt0,Nt):
 
     
 
-    print "Ploting"    
+    print "Ploting"
 
     plt.axis([ 0, ni, 0, nj])
 

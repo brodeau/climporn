@@ -424,6 +424,9 @@ if l_show_lsm or l_apply_lap or l_apply_hgrad or l_add_topo_land:
     print 'Done!\n'
 
 
+
+idx_land = nmp.where( XMSK < 0.01)
+
 if l_add_topo_land:
     bt.chck4f(cf_topo_land)
     id_top = Dataset(cf_topo_land)
@@ -433,9 +436,9 @@ if l_add_topo_land:
     if nmp.shape(xtopo) != (nj,ni):
         print 'ERROR: topo and mask do not agree in shape!'; sys.exit(0)
     xtopo = xtopo*(1. - XMSK)
-    bnc.dump_2d_field('topo_'+CBOX+'.nc', xtopo, name='z')
-        
-    
+    bnc.dump_2d_field('topo_'+CBOX+'.nc', xtopo, name='z')    
+    xtopo[nmp.where( XMSK > 0.01)] = nmp.nan
+
 
 params = { 'font.family':'Helvetica Neue',
            'font.weight':    'normal',
@@ -590,12 +593,7 @@ for jt in range(jt0,Nt):
 
     plt.axis([ 0, ni, 0, nj])
 
-    idx_miss = nmp.where( XMSK < 0.001)
-    Xplot[idx_miss] = nmp.nan
-
-    if l_add_topo_land:
-        idx_miss = nmp.where( XMSK > 0.01)
-        xtopo[idx_miss] = nmp.nan
+    Xplot[idx_land] = nmp.nan
     
     cf = plt.imshow(Xplot[:,:], cmap = pal_fld, norm = norm_fld, interpolation='none')
     del Xplot
