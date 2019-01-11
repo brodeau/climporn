@@ -80,7 +80,8 @@ elif CNEMO == 'CREG025':
     x_cnf = 20. ; y_cnf = 560. ; # where to put label of conf on Figure...
 
 elif CNEMO == 'eNATL4':
-    i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 2. ; vcb = [0.6, 0.11, 0.39, 0.025] ; font_rat = 0.5*rfact_zoom
+    i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 1. ; vcb = [0.6, 0.11, 0.39, 0.025] ; font_rat = 0.5*rfact_zoom
+    x_cnf = 20. ; y_cnf = 560. ; # where to put label of conf on Figure...
 
 elif CNEMO == 'eNATL60':
     i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 1. ; vcb = [0.6, 0.1, 0.39, 0.025] ; font_rat = 5.
@@ -116,14 +117,14 @@ if cv_in in ['sosstsst','tos']:
     cunit = r'SST ($^{\circ}$C)'
     cb_jump = 1
 
-
-if cv_in in ['Bathymetry']:
+elif cv_in in ['Bathymetry']:
     cfield = 'Bathymetry'
     #tmin=100. ;  tmax=4500.   ;  df = 100.
     tmin=0. ;  tmax=5000.   ;  df = 100.
     #cpal_fld = 'ocean'
     #cpal_fld = 'Blues'
-    cpal_fld = 'PuBu'
+    #cpal_fld = 'PuBu'
+    cpal_fld = 'on2_r'
     #cpal_fld = 'ncview_ssec'
     #cpal_fld = 'ncview_hotres'
     #cpal_fld = 'ncview_helix'
@@ -136,7 +137,7 @@ if cv_in in ['Bathymetry']:
     l_hide_cb_ticks=True
 
     
-if cv_in == 'sossheig':
+elif cv_in == 'sossheig':
     cfield = 'SSH'
     tmin=-0.3 ;  tmax=0.3   ;  df = 0.1
     cpal_fld = 'ncview_jaisnc'    
@@ -147,7 +148,12 @@ elif cv_in == 'somxl010':
     cfield == 'MLD'
     tmin=50. ;  tmax=1500. ;  df = 50.
     cpal_fld = 'viridis_r'
-    
+
+else:
+    print 'ERROR: variable '+cv_in+' is not known yet...'; sys.exit(0)
+
+
+
 
 # Time record stuff...
 bt.chck4f(cf_fld)
@@ -278,7 +284,6 @@ del XMSK
 
 print 'Ploting'
 cf = plt.imshow(XFLD[:,:], cmap = pal_fld, norm = norm_fld, interpolation='none')
-print 'LOLO: XFLD[4,4] = ', XFLD[4,4], nmp.isnan(XFLD[4,4])
 del XFLD
 print 'Done!'
 
