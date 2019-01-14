@@ -59,15 +59,17 @@ l_pow_field = False
 l_annotate_name = True
 l_show_clock = True
 
+#cdir_logos = '/home/brodeau/util/logos'
+cdir_logos = '/gpfs/scratch/pr1egh00/pr1egh01/movie/logos'
 l_add_logo = True
-cf_logo_on  = '/home/brodeau/util/logos/ocean-next_trans_white_281x191.png'
+cf_logo_on  = cdir_logos+'/ocean-next_trans_white_281x191.png'
 l_add_logo_ige = True
-cf_logo_ige = '/home/brodeau/util/logos/IGE_blanc_notext.png'
+cf_logo_ige = cdir_logos+'/IGE_blanc_notext.png'
 l_add_logo_prace = True
-cf_logo_prace = '/home/brodeau/util/logos/PRACE_blanc.png'
+cf_logo_prace = cdir_logos+'/PRACE_blanc.png'
 
-l_add_topo_land = True ; rof_log = 150.
-cf_topo_land = '/mnt/meom/workdir/brodeau/eNATL60/eNATL60-I/z_ETOPO1_21601x10801-eNATL60_ice.nc'
+rof_log = 150.
+
 
 
 l_save_nc = False ; # save the field we built in a netcdf file !!!
@@ -77,13 +79,19 @@ romega = 2.*nmp.pi/86400.0
 cb_extend = 'both' ;#colorbar extrema
 
 narg = len(sys.argv)
-if narg < 10: print 'Usage: '+sys.argv[0]+' <NEMOCONF> <BOX> <WHAT (CURL,CURLOF,CSPEED,TKE)> <fileX> <varX> <fileY> <varY> <LSM_file> <YYYYMMDD (start)>'; sys.exit(0)
+if narg < 10: print 'Usage: '+sys.argv[0]+' <NEMOCONF> <BOX> <WHAT (CURL,CURLOF,CSPEED,TKE)> <fileX> <varX> <fileY> <varY> <LSM_file> <YYYYMMDD (start)> (<TOPO_FILE>)'; sys.exit(0)
 CNEMO  = sys.argv[1]
 CBOX   = sys.argv[2]
 CWHAT  = sys.argv[3]
 cfx_in = sys.argv[4] ; cvx_in = sys.argv[5]
 cfy_in = sys.argv[6] ; cvy_in = sys.argv[7]
 cf_lsm = sys.argv[8] ; cf_clock0=sys.argv[9]
+
+l_add_topo_land = False
+if narg == 11:
+    l_add_topo_land = True
+    cf_topo_land = sys.argv[10]
+
 
 x_logo  = 50 ; y_logo  = 50
 
