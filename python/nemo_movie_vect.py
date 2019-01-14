@@ -8,7 +8,7 @@
 #    L. Brodeau, May 2018
 
 import sys
-from os import path
+from os import path, getcwd
 from string import replace
 import numpy as nmp
 
@@ -35,6 +35,8 @@ import barakuda_tool as bt
 import barakuda_ncio as bnc
 
 
+cwd = getcwd()
+
 vmn = [ 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ]
 vml = [ 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ]
 
@@ -59,8 +61,8 @@ l_pow_field = False
 l_annotate_name = True
 l_show_clock = True
 
-#cdir_logos = '/home/brodeau/util/logos'
-cdir_logos = '/gpfs/scratch/pr1egh00/pr1egh01/movie/logos'
+
+cdir_logos = cwd+'/logos'
 l_add_logo = True
 cf_logo_on  = cdir_logos+'/ocean-next_trans_white_281x191.png'
 l_add_logo_ige = True
@@ -248,6 +250,13 @@ if CNEMO == 'eNATL60':
     elif CBOX == 'GrlIcl':
         i1=3370; j1=3941; i2=5062; j2=Nj0 ; rfact_zoom=1. ; vcb=[0.3, 0.1, 0.38, 0.018] ; font_rat = 2. ; l_annotate_name=False
         x_clock = 1350 ; y_clock = 750 ; x_logo = 1400 ; y_logo = 16 ; l_save_nc=True
+
+    elif CBOX == 'Azores':
+        # 785 x 1190 => comparison of two => 1600 x 1200 (5px for frame)
+        i2=4410; j2=2240 ; i1=i2-785; j1=j2-1190; rfact_zoom=1. ; vcb=[0.05, 0.05, 0.9, 0.018] ; font_rat = 2. ; l_annotate_name=False
+        l_add_logo=False; l_add_logo_prace=False; l_add_logo_ige=False
+        x_clock = 400 ; y_clock = 120 ; l_save_nc=False
+        if CWHAT=='CURLOF': tmin=-0.8 ;  tmax=-tmin ;  df = 0.1 ; cb_jump = 2
 
     elif CBOX == 'Band':
         i1=5100-1920; j1=2200; i2=5100; j2=j1+1080 ; rfact_zoom=1. ; vcb=[0.59, 0.1, 0.38, 0.018] ; font_rat = 2.           ; l_annotate_name=False
