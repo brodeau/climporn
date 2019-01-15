@@ -252,8 +252,10 @@ if CNEMO == 'eNATL60':
         x_clock = 1350 ; y_clock = 750 ; x_logo = 1400 ; y_logo = 16 ; l_save_nc=True
 
     elif CBOX == 'Azores':
-        # 785 x 1190 => comparison of two => 1600 x 1200 (5px for frame)
-        i2=4410; j2=2240 ; i1=i2-785; j1=j2-1190; rfact_zoom=1. ; vcb=[0.05, 0.05, 0.9, 0.018] ; font_rat = 2. ; l_annotate_name=False
+        # 785 x 1190 => comparison of two => 1600 x 1200 (5px for frame), image is: 780x1190
+        ## use: CMD="montage -geometry 780x1190+10+5 -background black <img1> <img2> <img_montage>"
+        # => montage is then 1600x1200
+        i2=4410; j2=2240 ; i1=i2-780; j1=j2-1190; rfact_zoom=1. ; vcb=[0.05, 0.05, 0.9, 0.018] ; font_rat = 2. ; l_annotate_name=False
         l_add_logo=False; l_add_logo_prace=False; l_add_logo_ige=False
         x_clock = 400 ; y_clock = 120 ; l_save_nc=False
         if CWHAT=='CURLOF': tmin=-0.8 ;  tmax=-tmin ;  df = 0.1 ; cb_jump = 2
