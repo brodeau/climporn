@@ -422,8 +422,8 @@ if l_show_lsm or l_do_crl or l_do_cof or l_do_cspd or l_do_tke or l_do_eke:
         ff[:,:] = 2.*romega*nmp.sin(ff[:,:]*nmp.pi/180.0)
         (nj,ni) = nmp.shape(XMSK)
     if l_save_nc:
-        Xlon = id_lsm.variables['gphit'][0,j1:j2,i1:i2]
-        Xlat = id_lsm.variables['glamt'][0,j1:j2,i1:i2]
+        Xlon = id_lsm.variables['glamt'][0,j1:j2,i1:i2]
+        Xlat = id_lsm.variables['gphit'][0,j1:j2,i1:i2]
     id_lsm.close()
 
     print 'Shape Arrays => ni,nj =', ni,nj

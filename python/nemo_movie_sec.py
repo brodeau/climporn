@@ -31,6 +31,7 @@ from re import split
 
 import barakuda_colmap as bcm
 
+import barakuda_plot as bp
 import barakuda_tool as bt
 import barakuda_ncio as bnc
 
@@ -46,8 +47,8 @@ vml = [ 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ]
 
 fig_type='png'
 dpi = 110
-color_top = 'white'
-#color_top = 'k'
+#color_top = 'white'
+color_top = 'k'
 
 jt0 = 0
 
@@ -57,8 +58,6 @@ j2=0
 l_get_name_of_run = False
 l_show_lsm = True
 l_show_cb = False
-l_log_field = False
-l_pow_field = False
 l_annotate_name = False
 l_show_clock = False
 
@@ -100,7 +99,7 @@ cv_msk = 'tmask'
 
 if CWHAT == 'vozocrtx':
     cv_in = 'vozocrtx'
-    tmin=-0.8 ;  tmax=-tmin  ;  df = 0.1 ; cpal_fld = 'bone' ; cb_jump = 1
+    tmin=-0.5 ;  tmax=-tmin  ;  df = 0.1 ; cpal_fld = 'RdBu_r' ; cb_jump = 1
     cunit = r'Zonal component of current speed [m/s]'
     cv_msk = 'umask' ; l_show_cb = False
 
@@ -139,9 +138,9 @@ if CNEMO == 'eNATL60':
     # Boxes:
     if   CSEC == 'Azores':
         i1=4175 ; j1=1000 ; i2=i1 ; j2=3000 ; k_stop = 280
-        size_img_px=nmp.array([1200.,800.]) ; rfact_zoom=1. ; vcb=[0.61, 0.1, 0.36, 0.018]  ; font_rat=8.*rfact_zoom
+        size_img_px=nmp.array([1920.,800.]) ; rfact_zoom=1. ; vcb=[0.61, 0.1, 0.36, 0.018]  ; font_rat=1.*rfact_zoom
         #x_clock = 1600 ; y_clock = 200 ; x_logo=2200 ; y_logo=1200
-        l_show_cb = False ; l_save_nc = True
+        dx = 5. ; l_show_cb = False ; l_save_nc = True
 
     else:
         print ' ERROR: unknow section "'+CSEC+'" for config "'+CNEMO+'" !!!'
@@ -271,15 +270,19 @@ id_lsm = Dataset(cf_lsm)
 nb_dim = len(id_lsm.variables[cv_msk].dimensions)
 print ' The mesh_mask has '+str(nb_dim)+' dimmensions!'
 print ' *** Reading '+cv_msk+' !'
-if nb_dim==4: XMSK = nmp.squeeze( id_lsm.variables[cv_msk][0,k_stop:0:-1,j1:j2,i1:i2] )
-if nb_dim==3: XMSK = nmp.squeeze( id_lsm.variables[cv_msk][  k_stop:0:-1,j1:j2,i1:i2] )
+if nb_dim==4: XMSK = nmp.squeeze( id_lsm.variables[cv_msk][0,0:k_stop,j1:j2,i1:i2] )
+if nb_dim==3: XMSK = nmp.squeeze( id_lsm.variables[cv_msk][  0:k_stop,j1:j2,i1:i2] )
 if nb_dim==2: print 'ERROR: cannot be a 2D field!!!'; sys.exit(0)
 print nmp.shape(XMSK)
 (nj,ni) = nmp.shape(XMSK)
 
-Vdepth = nmp.squeeze( id_lsm.variables['gdept_1d'][0,k_stop:0:-1] )
-Vlon   = nmp.squeeze( id_lsm.variables['gphit'][0,j1:j2,i1:i2] )
-Vlat   = nmp.squeeze( id_lsm.variables['glamt'][0,j1:j2,i1:i2] )
+Vdepth = nmp.squeeze( id_lsm.variables['gdept_1d'][0,0:k_stop] )
+Vlon   = nmp.squeeze( id_lsm.variables['glamt'][0,j1:j2,i1:i2] )
+Vlat   = nmp.squeeze( id_lsm.variables['gphit'][0,j1:j2,i1:i2] )
+
+
+print ' Shape Vlon:', nmp.shape(Vlon)
+print ' Shape Vlat:', nmp.shape(Vlat)
 
 Vx = nmp.zeros(ni)
 if l_merid: Vx[:] = Vlat[:]
@@ -287,6 +290,9 @@ if l_zonal: Vx[:] = Vlon[:]
 
 print ' Shape Vx:', nmp.shape(Vx)
 print ' Shape Vdepth:', nmp.shape(Vdepth),'\n'
+
+print " *** Vx = ", Vx[:],'\n'
+print " *** Vdepth = ", Vdepth[:],'\n'
 #sys.exit(0);#lolo
 
 
@@ -302,11 +308,11 @@ if l_apply_hgrad:
     XE2V = id_lsm.variables['e2v'][0,j1:j2,i1:i2]
     print ' *** Reading umask and vmask !'
     if nb_dim==4:
-        UMSK = id_lsm.variables['umask'][0,k_stop:0:-1,j1:j2,i1:i2]
-        VMSK = id_lsm.variables['vmask'][0,k_stop:0:-1,j1:j2,i1:i2]
+        UMSK = id_lsm.variables['umask'][0,0:k_stop,j1:j2,i1:i2]
+        VMSK = id_lsm.variables['vmask'][0,0:k_stop,j1:j2,i1:i2]
     if nb_dim==3:
-        UMSK = id_lsm.variables['umask'][k_stop:0:-1,j1:j2,i1:i2]
-        VMSK = id_lsm.variables['vmask'][k_stop:0:-1,j1:j2,i1:i2]
+        UMSK = id_lsm.variables['umask'][0:k_stop,j1:j2,i1:i2]
+        VMSK = id_lsm.variables['vmask'][0:k_stop,j1:j2,i1:i2]
 
 #
 id_lsm.close()
@@ -336,12 +342,7 @@ cfont_titl =  { 'fontname':'Helvetica Neue', 'fontweight':'light', 'fontsize':in
 
 # Colormaps for fields:
 pal_fld = bcm.chose_colmap(cpal_fld)
-if   l_log_field:
-    norm_fld = colors.LogNorm(                   vmin=tmin, vmax=tmax, clip=False)
-elif l_pow_field:
-    norm_fld = colors.PowerNorm(gamma=pow_field, vmin=tmin, vmax=tmax, clip=False)
-else:
-    norm_fld = colors.Normalize(                 vmin=tmin, vmax=tmax, clip=False)
+norm_fld = colors.Normalize(vmin=tmin, vmax=tmax, clip=False)
 
 
 if l_show_lsm:
@@ -406,7 +407,7 @@ for jt in range(jt0,Nt):
 
     fig = plt.figure(num = 1, figsize=(size_figure[0], size_figure[1]), dpi=None, facecolor='w', edgecolor='0.5')
 
-    ax  = plt.axes([0., 0., 1., 1.], axisbg = '0.5')
+    ax  = plt.axes([0.025, 0.025, 0.95, 0.95]) ###, axisbg = 'w')
 
     vc_fld = nmp.arange(tmin, tmax + df, df)
 
@@ -414,9 +415,9 @@ for jt in range(jt0,Nt):
     print "Reading record #"+str(jt)+" of "+cv_in+" in "+cf_in
     #id_fld = Dataset(cf_in)
     if l_notime:
-        Xplot  = nmp.squeeze(  id_fld.variables[cv_in][k_stop:0:-1,j1:j2,i1:i2] )
+        Xplot  = nmp.squeeze(  id_fld.variables[cv_in][0:k_stop,j1:j2,i1:i2] )
     else:
-        Xplot  = nmp.squeeze(  id_fld.variables[cv_in][jt,k_stop:0:-1,j1:j2,i1:i2] ) ; # t, y, x        
+        Xplot  = nmp.squeeze(  id_fld.variables[cv_in][jt,0:k_stop,j1:j2,i1:i2] ) ; # t, y, x        
     #id_fld.close()
     print "Done!\n"
 
@@ -467,9 +468,9 @@ for jt in range(jt0,Nt):
 
     print "Ploting"
 
-    plt.axis([ 0, ni, 0, nj])
+    plt.axis([ nmp.min(Vx[:]), nmp.max(Vx[:]), nmp.max(Vdepth),  nmp.min(Vdepth) ])
 
-    Xplot[idx_land] = nmp.nan
+    #if l_show_lsm: Xplot[idx_land] = nmp.nan
     
     #cf = plt.imshow(Xplot[:,:], cmap = pal_fld, norm = norm_fld, interpolation='none')
 
@@ -477,8 +478,10 @@ for jt in range(jt0,Nt):
 
     del Xplot
 
+    if l_merid: bp.__nice_latitude_axis__(ax, plt, nmp.min(Vx[:]), nmp.max(Vx[:]), dx, axt='x')
+    if l_zonal: bp.__nice_longitude_axis__(ax, plt, nmp.min(Vx[:]), nmp.max(Vx[:]), dx, axt='x')
+    bp.__nice_depth_axis__(ax, plt, nmp.min(Vdepth), nmp.max(Vdepth), l_log=False, cunit='m') ####, cfont=font_xylb)
 
-    #LOLO: rm ???
     if l_show_lsm:
         clsm = plt.pcolormesh(Vx[:], Vdepth[:], nmp.ma.masked_where(XMSK>0.0001, XMSK), cmap=pal_lsm, norm=norm_lsm) ###, interpolation='none')
 
@@ -537,11 +540,11 @@ for jt in range(jt0,Nt):
         fig.figimage(im, x_logo-77, y_logo-140., zorder=9)
         del datafile, im
 
-    plt.savefig(cfig, dpi=dpi, orientation='portrait', facecolor='k')
+    plt.savefig(cfig, dpi=dpi, orientation='portrait', facecolor='w')
     print cfig+' created!\n'
     plt.close(1)
 
-    if l_show_lsm: del clsm
+    #if l_show_lsm: del clsm
     del cf, fig, ax
     if l_show_cb: del clb
 

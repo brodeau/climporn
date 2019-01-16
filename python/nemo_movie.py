@@ -436,8 +436,8 @@ if l_show_lsm or l_apply_lap or l_apply_hgrad or l_add_topo_land:
             UMSK = id_lsm.variables['umask'][j1:j2,i1:i2]
             VMSK = id_lsm.variables['vmask'][j1:j2,i1:i2]
     if l_save_nc:
-        Xlon = id_lsm.variables['gphit'][0,j1:j2,i1:i2]
-        Xlat = id_lsm.variables['glamt'][0,j1:j2,i1:i2]
+        Xlon = id_lsm.variables['glamt'][0,j1:j2,i1:i2]
+        Xlat = id_lsm.variables['gphit'][0,j1:j2,i1:i2]
     id_lsm.close()
 
     print 'Shape Arrays => ni,nj =', ni,nj
