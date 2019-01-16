@@ -97,11 +97,17 @@ x_logo  = 50 ; y_logo  = 50
 
 cv_msk = 'tmask'
 
-if CWHAT == 'U':
+if   CWHAT == 'U':
     cv_in = 'vozocrtx'
     tmin=-0.4 ; tmax=-tmin ; df=0.1 ; cpal_fld='RdBu_r' ; cb_jump=1
     cunit=r'Zonal component of current speed [m/s]'
     cv_msk='umask' ; l_show_cb=True
+
+elif CWHAT == 'V':
+    cv_in = 'vomecrty'
+    tmin=-0.4 ; tmax=-tmin ; df=0.1 ; cpal_fld='RdBu_r' ; cb_jump=1
+    cunit=r'Meridional component of current speed [m/s]'
+    cv_msk='vmask' ; l_show_cb=True
 
 elif CWHAT == 'T':
     cv_in = 'sosstsst' ; #in ['sosstsst','tos']:    
@@ -137,10 +143,10 @@ if CNEMO == 'eNATL60':
 
     # Boxes:
     if   CSEC == 'Azores':
-        i1=4175 ; j1=1000 ; i2=i1 ; j2=3000 ; k_stop=298
+        i1=4175 ; j1=1000 ; i2=i1 ; j2=3000 ; k_stop=296 ; x_min = 22.5 ; x_max = 49.0 ; dx=2.
         size_img_px=nmp.array([1920.,800.]) ; rfact_zoom=1. ; vcb=[0.4, 0.15, 0.5, 0.02]  ; font_rat=1.6
         l_show_clock=True ; x_clock=1600 ; y_clock=150
-        dx=5. ; l_save_nc=True
+        l_save_nc=True
 
     else:
         print ' ERROR: unknow section "'+CSEC+'" for config "'+CNEMO+'" !!!'
@@ -407,7 +413,7 @@ for jt in range(jt0,Nt):
 
     fig = plt.figure(num = 1, figsize=(size_figure[0], size_figure[1]), dpi=None) ###, facecolor='0.5', edgecolor='k')
 
-    ax = plt.axes([0.05, 0.042, 0.94, 0.93], axisbg = '0.4') ; # '0.4' inside ploting region
+    ax = plt.axes([0.05, 0.042, 0.94, 0.93], axisbg = '0.35') ; # '0.35' inside ploting region
 
     vc_fld = nmp.arange(tmin, tmax + df, df)
 
@@ -465,7 +471,7 @@ for jt in range(jt0,Nt):
 
     print "Ploting"
 
-    plt.axis([ nmp.min(Vx[:]), nmp.max(Vx[:]), nmp.max(Vdepth),  nmp.min(Vdepth) ])
+    plt.axis([ x_min, x_max, nmp.max(Vdepth),  nmp.min(Vdepth) ])
 
     #if l_show_lsm: Xplot[idx_land] = nmp.nan
     
@@ -475,9 +481,9 @@ for jt in range(jt0,Nt):
 
     del Xplot
 
-    if l_merid: bp.__nice_latitude_axis__(ax, plt, nmp.min(Vx[:]), nmp.max(Vx[:]), dx, axt='x')
-    if l_zonal: bp.__nice_longitude_axis__(ax, plt, nmp.min(Vx[:]), nmp.max(Vx[:]), dx, axt='x')
-    bp.__nice_depth_axis__(ax, plt, nmp.min(Vdepth), nmp.max(Vdepth), l_log=False, l_z_inc=False, cunit='(m)') ; ###, cfont=cfont_clb)
+    if l_merid: bp.__nice_latitude_axis__( ax, plt, x_min, x_max, dx, axt='x')
+    if l_zonal: bp.__nice_longitude_axis__(ax, plt, x_min, x_max, dx, axt='x')
+    bp.__nice_depth_axis__(ax, plt, nmp.min(Vdepth), nmp.max(Vdepth), l_log=False, l_z_inc=False, cunit='[m]') ; ###, cfont=cfont_clb)
 
     if l_show_lsm:
         clsm = plt.pcolormesh(Vx[:], Vdepth[:], nmp.ma.masked_where(XMSK>0.0001, XMSK), cmap=pal_lsm, norm=norm_lsm) ###, interpolation='none')
