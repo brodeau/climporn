@@ -120,7 +120,6 @@ elif CWHAT == 'T':
 elif CWHAT == 'GRAD_T':
     cv_in = 'sosstsst'
     l_apply_hgrad = True
-    l_save_nc = True
     l_smooth = True ; nb_smooth  = 5
     tmin=0. ;  tmax=0.001 ;  df = 0.0001 ; cpal_fld = 'ncview_hotres' ; cb_jump = 1
     #tmin=0. ;  tmax=32.   ;  df = 2. ; cpal_fld = 'viridis'
@@ -143,10 +142,10 @@ if CNEMO == 'eNATL60':
 
     # Boxes:
     if   CSEC == 'Azores':
-        i1=4175 ; j1=1000 ; i2=i1 ; j2=3000 ; k_stop=296 ; x_min = 22.5 ; x_max = 49.0 ; dx=2.
+        i1=4175 ; j1=1000 ; i2=i1 ; j2=3000 ; k_stop=294 ; x_min = 22.5 ; x_max = 49.0 ; dx=2.
         size_img_px=nmp.array([1920.,800.]) ; rfact_zoom=1. ; vcb=[0.4, 0.15, 0.5, 0.02]  ; font_rat=1.6
         l_show_clock=True ; x_clock=1600 ; y_clock=150
-        l_save_nc=True
+        l_save_nc=False
 
     else:
         print ' ERROR: unknow section "'+CSEC+'" for config "'+CNEMO+'" !!!'
