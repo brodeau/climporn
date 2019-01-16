@@ -97,11 +97,11 @@ x_logo  = 50 ; y_logo  = 50
 
 cv_msk = 'tmask'
 
-if CWHAT == 'vozocrtx':
+if CWHAT == 'U':
     cv_in = 'vozocrtx'
-    tmin=-0.5 ;  tmax=-tmin  ;  df = 0.1 ; cpal_fld = 'RdBu_r' ; cb_jump = 1
-    cunit = r'Zonal component of current speed [m/s]'
-    cv_msk = 'umask' ; l_show_cb = False
+    tmin=-0.4 ; tmax=-tmin ; df=0.1 ; cpal_fld='RdBu_r' ; cb_jump=1
+    cunit=r'Zonal component of current speed [m/s]'
+    cv_msk='umask' ; l_show_cb=True
 
 elif CWHAT == 'T':
     cv_in = 'sosstsst' ; #in ['sosstsst','tos']:    
@@ -137,10 +137,10 @@ if CNEMO == 'eNATL60':
 
     # Boxes:
     if   CSEC == 'Azores':
-        i1=4175 ; j1=1000 ; i2=i1 ; j2=3000 ; k_stop = 280
-        size_img_px=nmp.array([1920.,800.]) ; rfact_zoom=1. ; vcb=[0.61, 0.1, 0.36, 0.018]  ; font_rat=1.*rfact_zoom
-        #x_clock = 1600 ; y_clock = 200 ; x_logo=2200 ; y_logo=1200
-        dx = 5. ; l_show_cb = False ; l_save_nc = True
+        i1=4175 ; j1=1000 ; i2=i1 ; j2=3000 ; k_stop=300
+        size_img_px=nmp.array([1920.,800.]) ; rfact_zoom=1. ; vcb=[0.2, 0.15, 0.5, 0.018]  ; font_rat=1.6
+        l_show_clock=True ; x_clock=1600 ; y_clock=150
+        dx=5. ; l_save_nc=True
 
     else:
         print ' ERROR: unknow section "'+CSEC+'" for config "'+CNEMO+'" !!!'
@@ -347,7 +347,7 @@ norm_fld = colors.Normalize(vmin=tmin, vmax=tmax, clip=False)
 
 if l_show_lsm:
     pal_lsm = bcm.chose_colmap('land_dark')
-    norm_lsm = colors.Normalize(vmin = 0., vmax = 1., clip = False)
+    norm_lsm = colors.Normalize(vmin=0., vmax=1., clip=False)
 
 
 if cdt == '3h':
@@ -401,28 +401,25 @@ for jt in range(jt0,Nt):
 
 
 
-    cfig = 'figs/'+cv_in+'_'+CNEMO+'-'+CRUN+'_'+CSEC+'_'+cday+'_'+chour+'_'+cpal_fld+'.'+fig_type
+    cfig = 'figs/'+cv_in+'_'+CNEMO+'-'+CRUN+'_SECTION-'+CSEC+'_'+cday+'_'+chour+'_'+cpal_fld+'.'+fig_type
 
     ###### FIGURE ##############
 
     fig = plt.figure(num = 1, figsize=(size_figure[0], size_figure[1]), dpi=None, facecolor='w', edgecolor='0.5')
 
-    ax  = plt.axes([0.025, 0.025, 0.95, 0.95]) ###, axisbg = 'w')
+    ax = plt.axes([0.05, 0.042, 0.94, 0.93]) ###, axisbg = 'w')
 
     vc_fld = nmp.arange(tmin, tmax + df, df)
 
 
     print "Reading record #"+str(jt)+" of "+cv_in+" in "+cf_in
-    #id_fld = Dataset(cf_in)
     if l_notime:
         Xplot  = nmp.squeeze(  id_fld.variables[cv_in][0:k_stop,j1:j2,i1:i2] )
     else:
         Xplot  = nmp.squeeze(  id_fld.variables[cv_in][jt,0:k_stop,j1:j2,i1:i2] ) ; # t, y, x        
-    #id_fld.close()
     print "Done!\n"
 
-    #lili
-    print ' *** shape of Xplot => ', nmp.shape(Xplot)
+    #print ' *** shape of Xplot => ', nmp.shape(Xplot)
 
     #if l_apply_lap:
     #    print ' *** Computing Laplacian of "'+cv_in+'"!'
@@ -480,7 +477,7 @@ for jt in range(jt0,Nt):
 
     if l_merid: bp.__nice_latitude_axis__(ax, plt, nmp.min(Vx[:]), nmp.max(Vx[:]), dx, axt='x')
     if l_zonal: bp.__nice_longitude_axis__(ax, plt, nmp.min(Vx[:]), nmp.max(Vx[:]), dx, axt='x')
-    bp.__nice_depth_axis__(ax, plt, nmp.min(Vdepth), nmp.max(Vdepth), l_log=False, cunit='m') ####, cfont=font_xylb)
+    bp.__nice_depth_axis__(ax, plt, nmp.min(Vdepth), nmp.max(Vdepth), l_log=False, l_z_inc=False, cunit='m') ####, cfont=font_xylb)
 
     if l_show_lsm:
         clsm = plt.pcolormesh(Vx[:], Vdepth[:], nmp.ma.masked_where(XMSK>0.0001, XMSK), cmap=pal_lsm, norm=norm_lsm) ###, interpolation='none')
