@@ -47,8 +47,8 @@ vml = [ 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ]
 
 fig_type='png'
 dpi = 110
-#color_top = 'white'
-color_top = 'k'
+color_top = 'white'
+#color_top = 'k'
 
 jt0 = 0
 
@@ -138,7 +138,7 @@ if CNEMO == 'eNATL60':
     # Boxes:
     if   CSEC == 'Azores':
         i1=4175 ; j1=1000 ; i2=i1 ; j2=3000 ; k_stop=300
-        size_img_px=nmp.array([1920.,800.]) ; rfact_zoom=1. ; vcb=[0.2, 0.15, 0.5, 0.018]  ; font_rat=1.6
+        size_img_px=nmp.array([1920.,800.]) ; rfact_zoom=1. ; vcb=[0.3, 0.15, 0.5, 0.02]  ; font_rat=1.6
         l_show_clock=True ; x_clock=1600 ; y_clock=150
         dx=5. ; l_save_nc=True
 
@@ -334,8 +334,8 @@ params = { 'font.family':'Helvetica Neue',
            'ytick.labelsize': int(9.*font_rat),
            'axes.labelsize':  int(9.*font_rat) }
 mpl.rcParams.update(params)
-cfont_clb  =  { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(7.*font_rat), 'color':color_top}
-cfont_clock = { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(9.*font_rat), 'color':'w' }
+cfont_clb  =  { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(9.*font_rat), 'color':color_top}
+cfont_clock = { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(9.*font_rat), 'color':color_top }
 cfont_mail =  { 'fontname':'Times New Roman', 'fontweight':'normal', 'fontstyle':'italic', 'fontsize':int(14.*font_rat), 'color':'0.8'}
 cfont_titl =  { 'fontname':'Helvetica Neue', 'fontweight':'light', 'fontsize':int(30.*font_rat), 'color':'w' }
 
@@ -477,7 +477,7 @@ for jt in range(jt0,Nt):
 
     if l_merid: bp.__nice_latitude_axis__(ax, plt, nmp.min(Vx[:]), nmp.max(Vx[:]), dx, axt='x')
     if l_zonal: bp.__nice_longitude_axis__(ax, plt, nmp.min(Vx[:]), nmp.max(Vx[:]), dx, axt='x')
-    bp.__nice_depth_axis__(ax, plt, nmp.min(Vdepth), nmp.max(Vdepth), l_log=False, l_z_inc=False, cunit='m') ####, cfont=font_xylb)
+    bp.__nice_depth_axis__(ax, plt, nmp.min(Vdepth), nmp.max(Vdepth), l_log=False, l_z_inc=False, cunit='(m)', cfont=cfont_clb)
 
     if l_show_lsm:
         clsm = plt.pcolormesh(Vx[:], Vdepth[:], nmp.ma.masked_where(XMSK>0.0001, XMSK), cmap=pal_lsm, norm=norm_lsm) ###, interpolation='none')
@@ -537,7 +537,7 @@ for jt in range(jt0,Nt):
         fig.figimage(im, x_logo-77, y_logo-140., zorder=9)
         del datafile, im
 
-    plt.savefig(cfig, dpi=dpi, orientation='portrait', facecolor='w')
+    plt.savefig(cfig, dpi=dpi, orientation='portrait', facecolor='0.5')
     print cfig+' created!\n'
     plt.close(1)
 
