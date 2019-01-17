@@ -97,6 +97,8 @@ x_logo  = 50 ; y_logo  = 50
 
 cv_msk = 'tmask'
 
+rfactor = 1.0
+
 if   CWHAT == 'U':
     cv_in = 'vozocrtx'
     tmin=-0.4 ; tmax=-tmin ; df=0.1 ; cpal_fld='RdBu_r' ; cb_jump=1
@@ -108,6 +110,13 @@ elif CWHAT == 'V':
     tmin=-0.4 ; tmax=-tmin ; df=0.1 ; cpal_fld='RdBu_r' ; cb_jump=1
     cunit=r'Meridional component of current speed [m/s]'
     cv_msk='vmask' ; l_show_cb=True
+
+elif CWHAT == 'W':
+    cv_in = 'vovecrtz'
+    rfactor = 24.*3600. ; # => m/day
+    tmin=-75 ; tmax=-tmin ; df=5. ; cpal_fld='RdBu_r' ; cb_jump=1
+    cunit=r'Vertical current speed [m/day]'
+    cv_msk='tmask' ; l_show_cb=True
 
 elif CWHAT == 'T':
     cv_in = 'sosstsst' ; #in ['sosstsst','tos']:    
@@ -419,9 +428,9 @@ for jt in range(jt0,Nt):
 
     print "Reading record #"+str(jt)+" of "+cv_in+" in "+cf_in
     if l_notime:
-        Xplot  = nmp.squeeze(  id_fld.variables[cv_in][0:k_stop,j1:j2,i1:i2] )
+        Xplot  = nmp.squeeze(  rfactor*id_fld.variables[cv_in][0:k_stop,j1:j2,i1:i2] )
     else:
-        Xplot  = nmp.squeeze(  id_fld.variables[cv_in][jt,0:k_stop,j1:j2,i1:i2] ) ; # t, y, x        
+        Xplot  = nmp.squeeze(  rfactor*id_fld.variables[cv_in][jt,0:k_stop,j1:j2,i1:i2] ) ; # t, y, x        
     print "Done!\n"
 
     #print ' *** shape of Xplot => ', nmp.shape(Xplot)
