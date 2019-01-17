@@ -59,7 +59,7 @@ l_get_name_of_run = False
 l_show_lsm = True
 l_show_cb = False
 l_annotate_name = False
-l_show_clock = False
+l_show_clock = True
 
 
 cdir_logos = cwd+'/logos'
@@ -114,7 +114,7 @@ elif CWHAT == 'V':
 elif CWHAT == 'W':
     cv_in = 'vovecrtz'
     rfactor = 24.*3600. ; # => m/day
-    tmin=-75 ; tmax=-tmin ; df=5. ; cpal_fld='RdBu_r' ; cb_jump=1
+    tmin=-300. ; tmax=-tmin ; df=5. ; cpal_fld='RdBu_r' ; cb_jump=1
     cunit=r'Vertical current speed [m/day]'
     cv_msk='tmask' ; l_show_cb=True
 
@@ -153,7 +153,7 @@ if CNEMO == 'eNATL60':
     if   CSEC == 'Azores':
         i1=4175 ; j1=1000 ; i2=i1 ; j2=3000 ; k_stop=294 ; x_min = 22.5 ; x_max = 49.0 ; dx=2.
         size_img_px=nmp.array([1920.,800.]) ; rfact_zoom=1. ; vcb=[0.4, 0.15, 0.5, 0.02]  ; font_rat=1.6
-        l_show_clock=True ; x_clock=1600 ; y_clock=150
+        l_show_clock=True ; x_clock=1600 ; y_clock=300
         l_save_nc=False
 
     else:
@@ -164,7 +164,6 @@ elif CNEMO == 'eNATL4':
     # Defaults:
     Ni0 = 559
     Nj0 = 313
-    l_show_clock = False
     l_add_logo_on = False
     x_clock = 1600 ; y_clock = 200 ; x_logo = 2200 ; y_logo  = 50
     cdt = '1h'
