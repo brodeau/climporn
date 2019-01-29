@@ -118,6 +118,15 @@ elif CWHAT == 'SST':
     cunit = r'SST ($^{\circ}$C)'
     l_show_cb = True
 
+elif CWHAT == 'SSS':
+    cv_in = 'sosaline' ; #in ['sosstsst','tos']:    
+    tmin=20. ;  tmax=40.   ;  df = 2. ; cpal_fld = 'ncview_ssec' ;     cb_jump = 2
+    #tmin=0. ;  tmax=32.   ;  df = 2. ; cpal_fld = 'viridis'
+    #tmin=4. ;  tmax=20.   ;  df = 1. ; cpal_fld = 'PuBu'
+    cunit = r'Sea surface salinity'
+    l_show_cb = True
+    #l_save_nc = True
+
 elif CWHAT == 'GRAD_SST':
     cv_in = 'sosstsst'
     l_apply_hgrad = True
@@ -222,6 +231,16 @@ if CNEMO == 'eNATL60':
         l_annotate_name=False ; l_add_logo_ige=False ; l_add_logo_prace=False
         x_clock = 100 ; y_clock = 170 ; x_logo = 2090 ; y_logo  = 10
         if CWHAT == 'SST': tmin=7. ;  tmax=25.   ;  df = 1. ; cpal_fld = 'ncview_nrl'
+
+    elif CBOX == 'LabSea':
+        # 1818,3600 -> 3630,4722
+        #i2=3770 ; j2=Nj0 ; i1=i2-1920; j1=j2-1200;  rfact_zoom=1200./float(j2-j1)   ; vcb=[0.015, 0.07, 0.28, 0.02] ; font_rat=3.*rfact_zoom
+        i2=3770 ; j2=Nj0 ; i1=i2-1920; j1=j2-1080;  rfact_zoom=1080./float(j2-j1)   ; vcb=[0.014, 0.09, 0.25, 0.02] ; font_rat=3.*rfact_zoom
+        l_annotate_name=False ; l_add_logo_ige=False ; l_add_logo_prace=False
+        x_clock = 40 ; y_clock = 170 ; x_logo = 2090 ; y_logo  = 10
+        if CWHAT == 'SST': tmin=-2. ;  tmax=15.;  df = 1. ; cpal_fld = 'ncview_nrl'
+        if CWHAT == 'SSS': tmin=28. ; tmax=35.5 ;  df = 1. ; cb_jump = 1 ; cpal_fld = 'gist_stern_r'
+        l_save_nc = False
 
     elif CBOX == 'BlackSea':
         i1=Ni0-1920; j1=3330-1080; i2=Ni0 ; j2=3330 ; rfact_zoom=1.   ; vcb=[0.5, 0.875, 0.485, 0.02] ; font_rat=2.*rfact_zoom
@@ -647,17 +666,17 @@ for jt in range(jt0,Nt):
         ax2 = plt.axes(vcb)
         clb = mpl.colorbar.ColorbarBase(ax2, ticks=vc_fld, cmap=pal_fld, norm=norm_fld, orientation='horizontal', extend=cb_extend)
         cb_labs = []
-        if cb_jump > 1:
-            cpt = 0
-            for rr in vc_fld:
-                if cpt % cb_jump == 0:
-                    if df >= 1.: cb_labs.append(str(int(rr)))
-                    if df <  1.: cb_labs.append(str(round(rr,int(nmp.ceil(nmp.log10(1./df)))+1) ))
-                else:
-                    cb_labs.append(' ')
-                cpt = cpt + 1
-        else:
-            for rr in vc_fld: cb_labs.append(str(round(rr,int(nmp.ceil(nmp.log10(1./df)))+1) ))
+        #if cb_jump > 1:
+        cpt = 0
+        for rr in vc_fld:
+            if cpt % cb_jump == 0:
+                if df >= 1.: cb_labs.append(str(int(rr)))
+                if df <  1.: cb_labs.append(str(round(rr,int(nmp.ceil(nmp.log10(1./df)))+1) ))
+            else:
+                cb_labs.append(' ')
+            cpt = cpt + 1
+        #else:
+        #    for rr in vc_fld: cb_labs.append(str(round(rr,int(nmp.ceil(nmp.log10(1./df)))+1) ))
 
         clb.ax.set_xticklabels(cb_labs, **cfont_clb)
         clb.set_label(cunit, **cfont_clb)

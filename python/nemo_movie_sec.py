@@ -114,7 +114,7 @@ elif CWHAT == 'V':
 elif CWHAT == 'W':
     cv_in = 'vovecrtz'
     rfactor = 24.*3600. ; # => m/day
-    tmin=-300. ; tmax=-tmin ; df=50. ; cpal_fld='RdBu_r' ; cb_jump=1.
+    tmin=-500. ; tmax=-tmin ; df=100. ; cpal_fld='RdBu_r' ; cb_jump=1.
     cunit=r'Vertical current speed [m/day]'
     cv_msk='tmask' ; l_show_cb=True
 
