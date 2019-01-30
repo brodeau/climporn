@@ -33,7 +33,8 @@ import barakuda_tool as bt
 color_top = 'white'
 #color_top = 'k'
 
-
+l_show_cb = True
+l_show_nm = True
 
 
 
@@ -60,8 +61,9 @@ i2=0
 j2=0
 
 if CNEMO == 'NATL60':
-    i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 1. ; vcb = [0.6, 0.1, 0.39, 0.025] ; font_rat = 7.
+    i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 0.25 ; vcb = [0.6, 0.1, 0.39, 0.025] ; font_rat = 5.*rfact_zoom
     x_cnf = 160. ; y_cnf = 2300. ; # where to put label of conf on Figure...
+    l_show_cb = False ; l_show_nm = False
     
 elif CNEMO == 'NANUK1':
     i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 4. ; vcb = [0.5, 0.875, 0.49, 0.02] ; font_rat = 0.16*rfact_zoom
@@ -80,12 +82,14 @@ elif CNEMO == 'CREG025':
     x_cnf = 20. ; y_cnf = 560. ; # where to put label of conf on Figure...
 
 elif CNEMO == 'eNATL4':
-    i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 1. ; vcb = [0.6, 0.11, 0.39, 0.025] ; font_rat = 0.5*rfact_zoom
+    i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 0.25 ; vcb = [0.6, 0.11, 0.39, 0.025] ; font_rat = 0.5*rfact_zoom
     x_cnf = 20. ; y_cnf = 560. ; # where to put label of conf on Figure...
+    l_show_cb = False ; l_show_nm = False
 
 elif CNEMO == 'eNATL60':
-    i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 1. ; vcb = [0.6, 0.1, 0.39, 0.025] ; font_rat = 5.
+    i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 0.25 ; vcb = [0.6, 0.1, 0.39, 0.025] ; font_rat = 5.*rfact_zoom
     x_cnf = 160. ; y_cnf = 4000. ; # where to put label of conf on Figure...
+    l_show_cb = False ; l_show_nm = False
 
 elif CNEMO == 'eNATL1':
     i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 6.
@@ -302,38 +306,38 @@ plt.axis([ 0, Ni, 0, Nj])
 
 #ax2 = plt.axes([0.3, 0.08, 0.4, 0.025])
 
-ax2 = plt.axes(vcb)
+if l_show_cb:
+
+    ax2 = plt.axes(vcb)
     
-clb = mpl.colorbar.ColorbarBase(ax2, ticks=vc_fld, cmap=pal_fld, norm=norm_fld, orientation='horizontal', extend=cextend)
-if cb_jump > 1:
-    cb_labs = [] ; cpt = 0
-    for rr in vc_fld:
-        if cpt % cb_jump == 0:
-            if df >= 1.: cb_labs.append(str(int(rr)))
-            if df <  1.: cb_labs.append(str(rr))
-        else:
-            cb_labs.append(' ')
-        cpt = cpt + 1
-    clb.ax.set_xticklabels(cb_labs)    
-clb.set_label(cunit, **cfont_clb)
-clb.ax.yaxis.set_tick_params(color=color_top) ; # set colorbar tick color    
-#clb.outline.set_edgecolor(color_top) ; # set colorbar edgecolor
-if l_hide_cb_ticks: clb.ax.tick_params(axis=u'both', which=u'both',length=0) ; # remove ticks!
-plt.setp(plt.getp(clb.ax.axes, 'xticklabels'), color=color_top) ; # set colorbar ticklabels
+    clb = mpl.colorbar.ColorbarBase(ax2, ticks=vc_fld, cmap=pal_fld, norm=norm_fld, orientation='horizontal', extend=cextend)
+    if cb_jump > 1:
+        cb_labs = [] ; cpt = 0
+        for rr in vc_fld:
+            if cpt % cb_jump == 0:
+                if df >= 1.: cb_labs.append(str(int(rr)))
+                if df <  1.: cb_labs.append(str(rr))
+            else:
+                cb_labs.append(' ')
+            cpt = cpt + 1
+        clb.ax.set_xticklabels(cb_labs)    
+    clb.set_label(cunit, **cfont_clb)
+    clb.ax.yaxis.set_tick_params(color=color_top) ; # set colorbar tick color    
+    #clb.outline.set_edgecolor(color_top) ; # set colorbar edgecolor
+    if l_hide_cb_ticks: clb.ax.tick_params(axis=u'both', which=u'both',length=0) ; # remove ticks!
+    plt.setp(plt.getp(clb.ax.axes, 'xticklabels'), color=color_top) ; # set colorbar ticklabels
+        
+    del cf
     
-del cf
-
-
-#x_annot = nxr-nxr*0.22.*font_rat ; y_annot = 150
-x_annot = 650 ; y_annot = 1035
-
-#ax.annotate('Date: '+cday+' '+chour+':00',   xy=(1, 4), xytext=(x_annot,    y_annot), **cfont_date)
-
-#ax.annotate('laurent.brodeau@ocean-next.fr', xy=(1, 4), xytext=(x_annot+150, 20), **cfont_mail)
 
 
 
-ax.annotate(CNEMO, xy=(1, 4), xytext=(x_cnf, y_cnf), **cfont_titl)
+if l_show_nm:
+    #x_annot = nxr-nxr*0.22.*font_rat ; y_annot = 150
+    x_annot = 650 ; y_annot = 1035
+    #ax.annotate('Date: '+cday+' '+chour+':00',   xy=(1, 4), xytext=(x_annot,    y_annot), **cfont_date)
+    #ax.annotate('laurent.brodeau@ocean-next.fr', xy=(1, 4), xytext=(x_annot+150, 20), **cfont_mail)
+    ax.annotate(CNEMO, xy=(1, 4), xytext=(x_cnf, y_cnf), **cfont_titl)
 
 
 
@@ -342,6 +346,6 @@ print cfig+' created!\n'
 plt.close(1)
 
 
-del cm, fig, ax, clb
+del cm, fig, ax
 
 

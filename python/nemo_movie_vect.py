@@ -2,14 +2,15 @@
 
 #       B a r a K u d a
 #
-#  Prepare 2D maps (monthly) that will later become a GIF animation!
+#  Prepare 2D maps (monthly) that will later become a movie!
 #  NEMO output and observations needed
 #
-#    L. Brodeau, May 2018
+#    L. Brodeau, January 2019
 
 import sys
 from os import path, getcwd
 from string import replace
+import argparse as ap
 import numpy as nmp
 
 from netCDF4 import Dataset
@@ -80,19 +81,55 @@ romega = 2.*nmp.pi/86400.0
 
 cb_extend = 'both' ;#colorbar extrema
 
-narg = len(sys.argv)
-if narg < 10: print 'Usage: '+sys.argv[0]+' <NEMOCONF> <BOX> <WHAT (CURL,CURLOF,CSPEED,TKE)> <fileX> <varX> <fileY> <varY> <LSM_file> <YYYYMMDD (start)> (<TOPO_FILE>)'; sys.exit(0)
-CNEMO  = sys.argv[1]
-CBOX   = sys.argv[2]
-CWHAT  = sys.argv[3]
-cfx_in = sys.argv[4] ; cvx_in = sys.argv[5]
-cfy_in = sys.argv[6] ; cvy_in = sys.argv[7]
-cf_lsm = sys.argv[8] ; cf_clock0=sys.argv[9]
 
+################## ARGUMENT PARSING / USAGE ################################################################################################
+parser = ap.ArgumentParser(description='Generate pixel maps of a given scalar.')
+parser.add_argument('-C', '--conf', default="eNATL60",      help='specify NEMO config (ex: eNATL60)')
+parser.add_argument('-b', '--box' , default="ALL",          help='specify extraction box name (ex: ALL)')
+parser.add_argument('-w', '--what', default="SST",          help='specify the field/diagnostic to plot (ex: SST)')
+parser.add_argument('-u', '--fiu' ,                         help='specify the NEMO netCDF U file to read from...')
+parser.add_argument('-v', '--fiv' ,                         help='specify the NEMO netCDF V file to read from...')
+parser.add_argument('-x', '--fldx' ,                        help='specify the name of the NEMO U field in U file')
+parser.add_argument('-y', '--fldy' ,                        help='specify the name of the NEMO V field in V file')
+parser.add_argument('-m', '--fmm' , default="mesh_mask.nc", help='specify the NEMO mesh_mask file (ex: mesh_mask.nc)')
+parser.add_argument('-s', '--sd0' , default="20090101",     help='specify initial date as <YYYYMMDD>')
+parser.add_argument('-l', '--lev' , type=int, default=0,    help='specify the level to use if 3D field (default: 0 => 2D)')
+parser.add_argument('-z', '--zld' ,                         help='specify the topography netCDF file to use (field="z")')
+args = parser.parse_args()
+
+CNEMO = args.conf
+CBOX  = args.box
+CWHAT = args.what
+cfx_in = args.fiu
+cfy_in = args.fiv
+cvx_in = args.fldx
+cvy_in = args.fldy
+cf_mm = args.fmm
+csd0  = args.sd0
+jk    = args.lev
+cf_topo_land = args.zld
+
+print ''
+print ' *** CNEMO = ', CNEMO
+print ' *** CBOX  = ', CBOX
+print ' *** CWHAT = ', CWHAT
+print ' *** cfx_in = ', cfx_in
+print ' *** cvx_in = ', cvx_in
+print ' *** cfx_in = ', cfy_in
+print ' *** cvx_in = ', cvy_in
+print ' *** cf_mm = ', cf_mm
+print ' *** csd0 = ', csd0
+print ' ***   jk  = ', jk
 l_add_topo_land = False
-if narg == 11:
+if args.zld != None:
+    print ' *** cf_topo_land = ', cf_topo_land
     l_add_topo_land = True
-    cf_topo_land = sys.argv[10]
+###############################################################################################################################################
+
+
+
+
+
 
 
 x_logo  = 50 ; y_logo  = 50
@@ -364,9 +401,9 @@ print '\n================================================================\n\n\n'
 
 
 
-cyr0=cf_clock0[0:4]
-cmn0=cf_clock0[4:6]
-cdd0=cf_clock0[6:8]
+cyr0=csd0[0:4]
+cmn0=csd0[4:6]
+cdd0=csd0[6:8]
 
 
 l_3d_field = False

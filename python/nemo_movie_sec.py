@@ -10,6 +10,7 @@
 import sys
 from os import path, getcwd
 from string import replace
+import argparse as ap
 import numpy as nmp
 
 from netCDF4 import Dataset
@@ -34,7 +35,6 @@ import barakuda_colmap as bcm
 import barakuda_plot as bp
 import barakuda_tool as bt
 import barakuda_ncio as bnc
-
 
 
 cwd = getcwd()
@@ -81,14 +81,32 @@ l_apply_hgrad = False
 
 cb_extend = 'both' ;#colorbar extrema
 
-narg = len(sys.argv)
-if narg != 7: print 'Usage: '+sys.argv[0]+' <NEMOCONF> <SEC> <WHAT (SST, SSH, MLD, SSU, SSV, LAP_SSH, GRAD_SST)> <file> <LSM_file> <YYYYMMDD (start)>'; sys.exit(0)
-CNEMO  = sys.argv[1]
-CSEC   = sys.argv[2]
-CWHAT  = sys.argv[3]
-cf_in = sys.argv[4]
-cf_lsm=sys.argv[5]
-cf_clock0=sys.argv[6]
+
+################## ARGUMENT PARSING / USAGE ################################################################################################
+parser = ap.ArgumentParser(description='Generate pixel maps of a given scalar.')
+parser.add_argument('-C', '--conf', default="eNATL60",      help='specify NEMO config (ex: eNATL60)')
+parser.add_argument('-b', '--sec' , default="Azores",       help='specify extraction sec name (ex: ALL)')
+parser.add_argument('-w', '--what', default="SST",          help='specify the field/diagnostic to plot (ex: SST)')
+parser.add_argument('-i', '--fin' ,                         help='specify the NEMO netCDF file to read from...')
+parser.add_argument('-m', '--fmm' , default="mesh_mask.nc", help='specify the NEMO mesh_mask file (ex: mesh_mask.nc)')
+parser.add_argument('-s', '--sd0' , default="20090101",     help='specify initial date as <YYYYMMDD>')
+args = parser.parse_args()
+
+CNEMO = args.conf
+CSEC  = args.sec
+CWHAT = args.what
+cf_in = args.fin
+cf_mm = args.fmm
+csd0  = args.sd0
+
+print ''
+print ' *** CNEMO = ', CNEMO
+print ' *** CSEC  = ', CSEC
+print ' *** CWHAT = ', CWHAT
+print ' *** cf_in = ', cf_in
+print ' *** cf_mm = ', cf_mm
+print ' *** csd0 = ', csd0
+###############################################################################################################################################
 
 
 
@@ -149,7 +167,7 @@ if CNEMO == 'eNATL60':
     cdt = '1h'
     l_get_name_of_run = True
 
-    # Boxes:
+    # Sections:
     if   CSEC == 'Azores':
         i1=4175 ; j1=1000 ; i2=i1 ; j2=3000 ; k_stop=294 ; x_min = 22.5 ; x_max = 49.0 ; dx=2.
         size_img_px=nmp.array([1920.,800.]) ; rfact_zoom=1. ; vcb=[0.4, 0.15, 0.5, 0.02]  ; font_rat=1.6
@@ -247,9 +265,9 @@ print '\n================================================================\n\n\n'
 
 print ' size_figure =>', size_figure
 
-cyr0=cf_clock0[0:4]
-cmn0=cf_clock0[4:6]
-cdd0=cf_clock0[6:8]
+cyr0=csd0[0:4]
+cmn0=csd0[4:6]
+cdd0=csd0[6:8]
 
 
 l_3d_field = False

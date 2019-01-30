@@ -2,14 +2,15 @@
 
 #       B a r a K u d a
 #
-#  Prepare 2D maps (monthly) that will later become a GIF animation!
+#  Prepare 2D maps (monthly) that will later become a movie!
 #  NEMO output and observations needed
 #
-#    L. Brodeau, May 2018
+#    L. Brodeau, January 2019
 
 import sys
 from os import path, getcwd
 from string import replace
+import argparse as ap
 import numpy as nmp
 
 from netCDF4 import Dataset
@@ -35,9 +36,7 @@ import barakuda_tool as bt
 import barakuda_ncio as bnc
 
 
-
 cwd = getcwd()
-
 
 l_smooth = False
 
@@ -83,19 +82,45 @@ l_apply_hgrad = False
 
 cb_extend = 'both' ;#colorbar extrema
 
-narg = len(sys.argv)
-if narg < 7: print 'Usage: '+sys.argv[0]+' <NEMOCONF> <BOX> <WHAT (SST, SSH, MLD, SSU, SSV, LAP_SSH, GRAD_SST)> <file> <LSM_file> <YYYYMMDD (start)> (<TOPO_FILE>)'; sys.exit(0)
-CNEMO  = sys.argv[1]
-CBOX   = sys.argv[2]
-CWHAT  = sys.argv[3]
-cf_in = sys.argv[4]
-cf_lsm=sys.argv[5]
-cf_clock0=sys.argv[6]
 
+################## ARGUMENT PARSING / USAGE ################################################################################################
+parser = ap.ArgumentParser(description='Generate pixel maps of a given scalar.')
+parser.add_argument('-C', '--conf', default="eNATL60",      help='specify NEMO config (ex: eNATL60)')
+parser.add_argument('-b', '--box' , default="ALL",          help='specify extraction box name (ex: ALL)')
+parser.add_argument('-w', '--what', default="SST",          help='specify the field/diagnostic to plot (ex: SST)')
+parser.add_argument('-i', '--fin' ,                         help='specify the NEMO netCDF file to read from...')
+parser.add_argument('-m', '--fmm' , default="mesh_mask.nc", help='specify the NEMO mesh_mask file (ex: mesh_mask.nc)')
+parser.add_argument('-s', '--sd0' , default="20090101",     help='specify initial date as <YYYYMMDD>')
+parser.add_argument('-l', '--lev' , type=int, default=0,    help='specify the level to use if 3D field (default: 0 => 2D)')
+parser.add_argument('-z', '--zld' ,                         help='specify the topography netCDF file to use (field="z")')
+args = parser.parse_args()
+
+CNEMO = args.conf
+CBOX  = args.box
+CWHAT = args.what
+cf_in = args.fin
+cf_mm = args.fmm
+csd0  = args.sd0
+jk    = args.lev
+cf_topo_land = args.zld
+
+print ''
+print ' *** CNEMO = ', CNEMO
+print ' *** CBOX  = ', CBOX
+print ' *** CWHAT = ', CWHAT
+print ' *** cf_in = ', cf_in
+print ' *** cf_mm = ', cf_mm
+print ' *** csd0 = ', csd0
+print ' ***   jk  = ', jk
 l_add_topo_land = False
-if narg == 8:
+if args.zld != None:
+    print ' *** cf_topo_land = ', cf_topo_land
     l_add_topo_land = True
-    cf_topo_land = sys.argv[7]
+###############################################################################################################################################
+
+
+
+
 
 
 
@@ -187,6 +212,7 @@ elif CWHAT == 'Phase':
 else:
     print 'ERROR: we do not know variable "'+str(cv_in)+'" !'
     sys.exit(0)
+
 
     
 if CNEMO == 'eNATL60':
@@ -323,8 +349,10 @@ elif CNEMO == 'eNATL4':
     if   CBOX == 'ALL':
         i1=0   ; j1=0    ; i2=Ni0 ; j2=Nj0  ; rfact_zoom=3. ; vcb=[0.59, 0.1, 0.39, 0.018]  ; font_rat=0.7*rfact_zoom
         l_show_cb = True
+    else:
+        print ' ERROR: unknow box "'+CBOX+'" for config "'+CNEMO+'" !!!'
+        sys.exit(0)
 
-    
 else:
     print 'ERROR: we do not know NEMO config "'+str(CNEMO)+'" !'
     sys.exit(0)
@@ -338,8 +366,6 @@ if l_get_name_of_run:
         print 'ERROR: your file name is not consistent with "'+CNEMO+'" !!! ('+vv[0]+')' ; sys.exit(0)
     CRUN = vv[1]
     print '\n Run is called: "'+CRUN+'" !\n'
-
-    
 
 
     
@@ -379,9 +405,9 @@ print '\n================================================================\n\n\n'
 
 
 
-cyr0=cf_clock0[0:4]
-cmn0=cf_clock0[4:6]
-cdd0=cf_clock0[6:8]
+cyr0=csd0[0:4]
+cmn0=csd0[4:6]
+cdd0=csd0[6:8]
 
 
 l_3d_field = False
