@@ -428,7 +428,7 @@ if l_do_ice:
 
 if l_do_ice: bt.chck4f(cf_ice)
 
-bt.chck4f(cf_lsm)
+bt.chck4f(cf_mm)
 
 l_notime=False
 bt.chck4f(cf_in)
@@ -450,8 +450,8 @@ if not l_notime: Nt = len(vtime)
 
 
 if l_show_lsm or l_apply_lap or l_apply_hgrad or l_add_topo_land:
-    bt.chck4f(cf_lsm)
-    id_lsm = Dataset(cf_lsm)
+    bt.chck4f(cf_mm)
+    id_lsm = Dataset(cf_mm)
     nb_dim = len(id_lsm.variables[cv_msk].dimensions)
     print ' The mesh_mask has '+str(nb_dim)+' dimmensions!'
     print ' *** Reading '+cv_msk+' !'

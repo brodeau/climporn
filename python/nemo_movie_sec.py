@@ -273,7 +273,7 @@ cdd0=csd0[6:8]
 l_3d_field = False
 
 
-bt.chck4f(cf_lsm)
+bt.chck4f(cf_mm)
 
 l_notime=False
 bt.chck4f(cf_in)
@@ -295,8 +295,8 @@ if not l_notime: Nt = len(vtime)
 
 
 
-bt.chck4f(cf_lsm)
-id_lsm = Dataset(cf_lsm)
+bt.chck4f(cf_mm)
+id_lsm = Dataset(cf_mm)
 #
 nb_dim = len(id_lsm.variables[cv_msk].dimensions)
 print ' The mesh_mask has '+str(nb_dim)+' dimmensions!'

@@ -424,7 +424,7 @@ if l_do_ice:
 
 if l_do_ice: bt.chck4f(cf_ice)
 
-bt.chck4f(cf_lsm)
+bt.chck4f(cf_mm)
 bt.chck4f(cfx_in)
 bt.chck4f(cfy_in)
 
@@ -435,8 +435,8 @@ id_fx.close()
 Nt = len(vtime)
 
 if l_show_lsm or l_do_crl or l_do_cof or l_do_cspd or l_do_tke or l_do_eke:
-    print "\nReading record metrics in "+cf_lsm
-    id_lsm = Dataset(cf_lsm)
+    print "\nReading record metrics in "+cf_mm
+    id_lsm = Dataset(cf_mm)
     nb_dim = len(id_lsm.variables['tmask'].dimensions)
     print ' The mesh_mask has '+str(nb_dim)+' dimmensions!'
     if l_show_lsm:
