@@ -84,17 +84,21 @@ cb_extend = 'both' ;#colorbar extrema
 
 ################## ARGUMENT PARSING / USAGE ################################################################################################
 parser = ap.ArgumentParser(description='Generate pixel maps of a given scalar.')
+
+requiredNamed = parser.add_argument_group('required arguments')
+requiredNamed.add_argument('-u', '--fiu' , required=True, help='specify the NEMO netCDF U file to read from...')
+requiredNamed.add_argument('-v', '--fiv' , required=True, help='specify the NEMO netCDF V file to read from...')
+requiredNamed.add_argument('-x', '--fldx', required=True, help='specify the name of the NEMO U field in U file')
+requiredNamed.add_argument('-y', '--fldy', required=True, help='specify the name of the NEMO V field in V file')
+requiredNamed.add_argument('-w', '--what', required=True, help='specify the field/diagnostic to plot (ex: CSPEED,CURLOF,ect.)')
+
 parser.add_argument('-C', '--conf', default="eNATL60",      help='specify NEMO config (ex: eNATL60)')
 parser.add_argument('-b', '--box' , default="ALL",          help='specify extraction box name (ex: ALL)')
-parser.add_argument('-w', '--what', default="SST",          help='specify the field/diagnostic to plot (ex: SST)')
-parser.add_argument('-u', '--fiu' ,                         help='specify the NEMO netCDF U file to read from...')
-parser.add_argument('-v', '--fiv' ,                         help='specify the NEMO netCDF V file to read from...')
-parser.add_argument('-x', '--fldx' ,                        help='specify the name of the NEMO U field in U file')
-parser.add_argument('-y', '--fldy' ,                        help='specify the name of the NEMO V field in V file')
 parser.add_argument('-m', '--fmm' , default="mesh_mask.nc", help='specify the NEMO mesh_mask file (ex: mesh_mask.nc)')
 parser.add_argument('-s', '--sd0' , default="20090101",     help='specify initial date as <YYYYMMDD>')
 parser.add_argument('-l', '--lev' , type=int, default=0,    help='specify the level to use if 3D field (default: 0 => 2D)')
 parser.add_argument('-z', '--zld' ,                         help='specify the topography netCDF file to use (field="z")')
+
 args = parser.parse_args()
 
 CNEMO = args.conf
@@ -262,7 +266,6 @@ if CNEMO == 'eNATL60':
         i1=5400; j1=1530; i2=Ni0 ; j2=3310 ; rfact_zoom=1440./float(j2-j1)   ; vcb=[0.025, 0.06, 0.4, 0.02] ; font_rat=3.*rfact_zoom
         l_annotate_name=False ; l_add_logo_ige=False ; l_add_logo_prace=False
         x_clock = 100 ; y_clock = 170 ; x_logo = 2090 ; y_logo  = 10
-        if CWHAT == 'SST': tmin=7. ;  tmax=25.   ;  df = 1. ; cpal_fld = 'ncview_nrl'
 
     elif CBOX == 'BlackSea':
         i1=Ni0-1920; j1=3330-1080; i2=Ni0 ; j2=3330 ; rfact_zoom=1.   ; vcb=[0.5, 0.875, 0.485, 0.02] ; font_rat=2.*rfact_zoom

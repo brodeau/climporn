@@ -84,12 +84,16 @@ cb_extend = 'both' ;#colorbar extrema
 
 ################## ARGUMENT PARSING / USAGE ################################################################################################
 parser = ap.ArgumentParser(description='Generate pixel maps of a given scalar.')
+
+requiredNamed = parser.add_argument_group('required arguments')
+requiredNamed.add_argument('-i', '--fin' , required=True,                help='specify the NEMO netCDF file to read from...')
+requiredNamed.add_argument('-w', '--what', required=True, default="SST", help='specify the field/diagnostic to plot (ex: SST)')
+
 parser.add_argument('-C', '--conf', default="eNATL60",      help='specify NEMO config (ex: eNATL60)')
-parser.add_argument('-b', '--sec' , default="Azores",       help='specify extraction sec name (ex: ALL)')
-parser.add_argument('-w', '--what', default="SST",          help='specify the field/diagnostic to plot (ex: SST)')
-parser.add_argument('-i', '--fin' ,                         help='specify the NEMO netCDF file to read from...')
+parser.add_argument('-b', '--sec' , default="Azores",       help='specify extraction section name (ex: ALL)')
 parser.add_argument('-m', '--fmm' , default="mesh_mask.nc", help='specify the NEMO mesh_mask file (ex: mesh_mask.nc)')
 parser.add_argument('-s', '--sd0' , default="20090101",     help='specify initial date as <YYYYMMDD>')
+
 args = parser.parse_args()
 
 CNEMO = args.conf
