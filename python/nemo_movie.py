@@ -116,6 +116,8 @@ l_add_topo_land = False
 if args.zld != None:
     print ' *** cf_topo_land = ', cf_topo_land
     l_add_topo_land = True
+l3d = False
+if jk > 0: l3d=True
 ###############################################################################################################################################
 
 
@@ -151,6 +153,14 @@ elif CWHAT == 'SSS':
     cunit = r'Sea surface salinity'
     l_show_cb = True
     #l_save_nc = True
+
+elif CWHAT == 'S':
+    cv_in = 'vosaline' ; #in ['sosstsst','tos']:    
+    #tmin=32. ;  tmax=38.   ;  df = 1. ; cpal_fld = 'ncview_ssec' ;     cb_jump = 1
+    tmin=33.5 ;  tmax=36.5   ;  df = 0.5 ; cpal_fld = 'ncview_helix2' ; cb_jump = 1
+    cunit = r'Salinity'
+    l_show_cb = True
+    l_save_nc = False
 
 elif CWHAT == 'GRAD_SST':
     cv_in = 'sosstsst'
@@ -455,8 +465,8 @@ if l_show_lsm or l_apply_lap or l_apply_hgrad or l_add_topo_land:
     nb_dim = len(id_lsm.variables[cv_msk].dimensions)
     print ' The mesh_mask has '+str(nb_dim)+' dimmensions!'
     print ' *** Reading '+cv_msk+' !'
-    if nb_dim==4: XMSK = id_lsm.variables[cv_msk][0,0,j1:j2,i1:i2]
-    if nb_dim==3: XMSK = id_lsm.variables[cv_msk][0,j1:j2,i1:i2]
+    if nb_dim==4: XMSK = id_lsm.variables[cv_msk][0,jk,j1:j2,i1:i2]
+    if nb_dim==3: XMSK = id_lsm.variables[cv_msk][jk,j1:j2,i1:i2]
     if nb_dim==2: XMSK = id_lsm.variables[cv_msk][j1:j2,i1:i2]
     (nj,ni) = nmp.shape(XMSK)
 
@@ -472,17 +482,22 @@ if l_show_lsm or l_apply_lap or l_apply_hgrad or l_add_topo_land:
         XE2V = id_lsm.variables['e2v'][0,j1:j2,i1:i2]
         print ' *** Reading umask and vmask !'
         if nb_dim==4:
-            UMSK = id_lsm.variables['umask'][0,0,j1:j2,i1:i2]
-            VMSK = id_lsm.variables['vmask'][0,0,j1:j2,i1:i2]
+            UMSK = id_lsm.variables['umask'][0,jk,j1:j2,i1:i2]
+            VMSK = id_lsm.variables['vmask'][0,jk,j1:j2,i1:i2]
         if nb_dim==3:
-            UMSK = id_lsm.variables['umask'][0,j1:j2,i1:i2]
-            VMSK = id_lsm.variables['vmask'][0,j1:j2,i1:i2]
+            UMSK = id_lsm.variables['umask'][jk,j1:j2,i1:i2]
+            VMSK = id_lsm.variables['vmask'][jk,j1:j2,i1:i2]
         if nb_dim==2:
             UMSK = id_lsm.variables['umask'][j1:j2,i1:i2]
             VMSK = id_lsm.variables['vmask'][j1:j2,i1:i2]
     if l_save_nc:
         Xlon = id_lsm.variables['glamt'][0,j1:j2,i1:i2]
         Xlat = id_lsm.variables['gphit'][0,j1:j2,i1:i2]
+        
+    if l3d:
+        vdepth = id_lsm.variables['gdept_1d'][0,:]
+        zdepth = vdepth[jk]
+        cdepth = str(round(zdepth,1))+'m'
     id_lsm.close()
 
     print 'Shape Arrays => ni,nj =', ni,nj
@@ -590,8 +605,10 @@ for jt in range(jt0,Nt):
     chour = ct[11:13] ; print ' *** chour :', chour
 
 
-
-    cfig = 'figs/'+cv_in+'_'+CNEMO+'-'+CRUN+'_'+CBOX+'_'+cday+'_'+chour+'_'+cpal_fld+'.'+fig_type
+    if l3d:
+        cfig = 'figs/'+cv_in+'_'+CNEMO+'-'+CRUN+'_lev'+str(jk)+'_'+CBOX+'_'+cday+'_'+chour+'_'+cpal_fld+'.'+fig_type
+    else:
+        cfig = 'figs/'+cv_in+'_'+CNEMO+'-'+CRUN+'_'+CBOX+'_'+cday+'_'+chour+'_'+cpal_fld+'.'+fig_type
 
     ###### FIGURE ##############
 
@@ -602,12 +619,20 @@ for jt in range(jt0,Nt):
     vc_fld = nmp.arange(tmin, tmax + df, df)
 
 
+    
     print "Reading record #"+str(jt)+" of "+cv_in+" in "+cf_in
+    if l3d: print '            => at level #'+str(jk)+' ('+cdepth+')!'
     id_fld = Dataset(cf_in)
     if l_notime:
-        Xplot  = id_fld.variables[cv_in][j1:j2,i1:i2]
+        if l3d:
+            Xplot  = id_fld.variables[cv_in][jk,j1:j2,i1:i2]
+        else:
+            Xplot  = id_fld.variables[cv_in][j1:j2,i1:i2]
     else:
-        Xplot  = id_fld.variables[cv_in][jt,j1:j2,i1:i2] ; # t, y, x        
+        if l3d:
+            Xplot  = id_fld.variables[cv_in][jt,jk,j1:j2,i1:i2] ; # t, y, x        
+        else:
+            Xplot  = id_fld.variables[cv_in][jt,j1:j2,i1:i2] ; # t, y, x        
     id_fld.close()
     print "Done!\n"
 
@@ -647,7 +672,10 @@ for jt in range(jt0,Nt):
     print '  *** dimension of array => ', ni, nj, nmp.shape(Xplot)
 
     if l_save_nc:
-        cf_out = 'nc/'+CWHAT+'_NEMO_'+CNEMO+'_'+CBOX+'_'+cday+'_'+chour+'_'+cpal_fld+'.nc'
+        if l3d:
+            cf_out = 'nc/'+CWHAT+'_NEMO_'+CNEMO+'_lev'+str(jk)+'_'+CBOX+'_'+cday+'_'+chour+'_'+cpal_fld+'.nc'
+        else:
+            cf_out = 'nc/'+CWHAT+'_NEMO_'+CNEMO+'_'+CBOX+'_'+cday+'_'+chour+'_'+cpal_fld+'.nc'
         print ' Saving in '+cf_out
         bnc.dump_2d_field(cf_out, Xplot, xlon=Xlon, xlat=Xlat, name=CWHAT)
         print ''
@@ -705,6 +733,7 @@ for jt in range(jt0,Nt):
         #    for rr in vc_fld: cb_labs.append(str(round(rr,int(nmp.ceil(nmp.log10(1./df)))+1) ))
 
         clb.ax.set_xticklabels(cb_labs, **cfont_clb)
+        if l3d: cunit = cunit+' at '+cdepth
         clb.set_label(cunit, **cfont_clb)
         clb.ax.yaxis.set_tick_params(color=color_top) ; # set colorbar tick color
         clb.outline.set_edgecolor(color_top) ; # set colorbar edgecolor
