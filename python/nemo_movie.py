@@ -568,8 +568,8 @@ else:
     print 'ERROR: unknown dt!'
 
 
-
-
+if l3d: cunit = cunit+' at '+cdepth
+    
 ntpd = 24/dt
 
 vm = vmn
@@ -733,7 +733,6 @@ for jt in range(jt0,Nt):
         #    for rr in vc_fld: cb_labs.append(str(round(rr,int(nmp.ceil(nmp.log10(1./df)))+1) ))
 
         clb.ax.set_xticklabels(cb_labs, **cfont_clb)
-        if l3d: cunit = cunit+' at '+cdepth
         clb.set_label(cunit, **cfont_clb)
         clb.ax.yaxis.set_tick_params(color=color_top) ; # set colorbar tick color
         clb.outline.set_edgecolor(color_top) ; # set colorbar edgecolor
