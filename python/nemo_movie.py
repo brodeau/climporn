@@ -112,7 +112,7 @@ if   CWHAT == 'MLD':
 
 elif CWHAT == 'SST':
     cv_in = 'sosstsst' ; #in ['sosstsst','tos']:    
-    tmin=-2 ;  tmax=30.   ;  df = 1. ; cpal_fld = 'ncview_nrl' ;     cb_jump = 2
+    tmin=-2 ;  tmax=32.   ;  df = 1. ; cpal_fld = 'ncview_nrl' ;     cb_jump = 2
     #tmin=0. ;  tmax=32.   ;  df = 2. ; cpal_fld = 'viridis'
     #tmin=4. ;  tmax=20.   ;  df = 1. ; cpal_fld = 'PuBu'
     cunit = r'SST ($^{\circ}$C)'
