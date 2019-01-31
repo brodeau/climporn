@@ -10,11 +10,12 @@ FRAMERATE_OUT="25" ; # Normal ?
 FIMG="png"
 HEIGHT="1080"
 CODEC="x264"
-FRAMERATE_IN=12
+FRAMERATE_IN=25
 CRF=20
 PRESET="medium"
 FVID="mp4"
 NTHRD="1"
+DROPFRAMES=0
 
 usage()
 {
@@ -29,6 +30,7 @@ usage()
     echo "      -C: CRF value, 0 is lossless and 51 worse possible (default='${CRF}') [ffmpeg default=23]"
     echo "      -p: preset for encoding (default='${PRESET}') [fast, medium, slow, veryslow]"
     echo "      -v: video format (default='${FVID}') [mp4,webm,...]"
+    echo "      -d: frequency for dropping frames (ex: -d 2 would speed up video by 2 by dropping every other frame)"
     echo "      -n: number of threads (default='${NTHRD}')"
     echo
     exit
@@ -41,7 +43,7 @@ if [ "`ffmpeg -codecs 2>/dev/null | grep libx264`" = "" ]; then
 fi
 
 
-while getopts i:t:h:c:f:C:p:v:n:h option; do
+while getopts i:t:h:c:f:C:p:v:d:n:h option; do
     case $option in
         i) FPREF=${OPTARG};;
         t) FIMG=${OPTARG};;
@@ -51,6 +53,7 @@ while getopts i:t:h:c:f:C:p:v:n:h option; do
         C) CRF=${OPTARG};;
         p) PRESET=${OPTARG};;
         v) FVID=${OPTARG};;
+        d) DROPFRAMES=${OPTARG};;
         n) NTHRD=${OPTARG};;
         h)  usage ;;
         \?) usage ;;
@@ -60,10 +63,32 @@ done
 if [ "${FPREF}" = "" ]; then usage; fi
 
 
-SCALE="-vf scale='-2:${HEIGHT}'"
+# Video filter stuff:
+VFLTR="-vf scale='-2:${HEIGHT}'"
+
+if [ ${DROPFRAMES} -gt 1 ]; then
+    if [ "${FRAMERATE_IN}" != "${FRAMERATE_OUT}" ]; then
+        echo "PROBLEM: chose either option!"
+        echo "   => if you drop frames with '-d n' then ensure that FRAMERATE_IN == FRAMERATE_OUT !"
+        exit
+    fi    
+    if [ ${DROPFRAMES} -eq 2 ]; then
+        VFLTR="${VFLTR},setpts='0.5*PTS'" ; # drop every other frame => speed of video x 2
+    elif [ ${DROPFRAMES} -eq 3 ]; then
+        VFLTR="${VFLTR},setpts='0.3*PTS'"
+    elif [ ${DROPFRAMES} -eq 4 ]; then
+        VFLTR="${VFLTR},setpts='0.25*PTS'"
+    elif [ ${DROPFRAMES} -eq 5 ]; then
+        VFLTR="${VFLTR},setpts='0.2*PTS'"
+    elif [ ${DROPFRAMES} -eq 10 ]; then
+        VFLTR="${VFLTR},setpts='0.1*PTS'"
+    else
+        echo "ERROR: we dont do your DROPFRAMES = ${DROPFRAMES} !"; exit
+    fi
+fi
 
 
-#Codec stuff
+#Codec stuff:
 if [ "${FVID}" = "mp4" ]; then
     VC="-c:v libx264 -profile:v high444"
     info="${CODEC}_${HEIGHT}px"
@@ -79,7 +104,6 @@ else
 fi
 
 
-
 fo="movie_${FPREF}_${info}_${FRAMERATE_IN}fps_crf${CRF}.${FVID}"
 
 rm -f ${fo}
@@ -89,23 +113,28 @@ echo " fo = ${fo} !!!"
 #exit
 
 echo
-echo "ffmpeg -f image2 -threads ${NTHRD} -framerate ${FRAMERATE_IN} -r ${FRAMERATE_OUT} \
--pattern_type glob -i '${FPREF}*.${FIMG}' \
+echo "ffmpeg -f image2 -threads ${NTHRD} \
+-pattern_type glob -r ${FRAMERATE_IN} -i ${FPREF}*.${FIMG} \
 ${VC} -preset ${PRESET} \
--crf ${CRF} -refs 16 ${SCALE} \
+-crf ${CRF} -refs 16 ${VFLTR} \
 -pix_fmt yuv420p \
-${fo}"
+-r ${FRAMERATE_OUT} ${fo}"
 echo
 
 
-ffmpeg -f image2 -threads ${NTHRD} -framerate ${FRAMERATE_IN} -r ${FRAMERATE_OUT} \
-       -pattern_type glob -i "${FPREF}*.${FIMG}" \
+#ffmpeg -f image2 -threads ${NTHRD} -framerate ${FRAMERATE_IN} -r ${FRAMERATE_OUT} \
+#       -pattern_type glob -i "${FPREF}*.${FIMG}" \
+#       ${VC} -preset ${PRESET} \
+#       -crf ${CRF} -refs 16 ${VFLTR} \
+#       -pix_fmt yuv420p \
+#       ${fo}
+
+ffmpeg -f image2 -threads ${NTHRD} \
+       -pattern_type glob -r ${FRAMERATE_IN} -i "${FPREF}*.${FIMG}" \
        ${VC} -preset ${PRESET} \
-       -crf ${CRF} -refs 16 ${SCALE} \
+       -crf ${CRF} -refs 16 ${VFLTR} \
        -pix_fmt yuv420p \
-       ${fo}
-
-
+       -r ${FRAMERATE_OUT} ${fo}
 
 echo
 echo
