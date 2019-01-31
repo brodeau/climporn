@@ -1,12 +1,16 @@
 #!/bin/bash
 
-# Laurent Brodeau, 2017-2018
+# Laurent Brodeau, 2017-2019
+
+# Output framerate for the video to generate in "fps":
+#FRAMERATE_OUT="30000/1001" ; #NTSC (~29.97 fps)
+FRAMERATE_OUT="25" ; # Normal ?
 
 # Defaults:
 FIMG="png"
 HEIGHT="1080"
 CODEC="x264"
-FPS=12
+FRAMERATE_IN=12
 CRF=20
 PRESET="medium"
 FVID="mp4"
@@ -21,7 +25,7 @@ usage()
     echo "      -t: format of images (default='${FIMG}')"
     echo "      -h: height (pixels) of video to create (default='${HEIGHT}')"
     echo "      -c: codec for video (default='${CODEC})' [x264, x265, ...]"
-    echo "      -f: frame per second (default='${FPS}')"
+    echo "      -f: input framerate == images per second (default='${FRAMERATE_IN}')"
     echo "      -C: CRF value, 0 is lossless and 51 worse possible (default='${CRF}') [ffmpeg default=23]"
     echo "      -p: preset for encoding (default='${PRESET}') [fast, medium, slow, veryslow]"
     echo "      -v: video format (default='${FVID}') [mp4,webm,...]"
@@ -43,7 +47,7 @@ while getopts i:t:h:c:f:C:p:v:n:h option; do
         t) FIMG=${OPTARG};;
         h) HEIGHT=${OPTARG};;
         c) CODEC=${OPTARG};;
-        f) FPS=${OPTARG};;
+        f) FRAMERATE_IN=${OPTARG};;
         C) CRF=${OPTARG};;
         p) PRESET=${OPTARG};;
         v) FVID=${OPTARG};;
@@ -76,7 +80,7 @@ fi
 
 
 
-fo="movie_${FPREF}_${info}_${FPS}fps_crf${CRF}.${FVID}"
+fo="movie_${FPREF}_${info}_${FRAMERATE_IN}fps_crf${CRF}.${FVID}"
 
 rm -f ${fo}
 
@@ -85,16 +89,16 @@ echo " fo = ${fo} !!!"
 #exit
 
 echo
-echo "ffmpeg -f image2 -threads ${NTHRD} -framerate ${FPS} \
-       -pattern_type glob -i '${FPREF}*.${FIMG}' \
-       ${VC} -preset ${PRESET} \
-       -crf ${CRF} -refs 16 ${SCALE} \
-       -pix_fmt yuv420p \
-       ${fo}"
+echo "ffmpeg -f image2 -threads ${NTHRD} -framerate ${FRAMERATE_IN} -r ${FRAMERATE_OUT} \
+-pattern_type glob -i '${FPREF}*.${FIMG}' \
+${VC} -preset ${PRESET} \
+-crf ${CRF} -refs 16 ${SCALE} \
+-pix_fmt yuv420p \
+${fo}"
 echo
 
 
-ffmpeg -f image2 -threads ${NTHRD} -framerate ${FPS} \
+ffmpeg -f image2 -threads ${NTHRD} -framerate ${FRAMERATE_IN} -r ${FRAMERATE_OUT} \
        -pattern_type glob -i "${FPREF}*.${FIMG}" \
        ${VC} -preset ${PRESET} \
        -crf ${CRF} -refs 16 ${SCALE} \
