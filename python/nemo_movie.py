@@ -149,6 +149,13 @@ elif CWHAT == 'SST':
     cunit = r'SST ($^{\circ}$C)'
     l_show_cb = True
 
+elif CWHAT == 'T_1000':
+    cv_in = 'votemper'
+    tmin=0. ;  tmax=14.   ;  df = 1. ; cpal_fld = 'ncview_nrl' ; cb_jump = 1
+    cunit = r'Salinity at 1000 m'
+    l_show_cb = True
+    l_save_nc = False
+
 elif CWHAT == 'SSS':
     cv_in = 'sosaline' ; #in ['sosstsst','tos']:    
     tmin=20. ;  tmax=40.   ;  df = 2. ; cpal_fld = 'ncview_ssec' ;     cb_jump = 2
@@ -158,11 +165,10 @@ elif CWHAT == 'SSS':
     l_show_cb = True
     #l_save_nc = True
 
-elif CWHAT == 'S':
-    cv_in = 'vosaline' ; #in ['sosstsst','tos']:    
-    #tmin=32. ;  tmax=38.   ;  df = 1. ; cpal_fld = 'ncview_ssec' ;     cb_jump = 1
+elif CWHAT == 'S_1000':
+    cv_in = 'vosaline'
     tmin=33.5 ;  tmax=36.5   ;  df = 0.5 ; cpal_fld = 'ncview_helix2' ; cb_jump = 1
-    cunit = r'Salinity'
+    cunit = r'Salinity at 1000 m'
     l_show_cb = True
     l_save_nc = False
 
@@ -210,7 +216,14 @@ elif CWHAT == 'LAP_SSH':
     #cpal_fld = 'coolwarm' ; tmin=-1. ;  tmax=1.   ;  df = 0.05 ; l_apply_lap = True
     #cpal_fld = 'gray_r' ; tmin=-0.3 ;  tmax=0.3   ;  df = 0.05 ; l_apply_lap = True
 
-    
+
+elif CWHAT == 'W_1000':
+    cv_in = 'vovecrtz'
+    tmin=-0.01 ;  tmax=-tmin   ;  df = 0.005 ; cpal_fld='RdBu_r' ; cb_jump = 1
+    cunit = r'Vertical velocity at 1000 m [m/s]'
+    l_show_cb = True
+    l_save_nc = False
+
 
 elif CWHAT == 'Amplitude':
     cv_in = 'r'    
@@ -572,7 +585,7 @@ else:
     print 'ERROR: unknown dt!'
 
 
-if l3d: cunit = cunit+' at '+cdepth
+#if l3d: cunit = cunit+' at '+cdepth
     
 ntpd = 24/dt
 
