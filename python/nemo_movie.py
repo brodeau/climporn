@@ -72,6 +72,7 @@ l_add_logo_prace = True
 cf_logo_prace = cdir_logos+'/PRACE_blanc.png'
 
 rof_log = 150.
+rof_dpt = 0.
 
 
 
@@ -152,7 +153,7 @@ elif CWHAT == 'SST':
 elif CWHAT == 'T_1000':
     cv_in = 'votemper'
     tmin=0. ;  tmax=14.   ;  df = 1. ; cpal_fld = 'ncview_nrl' ; cb_jump = 1
-    cunit = r'Salinity at 1000 m'
+    cunit = r'Potential temperature at 1000 m'
     l_show_cb = True
     l_save_nc = False
 
@@ -514,6 +515,7 @@ if l_show_lsm or l_apply_lap or l_apply_hgrad or l_add_topo_land:
     if l3d:
         vdepth = id_lsm.variables['gdept_1d'][0,:]
         zdepth = vdepth[jk]
+        rof_dpt = zdepth
         cdepth = str(round(zdepth,1))+'m'
     id_lsm.close()
 
@@ -535,6 +537,7 @@ if l_add_topo_land:
         print 'ERROR: topo and mask do not agree in shape!'; sys.exit(0)
     xtopo = xtopo*(1. - XMSK)
     bnc.dump_2d_field('topo_'+CBOX+'.nc', xtopo, name='z')    
+    if l3d: xtopo = xtopo + rof_dpt
     xtopo[nmp.where( XMSK > 0.01)] = nmp.nan
 
 
@@ -566,7 +569,7 @@ if l_show_lsm or l_add_topo_land:
     if l_add_topo_land:
         xtopo = nmp.log10(xtopo+rof_log)
         pal_lsm = bcm.chose_colmap('gray_r')
-        norm_lsm = colors.Normalize(vmin = nmp.log10(-100.+rof_log), vmax = nmp.log10(4000.+rof_log), clip = False)        
+        norm_lsm = colors.Normalize(vmin = nmp.log10(min(-100.+rof_dpt/3.,0.) + rof_log), vmax = nmp.log10(4000.+rof_dpt + rof_log), clip = False)
     else:
         pal_lsm = bcm.chose_colmap('land_dark')
         norm_lsm = colors.Normalize(vmin = 0., vmax = 1., clip = False)
