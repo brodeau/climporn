@@ -515,6 +515,7 @@ if l_show_lsm or l_apply_lap or l_apply_hgrad or l_add_topo_land:
     if l3d:
         vdepth = id_lsm.variables['gdept_1d'][0,:]
         zdepth = vdepth[jk]
+        if zdepth>990. and zdepth<1010.: rof_log = 1000.
         rof_dpt = zdepth
         cdepth = str(round(zdepth,1))+'m'
     id_lsm.close()
@@ -569,7 +570,8 @@ if l_show_lsm or l_add_topo_land:
     if l_add_topo_land:
         xtopo = nmp.log10(xtopo+rof_log)
         pal_lsm = bcm.chose_colmap('gray_r')
-        norm_lsm = colors.Normalize(vmin = nmp.log10(min(-100.+rof_dpt/3.,0.) + rof_log), vmax = nmp.log10(4000.+rof_dpt + rof_log), clip = False)
+        #norm_lsm = colors.Normalize(vmin = nmp.log10(min(-100.+rof_dpt/3.,0.) + rof_log), vmax = nmp.log10(4000.+rof_dpt + rof_log), clip = False)
+        norm_lsm = colors.Normalize(vmin = nmp.log10(-100. + rof_log), vmax = nmp.log10(4000.+rof_dpt + rof_log), clip = False)
     else:
         pal_lsm = bcm.chose_colmap('land_dark')
         norm_lsm = colors.Normalize(vmin = 0., vmax = 1., clip = False)
