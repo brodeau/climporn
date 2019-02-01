@@ -16,6 +16,7 @@ PRESET="medium"
 FVID="mp4"
 NTHRD="1"
 DROPFRAMES=0
+DIR_OUT="."
 
 usage()
 {
@@ -31,6 +32,7 @@ usage()
     echo "      -p: preset for encoding (default='${PRESET}') [fast, medium, slow, veryslow]"
     echo "      -v: video format (default='${FVID}') [mp4,webm,...]"
     echo "      -d: frequency for dropping frames (ex: -d 2 would speed up video by 2 by dropping every other frame)"
+    echo "      -D: directory (path) in which to create the video if elsewhere than current directory"
     echo "      -n: number of threads (default='${NTHRD}')"
     echo
     exit
@@ -43,7 +45,7 @@ if [ "`ffmpeg -codecs 2>/dev/null | grep libx264`" = "" ]; then
 fi
 
 
-while getopts i:t:h:c:f:C:p:v:d:n:h option; do
+while getopts i:t:h:c:f:C:p:v:d:D:n:h option; do
     case $option in
         i) FPREF=${OPTARG};;
         t) FIMG=${OPTARG};;
@@ -54,6 +56,7 @@ while getopts i:t:h:c:f:C:p:v:d:n:h option; do
         p) PRESET=${OPTARG};;
         v) FVID=${OPTARG};;
         d) DROPFRAMES=${OPTARG};;
+        D) DIR_OUT=${OPTARG};;
         n) NTHRD=${OPTARG};;
         h)  usage ;;
         \?) usage ;;
@@ -104,7 +107,7 @@ else
 fi
 
 
-fo="movie_${FPREF}_${info}_${FRAMERATE_IN}fps_crf${CRF}.${FVID}"
+fo="${DIR_OUT}/movie_${FPREF}_${info}_${FRAMERATE_IN}fps_crf${CRF}.${FVID}"
 
 rm -f ${fo}
 
