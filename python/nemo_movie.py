@@ -51,6 +51,7 @@ color_top = 'white'
 jt0 = 0
 
 
+jk=0
 i2=0
 j2=0
 l_get_name_of_run = False
@@ -122,7 +123,10 @@ if args.zld != None:
     print ' *** cf_topo_land = ', cf_topo_land
     l_add_topo_land = True
 l3d = False
-if jk > 0: l3d=True
+if jk > 0:
+    l3d=True
+else:
+    jk=0
 ###############################################################################################################################################
 
 
@@ -590,7 +594,6 @@ else:
     print 'ERROR: unknown dt!'
 
 
-#if l3d: cunit = cunit+' at '+cdepth
     
 ntpd = 24/dt
 

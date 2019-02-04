@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+1#!/usr/bin/env python
 
 #       B a r a K u d a
 #
@@ -51,11 +51,11 @@ cv_out = 'unknown'
 jt0 = 0
 
 
+jk=0
 i2=0
 j2=0
 l_get_name_of_run = False
 l_show_lsm = True
-l_do_ice  = False
 l_show_cb = True
 l_log_field = False
 l_pow_field = False
@@ -72,8 +72,9 @@ l_add_logo_prace = True
 cf_logo_prace = cdir_logos+'/PRACE_blanc.png'
 
 rof_log = 150.
+rof_dpt = 0.
 
-
+l_3d_field = False
 
 l_save_nc = False ; # save the field we built in a netcdf file !!!
 
@@ -128,6 +129,11 @@ l_add_topo_land = False
 if args.zld != None:
     print ' *** cf_topo_land = ', cf_topo_land
     l_add_topo_land = True
+l3d = False
+if jk > 0:
+    l3d=True
+else:
+    jk=0
 ###############################################################################################################################################
 
 
@@ -149,13 +155,14 @@ l_do_eke=False
 if   CWHAT == 'CURL':
     l_do_crl = True  ; # do curl (relative-vorticity) !!!
     
-elif CWHAT == 'CURLOF':
+elif CWHAT == 'CURLOF' or CWHAT == 'CURLOF_1000':
     l_do_cof = True  ; # do curl/f
+    cpal_fld = 'on2' ; tmin=-1.2 ;  tmax=-tmin ;  df = 0.1 ; cb_jump = 2
+    cunit = r'$\zeta/f$'
+    if CWHAT == 'CURLOF_1000': cunit = r'$\zeta/f$ at 1000 m'
     
 elif CWHAT == 'CSPEED':
     l_do_cspd = True  ; # do current speed
-    #tmin=0. ; tmax=1.4 ; df = 0.1  ; cpal_fld = 'on2'
-    #tmin=0. ; tmax=2.0 ; df = 0.25 ; cpal_fld = 'on3'
     tmin=0. ; tmax=1.8 ; df = 0.2 ; cpal_fld = 'on3' ; # Poster full-res!!!
     l_save_nc=False
     cunit = 'Surface current speed [m/s]' ; cb_jump = 1
@@ -184,18 +191,8 @@ cv_out = CWHAT
 
 
     
-if cvx_in=='sozocrtx' and cvy_in=='somecrty' and l_do_cof:
-    cpal_fld = 'on2' ; tmin=-1.2 ;  tmax=-tmin ;  df = 0.1 ; cb_jump = 2
-    cunit = r'$\zeta/f$'
+if cvx_in=='vozocrtx' and cvy_in=='vomecrty' and l_do_cof: l_3d_field = True
 
-elif cvx_in=='sozocrtx' and cvy_in=='somecrty' and l_do_crl:
-    #cpal_fld = 'on2' ; tmin=-0.035 ;  tmax=0.035 ;  df = 0.05 ; ;  cb_jump = 1
-    #cpal_fld = 'ncview_bw' ; tmin=-0.03 ;  tmax=0.03 ;  df = 0.05
-    cpal_fld = 'bone' ; tmin=-0.025 ;  tmax=0.025 ;  df = 0.05 ; cb_jump = 1
-    cunit = r'$\zeta$'
-    l_show_clock = False
-    l_add_logo   = False
-    l_annotate_name = False
 
 elif cvx_in=='sozocrtx' and cvy_in=='somecrty' and l_do_cspd:
     # Current speed !
@@ -204,13 +201,6 @@ elif cvx_in=='sozocrtx' and cvy_in=='somecrty' and l_do_cspd:
     #if CBOX == 'Med+BS': tmin=0. ;  tmax=4. ;  df = 0.5 ; cpal_fld = 'ncview_hotres'
     if CBOX == 'Med+BS': tmin=0. ;  tmax=1.5 ;  df = 0.25 ; cpal_fld = 'on3'
         
-elif cvx_in=='vozocrtx' and cvy_in=='vomecrty' and l_do_cof:
-    l_3d_field = True
-    #cpal_fld = 'on2' ; tmin=-1. ;  tmax=1. ;  df = 0.05
-    cpal_fld = 'ncview_bw' ; tmin=-0.4 ;  tmax=0.4 ;  df = 0.05
-    cunit = ''
-    cb_jump = 1
-
 elif cvx_in=='vozocrtx' and cvy_in=='vomecrty' and l_do_crl:
     l_3d_field = True
     #cpal_fld = 'on2' ; tmin=-0.025 ;  tmax=0.025 ;  df = 0.05
@@ -225,7 +215,13 @@ elif cvx_in=='vozocrtx' and cvy_in=='vomecrty' and l_do_crl:
 #    print 'ERROR: we do not know cvx_in and cvy_in! ("'+cvx_in+'", "'+cvy_in+'")'
 #    sys.exit(0)
 
-    
+
+if l3d and not l_3d_field:
+    print 'ERROR: you cannot extract a level is the field is not 3D!!!'
+    sys.exit(0)
+
+
+
 if CNEMO == 'eNATL60':
 
     # Defaults:
@@ -327,7 +323,6 @@ elif CNEMO == 'NATL60':
 
 
 elif CNEMO == 'NANUK025':
-    l_do_ice = True
     cdt = '3h'; CBOX = 'ALL' ; i1 = 0 ; j1 = 0 ; i2 = 492 ; j2 = 614 ; rfact_zoom = 2. ; vcb=[0.5, 0.875, 0.485, 0.02] ; font_rat = 8.*rfact_zoom
     x_clock = 350 ; y_clock = 7 ; # where to put the date
 
@@ -348,8 +343,10 @@ elif CNEMO == 'eNATL4':
     if   CBOX == 'ALL':
         i1=0   ; j1=0    ; i2=Ni0 ; j2=Nj0  ; rfact_zoom=3. ; vcb=[0.59, 0.1, 0.39, 0.018]  ; font_rat=0.7*rfact_zoom
         l_show_cb = True
+    else:
+        print ' ERROR: unknow box "'+CBOX+'" for config "'+CNEMO+'" !!!'
+        sys.exit(0)
 
-    
 else:
     print 'ERROR: we do not know NEMO config "'+str(CNEMO)+'" !'
     sys.exit(0)
@@ -363,8 +360,6 @@ if l_get_name_of_run:
         print 'ERROR: your file name is not consistent with "'+CNEMO+'" !!! ('+vv[0]+')' ; sys.exit(0)
     CRUN = vv[1]
     print '\n Run is called: "'+CRUN+'" !\n'
-
-    
 
 
     
@@ -409,23 +404,10 @@ cmn0=csd0[4:6]
 cdd0=csd0[6:8]
 
 
-l_3d_field = False
-
-
-
-# Ice:
-if l_do_ice:
-    cv_ice  = 'siconc'
-    cf_ice = replace(cfx_in, 'grid_T', 'icemod')
-    rmin_ice = 0.5
-    cpal_ice = 'ncview_bw'
-    vcont_ice = nmp.arange(rmin_ice, 1.05, 0.05)
 
 
 
 
-
-if l_do_ice: bt.chck4f(cf_ice)
 
 bt.chck4f(cf_mm)
 bt.chck4f(cfx_in)
@@ -446,7 +428,7 @@ if l_show_lsm or l_do_crl or l_do_cof or l_do_cspd or l_do_tke or l_do_eke:
         cv_msk = 'tmask'
         if l_do_crl or l_do_cof:  cv_msk = 'fmask'
         print '\n Reading mask as "'+cv_msk+'" in:'; print cv_msk,'\n'
-        if nb_dim==4: XMSK = id_lsm.variables[cv_msk][0,0,j1:j2,i1:i2]
+        if nb_dim==4: XMSK = id_lsm.variables[cv_msk][0,jk,j1:j2,i1:i2]
         if nb_dim==3: XMSK = id_lsm.variables[cv_msk][0,j1:j2,i1:i2]
         if nb_dim==2: XMSK = id_lsm.variables[cv_msk][j1:j2,i1:i2]
         (nj,ni) = nmp.shape(XMSK)
@@ -464,6 +446,13 @@ if l_show_lsm or l_do_crl or l_do_cof or l_do_cspd or l_do_tke or l_do_eke:
     if l_save_nc:
         Xlon = id_lsm.variables['glamt'][0,j1:j2,i1:i2]
         Xlat = id_lsm.variables['gphit'][0,j1:j2,i1:i2]
+        
+    if l3d:
+        vdepth = id_lsm.variables['gdept_1d'][0,:]
+        zdepth = vdepth[jk]
+        if zdepth>990. and zdepth<1010.: rof_log = 1000.
+        rof_dpt = zdepth
+        cdepth = str(round(zdepth,1))+'m'
     id_lsm.close()
 
     print 'Shape Arrays => ni,nj =', ni,nj
@@ -484,6 +473,7 @@ if l_add_topo_land:
         print 'ERROR: topo and mask do not agree in shape!'; sys.exit(0)
     xtopo = xtopo*(1. - XMSK)
     bnc.dump_2d_field('topo_'+CBOX+'.nc', xtopo, name='z')    
+    if l3d: xtopo = xtopo + rof_dpt
     xtopo[nmp.where( XMSK > 0.01)] = nmp.nan
 
 
@@ -515,15 +505,11 @@ if l_show_lsm or l_add_topo_land:
     if l_add_topo_land:
         xtopo = nmp.log10(xtopo+rof_log)
         pal_lsm = bcm.chose_colmap('gray_r')
-        norm_lsm = colors.Normalize(vmin = nmp.log10(-100.+rof_log), vmax = nmp.log10(4000.+rof_log), clip = False)        
+        #norm_lsm = colors.Normalize(vmin = nmp.log10(min(-100.+rof_dpt/3.,0.) + rof_log), vmax = nmp.log10(4000.+rof_dpt + rof_log), clip = False)
+        norm_lsm = colors.Normalize(vmin = nmp.log10(-100. + rof_log), vmax = nmp.log10(4000.+rof_dpt + rof_log), clip = False)
     else:
         pal_lsm = bcm.chose_colmap('land_dark')
         norm_lsm = colors.Normalize(vmin = 0., vmax = 1., clip = False)
-
-if l_do_ice:
-    pal_ice = bcm.chose_colmap(cpal_ice)
-    norm_ice = colors.Normalize(vmin = rmin_ice, vmax = 1, clip = False)
-
 
 
 if cdt == '3h':
@@ -532,6 +518,7 @@ elif cdt == '1h':
     dt = 1
 else:
     print 'ERROR: unknown dt!'
+
 
 
 
@@ -553,14 +540,14 @@ if l_do_eke:
         if not l_3d_field:
             XFLD  = id_fx.variables[cvx_in][jt,j1:j2,i1:i2] ; # t, y, x
         else:
-            XFLD  = id_fx.variables[cvx_in][jt,0,j1:j2,i1:i2] ; # t, y, x
+            XFLD  = id_fx.variables[cvx_in][jt,jk,j1:j2,i1:i2] ; # t, y, x
         id_fx.close()
         
         id_fy = Dataset(cfy_in)
         if not l_3d_field:
             YFLD  = id_fy.variables[cvy_in][jt,j1:j2,i1:i2] ; # t, y, x
         else:
-            YFLD  = id_fy.variables[cvy_in][jt,0,j1:j2,i1:i2] ; # t, y, x
+            YFLD  = id_fy.variables[cvy_in][jt,jk,j1:j2,i1:i2] ; # t, y, x
         id_fy.close()
         
         print "Done!"
@@ -617,8 +604,10 @@ for jt in range(jt0,Nt):
     chour = ct[11:13] ; print ' *** chour :', chour
 
 
-
-    cfig = 'figs/'+cv_out+'_'+CNEMO+'-'+CRUN+'_'+CBOX+'_'+cday+'_'+chour+'_'+cpal_fld+'.'+fig_type
+    if l3d:
+        cfig = 'figs/'+cv_out+'_'+CNEMO+'-'+CRUN+'_lev'+str(jk)+'_'+CBOX+'_'+cday+'_'+chour+'_'+cpal_fld+'.'+fig_type
+    else:
+        cfig = 'figs/'+cv_out+'_'+CNEMO+'-'+CRUN+'_'+CBOX+'_'+cday+'_'+chour+'_'+cpal_fld+'.'+fig_type
 
     ###### FIGURE ##############
 
@@ -636,7 +625,7 @@ for jt in range(jt0,Nt):
     else:
         print 'j1:j2 =', j1,j2
         print 'i1:i2 =', i1,i2
-        XFLD  = id_fx.variables[cvx_in][jt,0,j1:j2,i1:i2] ; # t, y, x
+        XFLD  = id_fx.variables[cvx_in][jt,jk,j1:j2,i1:i2] ; # t, y, x
     id_fx.close()
     print "Done!"
 
@@ -645,7 +634,7 @@ for jt in range(jt0,Nt):
     if not l_3d_field:
         YFLD  = id_fy.variables[cvy_in][jt,j1:j2,i1:i2] ; # t, y, x
     else:
-        YFLD  = id_fy.variables[cvy_in][jt,0,j1:j2,i1:i2] ; # t, y, x
+        YFLD  = id_fy.variables[cvy_in][jt,jk,j1:j2,i1:i2] ; # t, y, x
     id_fy.close()
     print "Done!"
 
@@ -702,21 +691,6 @@ for jt in range(jt0,Nt):
     
     cf = plt.imshow(Xplot[:,:], cmap = pal_fld, norm = norm_fld, interpolation='none')
 
-    # Ice
-    if l_do_ice:
-        print "Reading record #"+str(jt)+" of "+cv_ice+" in "+cf_ice
-        id_ice = Dataset(cf_ice)
-        XICE  = id_ice.variables[cv_ice][jt,:,:] ; # t, y, x
-        id_ice.close()
-        print "Done!"
-
-        #XM[:,:] = XMSK[:,:]
-        #bt.drown(XICE, XM, k_ew=2, nb_max_inc=10, nb_smooth=10)
-        #ci = plt.contourf(XICE[:,:], vcont_ice, cmap = pal_ice, norm = norm_ice) #
-
-        pice = nmp.ma.masked_where(XICE < rmin_ice, XICE)
-        ci = plt.imshow(pice, cmap = pal_ice, norm = norm_ice, interpolation='none') ; del pice, ci
-        del XICE
 
     #LOLO: rm ???
     if l_show_lsm or l_add_topo_land:
@@ -730,17 +704,17 @@ for jt in range(jt0,Nt):
         ax2 = plt.axes(vcb)
         clb = mpl.colorbar.ColorbarBase(ax2, ticks=vc_fld, cmap=pal_fld, norm=norm_fld, orientation='horizontal', extend=cb_extend)
         cb_labs = []
-        if cb_jump > 1:
-            cpt = 0
-            for rr in vc_fld:
-                if cpt % cb_jump == 0:
-                    if df >= 1.: cb_labs.append(str(int(rr)))
-                    if df <  1.: cb_labs.append(str(round(rr,int(nmp.ceil(nmp.log10(1./df)))+1) ))
-                else:
-                    cb_labs.append(' ')
-                cpt = cpt + 1
-        else:
-            for rr in vc_fld: cb_labs.append(str(round(rr,int(nmp.ceil(nmp.log10(1./df)))+1) ))
+        #if cb_jump > 1:
+        cpt = 0
+        for rr in vc_fld:
+            if cpt % cb_jump == 0:
+                if df >= 1.: cb_labs.append(str(int(rr)))
+                if df <  1.: cb_labs.append(str(round(rr,int(nmp.ceil(nmp.log10(1./df)))+1) ))
+            else:
+                cb_labs.append(' ')
+            cpt = cpt + 1
+        #else:
+        #    for rr in vc_fld: cb_labs.append(str(round(rr,int(nmp.ceil(nmp.log10(1./df)))+1) ))
 
         clb.ax.set_xticklabels(cb_labs, **cfont_clb)
         clb.set_label(cunit, **cfont_clb)
