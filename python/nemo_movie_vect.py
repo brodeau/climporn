@@ -1,4 +1,4 @@
-1#!/usr/bin/env python
+#!/usr/bin/env python
 
 #       B a r a K u d a
 #
@@ -155,17 +155,26 @@ l_do_eke=False
 if   CWHAT == 'CURL':
     l_do_crl = True  ; # do curl (relative-vorticity) !!!
     
-elif CWHAT == 'CURLOF' or CWHAT == 'CURLOF_1000':
+elif CWHAT == 'CURLOF':
     l_do_cof = True  ; # do curl/f
     cpal_fld = 'on2' ; tmin=-1.2 ;  tmax=-tmin ;  df = 0.1 ; cb_jump = 2
     cunit = r'$\zeta/f$'
-    if CWHAT == 'CURLOF_1000': cunit = r'$\zeta/f$ at 1000 m'
+    
+elif CWHAT == 'CURLOF_1000':
+    l_do_cof = True  ; # do curl/f
+    cpal_fld = 'on2' ; tmin=-0.6 ;  tmax=-tmin ;  df = 0.1 ; cb_jump = 1
+    cunit = r'$\zeta/f$ at 1000 m'
     
 elif CWHAT == 'CSPEED':
     l_do_cspd = True  ; # do current speed
     tmin=0. ; tmax=1.8 ; df = 0.2 ; cpal_fld = 'on3' ; # Poster full-res!!!
-    l_save_nc=False
     cunit = 'Surface current speed [m/s]' ; cb_jump = 1
+    cb_extend = 'max' ;#colorbar extrema
+
+elif CWHAT == 'CSPEED_1000':
+    l_do_cspd = True  ; # do current speed
+    tmin=0. ; tmax=0.6 ; df = 0.1 ; cpal_fld = 'on3' ; # Poster full-res!!!
+    cunit = 'Current speed at 1000 m [m/s]' ; cb_jump = 1
     cb_extend = 'max' ;#colorbar extrema
 
 elif CWHAT == 'TKE':
@@ -191,7 +200,7 @@ cv_out = CWHAT
 
 
     
-if cvx_in=='vozocrtx' and cvy_in=='vomecrty' and l_do_cof: l_3d_field = True
+if cvx_in=='vozocrtx' and cvy_in=='vomecrty': l_3d_field = True
 
 
 elif cvx_in=='sozocrtx' and cvy_in=='somecrty' and l_do_cspd:
@@ -619,6 +628,7 @@ for jt in range(jt0,Nt):
 
 
     print "Reading record #"+str(jt)+" of "+cvx_in+" in "+cfx_in
+    if l3d: print '            => at level #'+str(jk)+' ('+cdepth+')!'
     id_fx = Dataset(cfx_in)
     if not l_3d_field:
         XFLD  = id_fx.variables[cvx_in][jt,j1:j2,i1:i2] ; # t, y, x
@@ -630,6 +640,7 @@ for jt in range(jt0,Nt):
     print "Done!"
 
     print "Reading record #"+str(jt)+" of "+cvy_in+" in "+cfy_in
+    if l3d: print '            => at level #'+str(jk)+' ('+cdepth+')!'
     id_fy = Dataset(cfy_in)
     if not l_3d_field:
         YFLD  = id_fy.variables[cvy_in][jt,j1:j2,i1:i2] ; # t, y, x
