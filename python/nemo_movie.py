@@ -284,6 +284,13 @@ if CNEMO == 'eNATL60':
         i1=5520; j1=1525; i2=i1+2560 ; j2=j1+1440 ; rfact_zoom=1. ; vcb=[0.5, 0.875, 0.485, 0.02] ; font_rat=2.*rfact_zoom
         l_annotate_name=False
 
+
+    elif CBOX == 'Meddies':
+        i2=5800; j1=1400; i1=i2-2560 ; j2=j1+1440 ; rfact_zoom=1. ; vcb=[0.5, 0.875, 0.485, 0.02] ; font_rat=2.*rfact_zoom
+        l_annotate_name=False
+
+
+
     elif CBOX == 'Med+BS':
         i1=5400; j1=1530; i2=Ni0 ; j2=3310 ; rfact_zoom=1440./float(j2-j1)   ; vcb=[0.025, 0.06, 0.4, 0.02] ; font_rat=3.*rfact_zoom
         l_annotate_name=False ; l_add_logo_ige=False ; l_add_logo_prace=False
