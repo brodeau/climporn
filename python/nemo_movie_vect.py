@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-#       B a r a K u d a
+#     CLIMPORN
 #
 #  Prepare 2D maps (monthly) that will later become a movie!
 #  NEMO output and observations needed
@@ -61,6 +61,7 @@ l_log_field = False
 l_pow_field = False
 l_annotate_name = True
 l_show_clock = True
+l_show_exp = False
 
 
 cdir_logos = cwd+'/logos'
@@ -495,9 +496,10 @@ params = { 'font.family':'Helvetica Neue',
            'axes.labelsize':  int(9.*font_rat) }
 mpl.rcParams.update(params)
 cfont_clb  =  { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(7.*font_rat), 'color':color_top}
-cfont_clock = { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(9.*font_rat), 'color':'w' }
+cfont_clock = { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(9.*font_rat), 'color':color_top }
+cfont_exp= { 'fontname':'Open Sans'  , 'fontweight':'light', 'fontsize':int(9.*font_rat), 'color':color_top }
 cfont_mail =  { 'fontname':'Times New Roman', 'fontweight':'normal', 'fontstyle':'italic', 'fontsize':int(14.*font_rat), 'color':'0.8'}
-cfont_titl =  { 'fontname':'Helvetica Neue', 'fontweight':'light', 'fontsize':int(30.*font_rat), 'color':'w' }
+cfont_titl =  { 'fontname':'Open Sans', 'fontweight':'light', 'fontsize':int(30.*font_rat), 'color':color_top }
 
 
 # Colormaps for fields:
@@ -739,6 +741,12 @@ for jt in range(jt0,Nt):
         xl = float(x_clock)/rfact_zoom
         yl = float(y_clock)/rfact_zoom
         ax.annotate('Date: '+cday+' '+chour+':00', xy=(1, 4), xytext=(xl,yl), **cfont_clock)
+
+    if l_get_name_of_run and l_show_exp:
+        xl = float(x_exp)/rfact_zoom
+        yl = float(y_exp)/rfact_zoom
+        ax.annotate('Experiment: '+CNEMO+'-'+CRUN, xy=(1, 4), xytext=(xl,yl), **cfont_exp)
+
 
     #ax.annotate('laurent.brodeau@ocean-next.fr', xy=(1, 4), xytext=(xl+150, 20), **cfont_mail)
 
