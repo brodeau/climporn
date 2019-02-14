@@ -62,6 +62,7 @@ l_log_field = False
 l_pow_field = False
 l_annotate_name = True
 l_show_clock = True
+l_show_exp = False
 
 
 cdir_logos = cwd+'/logos'
@@ -224,7 +225,10 @@ elif CWHAT == 'LAP_SSH':
 
 elif CWHAT == 'W_1000':
     cv_in = 'vovecrtz'
-    tmin=-0.01 ;  tmax=-tmin   ;  df = 0.005 ; cpal_fld='RdBu_r' ; cb_jump = 1
+    tmin=-0.01 ;  tmax=-tmin   ;  df = 0.005 ; cb_jump = 1
+    #cpal_fld='RdBu_r'
+    #cpal_fld='PiYG_r'
+    cpal_fld='BrBG_r'
     cunit = r'Vertical velocity at 1000 m [m/s]'
     l_show_cb = True
     l_save_nc = False
@@ -254,6 +258,7 @@ if CNEMO == 'eNATL60':
     Nj0 = 4729
     l_show_clock = True
     x_clock = 1600 ; y_clock = 200 ; x_logo = 2200 ; y_logo  = 50
+    x_exp = 40 ; y_exp = 980
     cdt = '1h'
     l_get_name_of_run = True
 
@@ -333,7 +338,8 @@ if CNEMO == 'eNATL60':
         x_clock = 1350 ; y_clock = 750 ; x_logo = 1400 ; y_logo = 16 ; l_save_nc=True
         if CWHAT == 'SST': tmax = 12.
 
-    elif CBOX == 'Azores':
+    elif CBOX == 'AzoresP':
+        # Azores Portrait:
         # 785 x 1190 => comparison of two => 1600 x 1200 (5px for frame), image is: 780x1190
         ## use: CMD="montage -geometry 780x1190+10+5 -background black <img1> <img2> <img_montage>"
         # => montage is then 1600x1200
@@ -341,6 +347,15 @@ if CNEMO == 'eNATL60':
         l_add_logo=False; l_add_logo_prace=False; l_add_logo_ige=False
         x_clock = 400 ; y_clock = 120 ; l_save_nc=False
         if CWHAT == 'SST': tmin = 15. ; tmax = 25. ; df=0.5 ; cb_jump = 2
+        if CWHAT == 'W_1000': color_top = 'k'
+
+    elif CBOX == 'AzoresL':
+        # Azores Landscape: (1920x1080)
+        i2=5200; j2=2240 ; i1=i2-1920; j1=j2-1080; rfact_zoom=1. ; vcb=[0.57, 0.08, 0.4, 0.018] ; font_rat = 2. ; l_annotate_name=False
+        l_add_logo=False; l_add_logo_prace=False; l_add_logo_ige=False
+        x_clock = 1400 ; y_clock = 120 ; l_save_nc=False ;  l_show_exp = True ; x_exp = 40 ; y_exp = 1030
+        if CWHAT == 'SST': tmin = 15. ; tmax = 25. ; df=0.5 ; cb_jump = 2
+        if CWHAT == 'W_1000': color_top = 'k'; #lili
 
     elif CBOX == 'Band':
         i1=5100-1920; j1=2200; i2=5100; j2=j1+1080 ; rfact_zoom=1. ; vcb=[0.59, 0.1, 0.38, 0.018] ; font_rat = 2.           ; l_annotate_name=False
@@ -564,9 +579,10 @@ params = { 'font.family':'Helvetica Neue',
            'axes.labelsize':  int(9.*font_rat) }
 mpl.rcParams.update(params)
 cfont_clb  =  { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(7.*font_rat), 'color':color_top}
-cfont_clock = { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(9.*font_rat), 'color':'w' }
+cfont_clock = { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(9.*font_rat), 'color':color_top }
+cfont_exp= { 'fontname':'Open Sans'  , 'fontweight':'light', 'fontsize':int(9.*font_rat), 'color':color_top }
 cfont_mail =  { 'fontname':'Times New Roman', 'fontweight':'normal', 'fontstyle':'italic', 'fontsize':int(14.*font_rat), 'color':'0.8'}
-cfont_titl =  { 'fontname':'Helvetica Neue', 'fontweight':'light', 'fontsize':int(30.*font_rat), 'color':'w' }
+cfont_titl =  { 'fontname':'Helvetica Neue', 'fontweight':'light', 'fontsize':int(30.*font_rat), 'color':color_top }
 
 
 # Colormaps for fields:
@@ -778,6 +794,12 @@ for jt in range(jt0,Nt):
         xl = float(x_clock)/rfact_zoom
         yl = float(y_clock)/rfact_zoom
         ax.annotate('Date: '+cday+' '+chour+':00', xy=(1, 4), xytext=(xl,yl), **cfont_clock)
+
+    if l_get_name_of_run and l_show_exp:
+        xl = float(x_exp)/rfact_zoom
+        yl = float(y_exp)/rfact_zoom
+        ax.annotate('Experiment: '+CNEMO+'-'+CRUN, xy=(1, 4), xytext=(xl,yl), **cfont_exp)
+
 
     #ax.annotate('laurent.brodeau@ocean-next.fr', xy=(1, 4), xytext=(xl+150, 20), **cfont_mail)
 
