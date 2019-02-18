@@ -160,7 +160,6 @@ elif CWHAT == 'T_1000':
     tmin=0. ;  tmax=14.   ;  df = 1. ; cpal_fld = 'ncview_nrl' ; cb_jump = 1
     cunit = r'Potential temperature at 1000 m'
     l_show_cb = True
-    l_save_nc = False
 
 elif CWHAT == 'SSS':
     cv_in = 'sosaline' ; #in ['sosstsst','tos']:    
@@ -169,19 +168,16 @@ elif CWHAT == 'SSS':
     #tmin=4. ;  tmax=20.   ;  df = 1. ; cpal_fld = 'PuBu'
     cunit = r'Sea surface salinity'
     l_show_cb = True
-    #l_save_nc = True
 
 elif CWHAT == 'S_1000':
     cv_in = 'vosaline'
     tmin=33.5 ;  tmax=36.5   ;  df = 0.5 ; cpal_fld = 'ncview_helix2' ; cb_jump = 1
     cunit = r'Salinity at 1000 m'
     l_show_cb = True
-    l_save_nc = False
 
 elif CWHAT == 'GRAD_SST':
     cv_in = 'sosstsst'
     l_apply_hgrad = True
-    l_save_nc = True
     l_smooth = True ; nb_smooth  = 5
     tmin=0. ;  tmax=0.001 ;  df = 0.0001 ; cpal_fld = 'ncview_hotres' ; cb_jump = 1
     #tmin=0. ;  tmax=32.   ;  df = 2. ; cpal_fld = 'viridis'
@@ -231,7 +227,6 @@ elif CWHAT == 'W_1000':
     cpal_fld='BrBG_r'
     cunit = r'Vertical velocity at 1000 m [m/s]'
     l_show_cb = True
-    l_save_nc = False
 
 
 elif CWHAT == 'Amplitude':
@@ -310,7 +305,6 @@ if CNEMO == 'eNATL60':
         x_clock = 40 ; y_clock = 170 ; x_logo = 2090 ; y_logo  = 10
         if CWHAT == 'SST': tmin=-2. ;  tmax=15.;  df = 1. ; cpal_fld = 'ncview_nrl'
         if CWHAT == 'SSS': tmin=28. ; tmax=35.5 ;  df = 1. ; cb_jump = 1 ; cpal_fld = 'gist_stern_r'
-        l_save_nc = False
 
     elif CBOX == 'BlackSea':
         i1=Ni0-1920; j1=3330-1080; i2=Ni0 ; j2=3330 ; rfact_zoom=1.   ; vcb=[0.5, 0.875, 0.485, 0.02] ; font_rat=2.*rfact_zoom
@@ -335,7 +329,7 @@ if CNEMO == 'eNATL60':
         
     elif CBOX == 'GrlIcl':
         i1=3370; j1=3941; i2=5062; j2=Nj0 ; rfact_zoom=1. ; vcb=[0.3, 0.1, 0.38, 0.018] ; font_rat = 2. ; l_annotate_name=False
-        x_clock = 1350 ; y_clock = 750 ; x_logo = 1400 ; y_logo = 16 ; l_save_nc=True
+        x_clock = 1350 ; y_clock = 750 ; x_logo = 1400 ; y_logo = 16
         if CWHAT == 'SST': tmax = 12.
 
     elif CBOX == 'AzoresP':
@@ -345,7 +339,7 @@ if CNEMO == 'eNATL60':
         # => montage is then 1600x1200
         i2=4410; j2=2240 ; i1=i2-780; j1=j2-1190; rfact_zoom=1. ; vcb=[0.05, 0.05, 0.9, 0.018] ; font_rat = 2. ; l_annotate_name=False
         l_add_logo=False; l_add_logo_prace=False; l_add_logo_ige=False
-        x_clock = 400 ; y_clock = 120 ; l_save_nc=False
+        x_clock = 400 ; y_clock = 120
         if CWHAT == 'SST': tmin = 15. ; tmax = 25. ; df=0.5 ; cb_jump = 2
         if CWHAT == 'W_1000': color_top = 'k'
 
@@ -353,7 +347,7 @@ if CNEMO == 'eNATL60':
         # Azores Landscape: (1920x1080)
         i2=5200; j2=2240 ; i1=i2-1920; j1=j2-1080; rfact_zoom=1. ; vcb=[0.57, 0.08, 0.4, 0.018] ; font_rat = 2. ; l_annotate_name=False
         l_add_logo=False; l_add_logo_prace=False; l_add_logo_ige=False
-        x_clock = 1400 ; y_clock = 120 ; l_save_nc=False ;  l_show_exp = True ; x_exp = 40 ; y_exp = 1030
+        x_clock = 1400 ; y_clock = 120 ; l_show_exp = True ; x_exp = 40 ; y_exp = 1030
         if CWHAT == 'SST': tmin = 15. ; tmax = 25. ; df=0.5 ; cb_jump = 2
         if CWHAT == 'W_1000': color_top = 'k'; #lili
 
@@ -565,7 +559,7 @@ if l_add_topo_land:
     if nmp.shape(xtopo) != (nj,ni):
         print 'ERROR: topo and mask do not agree in shape!'; sys.exit(0)
     xtopo = xtopo*(1. - XMSK)
-    bnc.dump_2d_field('topo_'+CBOX+'.nc', xtopo, name='z')    
+    #bnc.dump_2d_field('topo_'+CBOX+'.nc', xtopo, name='z')    
     if l3d: xtopo = xtopo + rof_dpt
     xtopo[nmp.where( XMSK > 0.01)] = nmp.nan
 

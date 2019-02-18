@@ -182,14 +182,12 @@ elif CWHAT == 'TKE':
     l_do_tke = True ; l_log_field = False
     tmin=0. ; tmax=3. ; df = 0.25 ; cpal_fld = 'ncview_hotres'
     #tmin=0. ; tmax=3. ; df = 0.25 ; cpal_fld = 'ncview_helix2'
-    l_save_nc=False
     cunit = r'Turbulent Kinetic Energy [$m^2/s^2$]' ; cb_jump = 1
     cb_extend = 'max' ;#colorbar extrema
 
 elif CWHAT == 'EKE':
     l_do_eke = True
     tmin=0. ; tmax=1. ; df = 0.1 ; cpal_fld = 'ncview_hotres' ; # Poster full-res!!!
-    l_save_nc=True
     cunit = r'E Kinetic Energy [$m^2/s^2$]' ; cb_jump = 1
     cb_extend = 'max' ;#colorbar extrema
     
@@ -295,7 +293,7 @@ if CNEMO == 'eNATL60':
         
     elif CBOX == 'GrlIcl':
         i1=3370; j1=3941; i2=5062; j2=Nj0 ; rfact_zoom=1. ; vcb=[0.3, 0.1, 0.38, 0.018] ; font_rat = 2. ; l_annotate_name=False
-        x_clock = 1350 ; y_clock = 750 ; x_logo = 1400 ; y_logo = 16 ; l_save_nc=True
+        x_clock = 1350 ; y_clock = 750 ; x_logo = 1400 ; y_logo = 16
 
     elif CBOX == 'Azores':
         # 785 x 1190 => comparison of two => 1600 x 1200 (5px for frame), image is: 780x1190
@@ -303,7 +301,7 @@ if CNEMO == 'eNATL60':
         # => montage is then 1600x1200
         i2=4410; j2=2240 ; i1=i2-780; j1=j2-1190; rfact_zoom=1. ; vcb=[0.05, 0.05, 0.9, 0.018] ; font_rat = 2. ; l_annotate_name=False
         l_add_logo=False; l_add_logo_prace=False; l_add_logo_ige=False
-        x_clock = 400 ; y_clock = 120 ; l_save_nc=False
+        x_clock = 400 ; y_clock = 120
         if CWHAT=='CURLOF': tmin=-0.8 ;  tmax=-tmin ;  df = 0.1 ; cb_jump = 2
 
     elif CBOX == 'Band':
@@ -482,7 +480,7 @@ if l_add_topo_land:
     if nmp.shape(xtopo) != (nj,ni):
         print 'ERROR: topo and mask do not agree in shape!'; sys.exit(0)
     xtopo = xtopo*(1. - XMSK)
-    bnc.dump_2d_field('topo_'+CBOX+'.nc', xtopo, name='z')    
+    #bnc.dump_2d_field('topo_'+CBOX+'.nc', xtopo, name='z')    
     if l3d: xtopo = xtopo + rof_dpt
     xtopo[nmp.where( XMSK > 0.01)] = nmp.nan
 
