@@ -76,12 +76,14 @@ cf_logo_prace = cdir_logos+'/PRACE_blanc.png'
 rof_log = 150.
 rof_dpt = 0.
 
+grav = 9.81
 
 
 l_save_nc = False ; # save the field we built in a netcdf file !!!
 
 l_apply_lap   = False
 l_apply_hgrad = False
+l_apply_geov  = False
 
 cb_extend = 'both' ;#colorbar extrema
 
@@ -207,6 +209,14 @@ elif CWHAT == 'SSH':
     #cpal_fld = 'bone_r' ; tmin=-0.9 ;  tmax=-tmin   ;  df = 0.05 ; l_apply_lap = True ; l_pow_field = True ; pow_field = 2.
     cpal_fld = 'RdBu_r' ; tmin=-3. ;  tmax=-tmin   ;  df = 0.5 ;
     #cpal_fld = 'RdBu_r' ; tmin=-1.5 ;  tmax=-tmin   ;  df = 0.5 ; 
+    l_show_cb = True ; cb_jump = 1 ; x_logo = 2190 ; y_logo  = 1230
+    cunit = r'SSH (m)'
+
+elif CWHAT == 'GEOSSV':
+    # Geostrophic velocity speed out of SSH
+    cv_in = 'sossheig'
+    l_apply_geov = True
+    cpal_fld = 'on3' ; tmin=0. ;  tmax=1.5   ;  df = 0.25 ; cb_extend = 'max'
     l_show_cb = True ; cb_jump = 1 ; x_logo = 2190 ; y_logo  = 1230
     cunit = r'SSH (m)'
 
@@ -499,52 +509,57 @@ if not l_notime: Nt = len(vtime)
 
 
 
-if l_show_lsm or l_apply_lap or l_apply_hgrad or l_add_topo_land:
-    bt.chck4f(cf_mm)
-    id_lsm = Dataset(cf_mm)
-    nb_dim = len(id_lsm.variables[cv_msk].dimensions)
-    print ' The mesh_mask has '+str(nb_dim)+' dimmensions!'
-    print ' *** Reading '+cv_msk+' !'
-    if nb_dim==4: XMSK = id_lsm.variables[cv_msk][0,jk,j1:j2,i1:i2]
-    if nb_dim==3: XMSK = id_lsm.variables[cv_msk][jk,j1:j2,i1:i2]
-    if nb_dim==2: XMSK = id_lsm.variables[cv_msk][j1:j2,i1:i2]
-    (nj,ni) = nmp.shape(XMSK)
+bt.chck4f(cf_mm)
+id_lsm = Dataset(cf_mm)
+nb_dim = len(id_lsm.variables[cv_msk].dimensions)
+print ' The mesh_mask has '+str(nb_dim)+' dimmensions!'
+print ' *** Reading '+cv_msk+' !'
+if nb_dim==4: XMSK = id_lsm.variables[cv_msk][0,jk,j1:j2,i1:i2]
+if nb_dim==3: XMSK = id_lsm.variables[cv_msk][jk,j1:j2,i1:i2]
+if nb_dim==2: XMSK = id_lsm.variables[cv_msk][j1:j2,i1:i2]
+(nj,ni) = nmp.shape(XMSK)
 
-    if l_apply_lap:
-        print ' *** Reading e1t and e2t !'
-        XE1T2 = id_lsm.variables['e1t'][0,j1:j2,i1:i2]
-        XE2T2 = id_lsm.variables['e2t'][0,j1:j2,i1:i2]
-        XE1T2 = XE1T2*XE1T2
-        XE2T2 = XE2T2*XE2T2
-    if l_apply_hgrad:
-        print ' *** Reading e1u and e2v !'
-        XE1U = id_lsm.variables['e1u'][0,j1:j2,i1:i2]
-        XE2V = id_lsm.variables['e2v'][0,j1:j2,i1:i2]
-        print ' *** Reading umask and vmask !'
-        if nb_dim==4:
-            UMSK = id_lsm.variables['umask'][0,jk,j1:j2,i1:i2]
-            VMSK = id_lsm.variables['vmask'][0,jk,j1:j2,i1:i2]
-        if nb_dim==3:
-            UMSK = id_lsm.variables['umask'][jk,j1:j2,i1:i2]
-            VMSK = id_lsm.variables['vmask'][jk,j1:j2,i1:i2]
-        if nb_dim==2:
-            UMSK = id_lsm.variables['umask'][j1:j2,i1:i2]
-            VMSK = id_lsm.variables['vmask'][j1:j2,i1:i2]
-    if l_save_nc:
-        Xlon = id_lsm.variables['glamt'][0,j1:j2,i1:i2]
-        Xlat = id_lsm.variables['gphit'][0,j1:j2,i1:i2]
+if l_apply_lap:
+    print ' *** Reading e1t and e2t !'
+    XE1T2 = id_lsm.variables['e1t'][0,j1:j2,i1:i2]
+    XE2T2 = id_lsm.variables['e2t'][0,j1:j2,i1:i2]
+    XE1T2 = XE1T2*XE1T2
+    XE2T2 = XE2T2*XE2T2
+if l_apply_hgrad or l_apply_geov:
+    print ' *** Reading e1u and e2v !'
+    XE1U = id_lsm.variables['e1u'][0,j1:j2,i1:i2]
+    XE2V = id_lsm.variables['e2v'][0,j1:j2,i1:i2]
+    print ' *** Reading umask and vmask !'
+    if nb_dim==4:
+        UMSK = id_lsm.variables['umask'][0,jk,j1:j2,i1:i2]
+        VMSK = id_lsm.variables['vmask'][0,jk,j1:j2,i1:i2]
+    if nb_dim==3:
+        UMSK = id_lsm.variables['umask'][jk,j1:j2,i1:i2]
+        VMSK = id_lsm.variables['vmask'][jk,j1:j2,i1:i2]
+    if nb_dim==2:
+        UMSK = id_lsm.variables['umask'][j1:j2,i1:i2]
+        VMSK = id_lsm.variables['vmask'][j1:j2,i1:i2]
+
+if l_apply_geov:        
+    ## Coriolis Parameter:
+    ff  = id_lsm.variables['gphif'][0,j1:j2,i1:i2]
+    ff[:,:] = 2.*romega*nmp.sin(ff[:,:]*nmp.pi/180.0)
         
-    if l3d:
-        vdepth = id_lsm.variables['gdept_1d'][0,:]
-        zdepth = vdepth[jk]
-        if zdepth>990. and zdepth<1010.: rof_log = 1000.
-        rof_dpt = zdepth
-        cdepth = str(round(zdepth,1))+'m'
-    id_lsm.close()
+if l_save_nc:
+    Xlon = id_lsm.variables['glamt'][0,j1:j2,i1:i2]
+    Xlat = id_lsm.variables['gphit'][0,j1:j2,i1:i2]
+    
+if l3d:
+    vdepth = id_lsm.variables['gdept_1d'][0,:]
+    zdepth = vdepth[jk]
+    if zdepth>990. and zdepth<1010.: rof_log = 1000.
+    rof_dpt = zdepth
+    cdepth = str(round(zdepth,1))+'m'
+id_lsm.close()
 
-    print 'Shape Arrays => ni,nj =', ni,nj
+print 'Shape Arrays => ni,nj =', ni,nj
 
-    print 'Done!\n'
+print 'Done!\n'
 
 
 
@@ -711,6 +726,30 @@ for jt in range(jt0,Nt):
         del lx, ly
 
 
+    if l_apply_geov:
+        print ' *** Computing gradient of "'+cv_in+'"!'
+        lx = nmp.zeros((nj,ni))
+        ly = nmp.zeros((nj,ni))
+
+        # Zonal gradient on T-points:
+        lx[:,1:ni-1] = (Xplot[:,2:ni] - Xplot[:,0:ni-2]) / (XE1U[:,1:ni-1] + XE1U[:,0:ni-2]) * UMSK[:,1:ni-1] * UMSK[:,0:ni-2]
+        lx[:,:] = XMSK[:,:]*lx[:,:]
+        #bnc.dump_2d_field('dsst_dx_gridT.nc', lx, xlon=Xlon, xlat=Xlat, name='dsst_dx')
+        # Meridional gradient on T-points:
+        ly[1:nj-1,:] = (Xplot[2:nj,:] - Xplot[0:nj-2,:]) / (XE2V[1:nj-1,:] + XE2V[0:nj-2,:]) * VMSK[1:nj-1,:] * VMSK[0:nj-2,:]
+        ly[:,:] = XMSK[:,:]*ly[:,:]
+        #bnc.dump_2d_field('dsst_dy_gridT.nc', ly, xlon=Xlon, xlat=Xlat, name='dsst_dy')
+        Xplot[:,:] = 0.0
+        # Modulus of vector gradient:        
+        Xplot[:,:] = grav/ff * nmp.sqrt( lx[:,:]*lx[:,:] + ly[:,:]*ly[:,:] )
+        #bnc.dump_2d_field('mod_grad_sst.nc', Xplot, xlon=Xlon, xlat=Xlat, name='dsst')
+        del lx, ly
+
+
+
+
+
+        
     print ''
     if not l_show_lsm and jt == jt0: ( nj , ni ) = nmp.shape(Xplot)
     print '  *** dimension of array => ', ni, nj, nmp.shape(Xplot)
