@@ -295,7 +295,8 @@ if CNEMO == 'eNATL60':
         i1=3370; j1=3941; i2=5062; j2=Nj0 ; rfact_zoom=1. ; vcb=[0.3, 0.1, 0.38, 0.018] ; font_rat = 2. ; l_annotate_name=False
         x_clock = 1350 ; y_clock = 750 ; x_logo = 1400 ; y_logo = 16
 
-    elif CBOX == 'Azores':
+    elif CBOX == 'AzoresP':
+        # Azores Portrait
         # 785 x 1190 => comparison of two => 1600 x 1200 (5px for frame), image is: 780x1190
         ## use: CMD="montage -geometry 780x1190+10+5 -background black <img1> <img2> <img_montage>"
         # => montage is then 1600x1200
@@ -303,6 +304,17 @@ if CNEMO == 'eNATL60':
         l_add_logo=False; l_add_logo_prace=False; l_add_logo_ige=False
         x_clock = 400 ; y_clock = 120
         if CWHAT=='CURLOF': tmin=-0.8 ;  tmax=-tmin ;  df = 0.1 ; cb_jump = 2
+
+    elif CBOX == 'AzoresS':
+        # Azores small square:
+        l_show_cb = True ; l_show_clock = False
+        i2=4300; j2=2140 ; i1=i2-360; j1=j2-360; rfact_zoom=1. ; vcb=[0.05, 0.12, 0.9, 0.018] ; font_rat = 1.5 ; l_annotate_name=False
+        l_add_logo=False; l_add_logo_prace=False; l_add_logo_ige=False
+        x_clock = 400 ; y_clock = 120
+        if CWHAT == 'SST': tmin = 15. ; tmax = 25. ; df=0.5 ; cb_jump = 2
+        if CWHAT == 'W_1000': color_top = 'k'
+        if CWHAT == 'CSPEED': tmin=0. ;  tmax=1.2   ;  df = 0.2 ; cb_jump = 1
+        l_save_nc = True
 
     elif CBOX == 'Band':
         i1=5100-1920; j1=2200; i2=5100; j2=j1+1080 ; rfact_zoom=1. ; vcb=[0.59, 0.1, 0.38, 0.018] ; font_rat = 2.           ; l_annotate_name=False

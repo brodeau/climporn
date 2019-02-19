@@ -76,12 +76,13 @@ cf_logo_prace = cdir_logos+'/PRACE_blanc.png'
 rof_log = 150.
 rof_dpt = 0.
 
-grav = 9.81
+grav = 9.80665 # same as in NEMO 3.6
 
 
 l_save_nc = False ; # save the field we built in a netcdf file !!!
 
-romega = 2.*nmp.pi/86400.0
+#romega = 2.*nmp.pi/86400.0
+romega = 7.292115083046062E-005 # same as in NEMO 3.6
 
 l_apply_lap   = False
 l_apply_hgrad = False
@@ -144,15 +145,16 @@ x_logo  = 50 ; y_logo  = 50
 
 cv_msk = 'tmask'
 
+cv_out = CWHAT ; # default
 
 if   CWHAT == 'MLD':
-    cv_in = 'somxl010'
+    cv_in = 'somxl010' ; cv_out = 'MLD'
     tmin=0. ;  tmax=1800.  ;  df = 50. ; cpal_fld = 'ncview_hotres' ;     cb_jump = 4
-    cunit = r'MLD (m)'
+    cunit = r'MLD [m]'
     l_show_cb = True
 
 elif CWHAT == 'SST':
-    cv_in = 'sosstsst' ; #in ['sosstsst','tos']:    
+    cv_in = 'sosstsst' ; cv_out = cv_in ; #in ['sosstsst','tos']:    
     tmin=-2 ;  tmax=32.   ;  df = 1. ; cpal_fld = 'ncview_nrl' ;     cb_jump = 2
     #tmin=0. ;  tmax=32.   ;  df = 2. ; cpal_fld = 'viridis'
     #tmin=4. ;  tmax=20.   ;  df = 1. ; cpal_fld = 'PuBu'
@@ -160,13 +162,13 @@ elif CWHAT == 'SST':
     l_show_cb = True
 
 elif CWHAT == 'T_1000':
-    cv_in = 'votemper'
+    cv_in = 'votemper' ; cv_out = cv_in ;
     tmin=0. ;  tmax=14.   ;  df = 1. ; cpal_fld = 'ncview_nrl' ; cb_jump = 1
     cunit = r'Potential temperature at 1000 m'
     l_show_cb = True
 
 elif CWHAT == 'SSS':
-    cv_in = 'sosaline' ; #in ['sosstsst','tos']:    
+    cv_in = 'sosaline' ; cv_out = cv_in ; #in ['sosstsst','tos']:    
     tmin=20. ;  tmax=40.   ;  df = 2. ; cpal_fld = 'ncview_ssec' ;     cb_jump = 2
     #tmin=0. ;  tmax=32.   ;  df = 2. ; cpal_fld = 'viridis'
     #tmin=4. ;  tmax=20.   ;  df = 1. ; cpal_fld = 'PuBu'
@@ -174,13 +176,13 @@ elif CWHAT == 'SSS':
     l_show_cb = True
 
 elif CWHAT == 'S_1000':
-    cv_in = 'vosaline'
+    cv_in = 'vosaline' ; cv_out = cv_in ;
     tmin=33.5 ;  tmax=36.5   ;  df = 0.5 ; cpal_fld = 'ncview_helix2' ; cb_jump = 1
     cunit = r'Salinity at 1000 m'
     l_show_cb = True
 
 elif CWHAT == 'GRAD_SST':
-    cv_in = 'sosstsst'
+    cv_in = 'sosstsst' ; cv_out = cv_in ;
     l_apply_hgrad = True
     l_smooth = True ; nb_smooth  = 5
     tmin=0. ;  tmax=0.001 ;  df = 0.0001 ; cpal_fld = 'ncview_hotres' ; cb_jump = 1
@@ -190,20 +192,20 @@ elif CWHAT == 'GRAD_SST':
     l_show_cb = True
 
 elif CWHAT == 'SSU':
-    cv_in = 'sozocrtx'
+    cv_in = 'sozocrtx' ; cv_out = CWHAT ;
     tmin=-0.8 ;  tmax=-tmin  ;  df = 0.1 ; cpal_fld = 'bone' ; cb_jump = 1
     cunit = r'Zonal component of current speed [m/s]'
     cv_msk = 'umask' ; l_show_cb = True
 
 elif CWHAT == 'SSV':
-    cv_in = 'somecrty'
+    cv_in = 'somecrty' ; cv_out = CWHAT ;
     tmin=-1. ;  tmax=-tmin  ;  df = 0.2 ; cpal_fld = 'bone' ; cb_jump = 1
     cunit = r'Meridional component of current speed [m/s]'
     cv_msk = 'vmask' ; l_show_cb = True
 
 
 elif CWHAT == 'SSH':
-    cv_in = 'sossheig'    
+    cv_in = 'sossheig' ; cv_out = CWHAT ;
     #cpal_fld = 'ncview_jaisnc'
     #cpal_fld = 'PuBu'
     #cpal_fld = 'RdBu'
@@ -212,19 +214,19 @@ elif CWHAT == 'SSH':
     cpal_fld = 'RdBu_r' ; tmin=-3. ;  tmax=-tmin   ;  df = 0.5 ;
     #cpal_fld = 'RdBu_r' ; tmin=-1.5 ;  tmax=-tmin   ;  df = 0.5 ; 
     l_show_cb = True ; cb_jump = 1 ; x_logo = 2190 ; y_logo  = 1230
-    cunit = r'SSH (m)'
+    cunit = r'SSH [m]'
 
 elif CWHAT == 'GEOSSV':
     # Geostrophic velocity speed out of SSH
-    cv_in = 'sossheig'
+    cv_in = 'sossheig' ; cv_out = CWHAT ;
     l_apply_geov = True
     cpal_fld = 'on3' ; tmin=0. ;  tmax=1.2   ;  df = 0.2 ; cb_extend = 'max'
     l_show_cb = True ; cb_jump = 1 ; x_logo = 2190 ; y_logo  = 1230
-    cunit = r'Surface geostrophic velocity speed (m)'
+    cunit = r'Surface geostrophic velocity speed [m/s]'
     l_save_nc = True
 
 elif CWHAT == 'LAP_SSH':
-    cv_in = 'sossheig'
+    cv_in = 'sossheig' ; cv_out = CWHAT ;
     l_apply_lap = True
     #cpal_fld = 'on3' ; tmin=-1.2 ;  tmax=2.3   ;  df = 0.05 ; l_apply_lap = True
     cpal_fld = 'on2' ; tmin=-1.2 ;  tmax=1.2   ;  df = 0.05 ; 
@@ -233,7 +235,7 @@ elif CWHAT == 'LAP_SSH':
 
 
 elif CWHAT == 'W_1000':
-    cv_in = 'vovecrtz'
+    cv_in = 'vovecrtz'  ; cv_out = cv_in ;
     tmin=-0.01 ;  tmax=-tmin   ;  df = 0.005 ; cb_jump = 1
     #cpal_fld='RdBu_r'
     #cpal_fld='PiYG_r'
@@ -243,12 +245,12 @@ elif CWHAT == 'W_1000':
 
 
 elif CWHAT == 'Amplitude':
-    cv_in = 'r'    
+    cv_in = 'r'     ; cv_out = cv_in ;
     cpal_fld = 'RdBu_r' ; tmin=-0.5 ;  tmax=-tmin   ;  df = 0.1 ; cb_jump = 1
-    cunit = r'Amplitude (m)'
+    cunit = r'Amplitude [m]'
 
 elif CWHAT == 'Phase':
-    cv_in = 'phi'    
+    cv_in = 'phi'     ; cv_out = cv_in ;
     cpal_fld = 'RdBu_r' ; tmin=-30. ;  tmax=-tmin   ;  df = 5. ; cb_jump = 1
     #
     cunit = r'Phase (deg.)'
@@ -257,6 +259,10 @@ else:
     print 'ERROR: we do not know variable "'+str(cv_in)+'" !'
     sys.exit(0)
 
+
+#if cv_out == '':
+#    print 'ERROR: "cv_out" has not been given a value!'
+#    sys.exit(0)
 
     
 if CNEMO == 'eNATL60':
@@ -363,6 +369,16 @@ if CNEMO == 'eNATL60':
         x_clock = 1400 ; y_clock = 120 ; l_show_exp = True ; x_exp = 40 ; y_exp = 1030
         if CWHAT == 'SST': tmin = 15. ; tmax = 25. ; df=0.5 ; cb_jump = 2
         if CWHAT == 'W_1000': color_top = 'k'; #lili
+
+    elif CBOX == 'AzoresS':
+        # Azores small square:
+        l_show_cb = True ; l_show_clock = False
+        i2=4300; j2=2140 ; i1=i2-360; j1=j2-360; rfact_zoom=1. ; vcb=[0.05, 0.12, 0.9, 0.018] ; font_rat = 1.5 ; l_annotate_name=False
+        l_add_logo=False; l_add_logo_prace=False; l_add_logo_ige=False
+        x_clock = 400 ; y_clock = 120
+        if CWHAT == 'SST': tmin = 15. ; tmax = 25. ; df=0.5 ; cb_jump = 2
+        if CWHAT == 'W_1000': color_top = 'k'
+        l_save_nc = True
 
     elif CBOX == 'Band':
         i1=5100-1920; j1=2200; i2=5100; j2=j1+1080 ; rfact_zoom=1. ; vcb=[0.59, 0.1, 0.38, 0.018] ; font_rat = 2.           ; l_annotate_name=False
@@ -668,9 +684,9 @@ for jt in range(jt0,Nt):
 
 
     if l3d:
-        cfig = 'figs/'+cv_in+'_'+CNEMO+'-'+CRUN+'_lev'+str(jk)+'_'+CBOX+'_'+cday+'_'+chour+'_'+cpal_fld+'.'+fig_type
+        cfig = 'figs/'+cv_out+'_'+CNEMO+'-'+CRUN+'_lev'+str(jk)+'_'+CBOX+'_'+cday+'_'+chour+'_'+cpal_fld+'.'+fig_type
     else:
-        cfig = 'figs/'+cv_in+'_'+CNEMO+'-'+CRUN+'_'+CBOX+'_'+cday+'_'+chour+'_'+cpal_fld+'.'+fig_type
+        cfig = 'figs/'+cv_out+'_'+CNEMO+'-'+CRUN+'_'+CBOX+'_'+cday+'_'+chour+'_'+cpal_fld+'.'+fig_type
 
     ###### FIGURE ##############
 
