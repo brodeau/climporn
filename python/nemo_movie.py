@@ -81,6 +81,8 @@ grav = 9.81
 
 l_save_nc = False ; # save the field we built in a netcdf file !!!
 
+romega = 2.*nmp.pi/86400.0
+
 l_apply_lap   = False
 l_apply_hgrad = False
 l_apply_geov  = False
@@ -216,9 +218,10 @@ elif CWHAT == 'GEOSSV':
     # Geostrophic velocity speed out of SSH
     cv_in = 'sossheig'
     l_apply_geov = True
-    cpal_fld = 'on3' ; tmin=0. ;  tmax=1.5   ;  df = 0.25 ; cb_extend = 'max'
+    cpal_fld = 'on3' ; tmin=0. ;  tmax=1.2   ;  df = 0.2 ; cb_extend = 'max'
     l_show_cb = True ; cb_jump = 1 ; x_logo = 2190 ; y_logo  = 1230
-    cunit = r'SSH (m)'
+    cunit = r'Surface geostrophic velocity speed (m)'
+    l_save_nc = True
 
 elif CWHAT == 'LAP_SSH':
     cv_in = 'sossheig'
