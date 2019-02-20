@@ -237,6 +237,7 @@ if CNEMO == 'eNATL60':
     Nj0 = 4729
     l_show_clock = True
     x_clock = 1600 ; y_clock = 200 ; x_logo = 2200 ; y_logo  = 50
+    x_exp = 40 ; y_exp = 980
     cdt = '1h'
     l_get_name_of_run = True
 
@@ -264,11 +265,10 @@ if CNEMO == 'eNATL60':
 
     elif CBOX == 'Med':
         i2=8040; i1=i2-2560 ; j1=1525 ; j2=j1+1440 ; rfact_zoom=1. ; vcb=[0.025, 0.06, 0.4, 0.02] ; font_rat=2.*rfact_zoom
-        l_annotate_name=False
+        l_annotate_name=False ; l_show_exp = True ; x_exp = 100 ; y_exp = 240
         x_clock = 200 ; y_clock = 170 ; x_logo = 1650 ; y_logo  = 1200
         if CWHAT == 'CURLOF': tmin=-1. ;  tmax=-tmin ; df = 0.1 ; cb_jump = 2
         if CWHAT == 'CSPEED': tmin= 0. ;  tmax=1.3   ; df = 0.1
-
 
     elif CBOX == 'Meddies':
         i2=5800; j1=1400; i1=i2-2560 ; j2=j1+1440 ; rfact_zoom=1. ; vcb=[0.5, 0.875, 0.485, 0.02] ; font_rat=2.*rfact_zoom
@@ -314,6 +314,12 @@ if CNEMO == 'eNATL60':
         l_add_logo=False; l_add_logo_prace=False; l_add_logo_ige=False
         x_clock = 400 ; y_clock = 120
         if CWHAT=='CURLOF': tmin=-0.8 ;  tmax=-tmin ;  df = 0.1 ; cb_jump = 2
+
+    elif CBOX == 'AzoresL':
+        # Azores Landscape: (1920x1080)
+        i2=5200; j2=2240 ; i1=i2-1920; j1=j2-1080; rfact_zoom=1. ; vcb=[0.57, 0.08, 0.4, 0.018] ; font_rat = 2. ; l_annotate_name=False
+        l_add_logo=False; l_add_logo_prace=False; l_add_logo_ige=False
+        x_clock = 1400 ; y_clock = 120 ; l_show_exp = True ; x_exp = 40 ; y_exp = 1030
 
     elif CBOX == 'AzoresS':
         # Azores small square:
