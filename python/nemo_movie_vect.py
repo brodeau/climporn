@@ -262,12 +262,20 @@ if CNEMO == 'eNATL60':
         i1=0   ; j1=0    ; i2=Ni0 ; j2=Nj0  ; rfact_zoom=1080./float(Nj0) ; vcb=[0.59, 0.1, 0.39, 0.018]  ; font_rat=8.*rfact_zoom
         x_clock = 1600 ; y_clock = 200 ; x_logo = 2200 ; y_logo  = 50
 
-    elif CBOX == 'FullMed':
-        i1=5520; j1=1525; i2=i1+2560 ; j2=j1+1440 ; rfact_zoom=1. ; vcb=[0.5, 0.875, 0.485, 0.02] ; font_rat=2.*rfact_zoom
+    elif CBOX == 'Med':
+        i2=8040; i1=i2-2560 ; j1=1525 ; j2=j1+1440 ; rfact_zoom=1. ; vcb=[0.025, 0.06, 0.4, 0.02] ; font_rat=2.*rfact_zoom
+        l_annotate_name=False
+        x_clock = 200 ; y_clock = 170 ; x_logo = 1650 ; y_logo  = 1200
+        if CWHAT == 'CURLOF': tmin=-1. ;  tmax=-tmin ;  df = 0.1 ; cb_jump = 2
+
+    elif CBOX == 'Meddies':
+        i2=5800; j1=1400; i1=i2-2560 ; j2=j1+1440 ; rfact_zoom=1. ; vcb=[0.5, 0.875, 0.485, 0.02] ; font_rat=2.*rfact_zoom
         l_annotate_name=False
 
+
     elif CBOX == 'Med+BS':
-        i1=5400; j1=1530; i2=Ni0 ; j2=3310 ; rfact_zoom=1440./float(j2-j1)   ; vcb=[0.025, 0.06, 0.4, 0.02] ; font_rat=3.*rfact_zoom
+        #
+        i2=Ni0 ; i1=5400; j1=1530;  j2=3310 ; rfact_zoom=1440./float(j2-j1)   ; vcb=[0.025, 0.06, 0.4, 0.02] ; font_rat=3.*rfact_zoom
         l_annotate_name=False ; l_add_logo_ige=False ; l_add_logo_prace=False
         x_clock = 100 ; y_clock = 170 ; x_logo = 2090 ; y_logo  = 10
 
