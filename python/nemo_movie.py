@@ -304,6 +304,7 @@ if CNEMO == 'eNATL60':
         l_annotate_name=False
         x_clock = 200 ; y_clock = 170 ; x_logo = 1650 ; y_logo  = 1200
         if CWHAT == 'SSS': tmin=33. ;  tmax=39.5   ;  df = 0.25 ; cb_jump = 2 ; cpal_fld = 'viridis' ;# cpal_fld = 'ncview_ssec'
+        if CWHAT == 'SST': tmin=10. ;  tmax=32.    ;  df = 1.   ; cb_jump = 1
 
     elif CBOX == 'Meddies':
         i2=5800; j1=1400; i1=i2-2560 ; j2=j1+1440 ; rfact_zoom=1. ; vcb=[0.5, 0.875, 0.485, 0.02] ; font_rat=2.*rfact_zoom

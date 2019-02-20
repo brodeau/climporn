@@ -266,7 +266,9 @@ if CNEMO == 'eNATL60':
         i2=8040; i1=i2-2560 ; j1=1525 ; j2=j1+1440 ; rfact_zoom=1. ; vcb=[0.025, 0.06, 0.4, 0.02] ; font_rat=2.*rfact_zoom
         l_annotate_name=False
         x_clock = 200 ; y_clock = 170 ; x_logo = 1650 ; y_logo  = 1200
-        if CWHAT == 'CURLOF': tmin=-1. ;  tmax=-tmin ;  df = 0.1 ; cb_jump = 2
+        if CWHAT == 'CURLOF': tmin=-1. ;  tmax=-tmin ; df = 0.1 ; cb_jump = 2
+        if CWHAT == 'CSPEED': tmin= 0. ;  tmax=1.3   ; df = 0.1
+
 
     elif CBOX == 'Meddies':
         i2=5800; j1=1400; i1=i2-2560 ; j2=j1+1440 ; rfact_zoom=1. ; vcb=[0.5, 0.875, 0.485, 0.02] ; font_rat=2.*rfact_zoom
