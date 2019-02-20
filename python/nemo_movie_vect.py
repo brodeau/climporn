@@ -698,7 +698,7 @@ for jt in range(jt0,Nt):
 
 
     if l_save_nc:
-        cf_out = 'nc/'+cv_out+'_NEMO_'+CNEMO+'_'+CBOX+'_'+cday+'_'+chour+'_'+cpal_fld+'.nc'
+        cf_out = 'nc/'+cv_out+'_NEMO_'+CNEMO+'-'+CRUN+'_'+CBOX+'_'+cday+'_'+chour+'_'+cpal_fld+'.nc'
         print ' Saving in '+cf_out
         bnc.dump_2d_field(cf_out, Xplot, xlon=Xlon, xlat=Xlat, name=cv_out)
         print ''
