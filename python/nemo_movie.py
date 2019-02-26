@@ -65,6 +65,7 @@ l_pow_field = False
 l_annotate_name = True
 l_show_clock = True
 l_show_exp = False
+l_fill_holes_black = False
 
 
 cdir_logos = cwd+'/logos'
@@ -282,6 +283,7 @@ if CNEMO == 'eNATL60':
     if   CBOX == 'ALL':
         i1=0   ; j1=0    ; i2=Ni0 ; j2=Nj0  ; rfact_zoom=1440./float(Nj0) ; vcb=[0.61, 0.1, 0.36, 0.018]  ; font_rat=8.*rfact_zoom
         x_clock = 1600 ; y_clock = 200 ; x_logo=2200 ; y_logo=1200
+        l_fill_holes_black=True
 
     elif CBOX == 'EUROPA':
         i2=6400 ; j2=4000 ; i1=i2-2*1920; j1=j2-2*1080; rfact_zoom=0.5   ; vcb=[0.5, 0.875, 0.485, 0.02] ; font_rat=2.*rfact_zoom
@@ -296,6 +298,7 @@ if CNEMO == 'eNATL60':
     elif   CBOX == 'ALLFR':
         i1=0   ; j1=0    ; i2=Ni0 ; j2=Nj0  ; rfact_zoom=1. ; vcb=[0.59, 0.1, 0.39, 0.018]  ; font_rat=8.*rfact_zoom
         x_clock = 4000 ; y_clock = 200 ; x_logo = 6000 ; y_logo  = 50; l_show_clock=False ; l_annotate_name=False; l_add_logo=False
+        l_fill_holes_black=True
 
     elif   CBOX == 'SALL':
         i1=0   ; j1=0    ; i2=Ni0 ; j2=Nj0  ; rfact_zoom=1080./float(Nj0) ; vcb=[0.59, 0.1, 0.39, 0.018]  ; font_rat=8.*rfact_zoom
@@ -600,7 +603,7 @@ if l_add_topo_land:
     #bnc.dump_2d_field('topo_'+CBOX+'.nc', xtopo, name='z')    
     if l3d: xtopo = xtopo + rof_dpt
     xtopo[nmp.where( XMSK > 0.01)] = nmp.nan
-    if not l3d: xtopo[nmp.where( xtopo < -10.0)] = nmp.nan
+    if l_fill_holes_black and not l3d: xtopo[nmp.where( xtopo < -10.0)] = nmp.nan
 
 
 params = { 'font.family':'Helvetica Neue',
