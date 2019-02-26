@@ -237,9 +237,9 @@ elif CWHAT == 'LAP_SSH':
 elif CWHAT == 'W_1000':
     cv_in = 'vovecrtz'  ; cv_out = cv_in ;
     tmin=-0.01 ;  tmax=-tmin   ;  df = 0.005 ; cb_jump = 1
-    #cpal_fld='RdBu_r'
+    cpal_fld='RdBu_r'
     #cpal_fld='PiYG_r'
-    cpal_fld='BrBG_r'
+    #cpal_fld='BrBG_r'
     cunit = r'Vertical velocity at 1000 m [m/s]'
     l_show_cb = True
 
