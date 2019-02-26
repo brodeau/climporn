@@ -48,6 +48,8 @@ dpi = 110
 color_top = 'white'
 #color_top = 'k'
 
+cv_out = 'unknown'
+
 jt0 = 0
 
 
@@ -598,6 +600,7 @@ if l_add_topo_land:
     #bnc.dump_2d_field('topo_'+CBOX+'.nc', xtopo, name='z')    
     if l3d: xtopo = xtopo + rof_dpt
     xtopo[nmp.where( XMSK > 0.01)] = nmp.nan
+    if not l3d: xtopo[nmp.where( xtopo < -10.0)] = nmp.nan
 
 
 params = { 'font.family':'Helvetica Neue',
@@ -694,12 +697,11 @@ for jt in range(jt0,Nt):
 
     fig = plt.figure(num = 1, figsize=(rw_fig, rh_fig), dpi=None, facecolor='w', edgecolor='0.5')
 
-    ax  = plt.axes([0., 0., 1., 1.], axisbg = '0.5')
+    ax  = plt.axes([0., 0., 1., 1.], axisbg = 'k')
 
     vc_fld = nmp.arange(tmin, tmax + df, df)
 
 
-    
     print "Reading record #"+str(jt)+" of "+cv_in+" in "+cf_in
     if l3d: print '            => at level #'+str(jk)+' ('+cdepth+')!'
     id_fld = Dataset(cf_in)

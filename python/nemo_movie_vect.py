@@ -511,6 +511,7 @@ if l_add_topo_land:
     #bnc.dump_2d_field('topo_'+CBOX+'.nc', xtopo, name='z')    
     if l3d: xtopo = xtopo + rof_dpt
     xtopo[nmp.where( XMSK > 0.01)] = nmp.nan
+    if not l3d: xtopo[nmp.where( xtopo < -10.0)] = nmp.nan
 
 
 params = { 'font.family':'Helvetica Neue',
@@ -650,7 +651,7 @@ for jt in range(jt0,Nt):
 
     fig = plt.figure(num = 1, figsize=(rw_fig, rh_fig), dpi=None, facecolor='w', edgecolor='0.5')
 
-    ax  = plt.axes([0., 0., 1., 1.], axisbg = '0.5')
+    ax  = plt.axes([0., 0., 1., 1.], axisbg = 'k')
 
     vc_fld = nmp.arange(tmin, tmax + df, df)
 
