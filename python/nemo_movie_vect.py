@@ -246,6 +246,7 @@ if CNEMO == 'eNATL60':
     if   CBOX == 'ALL':
         i1=0   ; j1=0    ; i2=Ni0 ; j2=Nj0  ; rfact_zoom=1440./float(Nj0) ; vcb=[0.61, 0.1, 0.36, 0.018]  ; font_rat=8.*rfact_zoom
         x_clock = 1600 ; y_clock = 200 ; x_logo=2200 ; y_logo=1200
+        l_annotate_name=False ; l_show_exp = True ; x_exp = 1750 ; y_exp = 300
         l_fill_holes_black=True
 
     elif CBOX == 'EUROPA':
@@ -499,7 +500,18 @@ if l_show_lsm or l_do_crl or l_do_cof or l_do_cspd or l_do_tke or l_do_eke:
 
 
 
-idx_land = nmp.where( XMSK < 0.01)
+idx_land = nmp.where( XMSK <  0.5 )
+#idx_ocea = nmp.where( XMSK >= 0.5 )
+
+#(vjj_land, vji_land) = idx_land
+#print idx_land
+#print vjj_land
+#print vji_land
+#print len(vjj_land), len(vji_land)
+#sys.exit(0)
+
+
+XLSM = nmp.zeros((nj,ni)) ; # will define real continents not NEMO mask...
 
 if l_add_topo_land:
     bt.chck4f(cf_topo_land)
@@ -513,9 +525,13 @@ if l_add_topo_land:
     #bnc.dump_2d_field('topo_'+CBOX+'.nc', xtopo, name='z')    
     if l3d: xtopo = xtopo + rof_dpt
     xtopo[nmp.where( XMSK > 0.01)] = nmp.nan
-    if l_fill_holes_black and not l3d: xtopo[nmp.where( xtopo < -10.0)] = nmp.nan
+    if l_fill_holes_black and not l3d:
+        XLSM[nmp.where( xtopo < 0.0)] = 1
+        xtopo[nmp.where( xtopo < 0.0)] = nmp.nan
 
+XLSM[nmp.where( XMSK > 0.5)] = 1
 
+        
 params = { 'font.family':'Helvetica Neue',
            'font.weight':    'normal',
            'font.size':       int(9.*font_rat),
@@ -737,10 +753,10 @@ for jt in range(jt0,Nt):
     #LOLO: rm ???
     if l_show_lsm or l_add_topo_land:
         if l_add_topo_land:
-            clsm = plt.imshow(nmp.ma.masked_where(XMSK>0.0001, xtopo), cmap = pal_lsm, norm = norm_lsm, interpolation='none')
-            plt.contour(XMSK, [0.9], colors='k', linewidths=0.5)
+            clsm = plt.imshow(nmp.ma.masked_where(XLSM>0.0001, xtopo), cmap = pal_lsm, norm = norm_lsm, interpolation='none')
+            plt.contour(XLSM, [0.9], colors='k', linewidths=0.5)
         else:
-            clsm = plt.imshow(nmp.ma.masked_where(XMSK>0.0001, XMSK), cmap = pal_lsm, norm = norm_lsm, interpolation='none')
+            clsm = plt.imshow(nmp.ma.masked_where(XLSM>0.0001, XLSM), cmap = pal_lsm, norm = norm_lsm, interpolation='none')
 
     if l_show_cb:
         ax2 = plt.axes(vcb)
