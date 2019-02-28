@@ -1,0 +1,12 @@
+*.err
+*.tmp
+*.out
+*.pyc
+*#
+*.mod
+*.o
+*.nc
+make.macro
+*.bak
+out
+err
