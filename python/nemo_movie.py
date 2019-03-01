@@ -35,6 +35,10 @@ import barakuda_colmap as bcm
 import barakuda_tool as bt
 import barakuda_ncio as bnc
 
+# ClimPorn:
+import nemo_hboxes as nhb
+
+
 
 cwd = getcwd()
 
@@ -46,7 +50,6 @@ vml = [ 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ]
 fig_type='png'
 dpi = 110
 color_top = 'white'
-#color_top = 'k'
 
 cv_out = 'unknown'
 
@@ -54,44 +57,35 @@ jt0 = 0
 
 
 jk=0
-i2=0
-j2=0
 l_get_name_of_run = False
 l_show_lsm = True
 l_do_ice  = False
 l_show_cb = True
 l_log_field = False
 l_pow_field = False
-l_annotate_name = True
-l_show_clock = True
-l_show_exp = False
-l_fill_holes_black = False
 
+cdt = '1h'
+l_get_name_of_run = True
 
 cdir_logos = cwd+'/logos'
-l_add_logo = True
 cf_logo_on  = cdir_logos+'/ocean-next_trans_white_281x191.png'
-l_add_logo_ige = True
 cf_logo_ige = cdir_logos+'/IGE_blanc_notext.png'
-l_add_logo_prace = True
-cf_logo_prace = cdir_logos+'/PRACE_blanc.png'
+cf_logo_prc = cdir_logos+'/PRACE_blanc.png'
 
 rof_log = 150.
 rof_dpt = 0.
 
 grav = 9.80665 # same as in NEMO 3.6
 
-
 l_save_nc = False ; # save the field we built in a netcdf file !!!
 
-#romega = 2.*nmp.pi/86400.0
-romega = 7.292115083046062E-005 # same as in NEMO 3.6
+romega = 7.292115083046062E-005 # same as in NEMO 3.6 / #romega = 2.*nmp.pi/86400.0
 
 l_apply_lap   = False
 l_apply_hgrad = False
 l_apply_geov  = False
 
-cb_extend = 'both' ;#colorbar extrema
+cb_extend = 'both'
 
 
 ################## ARGUMENT PARSING / USAGE ################################################################################################
@@ -140,11 +134,26 @@ else:
 
 
 
+#---------------------------------------------------------------
 
+nemo_box = nhb.nemo_hbox(CNEMO,CBOX)
 
+(Ni0,Nj0) = nemo_box.size()
+print " "+CNEMO+": Ni0,Nj0 => ", Ni0,Nj0
 
+(i1,j1, i2,j2) = nemo_box.idx()
+print " i1,j1, i2,j2 => ", i1,j1, i2,j2,'\n'
 
-x_logo  = 50 ; y_logo  = 50
+if nemo_box.l_show_clock: (x_clock,y_clock) = nemo_box.clock
+#print ' x_clock,y_clock =', x_clock,y_clock
+
+if nemo_box.l_show_exp: (x_exp,y_exp) = nemo_box.exp
+#print ' x_exp,y_exp =', x_exp,y_exp
+
+if nemo_box.l_add_logo: (x_logo,y_logo) = nemo_box.logo
+
+#---------------------------------------------------------------
+
 
 cv_msk = 'tmask'
 
@@ -154,69 +163,60 @@ if   CWHAT == 'MLD':
     cv_in = 'somxl010' ; cv_out = 'MLD'
     tmin=0. ;  tmax=1800.  ;  df = 50. ; cpal_fld = 'ncview_hotres' ;     cb_jump = 4
     cunit = r'MLD [m]'
-    l_show_cb = True
 
 elif CWHAT == 'SST':
     cv_in = 'sosstsst' ; cv_out = cv_in ; #in ['sosstsst','tos']:    
     tmin=-2 ;  tmax=32.   ;  df = 1. ; cpal_fld = 'ncview_nrl' ;     cb_jump = 2
-    #tmin=0. ;  tmax=32.   ;  df = 2. ; cpal_fld = 'viridis'
-    #tmin=4. ;  tmax=20.   ;  df = 1. ; cpal_fld = 'PuBu'
     cunit = r'SST ($^{\circ}$C)'
-    l_show_cb = True
-
+    if CBOX == 'EUROPA':   tmin=0. ;  tmax=25.
+    if CBOX == 'EUROPAs':  tmin=6. ;  tmax=18.
+    if CBOX == 'Med':      tmin=10.;  tmax=30. ; cb_jump = 1
+    if CBOX == 'Med+BS':   tmin=7. ;  tmax=25.
+    if CBOX == 'LabSea':   tmin=-2.;  tmax=15.
+    if CBOX == 'Brittany': tmin=7. ;  tmax=13.
+    if CBOX == 'GrlIcl':   tmax = 12.
+    if CBOX in [ 'AzoresP','AzoresL','AzoresS']:  tmin = 15. ; tmax = 25. ; df=0.5
+    
 elif CWHAT == 'T_1000':
     cv_in = 'votemper' ; cv_out = cv_in ;
     tmin=0. ;  tmax=14.   ;  df = 1. ; cpal_fld = 'ncview_nrl' ; cb_jump = 1
     cunit = r'Potential temperature at 1000 m'
-    l_show_cb = True
 
 elif CWHAT == 'SSS':
     cv_in = 'sosaline' ; cv_out = cv_in ; #in ['sosstsst','tos']:    
-    tmin=20. ;  tmax=40.   ;  df = 2. ; cpal_fld = 'ncview_ssec' ;     cb_jump = 2
-    #tmin=0. ;  tmax=32.   ;  df = 2. ; cpal_fld = 'viridis'
-    #tmin=4. ;  tmax=20.   ;  df = 1. ; cpal_fld = 'PuBu'
+    tmin=20. ;  tmax=40.   ;  df = 2. ; cpal_fld = 'ncview_ssec' ; cb_jump = 2
     cunit = r'Sea surface salinity'
-    l_show_cb = True
+    if CBOX == 'Med' :    tmin=33. ; tmax=39.5 ;  df = 0.25 ; cpal_fld = 'magma'
+    if CBOX == 'LabSea' : tmin=28. ; tmax=35.5 ;  df = 1.   ; cb_jump = 1 ; cpal_fld = 'gist_stern_r'
 
 elif CWHAT == 'S_1000':
     cv_in = 'vosaline' ; cv_out = cv_in ;
     tmin=33.5 ;  tmax=36.5   ;  df = 0.5 ; cpal_fld = 'ncview_helix2' ; cb_jump = 1
     cunit = r'Salinity at 1000 m'
-    l_show_cb = True
 
 elif CWHAT == 'GRAD_SST':
     cv_in = 'sosstsst' ; cv_out = cv_in ;
     l_apply_hgrad = True
     l_smooth = True ; nb_smooth  = 5
     tmin=0. ;  tmax=0.001 ;  df = 0.0001 ; cpal_fld = 'ncview_hotres' ; cb_jump = 1
-    #tmin=0. ;  tmax=32.   ;  df = 2. ; cpal_fld = 'viridis'
-    #tmin=4. ;  tmax=20.   ;  df = 1. ; cpal_fld = 'PuBu'
     cunit = r'$\left|\vec{\nabla}SST\right|$ (K/m)'
-    l_show_cb = True
 
 elif CWHAT == 'SSU':
     cv_in = 'sozocrtx' ; cv_out = CWHAT ;
     tmin=-0.8 ;  tmax=-tmin  ;  df = 0.1 ; cpal_fld = 'bone' ; cb_jump = 1
     cunit = r'Zonal component of current speed [m/s]'
-    cv_msk = 'umask' ; l_show_cb = True
+    cv_msk = 'umask'
 
 elif CWHAT == 'SSV':
     cv_in = 'somecrty' ; cv_out = CWHAT ;
     tmin=-1. ;  tmax=-tmin  ;  df = 0.2 ; cpal_fld = 'bone' ; cb_jump = 1
     cunit = r'Meridional component of current speed [m/s]'
-    cv_msk = 'vmask' ; l_show_cb = True
-
+    cv_msk = 'vmask'
 
 elif CWHAT == 'SSH':
     cv_in = 'sossheig' ; cv_out = CWHAT ;
-    #cpal_fld = 'ncview_jaisnc'
-    #cpal_fld = 'PuBu'
-    #cpal_fld = 'RdBu'
-    #cpal_fld = 'BrBG'
-    #cpal_fld = 'bone_r' ; tmin=-0.9 ;  tmax=-tmin   ;  df = 0.05 ; l_apply_lap = True ; l_pow_field = True ; pow_field = 2.
     cpal_fld = 'RdBu_r' ; tmin=-3. ;  tmax=-tmin   ;  df = 0.5 ;
-    #cpal_fld = 'RdBu_r' ; tmin=-1.5 ;  tmax=-tmin   ;  df = 0.5 ; 
-    l_show_cb = True ; cb_jump = 1 ; x_logo = 2190 ; y_logo  = 1230
+    cb_jump = 1
     cunit = r'SSH [m]'
 
 elif CWHAT == 'GEOSSV':
@@ -224,28 +224,21 @@ elif CWHAT == 'GEOSSV':
     cv_in = 'sossheig' ; cv_out = CWHAT ;
     l_apply_geov = True
     cpal_fld = 'on3' ; tmin=0. ;  tmax=1.2   ;  df = 0.2 ; cb_extend = 'max'
-    l_show_cb = True ; cb_jump = 1 ; x_logo = 2190 ; y_logo  = 1230
+    cb_jump = 1
     cunit = r'Surface geostrophic velocity speed [m/s]'
     l_save_nc = True
 
 elif CWHAT == 'LAP_SSH':
     cv_in = 'sossheig' ; cv_out = CWHAT ;
     l_apply_lap = True
-    #cpal_fld = 'on3' ; tmin=-1.2 ;  tmax=2.3   ;  df = 0.05 ; l_apply_lap = True
     cpal_fld = 'on2' ; tmin=-1.2 ;  tmax=1.2   ;  df = 0.05 ; 
-    #cpal_fld = 'coolwarm' ; tmin=-1. ;  tmax=1.   ;  df = 0.05 ; l_apply_lap = True
-    #cpal_fld = 'gray_r' ; tmin=-0.3 ;  tmax=0.3   ;  df = 0.05 ; l_apply_lap = True
-
 
 elif CWHAT == 'W_1000':
     cv_in = 'vovecrtz'  ; cv_out = cv_in ;
     tmin=-0.01 ;  tmax=-tmin   ;  df = 0.005 ; cb_jump = 1
-    cpal_fld='RdBu_r'
-    #cpal_fld='PiYG_r'
-    #cpal_fld='BrBG_r'
+    cpal_fld='RdBu_r' ;    #cpal_fld='PiYG_r' ; #cpal_fld='BrBG_r'
     cunit = r'Vertical velocity at 1000 m [m/s]'
-    l_show_cb = True
-
+    if CBOX in [ 'AzoresP','AzoresL','AzoresS']: color_top = 'k'
 
 elif CWHAT == 'Amplitude':
     cv_in = 'r'     ; cv_out = cv_in ;
@@ -262,188 +255,7 @@ else:
     print 'ERROR: we do not know variable "'+str(cv_in)+'" !'
     sys.exit(0)
 
-
-#if cv_out == '':
-#    print 'ERROR: "cv_out" has not been given a value!'
-#    sys.exit(0)
-
-    
-if CNEMO == 'eNATL60':
-
-    # Defaults:
-    Ni0 = 8354
-    Nj0 = 4729
-    l_show_clock = True
-    x_clock = 1600 ; y_clock = 200 ; x_logo = 2200 ; y_logo  = 50
-    x_exp = 40 ; y_exp = 980
-    cdt = '1h'
-    l_get_name_of_run = True
-
-    # Boxes:
-    if   CBOX == 'ALL':
-        i1=0   ; j1=0    ; i2=Ni0 ; j2=Nj0  ; rfact_zoom=1440./float(Nj0) ; vcb=[0.61, 0.1, 0.36, 0.018]  ; font_rat=8.*rfact_zoom
-        x_clock = 1600 ; y_clock = 200 ; x_logo=2200 ; y_logo=1200
-        l_annotate_name=False ; l_show_exp = True ; x_exp = 1750 ; y_exp = 300
-        l_fill_holes_black=True
-
-    elif CBOX == 'EUROPA':
-        i2=6400 ; j2=4000 ; i1=i2-2*1920; j1=j2-2*1080; rfact_zoom=0.5   ; vcb=[0.5, 0.875, 0.485, 0.02] ; font_rat=2.*rfact_zoom
-        x_clock = 30 ; y_clock = 1040 ; x_logo = 1500 ; y_logo = 16 ; l_annotate_name=False
-        if CWHAT == 'SST': tmin=0. ;  tmax=25.   ;  df = 1. ; cpal_fld = 'ncview_nrl'
         
-    elif CBOX == 'EUROPAs':
-        i2=6500 ; j2=3600 ; i1=i2-1920; j1=j2-1080; rfact_zoom=1.  ; vcb=[0.5, 0.875, 0.485, 0.02] ; font_rat=2.*rfact_zoom
-        x_clock = 30 ; y_clock = 1040 ; x_logo = 1500 ; y_logo = 16 ; l_annotate_name=False
-        if CWHAT == 'SST': tmin=6. ;  tmax=18.   ;  df = 1. ; cpal_fld = 'ncview_nrl'
-        
-    elif   CBOX == 'ALLFR':
-        i1=0   ; j1=0    ; i2=Ni0 ; j2=Nj0  ; rfact_zoom=1. ; vcb=[0.59, 0.1, 0.39, 0.018]  ; font_rat=8.*rfact_zoom
-        x_clock = 4000 ; y_clock = 200 ; x_logo = 6000 ; y_logo  = 50; l_show_clock=False ; l_annotate_name=False; l_add_logo=False
-        l_fill_holes_black=True
-
-    elif   CBOX == 'SALL':
-        i1=0   ; j1=0    ; i2=Ni0 ; j2=Nj0  ; rfact_zoom=1080./float(Nj0) ; vcb=[0.59, 0.1, 0.39, 0.018]  ; font_rat=8.*rfact_zoom
-        x_clock = 1600 ; y_clock = 200 ; x_logo = 2200 ; y_logo  = 50
-
-    elif CBOX == 'Med':
-        i2=8040; i1=i2-2560 ; j1=1525 ; j2=j1+1440 ; rfact_zoom=1. ; vcb=[0.025, 0.06, 0.4, 0.02] ; font_rat=2.*rfact_zoom
-        l_annotate_name=False ; l_show_exp = True ; x_exp = 100 ; y_exp = 240
-        x_clock = 200 ; y_clock = 170 ; x_logo = 1650 ; y_logo  = 1200
-        if CWHAT == 'SSS': tmin=33. ;  tmax=39.5   ;  df = 0.25 ; cb_jump = 2 ; cpal_fld = 'magma' ;# cpal_fld = 'ncview_ssec'
-        if CWHAT == 'SST': tmin=10. ;  tmax=30.    ;  df = 1.   ; cb_jump = 1
-
-    elif CBOX == 'Meddies':
-        i2=5800; j1=1400; i1=i2-2560 ; j2=j1+1440 ; rfact_zoom=1. ; vcb=[0.5, 0.875, 0.485, 0.02] ; font_rat=2.*rfact_zoom
-        l_annotate_name=False
-
-
-    elif CBOX == 'Med+BS':
-        #
-        i2=Ni0 ; i1=5400; j1=1530;  j2=3310 ; rfact_zoom=1440./float(j2-j1)   ; vcb=[0.025, 0.06, 0.4, 0.02] ; font_rat=3.*rfact_zoom
-        l_annotate_name=False ; l_add_logo_ige=False ; l_add_logo_prace=False
-        x_clock = 100 ; y_clock = 170 ; x_logo = 2090 ; y_logo  = 10
-        if CWHAT == 'SST': tmin=7. ;  tmax=25.   ;  df = 1. ; cpal_fld = 'ncview_nrl'
-
-    elif CBOX == 'LabSea':
-        # 1818,3600 -> 3630,4722
-        #i2=3770 ; j2=Nj0 ; i1=i2-1920; j1=j2-1200;  rfact_zoom=1200./float(j2-j1)   ; vcb=[0.015, 0.07, 0.28, 0.02] ; font_rat=3.*rfact_zoom
-        i2=3770 ; j2=Nj0 ; i1=i2-1920; j1=j2-1080;  rfact_zoom=1080./float(j2-j1)   ; vcb=[0.014, 0.09, 0.25, 0.02] ; font_rat=3.*rfact_zoom
-        l_annotate_name=False ; l_add_logo_ige=False ; l_add_logo_prace=False
-        x_clock = 40 ; y_clock = 170 ; x_logo = 2090 ; y_logo  = 10
-        if CWHAT == 'SST': tmin=-2. ;  tmax=15.;  df = 1. ; cpal_fld = 'ncview_nrl'
-        if CWHAT == 'SSS': tmin=28. ; tmax=35.5 ;  df = 1. ; cb_jump = 1 ; cpal_fld = 'gist_stern_r'
-
-    elif CBOX == 'BlackSea':
-        i1=Ni0-1920; j1=3330-1080; i2=Ni0 ; j2=3330 ; rfact_zoom=1.   ; vcb=[0.5, 0.875, 0.485, 0.02] ; font_rat=2.*rfact_zoom
-        x_clock = 30 ; y_clock = 1040 ; x_logo = 1500 ; y_logo = 16 ; l_annotate_name=False
-
-    elif CBOX == 'Brittany':
-        i1=5400; j1=2850; i2=5700 ; j2=3100 ; rfact_zoom=4.   ; vcb=[0.5, 0.875, 0.485, 0.02] ; font_rat=1.*rfact_zoom
-        x_clock = 30 ; y_clock = 1040 ; x_logo = 1500 ; y_logo = 16 ; l_annotate_name=False
-        if CWHAT == 'SST': tmin=7. ;  tmax=13.   ;  df = 1. ; cpal_fld = 'ncview_nrl'
-
-    elif CBOX == 'Portrait':
-        i1=2760; j1=1000; i2=4870; j2=4000 ; rfact_zoom=1.     ; vcb=[0.59, 0.1, 0.38, 0.018]  ; font_rat=1.*rfact_zoom
-        l_annotate_name=False; l_show_clock=False
-
-    elif CBOX == 'EATL':
-        i1=3100; j1=2160; i2=i1+1920; j2=j1+1200 ; rfact_zoom=1. ; vcb=[0.3, 0.06, 0.38, 0.018] ; font_rat = 2. ; l_annotate_name=False
-        x_clock = 1570 ; y_clock = 1150 ; x_logo = 1620 ; y_logo = 16
-
-    elif CBOX == 'EATL2':
-        i1=2740; j1=1600; i2=i1+2560; j2=j1+1440 ; rfact_zoom=1. ; vcb=[0.3, 0.06, 0.38, 0.018] ; font_rat = 2.5 ; l_annotate_name=False
-        x_clock = 2140 ; y_clock = 1390 ; x_logo = 2220 ; y_logo = 16
-        
-    elif CBOX == 'GrlIcl':
-        i1=3370; j1=3941; i2=5062; j2=Nj0 ; rfact_zoom=1. ; vcb=[0.3, 0.1, 0.38, 0.018] ; font_rat = 2. ; l_annotate_name=False
-        x_clock = 1350 ; y_clock = 750 ; x_logo = 1400 ; y_logo = 16
-        if CWHAT == 'SST': tmax = 12.
-
-    elif CBOX == 'AzoresP':
-        # Azores Portrait:
-        # 785 x 1190 => comparison of two => 1600 x 1200 (5px for frame), image is: 780x1190
-        ## use: CMD="montage -geometry 780x1190+10+5 -background black <img1> <img2> <img_montage>"
-        # => montage is then 1600x1200
-        i2=4410; j2=2240 ; i1=i2-780; j1=j2-1190; rfact_zoom=1. ; vcb=[0.05, 0.05, 0.9, 0.018] ; font_rat = 2. ; l_annotate_name=False
-        l_add_logo=False; l_add_logo_prace=False; l_add_logo_ige=False
-        x_clock = 400 ; y_clock = 120
-        if CWHAT == 'SST': tmin = 15. ; tmax = 25. ; df=0.5 ; cb_jump = 2
-        if CWHAT == 'W_1000': color_top = 'k'
-
-    elif CBOX == 'AzoresL':
-        # Azores Landscape: (1920x1080)
-        i2=5200; j2=2240 ; i1=i2-1920; j1=j2-1080; rfact_zoom=1. ; vcb=[0.57, 0.08, 0.4, 0.018] ; font_rat = 2. ; l_annotate_name=False
-        l_add_logo=False; l_add_logo_prace=False; l_add_logo_ige=False
-        x_clock = 1400 ; y_clock = 120 ; l_show_exp = True ; x_exp = 40 ; y_exp = 1030
-        if CWHAT == 'SST': tmin = 15. ; tmax = 25. ; df=0.5 ; cb_jump = 2
-        if CWHAT == 'W_1000': color_top = 'k'; #lili
-
-    elif CBOX == 'AzoresS':
-        # Azores small square:
-        l_show_cb = True ; l_show_clock = False
-        i2=4300; j2=2140 ; i1=i2-360; j1=j2-360; rfact_zoom=1. ; vcb=[0.05, 0.12, 0.9, 0.018] ; font_rat = 1.5 ; l_annotate_name=False
-        l_add_logo=False; l_add_logo_prace=False; l_add_logo_ige=False
-        x_clock = 400 ; y_clock = 120
-        if CWHAT == 'SST': tmin = 15. ; tmax = 25. ; df=0.5 ; cb_jump = 2
-        if CWHAT == 'W_1000': color_top = 'k'
-        l_save_nc = True
-
-    elif CBOX == 'Band':
-        i1=5100-1920; j1=2200; i2=5100; j2=j1+1080 ; rfact_zoom=1. ; vcb=[0.59, 0.1, 0.38, 0.018] ; font_rat = 2.           ; l_annotate_name=False
-        l_show_clock = False ; l_add_logo = False ; #x_clock = 1420 ; y_clock = 1030 ; x_logo = 1500 ; y_logo = 16
-
-    elif CBOX == 'Balear':
-        i1=5750; j1=1880; i2=6470; j2=2600 ; rfact_zoom=1. ; vcb=[0.59, 0.1, 0.38, 0.018] ; font_rat = 2. ; l_annotate_name=False
-        x_clock = 1420 ; y_clock = 1030 ; x_logo = 1500 ; y_logo = 16
-
-    else:
-        print ' ERROR: unknow box "'+CBOX+'" for config "'+CNEMO+'" !!!'
-        sys.exit(0)
-
-
-
-elif CNEMO == 'NATL60':
-    Ni0 = 5422
-    Nj0 = 3454
-    #l_pow_field = True ; pow_field = 1.5
-    l_show_clock = False
-    cdt = '1h'
-    #CBOX = 'zoom1' ; i1 = 1800 ; j1 = 950 ; i2 = i1+1920 ; j2 = j1+1080 ; rfact_zoom = 1. ; vcb=[0.5, 0.875, 0.485, 0.02] ; font_rat = 8.*rfact_zoom ; l_show_lsm = False
-    #CBOX = 'zoom1' ; i1 = 1800 ; j1 = 950 ; i2 = i1+2560 ; j2 = j1+1440 ; rfact_zoom = 1. ; vcb=[0.5, 0.875, 0.485, 0.02] ; font_rat = 8.*rfact_zoom
-    CBOX = 'ALL' ; i1=0 ; j1=0 ; i2=Ni0 ; j2=Nj0 ; rfact_zoom = 0.4 ; vcb=[0.59, 0.1, 0.38, 0.018] ; font_rat = 4.*rfact_zoom
-    x_clock = 350 ; y_clock = 7 ; # where to put the date
-
-
-elif CNEMO == 'NANUK025':
-    l_do_ice = True
-    cdt = '3h'; CBOX = 'ALL' ; i1 = 0 ; j1 = 0 ; i2 = 492 ; j2 = 614 ; rfact_zoom = 2. ; vcb=[0.5, 0.875, 0.485, 0.02] ; font_rat = 8.*rfact_zoom
-    x_clock = 350 ; y_clock = 7 ; # where to put the date
-
-
-
-
-elif CNEMO == 'eNATL4':
-    # Defaults:
-    Ni0 = 559
-    Nj0 = 313
-    l_annotate_name = False
-    l_show_clock = False
-    l_add_logo = False
-    x_clock = 1600 ; y_clock = 200 ; x_logo = 2200 ; y_logo  = 50
-    cdt = '1h'
-
-    # Boxes:
-    if   CBOX == 'ALL':
-        i1=0   ; j1=0    ; i2=Ni0 ; j2=Nj0  ; rfact_zoom=3. ; vcb=[0.59, 0.1, 0.39, 0.018]  ; font_rat=0.7*rfact_zoom
-        l_show_cb = True
-    else:
-        print ' ERROR: unknow box "'+CBOX+'" for config "'+CNEMO+'" !!!'
-        sys.exit(0)
-
-else:
-    print 'ERROR: we do not know NEMO config "'+str(CNEMO)+'" !'
-    sys.exit(0)
-
 
 CRUN = ''
 if l_get_name_of_run:
@@ -453,13 +265,13 @@ if l_get_name_of_run:
         print 'ERROR: your file name is not consistent with "'+CNEMO+'" !!! ('+vv[0]+')' ; sys.exit(0)
     CRUN = vv[1]
     print '\n Run is called: "'+CRUN+'" !\n'
-
-
     
-
+rfz   = nemo_box.rfact_zoom
+fontr = nemo_box.font_rat
+    
 print '\n================================================================'
-print '\n rfact_zoom = ', rfact_zoom
-print ' font_rat = ', font_rat, '\n'
+print '\n rfact_zoom = ', rfz
+print ' font_rat = ', fontr, '\n'
 
 
 print ' i1,i2,j1,j2 =>', i1,i2,j1,j2
@@ -471,8 +283,8 @@ print ' *** nx_res, ny_res =', nx_res, ny_res
 
 yx_ratio = float(nx_res+1)/float(ny_res+1)
 
-rnxr = rfact_zoom*nx_res ; # widt image (in pixels)
-rnyr = rfact_zoom*ny_res ; # height image (in pixels)
+rnxr = rfz*nx_res ; # widt image (in pixels)
+rnyr = rfz*ny_res ; # height image (in pixels)
 
 # Target resolution for figure:
 rh_fig = round(rnyr/float(dpi),3) ; # width of figure
@@ -615,7 +427,7 @@ if l_add_topo_land:
     #bnc.dump_2d_field('topo_'+CBOX+'.nc', xtopo, name='z')    
     if l3d: xtopo = xtopo + rof_dpt
     xtopo[nmp.where( XMSK > 0.01)] = nmp.nan
-    if l_fill_holes_black and not l3d:
+    if nemo_box.l_fill_holes_black and not l3d:
         XLSM[nmp.where( xtopo < 0.0)] = 1
         xtopo[nmp.where( xtopo < 0.0)] = nmp.nan
 
@@ -624,17 +436,17 @@ XLSM[nmp.where( XMSK > 0.5)] = 1
         
 params = { 'font.family':'Helvetica Neue',
            'font.weight':    'normal',
-           'font.size':       int(9.*font_rat),
-           'legend.fontsize': int(9.*font_rat),
-           'xtick.labelsize': int(9.*font_rat),
-           'ytick.labelsize': int(9.*font_rat),
-           'axes.labelsize':  int(9.*font_rat) }
+           'font.size':       int(9.*fontr),
+           'legend.fontsize': int(9.*fontr),
+           'xtick.labelsize': int(9.*fontr),
+           'ytick.labelsize': int(9.*fontr),
+           'axes.labelsize':  int(9.*fontr) }
 mpl.rcParams.update(params)
-cfont_clb  =  { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(7.*font_rat), 'color':color_top}
-cfont_clock = { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(9.*font_rat), 'color':color_top }
-cfont_exp= { 'fontname':'Open Sans'  , 'fontweight':'light', 'fontsize':int(9.*font_rat), 'color':color_top }
-cfont_mail =  { 'fontname':'Times New Roman', 'fontweight':'normal', 'fontstyle':'italic', 'fontsize':int(14.*font_rat), 'color':'0.8'}
-cfont_titl =  { 'fontname':'Open Sans', 'fontweight':'light', 'fontsize':int(30.*font_rat), 'color':color_top }
+cfont_clb  =  { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(7.*fontr), 'color':color_top}
+cfont_clock = { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(9.*fontr), 'color':color_top }
+cfont_exp= { 'fontname':'Open Sans'  , 'fontweight':'light', 'fontsize':int(9.*fontr), 'color':color_top }
+cfont_mail =  { 'fontname':'Times New Roman', 'fontweight':'normal', 'fontstyle':'italic', 'fontsize':int(14.*fontr), 'color':'0.8'}
+cfont_titl =  { 'fontname':'Open Sans', 'fontweight':'light', 'fontsize':int(30.*fontr), 'color':color_top }
 
 
 # Colormaps for fields:
@@ -842,7 +654,7 @@ for jt in range(jt0,Nt):
             clsm = plt.imshow(nmp.ma.masked_where(XLSM>0.0001, XLSM), cmap = pal_lsm, norm = norm_lsm, interpolation='none')
 
     if l_show_cb:
-        ax2 = plt.axes(vcb)
+        ax2 = plt.axes(nemo_box.vcb)
         clb = mpl.colorbar.ColorbarBase(ax2, ticks=vc_fld, cmap=pal_fld, norm=norm_fld, orientation='horizontal', extend=cb_extend)
         cb_labs = []
         #if cb_jump > 1:
@@ -865,39 +677,39 @@ for jt in range(jt0,Nt):
         clb.ax.tick_params(which = 'major', length = 4, color = color_top )
 
 
-    if l_show_clock:
-        xl = float(x_clock)/rfact_zoom
-        yl = float(y_clock)/rfact_zoom
+    if nemo_box.l_show_clock:
+        xl = float(x_clock)/rfz
+        yl = float(y_clock)/rfz
         ax.annotate('Date: '+cday+' '+chour+':00', xy=(1, 4), xytext=(xl,yl), **cfont_clock)
 
-    if l_get_name_of_run and l_show_exp:
-        xl = float(x_exp)/rfact_zoom
-        yl = float(y_exp)/rfact_zoom
+    if l_get_name_of_run and nemo_box.l_show_exp:
+        xl = float(x_exp)/rfz
+        yl = float(y_exp)/rfz
         ax.annotate('Experiment: '+CNEMO+'-'+CRUN, xy=(1, 4), xytext=(xl,yl), **cfont_exp)
 
 
     #ax.annotate('laurent.brodeau@ocean-next.fr', xy=(1, 4), xytext=(xl+150, 20), **cfont_mail)
 
-    if l_annotate_name:
-        xl = rnxr/20./rfact_zoom
-        yl = rnyr/1.33/rfact_zoom
+    if nemo_box.l_annotate_name:
+        xl = rnxr/20./rfz
+        yl = rnyr/1.33/rfz
         ax.annotate(CNEMO, xy=(1, 4), xytext=(xl, yl), **cfont_titl)
 
-    if l_add_logo:
+    if nemo_box.l_add_logo:
         datafile = cbook.get_sample_data(cf_logo_on, asfileobj=False)
         im = image.imread(datafile)
         #im[:, :, -1] = 0.5  # set the alpha channel
         fig.figimage(im, x_logo, y_logo, zorder=9)
         del datafile, im
         #
-    if l_add_logo_ige:
+    if nemo_box.l_add_logo_ige:
         datafile = cbook.get_sample_data(cf_logo_ige, asfileobj=False)
         im = image.imread(datafile)
         fig.figimage(im, x_logo+144, y_logo-150., zorder=9)
         del datafile, im
         #
-    if l_add_logo_prace:
-        datafile = cbook.get_sample_data(cf_logo_prace, asfileobj=False)
+    if nemo_box.l_add_logo_prc:
+        datafile = cbook.get_sample_data(cf_logo_prc, asfileobj=False)
         im = image.imread(datafile)
         fig.figimage(im, x_logo-77, y_logo-140., zorder=9)
         del datafile, im

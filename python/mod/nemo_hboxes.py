@@ -31,13 +31,16 @@ class nemo_hbox:
         (Ni0,Nj0) = self.size()
         box       = self.box
 
+
+        rfact_zoom=1.
+        
         l_show_exp = False
         l_fill_holes_black=False
         l_annotate_name=True
         l_show_clock = True
         l_add_logo=True
         l_add_logo_ige=True
-        l_add_logo_prace=True
+        l_add_logo_prc=True
 
         x_clock = 1600 ; y_clock = 200
         x_logo = 2200  ; y_logo  = 50
@@ -79,14 +82,14 @@ class nemo_hbox:
     
         elif box == 'Med+BS':
             i2=Ni0 ; i1=5400; j1=1530;  j2=3310 ; rfact_zoom=1440./float(j2-j1)   ; vcb=[0.025, 0.06, 0.4, 0.02] ; font_rat=3.*rfact_zoom
-            l_annotate_name=False ; l_add_logo_ige=False ; l_add_logo_prace=False
+            l_annotate_name=False ; l_add_logo_ige=False ; l_add_logo_prc=False
             x_clock = 100 ; y_clock = 170 ; x_logo = 2090 ; y_logo  = 10
     
         elif box == 'LabSea':
             # 1818,3600 -> 3630,4722
             #i2=3770 ; j2=Nj0 ; i1=i2-1920; j1=j2-1200;  rfact_zoom=1200./float(j2-j1)   ; vcb=[0.015, 0.07, 0.28, 0.02] ; font_rat=3.*rfact_zoom
             i2=3770 ; j2=Nj0 ; i1=i2-1920; j1=j2-1080;  rfact_zoom=1080./float(j2-j1)   ; vcb=[0.014, 0.09, 0.25, 0.02] ; font_rat=3.*rfact_zoom
-            l_annotate_name=False ; l_add_logo_ige=False ; l_add_logo_prace=False
+            l_annotate_name=False ; l_add_logo_ige=False ; l_add_logo_prc=False
             x_clock = 40 ; y_clock = 170 ; x_logo = 2090 ; y_logo  = 10
     
         elif box == 'BlackSea':
@@ -119,20 +122,20 @@ class nemo_hbox:
             ## use: CMD="montage -geometry 780x1190+10+5 -background black <img1> <img2> <img_montage>"
             # => montage is then 1600x1200
             i2=4410; j2=2240 ; i1=i2-780; j1=j2-1190; rfact_zoom=1. ; vcb=[0.05, 0.05, 0.9, 0.018] ; font_rat = 2. ; l_annotate_name=False
-            l_add_logo=False; l_add_logo_prace=False; l_add_logo_ige=False
+            l_add_logo=False; l_add_logo_prc=False; l_add_logo_ige=False
             x_clock = 400 ; y_clock = 120
     
         elif box == 'AzoresL':
             # Azores Landscape: (1920x1080)
             i2=5200; j2=2240 ; i1=i2-1920; j1=j2-1080; rfact_zoom=1. ; vcb=[0.57, 0.08, 0.4, 0.018] ; font_rat = 2. ; l_annotate_name=False
-            l_add_logo=False; l_add_logo_prace=False; l_add_logo_ige=False
+            l_add_logo=False; l_add_logo_prc=False; l_add_logo_ige=False
             x_clock = 1400 ; y_clock = 120 ; l_show_exp = True ; x_exp = 40 ; y_exp = 1030
     
         elif box == 'AzoresS':
             # Azores small square:
             l_show_cb = True ; l_show_clock = False
             i2=4300; j2=2140 ; i1=i2-360; j1=j2-360; rfact_zoom=1. ; vcb=[0.05, 0.12, 0.9, 0.018] ; font_rat = 1.5 ; l_annotate_name=False
-            l_add_logo=False; l_add_logo_prace=False; l_add_logo_ige=False
+            l_add_logo=False; l_add_logo_prc=False; l_add_logo_ige=False
             x_clock = 400 ; y_clock = 120
     
         elif box == 'Band':
@@ -155,9 +158,9 @@ class nemo_hbox:
         self.l_show_clock    = l_show_clock
         self.clock           = (x_clock,y_clock)
         self.l_add_logo      = l_add_logo
-        self.l_add_logo_ige  = l_add_logo_ige
-        self.l_add_logo_prace= l_add_logo_prace
         self.logo            = (x_logo,y_logo)
+        self.l_add_logo_ige  = l_add_logo_ige
+        self.l_add_logo_prc  = l_add_logo_prc
         self.l_show_exp      = l_show_exp
         self.exp             = (x_exp,y_exp)
 

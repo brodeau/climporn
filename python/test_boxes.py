@@ -32,6 +32,15 @@ for CBOX in VBOX:
     (i1,j1, i2,j2) = nemo_box.idx()
     print " i1,j1, i2,j2 => ", i1,j1, i2,j2
     
-    (x_clock,y_clock) = nemo_box.clock
-    print ' x_clock,y_clock =', x_clock,y_clock
+    if nemo_box.l_show_clock:
+        (x_clock,y_clock) = nemo_box.clock
+        print ' x_clock,y_clock =', x_clock,y_clock
+
+    if nemo_box.l_show_exp:
+        (x_exp,y_exp) = nemo_box.exp
+        print ' x_exp,y_exp =', x_exp,y_exp
+
+    if nemo_box.l_add_logo:
+        (x_logo,y_logo) = nemo_box.logo
+        print ' x_logo,y_logo =', x_logo,y_logo
 
