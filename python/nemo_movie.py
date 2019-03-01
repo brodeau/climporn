@@ -427,7 +427,7 @@ if l_add_topo_land:
     #bnc.dump_2d_field('topo_'+CBOX+'.nc', xtopo, name='z')    
     if l3d: xtopo = xtopo + rof_dpt
     xtopo[nmp.where( XMSK > 0.01)] = nmp.nan
-    if nemo_box.l_fill_holes_black and not l3d:
+    if nemo_box.l_fill_holes_k and not l3d:
         XLSM[nmp.where( xtopo < 0.0)] = 1
         xtopo[nmp.where( xtopo < 0.0)] = nmp.nan
 

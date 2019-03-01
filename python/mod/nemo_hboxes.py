@@ -35,7 +35,7 @@ class nemo_hbox:
         rfact_zoom=1.
         
         l_show_exp = False
-        l_fill_holes_black=False
+        l_fill_holes_k=False
         l_annotate_name=True
         l_show_clock = True
         l_add_logo=True
@@ -52,7 +52,7 @@ class nemo_hbox:
             i1=0   ; j1=0    ; i2=Ni0 ; j2=Nj0  ; rfact_zoom=1440./float(Nj0) ; vcb=[0.61, 0.1, 0.36, 0.018]  ; font_rat=8.*rfact_zoom
             x_clock = 1600 ; y_clock = 200 ; x_logo=2200 ; y_logo=1200
             l_annotate_name=False ; l_show_exp = True ; x_exp = 1750 ; y_exp = 300
-            l_fill_holes_black=True
+            l_fill_holes_k=True
     
         elif box == 'EUROPA':
             i2=6400 ; j2=4000 ; i1=i2-2*1920; j1=j2-2*1080; rfact_zoom=0.5   ; vcb=[0.5, 0.875, 0.485, 0.02] ; font_rat=2.*rfact_zoom
@@ -65,7 +65,7 @@ class nemo_hbox:
         elif   box == 'ALLFR':
             i1=0   ; j1=0    ; i2=Ni0 ; j2=Nj0  ; rfact_zoom=1. ; vcb=[0.59, 0.1, 0.39, 0.018]  ; font_rat=8.*rfact_zoom
             x_clock = 4000 ; y_clock = 200 ; x_logo = 6000 ; y_logo  = 50; l_show_clock=False ; l_annotate_name=False; l_add_logo=False
-            l_fill_holes_black=True
+            l_fill_holes_k=True
     
         elif   box == 'SALL':
             i1=0   ; j1=0    ; i2=Ni0 ; j2=Nj0  ; rfact_zoom=1080./float(Nj0) ; vcb=[0.59, 0.1, 0.39, 0.018]  ; font_rat=8.*rfact_zoom
@@ -163,6 +163,7 @@ class nemo_hbox:
         self.l_add_logo_prc  = l_add_logo_prc
         self.l_show_exp      = l_show_exp
         self.exp             = (x_exp,y_exp)
+        self.l_fill_holes_k  = l_fill_holes_k
 
         return (i1,j1, i2,j2)
 
