@@ -35,6 +35,10 @@ import barakuda_colmap as bcm
 import barakuda_tool as bt
 import barakuda_ncio as bnc
 
+# ClimPorn:
+import nemo_hboxes as nhb
+
+
 
 cwd = getcwd()
 
@@ -59,19 +63,14 @@ l_show_lsm = True
 l_show_cb = True
 l_log_field = False
 l_pow_field = False
-l_annotate_name = True
-l_show_clock = True
-l_show_exp = False
-l_fill_holes_black = False
 
+cdt = '1h'
+l_get_name_of_run = True
 
 cdir_logos = cwd+'/logos'
-l_add_logo = True
 cf_logo_on  = cdir_logos+'/ocean-next_trans_white_281x191.png'
-l_add_logo_ige = True
 cf_logo_ige = cdir_logos+'/IGE_blanc_notext.png'
-l_add_logo_prace = True
-cf_logo_prace = cdir_logos+'/PRACE_blanc.png'
+cf_logo_prc = cdir_logos+'/PRACE_blanc.png'
 
 rof_log = 150.
 rof_dpt = 0.
@@ -140,11 +139,26 @@ else:
 
 
 
+#---------------------------------------------------------------
 
+nemo_box = nhb.nemo_hbox(CNEMO,CBOX)
 
+(Ni0,Nj0) = nemo_box.size()
+print " "+CNEMO+": Ni0,Nj0 => ", Ni0,Nj0
 
+(i1,j1, i2,j2) = nemo_box.idx()
+print " i1,j1, i2,j2 => ", i1,j1, i2,j2,'\n'
 
-x_logo  = 50 ; y_logo  = 50
+if nemo_box.l_show_clock: (x_clock,y_clock) = nemo_box.clock
+#print ' x_clock,y_clock =', x_clock,y_clock
+
+if nemo_box.l_show_exp: (x_exp,y_exp) = nemo_box.exp
+#print ' x_exp,y_exp =', x_exp,y_exp
+
+if nemo_box.l_add_logo: (x_logo,y_logo) = nemo_box.logo
+
+#---------------------------------------------------------------
+
 
 
 
@@ -161,6 +175,8 @@ elif CWHAT == 'CURLOF':
     l_do_cof = True  ; # do curl/f
     cpal_fld = 'on2' ; tmin=-1.2 ;  tmax=-tmin ;  df = 0.1 ; cb_jump = 2
     cunit = r'$\zeta/f$'
+    if CBOX ==   'Med'  : tmin=-1. ;  tmax=-tmin ; df = 0.1 ; cb_jump = 2
+    if CBOX == 'AzoresP': tmin=-0.8 ;  tmax=-tmin ;  df = 0.1 ; cb_jump = 2
     
 elif CWHAT == 'CURLOF_1000':
     l_do_cof = True  ; # do curl/f
@@ -172,6 +188,8 @@ elif CWHAT == 'CSPEED':
     tmin=0. ; tmax=1.8 ; df = 0.2 ; cpal_fld = 'on3' ; # Poster full-res!!!
     cunit = 'Surface current speed [m/s]' ; cb_jump = 1
     cb_extend = 'max' ;#colorbar extrema
+    if CBOX ==   'Med'  : tmin=0. ;  tmax=1.3 ; df = 0.1
+    if CBOX == 'AzoresS': tmin=0. ;  tmax=1.2 ; df = 0.2 ; cb_jump = 1
 
 elif CWHAT == 'CSPEED_1000':
     l_do_cspd = True  ; # do current speed
@@ -231,166 +249,6 @@ if l3d and not l_3d_field:
 
 
 
-if CNEMO == 'eNATL60':
-
-    # Defaults:
-    Ni0 = 8354
-    Nj0 = 4729
-    l_show_clock = True
-    x_clock = 1600 ; y_clock = 200 ; x_logo = 2200 ; y_logo  = 50
-    x_exp = 40 ; y_exp = 980
-    cdt = '1h'
-    l_get_name_of_run = True
-
-    # Boxes:
-    if   CBOX == 'ALL':
-        i1=0   ; j1=0    ; i2=Ni0 ; j2=Nj0  ; rfact_zoom=1440./float(Nj0) ; vcb=[0.61, 0.1, 0.36, 0.018]  ; font_rat=8.*rfact_zoom
-        x_clock = 1600 ; y_clock = 200 ; x_logo=2200 ; y_logo=1200
-        l_annotate_name=False ; l_show_exp = True ; x_exp = 1750 ; y_exp = 300
-        l_fill_holes_black=True
-
-    elif CBOX == 'EUROPA':
-        i2=6400 ; j2=4000 ; i1=i2-2*1920; j1=j2-2*1080; rfact_zoom=0.5   ; vcb=[0.5, 0.875, 0.485, 0.02] ; font_rat=2.*rfact_zoom
-        x_clock = 30 ; y_clock = 1040 ; x_logo = 1500 ; y_logo = 16 ; l_annotate_name=False
-        
-    elif CBOX == 'EUROPAs':
-        i2=6500 ; j2=3600 ; i1=i2-1920; j1=j2-1080; rfact_zoom=1.  ; vcb=[0.5, 0.875, 0.485, 0.02] ; font_rat=2.*rfact_zoom
-        x_clock = 30 ; y_clock = 1040 ; x_logo = 1500 ; y_logo = 16 ; l_annotate_name=False
-         
-    elif   CBOX == 'ALLFR':
-        i1=0   ; j1=0    ; i2=Ni0 ; j2=Nj0  ; rfact_zoom=1. ; vcb=[0.6, 0.1, 0.38, 0.018]  ; font_rat=8.*rfact_zoom
-        l_show_cb=True; l_add_logo=False ; l_add_logo_ige=False ; l_add_logo_prace=False ; l_show_clock=False ; l_annotate_name=False
-        l_fill_holes_black=True
-
-    elif   CBOX == 'SALL':
-        i1=0   ; j1=0    ; i2=Ni0 ; j2=Nj0  ; rfact_zoom=1080./float(Nj0) ; vcb=[0.59, 0.1, 0.39, 0.018]  ; font_rat=8.*rfact_zoom
-        x_clock = 1600 ; y_clock = 200 ; x_logo = 2200 ; y_logo  = 50
-
-    elif CBOX == 'Med':
-        i2=8040; i1=i2-2560 ; j1=1525 ; j2=j1+1440 ; rfact_zoom=1. ; vcb=[0.025, 0.06, 0.4, 0.02] ; font_rat=2.*rfact_zoom
-        l_annotate_name=False ; l_show_exp = True ; x_exp = 100 ; y_exp = 240
-        x_clock = 200 ; y_clock = 170 ; x_logo = 1650 ; y_logo  = 1200
-        if CWHAT == 'CURLOF': tmin=-1. ;  tmax=-tmin ; df = 0.1 ; cb_jump = 2
-        if CWHAT == 'CSPEED': tmin= 0. ;  tmax=1.3   ; df = 0.1
-
-    elif CBOX == 'Meddies':
-        i2=5800; j1=1400; i1=i2-2560 ; j2=j1+1440 ; rfact_zoom=1. ; vcb=[0.5, 0.875, 0.485, 0.02] ; font_rat=2.*rfact_zoom
-        l_annotate_name=False
-
-
-    elif CBOX == 'Med+BS':
-        #
-        i2=Ni0 ; i1=5400; j1=1530;  j2=3310 ; rfact_zoom=1440./float(j2-j1)   ; vcb=[0.025, 0.06, 0.4, 0.02] ; font_rat=3.*rfact_zoom
-        l_annotate_name=False ; l_add_logo_ige=False ; l_add_logo_prace=False
-        x_clock = 100 ; y_clock = 170 ; x_logo = 2090 ; y_logo  = 10
-
-    elif CBOX == 'BlackSea':
-        i1=Ni0-1920; j1=3330-1080; i2=Ni0 ; j2=3330 ; rfact_zoom=1.   ; vcb=[0.5, 0.875, 0.485, 0.02] ; font_rat=2.*rfact_zoom
-        x_clock = 30 ; y_clock = 1040 ; x_logo = 1500 ; y_logo = 16 ; l_annotate_name=False
-
-    elif CBOX == 'Brittany':
-        i1=5400; j1=2850; i2=5700 ; j2=3100 ; rfact_zoom=4.   ; vcb=[0.5, 0.875, 0.485, 0.02] ; font_rat=1.*rfact_zoom
-        x_clock = 30 ; y_clock = 1040 ; x_logo = 1500 ; y_logo = 16 ; l_annotate_name=False
-
-    elif CBOX == 'Portrait':
-        i1=2760; j1=1000; i2=4870; j2=4000 ; rfact_zoom=1.     ; vcb=[0.59, 0.1, 0.38, 0.018]  ; font_rat=1.*rfact_zoom
-        l_annotate_name=False; l_show_clock=False
-
-    elif CBOX == 'EATL':
-        i1=3100; j1=2160; i2=i1+1920; j2=j1+1200 ; rfact_zoom=1. ; vcb=[0.3, 0.06, 0.38, 0.018] ; font_rat = 2. ; l_annotate_name=False
-        x_clock = 1570 ; y_clock = 1150 ; x_logo = 1620 ; y_logo = 16
-
-    elif CBOX == 'EATL2':
-        i1=2740; j1=1600; i2=i1+2560; j2=j1+1440 ; rfact_zoom=1. ; vcb=[0.3, 0.06, 0.38, 0.018] ; font_rat = 2.5 ; l_annotate_name=False
-        x_clock = 2140 ; y_clock = 1390 ; x_logo = 2220 ; y_logo = 16
-        
-    elif CBOX == 'GrlIcl':
-        i1=3370; j1=3941; i2=5062; j2=Nj0 ; rfact_zoom=1. ; vcb=[0.3, 0.1, 0.38, 0.018] ; font_rat = 2. ; l_annotate_name=False
-        x_clock = 1350 ; y_clock = 750 ; x_logo = 1400 ; y_logo = 16
-
-    elif CBOX == 'AzoresP':
-        # Azores Portrait
-        # 785 x 1190 => comparison of two => 1600 x 1200 (5px for frame), image is: 780x1190
-        ## use: CMD="montage -geometry 780x1190+10+5 -background black <img1> <img2> <img_montage>"
-        # => montage is then 1600x1200
-        i2=4410; j2=2240 ; i1=i2-780; j1=j2-1190; rfact_zoom=1. ; vcb=[0.05, 0.05, 0.9, 0.018] ; font_rat = 2. ; l_annotate_name=False
-        l_add_logo=False; l_add_logo_prace=False; l_add_logo_ige=False
-        x_clock = 400 ; y_clock = 120
-        if CWHAT=='CURLOF': tmin=-0.8 ;  tmax=-tmin ;  df = 0.1 ; cb_jump = 2
-
-    elif CBOX == 'AzoresL':
-        # Azores Landscape: (1920x1080)
-        i2=5200; j2=2240 ; i1=i2-1920; j1=j2-1080; rfact_zoom=1. ; vcb=[0.57, 0.08, 0.4, 0.018] ; font_rat = 2. ; l_annotate_name=False
-        l_add_logo=False; l_add_logo_prace=False; l_add_logo_ige=False
-        x_clock = 1400 ; y_clock = 120 ; l_show_exp = True ; x_exp = 40 ; y_exp = 1030
-
-    elif CBOX == 'AzoresS':
-        # Azores small square:
-        l_show_cb = True ; l_show_clock = False
-        i2=4300; j2=2140 ; i1=i2-360; j1=j2-360; rfact_zoom=1. ; vcb=[0.05, 0.12, 0.9, 0.018] ; font_rat = 1.5 ; l_annotate_name=False
-        l_add_logo=False; l_add_logo_prace=False; l_add_logo_ige=False
-        x_clock = 400 ; y_clock = 120
-        if CWHAT == 'SST': tmin = 15. ; tmax = 25. ; df=0.5 ; cb_jump = 2
-        if CWHAT == 'W_1000': color_top = 'k'
-        if CWHAT == 'CSPEED': tmin=0. ;  tmax=1.2   ;  df = 0.2 ; cb_jump = 1
-        l_save_nc = True
-
-    elif CBOX == 'Band':
-        i1=5100-1920; j1=2200; i2=5100; j2=j1+1080 ; rfact_zoom=1. ; vcb=[0.59, 0.1, 0.38, 0.018] ; font_rat = 2.           ; l_annotate_name=False
-        l_show_clock = False ; l_add_logo = False ; #x_clock = 1420 ; y_clock = 1030 ; x_logo = 1500 ; y_logo = 16
-
-    elif CBOX == 'Balear':
-        i1=5750; j1=1880; i2=6470; j2=2600 ; rfact_zoom=1. ; vcb=[0.59, 0.1, 0.38, 0.018] ; font_rat = 2. ; l_annotate_name=False
-        x_clock = 1420 ; y_clock = 1030 ; x_logo = 1500 ; y_logo = 16
-
-    else:
-        print ' ERROR: unknow box "'+CBOX+'" for config "'+CNEMO+'" !!!'
-        sys.exit(0)
-
-
-
-elif CNEMO == 'NATL60':
-    Ni0 = 5422
-    Nj0 = 3454
-    #l_pow_field = True ; pow_field = 1.5
-    l_show_clock = False
-    cdt = '1h'
-    #CBOX = 'zoom1' ; i1 = 1800 ; j1 = 950 ; i2 = i1+1920 ; j2 = j1+1080 ; rfact_zoom = 1. ; vcb=[0.5, 0.875, 0.485, 0.02] ; font_rat = 8.*rfact_zoom ; l_show_lsm = False
-    #CBOX = 'zoom1' ; i1 = 1800 ; j1 = 950 ; i2 = i1+2560 ; j2 = j1+1440 ; rfact_zoom = 1. ; vcb=[0.5, 0.875, 0.485, 0.02] ; font_rat = 8.*rfact_zoom
-    CBOX = 'ALL' ; i1=0 ; j1=0 ; i2=Ni0 ; j2=Nj0 ; rfact_zoom = 0.4 ; vcb=[0.59, 0.1, 0.38, 0.018] ; font_rat = 4.*rfact_zoom
-    x_clock = 350 ; y_clock = 7 ; # where to put the date
-
-
-elif CNEMO == 'NANUK025':
-    cdt = '3h'; CBOX = 'ALL' ; i1 = 0 ; j1 = 0 ; i2 = 492 ; j2 = 614 ; rfact_zoom = 2. ; vcb=[0.5, 0.875, 0.485, 0.02] ; font_rat = 8.*rfact_zoom
-    x_clock = 350 ; y_clock = 7 ; # where to put the date
-
-
-
-
-elif CNEMO == 'eNATL4':
-    # Defaults:
-    Ni0 = 559
-    Nj0 = 313
-    l_annotate_name = False
-    l_show_clock = False
-    l_add_logo = False
-    x_clock = 1600 ; y_clock = 200 ; x_logo = 2200 ; y_logo  = 50
-    cdt = '1h'
-
-    # Boxes:
-    if   CBOX == 'ALL':
-        i1=0   ; j1=0    ; i2=Ni0 ; j2=Nj0  ; rfact_zoom=3. ; vcb=[0.59, 0.1, 0.39, 0.018]  ; font_rat=0.7*rfact_zoom
-        l_show_cb = True
-    else:
-        print ' ERROR: unknow box "'+CBOX+'" for config "'+CNEMO+'" !!!'
-        sys.exit(0)
-
-else:
-    print 'ERROR: we do not know NEMO config "'+str(CNEMO)+'" !'
-    sys.exit(0)
-
-
 CRUN = ''
 if l_get_name_of_run:
     # Name of RUN:
@@ -399,13 +257,13 @@ if l_get_name_of_run:
         print 'ERROR: your file name is not consistent with "'+CNEMO+'" !!! ('+vv[0]+')' ; sys.exit(0)
     CRUN = vv[1]
     print '\n Run is called: "'+CRUN+'" !\n'
-
-
     
-
+rfz   = nemo_box.rfact_zoom
+fontr = nemo_box.font_rat
+    
 print '\n================================================================'
-print '\n rfact_zoom = ', rfact_zoom
-print ' font_rat = ', font_rat, '\n'
+print '\n rfact_zoom = ', rfz
+print ' font_rat = ', fontr, '\n'
 
 
 print ' i1,i2,j1,j2 =>', i1,i2,j1,j2
@@ -417,8 +275,8 @@ print ' *** nx_res, ny_res =', nx_res, ny_res
 
 yx_ratio = float(nx_res+1)/float(ny_res+1)
 
-rnxr = rfact_zoom*nx_res ; # widt image (in pixels)
-rnyr = rfact_zoom*ny_res ; # height image (in pixels)
+rnxr = rfz*nx_res ; # widt image (in pixels)
+rnyr = rfz*ny_res ; # height image (in pixels)
 
 # Target resolution for figure:
 rh_fig = round(rnyr/float(dpi),3) ; # width of figure
@@ -525,7 +383,7 @@ if l_add_topo_land:
     #bnc.dump_2d_field('topo_'+CBOX+'.nc', xtopo, name='z')    
     if l3d: xtopo = xtopo + rof_dpt
     xtopo[nmp.where( XMSK > 0.01)] = nmp.nan
-    if l_fill_holes_black and not l3d:
+    if nemo_box.l_fill_holes_k and not l3d:
         XLSM[nmp.where( xtopo < 0.0)] = 1
         xtopo[nmp.where( xtopo < 0.0)] = nmp.nan
 
@@ -534,17 +392,17 @@ XLSM[nmp.where( XMSK > 0.5)] = 1
         
 params = { 'font.family':'Helvetica Neue',
            'font.weight':    'normal',
-           'font.size':       int(9.*font_rat),
-           'legend.fontsize': int(9.*font_rat),
-           'xtick.labelsize': int(9.*font_rat),
-           'ytick.labelsize': int(9.*font_rat),
-           'axes.labelsize':  int(9.*font_rat) }
+           'font.size':       int(9.*fontr),
+           'legend.fontsize': int(9.*fontr),
+           'xtick.labelsize': int(9.*fontr),
+           'ytick.labelsize': int(9.*fontr),
+           'axes.labelsize':  int(9.*fontr) }
 mpl.rcParams.update(params)
-cfont_clb  =  { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(7.*font_rat), 'color':color_top}
-cfont_clock = { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(9.*font_rat), 'color':color_top }
-cfont_exp= { 'fontname':'Open Sans'  , 'fontweight':'light', 'fontsize':int(9.*font_rat), 'color':color_top }
-cfont_mail =  { 'fontname':'Times New Roman', 'fontweight':'normal', 'fontstyle':'italic', 'fontsize':int(14.*font_rat), 'color':'0.8'}
-cfont_titl =  { 'fontname':'Open Sans', 'fontweight':'light', 'fontsize':int(30.*font_rat), 'color':color_top }
+cfont_clb  =  { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(7.*fontr), 'color':color_top}
+cfont_clock = { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(9.*fontr), 'color':color_top }
+cfont_exp= { 'fontname':'Open Sans'  , 'fontweight':'light', 'fontsize':int(9.*fontr), 'color':color_top }
+cfont_mail =  { 'fontname':'Times New Roman', 'fontweight':'normal', 'fontstyle':'italic', 'fontsize':int(14.*fontr), 'color':'0.8'}
+cfont_titl =  { 'fontname':'Open Sans', 'fontweight':'light', 'fontsize':int(30.*fontr), 'color':color_top }
 
 
 # Colormaps for fields:
@@ -669,7 +527,7 @@ for jt in range(jt0,Nt):
 
     fig = plt.figure(num = 1, figsize=(rw_fig, rh_fig), dpi=None, facecolor='w', edgecolor='0.5')
 
-    ax  = plt.axes([0., 0., 1., 1.], axisbg = 'k')
+    ax  = plt.axes([0., 0., 1., 1.], axisbg = '0.85')
 
     vc_fld = nmp.arange(tmin, tmax + df, df)
 
@@ -733,9 +591,12 @@ for jt in range(jt0,Nt):
 
 
     if l_save_nc:
-        cf_out = 'nc/'+cv_out+'_NEMO_'+CNEMO+'-'+CRUN+'_'+CBOX+'_'+cday+'_'+chour+'_'+cpal_fld+'.nc'
+        if l3d:
+            cf_out = 'nc/'+CWHAT+'_NEMO_'+CNEMO+'-'+CRUN+'_lev'+str(jk)+'_'+CBOX+'_'+cday+'_'+chour+'_'+cpal_fld+'.nc'
+        else:
+            cf_out = 'nc/'+CWHAT+'_NEMO_'+CNEMO+'-'+CRUN+'_'+CBOX+'_'+cday+'_'+chour+'_'+cpal_fld+'.nc'
         print ' Saving in '+cf_out
-        bnc.dump_2d_field(cf_out, Xplot, xlon=Xlon, xlat=Xlat, name=cv_out)
+        bnc.dump_2d_field(cf_out, Xplot, xlon=Xlon, xlat=Xlat, name=CWHAT)
         print ''
 
 
@@ -759,7 +620,7 @@ for jt in range(jt0,Nt):
             clsm = plt.imshow(nmp.ma.masked_where(XLSM>0.0001, XLSM), cmap = pal_lsm, norm = norm_lsm, interpolation='none')
 
     if l_show_cb:
-        ax2 = plt.axes(vcb)
+        ax2 = plt.axes(nemo_box.vcb)
         clb = mpl.colorbar.ColorbarBase(ax2, ticks=vc_fld, cmap=pal_fld, norm=norm_fld, orientation='horizontal', extend=cb_extend)
         cb_labs = []
         #if cb_jump > 1:
@@ -782,39 +643,39 @@ for jt in range(jt0,Nt):
         clb.ax.tick_params(which = 'major', length = 4, color = color_top )
 
 
-    if l_show_clock:
-        xl = float(x_clock)/rfact_zoom
-        yl = float(y_clock)/rfact_zoom
+    if nemo_box.l_show_clock:
+        xl = float(x_clock)/rfz
+        yl = float(y_clock)/rfz
         ax.annotate('Date: '+cday+' '+chour+':00', xy=(1, 4), xytext=(xl,yl), **cfont_clock)
 
-    if l_get_name_of_run and l_show_exp:
-        xl = float(x_exp)/rfact_zoom
-        yl = float(y_exp)/rfact_zoom
+    if l_get_name_of_run and nemo_box.l_show_exp:
+        xl = float(x_exp)/rfz
+        yl = float(y_exp)/rfz
         ax.annotate('Experiment: '+CNEMO+'-'+CRUN, xy=(1, 4), xytext=(xl,yl), **cfont_exp)
 
 
     #ax.annotate('laurent.brodeau@ocean-next.fr', xy=(1, 4), xytext=(xl+150, 20), **cfont_mail)
 
-    if l_annotate_name:
-        xl = rnxr/20./rfact_zoom
-        yl = rnyr/1.33/rfact_zoom
+    if nemo_box.l_annotate_name:
+        xl = rnxr/20./rfz
+        yl = rnyr/1.33/rfz
         ax.annotate(CNEMO, xy=(1, 4), xytext=(xl, yl), **cfont_titl)
 
-    if l_add_logo:
+    if nemo_box.l_add_logo:
         datafile = cbook.get_sample_data(cf_logo_on, asfileobj=False)
         im = image.imread(datafile)
         #im[:, :, -1] = 0.5  # set the alpha channel
         fig.figimage(im, x_logo, y_logo, zorder=9)
         del datafile, im
         #
-    if l_add_logo_ige:
+    if nemo_box.l_add_logo_ige:
         datafile = cbook.get_sample_data(cf_logo_ige, asfileobj=False)
         im = image.imread(datafile)
         fig.figimage(im, x_logo+144, y_logo-150., zorder=9)
         del datafile, im
         #
-    if l_add_logo_prace:
-        datafile = cbook.get_sample_data(cf_logo_prace, asfileobj=False)
+    if nemo_box.l_add_logo_prc:
+        datafile = cbook.get_sample_data(cf_logo_prc, asfileobj=False)
         im = image.imread(datafile)
         fig.figimage(im, x_logo-77, y_logo-140., zorder=9)
         del datafile, im

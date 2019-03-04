@@ -50,6 +50,7 @@ vml = [ 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ]
 fig_type='png'
 dpi = 110
 color_top = 'white'
+#color_top = 'k'
 
 cv_out = 'unknown'
 
@@ -255,7 +256,7 @@ else:
     print 'ERROR: we do not know variable "'+str(cv_in)+'" !'
     sys.exit(0)
 
-        
+
 
 CRUN = ''
 if l_get_name_of_run:

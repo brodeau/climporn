@@ -31,7 +31,6 @@ class nemo_hbox:
         (Ni0,Nj0) = self.size()
         box       = self.box
 
-
         rfact_zoom=1.
         
         l_show_exp = False
@@ -45,8 +44,6 @@ class nemo_hbox:
         x_clock = 1600 ; y_clock = 200
         x_logo = 2200  ; y_logo  = 50
         x_exp = 40     ; y_exp = 980
-
-
         
         if   box == 'ALL':
             i1=0   ; j1=0    ; i2=Ni0 ; j2=Nj0  ; rfact_zoom=1440./float(Nj0) ; vcb=[0.61, 0.1, 0.36, 0.018]  ; font_rat=8.*rfact_zoom
