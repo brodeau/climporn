@@ -134,6 +134,14 @@ else:
 ###############################################################################################################################################
 
 
+CRUN = ''
+if l_get_name_of_run:
+    # Name of RUN:
+    vv = split('-|_', path.basename(cf_in))
+    if vv[0] != CNEMO:
+        print 'ERROR: your file name is not consistent with "'+CNEMO+'" !!! ('+vv[0]+')' ; sys.exit(0)
+    CRUN = vv[1]
+    print '\n Run is called: "'+CRUN+'" !\n'
 
 #---------------------------------------------------------------
 
@@ -219,6 +227,8 @@ elif CWHAT == 'SSH':
     cpal_fld = 'RdBu_r' ; tmin=-3. ;  tmax=-tmin   ;  df = 0.5 ;
     cb_jump = 1
     cunit = r'SSH [m]'
+    if CBOX == 'Med' or CBOX == 'Med+BS': tmin=-0.7; tmax=0.2   ; df = 0.1
+    if CRUN[:4] == 'BLB0':                tmin=-1.2; tmax=-tmin ; df = 0.2
 
 elif CWHAT == 'GEOSSV':
     # Geostrophic velocity speed out of SSH
@@ -258,14 +268,6 @@ else:
 
 
 
-CRUN = ''
-if l_get_name_of_run:
-    # Name of RUN:
-    vv = split('-|_', path.basename(cf_in))
-    if vv[0] != CNEMO:
-        print 'ERROR: your file name is not consistent with "'+CNEMO+'" !!! ('+vv[0]+')' ; sys.exit(0)
-    CRUN = vv[1]
-    print '\n Run is called: "'+CRUN+'" !\n'
     
 rfz   = nemo_box.rfact_zoom
 fontr = nemo_box.font_rat
