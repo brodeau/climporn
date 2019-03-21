@@ -41,6 +41,10 @@ class nemo_hbox:
         l_add_logo_ige=True
         l_add_logo_prc=True
 
+        cf_logo_on  = 'ocean-next_trans_white_281x191.png'
+        cf_logo_ige = 'IGE_blanc_notext.png'
+        cf_logo_prc = 'PRACE_blanc.png'
+
         x_clock = 1600 ; y_clock = 200
         x_logo = 2200  ; y_logo  = 50
         x_exp = 40     ; y_exp = 980
@@ -78,9 +82,10 @@ class nemo_hbox:
             l_annotate_name=False
     
         elif box == 'Med+BS':
-            i2=Ni0 ; i1=5400; j1=1530;  j2=3310 ; rfact_zoom=1440./float(j2-j1)   ; vcb=[0.025, 0.06, 0.4, 0.02] ; font_rat=3.*rfact_zoom
+            i2=Ni0 ; i1=5400; j1=1530;  j2=3310 ; rfact_zoom=1080./float(j2-j1)   ; vcb=[0.025, 0.06, 0.4, 0.02] ; font_rat=3.*rfact_zoom
             l_annotate_name=False ; l_add_logo_ige=False ; l_add_logo_prc=False
-            x_clock = 100 ; y_clock = 170 ; x_logo = 2090 ; y_logo  = 10
+            rcc = 1080./1440. ; x_clock = 100.*rcc ; y_clock = 170.*rcc ; x_logo = 2090.*rcc ; y_logo  = 10.*rcc
+            cf_logo_on  = 'ocean-next_trans_white_210x142.png'
     
         elif box == 'LabSea':
             # 1818,3600 -> 3630,4722
@@ -161,6 +166,11 @@ class nemo_hbox:
         self.l_show_exp      = l_show_exp
         self.exp             = (x_exp,y_exp)
         self.l_fill_holes_k  = l_fill_holes_k
+
+        self.cf_logo_on  = cf_logo_on 
+        self.cf_logo_ige = cf_logo_ige
+        self.cf_logo_prc = cf_logo_prc
+
 
         return (i1,j1, i2,j2)
 

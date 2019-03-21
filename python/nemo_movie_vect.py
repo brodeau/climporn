@@ -68,9 +68,9 @@ cdt = '1h'
 l_get_name_of_run = True
 
 cdir_logos = cwd+'/logos'
-cf_logo_on  = cdir_logos+'/ocean-next_trans_white_281x191.png'
-cf_logo_ige = cdir_logos+'/IGE_blanc_notext.png'
-cf_logo_prc = cdir_logos+'/PRACE_blanc.png'
+#cf_logo_on  = cdir_logos+'/ocean-next_trans_white_281x191.png'
+#cf_logo_ige = cdir_logos+'/IGE_blanc_notext.png'
+#cf_logo_prc = cdir_logos+'/PRACE_blanc.png'
 
 rof_log = 150.
 rof_dpt = 0.
@@ -662,20 +662,20 @@ for jt in range(jt0,Nt):
         ax.annotate(CNEMO, xy=(1, 4), xytext=(xl, yl), **cfont_titl)
 
     if nemo_box.l_add_logo:
-        datafile = cbook.get_sample_data(cf_logo_on, asfileobj=False)
+        datafile = cbook.get_sample_data(cdir_logos+'/'+nemo_box.cf_logo_on, asfileobj=False)
         im = image.imread(datafile)
         #im[:, :, -1] = 0.5  # set the alpha channel
         fig.figimage(im, x_logo, y_logo, zorder=9)
         del datafile, im
         #
     if nemo_box.l_add_logo_ige:
-        datafile = cbook.get_sample_data(cf_logo_ige, asfileobj=False)
+        datafile = cbook.get_sample_data(cdir_logos+'/'+nemo_box.cf_logo_ige, asfileobj=False)
         im = image.imread(datafile)
         fig.figimage(im, x_logo+144, y_logo-150., zorder=9)
         del datafile, im
         #
     if nemo_box.l_add_logo_prc:
-        datafile = cbook.get_sample_data(cf_logo_prc, asfileobj=False)
+        datafile = cbook.get_sample_data(cdir_logos+'/'+nemo_box.cf_logo_prc, asfileobj=False)
         im = image.imread(datafile)
         fig.figimage(im, x_logo-77, y_logo-140., zorder=9)
         del datafile, im
