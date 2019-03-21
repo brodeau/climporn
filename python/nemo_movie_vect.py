@@ -68,9 +68,6 @@ cdt = '1h'
 l_get_name_of_run = True
 
 cdir_logos = cwd+'/logos'
-#cf_logo_on  = cdir_logos+'/ocean-next_trans_white_281x191.png'
-#cf_logo_ige = cdir_logos+'/IGE_blanc_notext.png'
-#cf_logo_prc = cdir_logos+'/PRACE_blanc.png'
 
 rof_log = 150.
 rof_dpt = 0.
