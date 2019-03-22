@@ -83,7 +83,7 @@ elif CNEMO in [ 'CREG025' ] :
 elif CNEMO in [ 'CREG4' ] :
     i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 2.
     vcb = [0.14, 0.05, 0.8, 0.02] ; font_rat = 0.5*rfact_zoom
-    x_ttl = 100. ; y_ttl = 620. ; # where to put label of conf on Figure...
+    x_ttl = 210. ; y_ttl = 620. ; # where to put label of conf on Figure...
     l_show_nm = False
     l_scientific_mode = True ; l_show_ttl = True
     color_top = 'k'
@@ -243,7 +243,7 @@ cfont_date = { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(1
 cfont_mail = { 'fontname':'Times New Roman', 'fontweight':'normal', 'fontstyle':'italic', 'fontsize':int(14.*font_rat), 'color':'0.8'}
 cfont_confname = { 'fontname':'Helvetica Neue', 'fontweight':'light', 'fontsize':int(50.*font_rat), 'color':'w' }
 cfont_axis  = { 'fontname':'Helvetica Neue', 'fontweight':'medium', 'fontsize':int(18.*font_rat), 'color':color_top }
-cfont_ttl = { 'fontname':'Helvetica Neue', 'fontweight':'medium', 'fontsize':int(22.*font_rat), 'color':color_top }
+cfont_ttl = { 'fontname':'Helvetica Neue', 'fontweight':'medium', 'fontsize':int(25.*font_rat), 'color':color_top }
 
 
 # Colormaps for fields:
@@ -356,7 +356,7 @@ if l_show_cb:
 
 if l_show_nm:  ax.annotate(CNEMO, xy=(1, 4), xytext=(x_cnf, y_cnf), **cfont_confname)
 
-if l_show_ttl: ax.annotate("BOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO", xy=(1, 4), xytext=(x_ttl, y_ttl), **cfont_ttl)
+if l_show_ttl: ax.annotate(CNEMO, xy=(1, 4), xytext=(x_ttl, y_ttl), **cfont_ttl)
 
 
 
