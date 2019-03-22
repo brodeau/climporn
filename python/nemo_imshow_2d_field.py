@@ -31,13 +31,12 @@ import barakuda_tool as bt
 #CNEMO = 'NANUK025'
 
 color_top = 'white'
-#color_top = 'k'
+
 
 l_show_cb = True
 l_show_nm = True
-
-
-
+l_scientific_mode = False
+l_show_ttl = False
 
     
 
@@ -76,10 +75,19 @@ elif CNEMO == 'ROALD12':
     i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 2. ; vcb = [0.63, 0.95, 0.36, 0.02] ; font_rat = 1.*rfact_zoom
     x_cnf = 50. ; y_cnf = 1250. ; # where to put label of conf on Figure...
     
-elif CNEMO in [ 'CREG025', 'CREG4' ] :
+elif CNEMO in [ 'CREG025' ] :
     i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 2.
     vcb = [0.6, 0.975, 0.38, 0.02] ; font_rat = 0.5*rfact_zoom
     x_cnf = 20. ; y_cnf = 560. ; # where to put label of conf on Figure...
+
+elif CNEMO in [ 'CREG4' ] :
+    i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 2.
+    vcb = [0.14, 0.05, 0.8, 0.02] ; font_rat = 0.5*rfact_zoom
+    x_ttl = 100. ; y_ttl = 620. ; # where to put label of conf on Figure...
+    l_show_nm = False
+    l_scientific_mode = True ; l_show_ttl = True
+    color_top = 'k'
+
 
 elif CNEMO == 'eNATL4':
     i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 0.25 ; vcb = [0.6, 0.11, 0.39, 0.025] ; font_rat = 0.5*rfact_zoom
@@ -225,15 +233,17 @@ idx_oce = nmp.where(XMSK[:,:] > 0.5)
 params = { 'font.family':'Helvetica Neue',
            'font.weight':    'normal',
            'font.size':       int(12.*font_rat),
-           'legend.fontsize': int(12.*font_rat),
-           'xtick.labelsize': int(12.*font_rat),
-           'ytick.labelsize': int(12.*font_rat),
-           'axes.labelsize':  int(12.*font_rat) }
+           'legend.fontsize': int(22.*font_rat),
+           'xtick.labelsize': int(18.*font_rat),
+           'ytick.labelsize': int(18.*font_rat),
+           'axes.labelsize':  int(15.*font_rat) }
 mpl.rcParams.update(params)
-cfont_clb  = { 'fontname':'Helvetica Neue', 'fontweight':'medium', 'fontsize':int(12.*font_rat), 'color':color_top }
+cfont_clb  = { 'fontname':'Helvetica Neue', 'fontweight':'medium', 'fontsize':int(18.*font_rat), 'color':color_top }
 cfont_date = { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(12.*font_rat), 'color':'w' }
 cfont_mail = { 'fontname':'Times New Roman', 'fontweight':'normal', 'fontstyle':'italic', 'fontsize':int(14.*font_rat), 'color':'0.8'}
-cfont_titl = { 'fontname':'Helvetica Neue', 'fontweight':'light', 'fontsize':int(50.*font_rat), 'color':'w' }
+cfont_confname = { 'fontname':'Helvetica Neue', 'fontweight':'light', 'fontsize':int(50.*font_rat), 'color':'w' }
+cfont_axis  = { 'fontname':'Helvetica Neue', 'fontweight':'medium', 'fontsize':int(18.*font_rat), 'color':color_top }
+cfont_ttl = { 'fontname':'Helvetica Neue', 'fontweight':'medium', 'fontsize':int(22.*font_rat), 'color':color_top }
 
 
 # Colormaps for fields:
@@ -254,10 +264,16 @@ if Nt == 0:
 else:
     cfig = 'snapshot_'+str(jt)+'_'+cv_in+'_'+CNEMO+'_'+cpal_fld+'.'+fig_type    
 
-fig = plt.figure(num = 1, figsize=(rh,rh*yx_ratio), dpi=None, facecolor='w', edgecolor='0.5')
 
-#ax  = plt.axes([0.065, 0.05, 0.9, 1.], axisbg = '0.5')
-ax  = plt.axes([0., 0., 1., 1.], axisbg = '0.5')
+rextra_height = 1.
+if l_scientific_mode: rextra_height = 1.12
+    
+fig = plt.figure(num = 1, figsize=(rh,rh*yx_ratio*rextra_height), dpi=None, facecolor='w', edgecolor='0.5')
+
+if l_scientific_mode:
+    ax  = plt.axes([0.09, 0.09, 0.9, 0.9], axisbg = 'r')
+else:
+    ax  = plt.axes([0., 0., 1., 1.],     axisbg = '0.5')
 
 vc_fld = nmp.arange(tmin, tmax + df, df)
 
@@ -301,7 +317,13 @@ del pmsk
 
 plt.axis([ 0, Ni, 0, Nj])
 
-#plt.title('NEMO: '+cfield+', coupled '+CNEMO+', '+cday+' '+chour+':00', **cfont_title)
+if l_scientific_mode:
+    plt.xlabel('i-points', **cfont_axis)
+    plt.ylabel('j-points', **cfont_axis)
+
+
+
+#plt.title('NEMO: '+cfield+', coupled '+CNEMO+', '+cday+' '+chour+':00', **cfont_confnamee)
 
 
 #ax2 = plt.axes([0.3, 0.08, 0.4, 0.025])
@@ -332,16 +354,17 @@ if l_show_cb:
 
 
 
-if l_show_nm:
-    #x_annot = nxr-nxr*0.22.*font_rat ; y_annot = 150
-    x_annot = 650 ; y_annot = 1035
-    #ax.annotate('Date: '+cday+' '+chour+':00',   xy=(1, 4), xytext=(x_annot,    y_annot), **cfont_date)
-    #ax.annotate('laurent.brodeau@ocean-next.fr', xy=(1, 4), xytext=(x_annot+150, 20), **cfont_mail)
-    ax.annotate(CNEMO, xy=(1, 4), xytext=(x_cnf, y_cnf), **cfont_titl)
+if l_show_nm:  ax.annotate(CNEMO, xy=(1, 4), xytext=(x_cnf, y_cnf), **cfont_confname)
+
+if l_show_ttl: ax.annotate("BOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO", xy=(1, 4), xytext=(x_ttl, y_ttl), **cfont_ttl)
 
 
 
-plt.savefig(cfig, dpi=dpi, orientation='portrait', facecolor='k')
+
+    
+
+#plt.savefig(cfig, dpi=dpi, orientation='portrait', facecolor='b', transparent=True)
+plt.savefig(cfig, dpi=dpi, orientation='portrait', transparent=True)
 print cfig+' created!\n'
 plt.close(1)
 
