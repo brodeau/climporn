@@ -75,8 +75,8 @@ elif CNEMO == 'NANUK025':
 elif CNEMO == 'ROALD12':
     i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 2. ; vcb = [0.63, 0.95, 0.36, 0.02] ; font_rat = 1.*rfact_zoom
     x_cnf = 50. ; y_cnf = 1250. ; # where to put label of conf on Figure...
-
-elif CNEMO == 'CREG025':
+    
+elif CNEMO in [ 'CREG025', 'CREG4' ] :
     i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 2.
     vcb = [0.6, 0.975, 0.38, 0.02] ; font_rat = 0.5*rfact_zoom
     x_cnf = 20. ; y_cnf = 560. ; # where to put label of conf on Figure...
