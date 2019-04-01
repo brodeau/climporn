@@ -8,7 +8,7 @@
 #    L. Brodeau, January 2019
 
 import sys
-from os import path, getcwd
+from os import path, getcwd, mkdir
 from string import replace
 import argparse as ap
 import numpy as nmp
@@ -134,6 +134,9 @@ else:
     jk=0
 ###############################################################################################################################################
 
+if not path.exists("figs"): mkdir("figs")
+cdir_figs = './figs/'+CWHAT
+if not path.exists(cdir_figs): mkdir(cdir_figs)
 
 
 #---------------------------------------------------------------
@@ -514,11 +517,10 @@ for jt in range(jt0,Nt):
     cday  = ct[:10]   ; print ' *** cday  :', cday
     chour = ct[11:13] ; print ' *** chour :', chour
 
-
     if l3d:
-        cfig = 'figs/'+cv_out+'_'+CNEMO+'-'+CRUN+'_lev'+str(jk)+'_'+CBOX+'_'+cday+'_'+chour+'_'+cpal_fld+'.'+fig_type
+        cfig = cdir_figs+'/'+cv_out+'_'+CNEMO+'-'+CRUN+'_lev'+str(jk)+'_'+CBOX+'_'+cday+'_'+chour+'_'+cpal_fld+'.'+fig_type
     else:
-        cfig = 'figs/'+cv_out+'_'+CNEMO+'-'+CRUN+'_'+CBOX+'_'+cday+'_'+chour+'_'+cpal_fld+'.'+fig_type
+        cfig = cdir_figs+'/'+cv_out+'_'+CNEMO+'-'+CRUN+'_'+CBOX+'_'+cday+'_'+chour+'_'+cpal_fld+'.'+fig_type
 
     ###### FIGURE ##############
 
