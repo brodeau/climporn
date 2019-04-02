@@ -60,7 +60,7 @@ jt0 = 0
 jk=0
 l_get_name_of_run = False
 l_show_lsm = True
-l_do_ice  = True
+l_do_ice  = False
 l_show_cb = True
 l_log_field = False
 l_pow_field = False
@@ -178,6 +178,7 @@ elif CWHAT == 'SST':
     cv_in = 'sosstsst' ; cv_out = CWHAT ; #in ['sosstsst','tos']:    
     tmin=-2 ;  tmax=32.   ;  df = 1. ; cpal_fld = 'ncview_nrl' ;     cb_jump = 2
     cunit = r'SST ($^{\circ}$C)'
+    if CBOX == 'ALL':      l_do_ice = True
     if CBOX == 'EUROPA':   tmin=0. ;  tmax=25.
     if CBOX == 'EUROPAs':  tmin=6. ;  tmax=18.
     if CBOX == 'Med':      tmin=10.;  tmax=30. ; cb_jump = 1
@@ -554,7 +555,7 @@ for jt in range(jt0,Nt):
 
 
     # Ice
-    if not CWHAT == 'MLD' and l_do_ice:
+    if l_do_ice:
         print "Reading record #"+str(jt)+" of "+cv_ice+" in "+cf_ice
         id_ice = Dataset(cf_ice)
         XICE  = id_ice.variables[cv_ice][jt,j1:j2,i1:i2] ; # t, y, x
@@ -646,7 +647,7 @@ for jt in range(jt0,Nt):
     del Xplot
 
     # Ice
-    if not CWHAT == 'MLD' and l_do_ice:
+    if l_do_ice:
         #XM[:,:] = XMSK[:,:]
         #bt.drown(XICE, XM, k_ew=2, nb_max_inc=10, nb_smooth=10)
         #ci = plt.contourf(XICE[:,:], vcont_ice, cmap = pal_ice, norm = norm_ice) #
