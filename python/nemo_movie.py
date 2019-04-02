@@ -175,7 +175,7 @@ if   CWHAT == 'MLD':
     cunit = r'MLD [m]'
 
 elif CWHAT == 'SST':
-    cv_in = 'sosstsst' ; cv_out = cv_in ; #in ['sosstsst','tos']:    
+    cv_in = 'sosstsst' ; cv_out = CWHAT ; #in ['sosstsst','tos']:    
     tmin=-2 ;  tmax=32.   ;  df = 1. ; cpal_fld = 'ncview_nrl' ;     cb_jump = 2
     cunit = r'SST ($^{\circ}$C)'
     if CBOX == 'EUROPA':   tmin=0. ;  tmax=25.
@@ -188,24 +188,24 @@ elif CWHAT == 'SST':
     if CBOX in [ 'AzoresP','AzoresL','AzoresS']:  tmin = 15. ; tmax = 25. ; df=0.5
     
 elif CWHAT == 'T_1000':
-    cv_in = 'votemper' ; cv_out = cv_in ;
+    cv_in = 'votemper' ; cv_out = CWHAT ;
     tmin=0. ;  tmax=14.   ;  df = 1. ; cpal_fld = 'ncview_nrl' ; cb_jump = 1
     cunit = r'Potential temperature at 1000 m'
 
 elif CWHAT == 'SSS':
-    cv_in = 'sosaline' ; cv_out = cv_in ; #in ['sosstsst','tos']:    
+    cv_in = 'sosaline' ; cv_out = CWHAT ; #in ['sosstsst','tos']:    
     tmin=20. ;  tmax=40.   ;  df = 2. ; cpal_fld = 'ncview_ssec' ; cb_jump = 2
     cunit = r'Sea surface salinity'
     if CBOX == 'Med' :    tmin=33. ; tmax=39.5 ;  df = 0.25 ; cpal_fld = 'magma'
     if CBOX == 'LabSea' : tmin=28. ; tmax=35.5 ;  df = 1.   ; cb_jump = 1 ; cpal_fld = 'gist_stern_r'
 
 elif CWHAT == 'S_1000':
-    cv_in = 'vosaline' ; cv_out = cv_in ;
+    cv_in = 'vosaline' ; cv_out = CWHAT ;
     tmin=33.5 ;  tmax=36.5   ;  df = 0.5 ; cpal_fld = 'ncview_helix2' ; cb_jump = 1
     cunit = r'Salinity at 1000 m'
 
 elif CWHAT == 'GRAD_SST':
-    cv_in = 'sosstsst' ; cv_out = cv_in ;
+    cv_in = 'sosstsst' ; cv_out = CWHAT ;
     l_apply_hgrad = True
     l_smooth = True ; nb_smooth  = 5
     tmin=0. ;  tmax=0.001 ;  df = 0.0001 ; cpal_fld = 'ncview_hotres' ; cb_jump = 1
@@ -246,7 +246,7 @@ elif CWHAT == 'LAP_SSH':
     cpal_fld = 'on2' ; tmin=-1.2 ;  tmax=1.2   ;  df = 0.05 ; 
 
 elif CWHAT == 'W_1000':
-    cv_in = 'vovecrtz'  ; cv_out = cv_in ;
+    cv_in = 'vovecrtz'  ; cv_out = CWHAT ;
     tmin=-0.01 ;  tmax=-tmin   ;  df = 0.005 ; cb_jump = 1
     cpal_fld='RdBu_r' ;    #cpal_fld='PiYG_r' ; #cpal_fld='BrBG_r'
     cunit = r'Vertical velocity at 1000 m [m/s]'
