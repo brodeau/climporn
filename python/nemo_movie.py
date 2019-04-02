@@ -60,7 +60,7 @@ jt0 = 0
 jk=0
 l_get_name_of_run = False
 l_show_lsm = True
-l_do_ice  = False
+l_do_ice  = True
 l_show_cb = True
 l_log_field = False
 l_pow_field = False
@@ -319,11 +319,16 @@ l_3d_field = False
 
 # Ice:
 if l_do_ice:
-    cv_ice  = 'siconc'
-    cf_ice = replace(cf_in, 'grid_T', 'icemod')
-    rmin_ice = 0.5
-    cpal_ice = 'ncview_bw'
+    cv_ice  = 'ileadfrac'
+    cf_ice = replace(cf_in, 'gridT-2D', 'icemod')
+    rmin_ice = 0.25
+    #cpal_ice = 'ncview_bw'
+    #cpal_ice = 'Blues_r'
+    cpal_ice = 'bone'
     vcont_ice = nmp.arange(rmin_ice, 1.05, 0.05)
+    #
+    pal_ice = bcm.chose_colmap(cpal_ice)
+    norm_ice = colors.Normalize(vmin = rmin_ice, vmax = 0.95, clip = False)
 
 
 
@@ -473,11 +478,6 @@ if l_show_lsm or l_add_topo_land:
         pal_lsm = bcm.chose_colmap('land_dark')
         norm_lsm = colors.Normalize(vmin = 0., vmax = 1., clip = False)
 
-if l_do_ice:
-    pal_ice = bcm.chose_colmap(cpal_ice)
-    norm_ice = colors.Normalize(vmin = rmin_ice, vmax = 1, clip = False)
-
-
 
 if cdt == '3h':
     dt = 3
@@ -551,6 +551,19 @@ for jt in range(jt0,Nt):
             Xplot  = id_fld.variables[cv_in][jt,j1:j2,i1:i2] ; # t, y, x        
     id_fld.close()
     print "Done!\n"
+
+
+    # Ice
+    if not CWHAT == 'MLD' and l_do_ice:
+        print "Reading record #"+str(jt)+" of "+cv_ice+" in "+cf_ice
+        id_ice = Dataset(cf_ice)
+        XICE  = id_ice.variables[cv_ice][jt,j1:j2,i1:i2] ; # t, y, x
+        id_ice.close()
+        print "Done!\n"
+
+
+
+
 
     if l_apply_lap:
         print ' *** Computing Laplacian of "'+cv_in+'"!'
@@ -634,16 +647,9 @@ for jt in range(jt0,Nt):
 
     # Ice
     if not CWHAT == 'MLD' and l_do_ice:
-        print "Reading record #"+str(jt)+" of "+cv_ice+" in "+cf_ice
-        id_ice = Dataset(cf_ice)
-        XICE  = id_ice.variables[cv_ice][jt,:,:] ; # t, y, x
-        id_ice.close()
-        print "Done!"
-
         #XM[:,:] = XMSK[:,:]
         #bt.drown(XICE, XM, k_ew=2, nb_max_inc=10, nb_smooth=10)
         #ci = plt.contourf(XICE[:,:], vcont_ice, cmap = pal_ice, norm = norm_ice) #
-
         pice = nmp.ma.masked_where(XICE < rmin_ice, XICE)
         ci = plt.imshow(pice, cmap = pal_ice, norm = norm_ice, interpolation='none') ; del pice, ci
         del XICE
