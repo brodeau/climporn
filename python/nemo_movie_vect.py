@@ -188,8 +188,9 @@ elif CWHAT == 'CSPEED':
     tmin=0. ; tmax=1.8 ; df = 0.2 ; cpal_fld = 'on3' ; # Poster full-res!!!
     cunit = 'Surface current speed [m/s]' ; cb_jump = 1
     cb_extend = 'max' ;#colorbar extrema
-    if CBOX ==   'Med'  : tmin=0. ;  tmax=1.3 ; df = 0.1
-    if CBOX == 'AzoresS': tmin=0. ;  tmax=1.2 ; df = 0.2 ; cb_jump = 1
+    if CBOX ==    'Med'  : tmax=1.3 ; df = 0.1
+    if CBOX ==  'AzoresS': tmax=1.2 ; df = 0.2 ; cb_jump = 1
+    if CBOX == 'BlackSea': tmax=0.8 ; df = 0.1 ; cb_jump = 1
 
 elif CWHAT == 'CSPEED_1000':
     l_do_cspd = True  ; # do current speed

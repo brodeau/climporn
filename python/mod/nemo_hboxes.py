@@ -95,7 +95,13 @@ class nemo_hbox:
             x_clock = 40 ; y_clock = 170 ; x_logo = 2090 ; y_logo  = 10
     
         elif box == 'BlackSea':
-            i1=Ni0-1920; j1=3330-1080; i2=Ni0 ; j2=3330 ; rfact_zoom=1.   ; vcb=[0.5, 0.875, 0.485, 0.02] ; font_rat=2.*rfact_zoom
+            i2=Ni0 ; j2=3330 ; i1=i2-1200; j1=j2-1200;  rfact_zoom=1.   ; vcb=[0.35, 0.06, 0.61, 0.02] ; font_rat=2.*rfact_zoom
+            x_clock = 500 ; y_clock = 130 ; x_logo = 950 ; y_logo = 160 ; l_annotate_name=False ; l_add_logo_ige=False ; l_add_logo_prc=False
+            l_show_exp = True ; x_exp = 50 ; y_exp = 1100
+            cf_logo_on  = 'ocean-next_trans_white_210x142.png'
+    
+        elif box == 'eBlackSea':
+            i2=Ni0 ; j2=3330 ; i1=i2-1920; j1=j2-1080;  rfact_zoom=1.   ; vcb=[0.5, 0.875, 0.485, 0.02] ; font_rat=2.*rfact_zoom
             x_clock = 30 ; y_clock = 1040 ; x_logo = 1500 ; y_logo = 16 ; l_annotate_name=False
     
         elif box == 'Brittany':
