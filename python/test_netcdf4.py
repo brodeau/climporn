@@ -64,21 +64,28 @@ id_file.close()
 
 (Nj,Ni) = nmp.shape(Xlon)
 
-#############################
+print '\n Shape of the domain Nj,Ni = ', Nj,Ni
 
+
+
+
+#############################
 
 fig = plt.figure(num = 1, figsize=(8,8), dpi=None, facecolor='w', edgecolor='0.5')
 ax  = plt.axes([0., 0., 1., 1.], axisbg = '0.5')
 
 cf = plt.imshow(Xtemp[:,:], interpolation='none')
 
+# => plt.contourf(Xlon, Xlat, Xtemp, ...)
+# => plt.pcolor(Xlon, Xlat, Xtemp, ...) 
+
+# => look at "basemap" doc (to create real maps on real projection).
+
 plt.axis([ 0, Ni, 0, Nj])
 
 #plt.title('NEMO: '+cfield+', coupled '+CNEMO+', '+cday+' '+chour+':00', **cfont_title)
 
-
 #ax2 = plt.axes([0.3, 0.08, 0.4, 0.025])
-
 
 plt.savefig('figure.png', dpi=100, orientation='portrait', facecolor='k')
 plt.close(1)
