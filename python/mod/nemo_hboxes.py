@@ -55,6 +55,13 @@ class nemo_hbox:
             l_annotate_name=False ; l_show_exp = True ; x_exp = 1750 ; y_exp = 300
             l_fill_holes_k=True
     
+        if   box == 'ALLC':
+            # pour la com!!!
+            i1=0   ; j1=0    ; i2=Ni0 ; j2=Nj0  ; rfact_zoom=1440./float(Nj0) ; vcb=[0.61, 0.1, 0.36, 0.018]  ; font_rat=8.*rfact_zoom
+            x_clock = 1600 ; y_clock = 200 ; l_add_logo=False ; l_add_logo_ige=False ; l_add_logo_prc=False
+            l_annotate_name=False ; l_show_exp = False ; x_exp = 1750 ; y_exp = 300
+            l_fill_holes_k=True
+    
         elif box == 'EUROPA':
             i2=6400 ; j2=4000 ; i1=i2-2*1920; j1=j2-2*1080; rfact_zoom=0.5   ; vcb=[0.5, 0.875, 0.485, 0.02] ; font_rat=2.*rfact_zoom
             x_clock = 30 ; y_clock = 1040 ; x_logo = 1500 ; y_logo = 16 ; l_annotate_name=False
