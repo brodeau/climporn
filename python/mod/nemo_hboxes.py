@@ -74,8 +74,9 @@ class nemo_hbox:
             
         elif   box == 'ALLFR':
             i1=0   ; j1=0    ; i2=Ni0 ; j2=Nj0  ; rfact_zoom=1. ; vcb=[0.59, 0.1, 0.39, 0.018]  ; font_rat=8.*rfact_zoom
-            x_clock = 4000 ; y_clock = 200 ; x_logo = 6000 ; y_logo  = 50; l_show_clock=False ; l_annotate_name=False; l_add_logo=False
+            x_clock = 4000 ; y_clock = 200 ; x_logo = 6000 ; y_logo  = 50; 
             l_fill_holes_k=True
+            l_show_clock=False; l_add_logo=False ; l_add_logo_ige=False ; l_add_logo_prc=False; l_annotate_name=False ; l_show_exp=False
     
         elif   box == 'SALL':
             i1=0   ; j1=0    ; i2=Ni0 ; j2=Nj0  ; rfact_zoom=1080./float(Nj0) ; vcb=[0.59, 0.1, 0.39, 0.018]  ; font_rat=8.*rfact_zoom
