@@ -1,3 +1,5 @@
+from sys import exit
+
 class nemo_hbox:
 
     ''' Bla bla bla
@@ -20,7 +22,7 @@ class nemo_hbox:
             Nj0 = 313
         else:
             print 'ERROR: we do not know NEMO config "'+str(config)+'" !'
-            sys.exit(0)
+            exit(0)
         #
         return  (Ni0,Nj0)
 
@@ -54,14 +56,14 @@ class nemo_hbox:
             x_clock = 1600 ; y_clock = 200 ; x_logo=2200 ; y_logo=1200
             l_annotate_name=False ; l_show_exp = True ; x_exp = 1750 ; y_exp = 300
             l_fill_holes_k=True
-    
-        if   box == 'ALLC':
+            
+        elif   box == 'ALLC':
             # pour la com!!!
             i1=0   ; j1=0    ; i2=Ni0 ; j2=Nj0  ; rfact_zoom=1440./float(Nj0) ; vcb=[0.61, 0.1, 0.36, 0.018]  ; font_rat=8.*rfact_zoom
             x_clock = 1600 ; y_clock = 200 ; l_add_logo=False ; l_add_logo_ige=False ; l_add_logo_prc=False
             l_annotate_name=False ; l_show_exp = False ; x_exp = 1750 ; y_exp = 300
             l_fill_holes_k=True
-    
+        
         elif box == 'EUROPA':
             i2=6400 ; j2=4000 ; i1=i2-2*1920; j1=j2-2*1080; rfact_zoom=0.5   ; vcb=[0.5, 0.875, 0.485, 0.02] ; font_rat=2.*rfact_zoom
             x_clock = 30 ; y_clock = 1040 ; x_logo = 1500 ; y_logo = 16 ; l_annotate_name=False
@@ -169,7 +171,7 @@ class nemo_hbox:
     
         else:
             print ' ERROR: unknow box "'+box+'" for config "'+config+'" !!!'
-            sys.exit(0)
+            exit(0)
 
 
         self.rfact_zoom      = rfact_zoom
