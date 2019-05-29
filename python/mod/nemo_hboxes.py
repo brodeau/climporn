@@ -43,6 +43,8 @@ class nemo_hbox:
         l_add_logo_ige=True
         l_add_logo_prc=True
 
+        l_add_quiver = False
+
         cf_logo_on  = 'ocean-next_trans_white_281x191.png'
         cf_logo_ige = 'IGE_blanc_notext.png'
         cf_logo_prc = 'PRACE_blanc.png'
@@ -96,6 +98,14 @@ class nemo_hbox:
             l_show_exp = True ; x_exp = 100 ; y_exp = 1380
             l_add_logo_ige=False ; l_add_logo_prc=False
 
+        elif box == 'Manche':
+            l_add_quiver = True
+            i2=6300; j2=3700; i1=i2-1920 ; j1=j2-1080 ; rfact_zoom=1. ; vcb=[0.1, 0.06, 0.5, 0.02] ; font_rat=2.*rfact_zoom
+            #i2=6300; j2=3700; i1=i2-200 ; j1=j2-100 ; rfact_zoom=7. ; vcb=[0.1, 0.06, 0.5, 0.02] ; font_rat=2.*rfact_zoom
+            x_clock = 100 ; y_clock = 980
+            l_show_exp = True ; x_exp = 100 ; y_exp = 1030
+            l_add_logo_ige=False ; l_add_logo_prc=False
+            cf_logo_on  = 'ocean-next_trans_white_210x142.png' ; x_logo = 1670 ; y_logo  = 30
     
         elif box == 'Med+BS':
             i2=Ni0 ; i1=5400; j1=1530;  j2=3310 ; rfact_zoom=1080./float(j2-j1)   ; vcb=[0.025, 0.06, 0.4, 0.02] ; font_rat=3.*rfact_zoom
@@ -194,6 +204,8 @@ class nemo_hbox:
         self.l_show_exp      = l_show_exp
         self.exp             = (x_exp,y_exp)
         self.l_fill_holes_k  = l_fill_holes_k
+
+        self.l_add_quiver    = l_add_quiver
 
         self.cf_logo_on  = cf_logo_on 
         self.cf_logo_ige = cf_logo_ige

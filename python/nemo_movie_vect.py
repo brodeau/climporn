@@ -38,8 +38,6 @@ import barakuda_ncio as bnc
 # ClimPorn:
 import nemo_hboxes as nhb
 
-
-
 cwd = getcwd()
 
 vmn = [ 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ]
@@ -194,6 +192,7 @@ elif CWHAT == 'CSPEED':
     if CBOX ==    'Med'  : tmax=1.3 ; df = 0.1
     if CBOX ==  'AzoresS': tmax=1.2 ; df = 0.2 ; cb_jump = 1
     if CBOX == 'BlackSea': tmax=0.8 ; df = 0.1 ; cb_jump = 1
+    if CBOX == 'Manche':   tmax=2.6 ; df = 0.1 ; cb_jump = 2
 
 elif CWHAT == 'CSPEED_1000':
     l_do_cspd = True  ; # do current speed
@@ -494,7 +493,13 @@ jm = int(cmn0)
 
 
 Xplot = nmp.zeros((nj,ni))
-
+if nemo_box.l_add_quiver:
+    #VX = nmp.arange(0,ni,10)
+    #VY = nmp.arange(0,nj,10)
+    VX = nmp.arange(ni)
+    VY = nmp.arange(nj)
+    XU = nmp.zeros((nj,ni))
+    XV = nmp.zeros((nj,ni))
 
 for jt in range(jt0,Nt):
 
@@ -573,6 +578,11 @@ for jt in range(jt0,Nt):
         lx[:,2:ni] = 0.5*( XFLD[:,1:ni-1] + XFLD[:,2:ni] )
         ly[2:nj,:] = 0.5*( YFLD[1:nj-1,:] + YFLD[2:nj,:] )
         Xplot[:,:] = nmp.sqrt( lx[:,:]*lx[:,:] + ly[:,:]*ly[:,:] ) * XMSK[:,:]
+        if nemo_box.l_add_quiver:
+            XU[:,:] = nmp.ma.masked_where(XLSM<0.5,XFLD[:,:])
+            XV[:,:] = nmp.ma.masked_where(XLSM<0.5,YFLD[:,:])
+            #XU[:,:] = XFLD[:,:]
+            #XV[:,:] = YFLD[:,:]
 
     if l_do_tke:
         print '\nComputing TKE at T-points ...'
@@ -613,6 +623,9 @@ for jt in range(jt0,Nt):
     
     cf = plt.imshow(Xplot[:,:], cmap = pal_fld, norm = norm_fld, interpolation='none')
 
+    if nemo_box.l_add_quiver:
+        XU = XU*XLSM ; XV = XV*XLSM 
+        cq = plt.quiver( VX[:ni:20], VY[:nj:20], XU[:nj:20,:ni:20], XV[:nj:20,:ni:20], scale=50, color='w', width=0.00075, linewidth=0.1 )
 
     #LOLO: rm ???
     if l_show_lsm or l_add_topo_land:
