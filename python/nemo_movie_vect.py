@@ -175,8 +175,10 @@ elif CWHAT == 'CURLOF':
     l_do_cof = True  ; # do curl/f
     cpal_fld = 'on2' ; tmin=-1.2 ;  tmax=-tmin ;  df = 0.1 ; cb_jump = 2
     cunit = r'$\zeta/f$'
-    if CBOX ==      'Med': tmin=-1. ;  tmax=-tmin ; df = 0.1 ; cb_jump = 2
-    if CBOX ==  'AzoresP': tmin=-0.8 ;  tmax=-tmin ;  df = 0.1 ; cb_jump = 2
+    if CBOX ==     'ALLC': tmin=-1. ;  tmax=-tmin ; df = 0.1 ; cb_jump = 2 ; cpal_fld='RdBu_r'; #; cpal_fld = 'bone'
+    #if CBOX ==     'ALLFR': tmin=-1. ;  tmax=-tmin ; df = 0.1 ; cb_jump = 2 ; cpal_fld='RdBu_r'; #; cpal_fld = 'bone'
+    if CBOX ==      'Med': tmin=-1. ;  tmax=-tmin ; df = 0.1 ; cb_jump = 2 ; cpal_fld='RdBu_r'
+    if CBOX in ['AzoresP','MeddiesW','ALLFR']: tmin=-0.8 ;  tmax=-tmin ;  df = 0.1 ; cb_jump = 2
     if CBOX == 'BlackSea': tmin=-0.6 ;  tmax=-tmin  ; df = 0.1 ; cb_jump = 1
     
 elif CWHAT == 'CURLOF_1000':

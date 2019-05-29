@@ -204,6 +204,7 @@ elif CWHAT == 'S_1000':
     cv_in = 'vosaline' ; cv_out = CWHAT ;
     tmin=33.5 ;  tmax=36.5   ;  df = 0.5 ; cpal_fld = 'ncview_helix2' ; cb_jump = 1
     cunit = r'Salinity at 1000 m'
+    if CBOX == 'MeddiesW' : tmin=35. ;  tmax=36.6 ; df = 0.1
 
 elif CWHAT == 'GRAD_SST':
     cv_in = 'sosstsst' ; cv_out = CWHAT ;
