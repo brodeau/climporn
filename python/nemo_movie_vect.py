@@ -192,7 +192,7 @@ elif CWHAT == 'CSPEED':
     if CBOX ==    'Med'  : tmax=1.3 ; df = 0.1
     if CBOX ==  'AzoresS': tmax=1.2 ; df = 0.2 ; cb_jump = 1
     if CBOX == 'BlackSea': tmax=0.8 ; df = 0.1 ; cb_jump = 1
-    if CBOX == 'Manche':   tmax=2.6 ; df = 0.1 ; cb_jump = 2
+    if CBOX in ['Manche','Bretagne']:  tmax=2.4 ; df = 0.1 ; cb_jump = 2
 
 elif CWHAT == 'CSPEED_1000':
     l_do_cspd = True  ; # do current speed
@@ -579,10 +579,8 @@ for jt in range(jt0,Nt):
         ly[2:nj,:] = 0.5*( YFLD[1:nj-1,:] + YFLD[2:nj,:] )
         Xplot[:,:] = nmp.sqrt( lx[:,:]*lx[:,:] + ly[:,:]*ly[:,:] ) * XMSK[:,:]
         if nemo_box.l_add_quiver:
-            XU[:,:] = nmp.ma.masked_where(XLSM<0.5,XFLD[:,:])
-            XV[:,:] = nmp.ma.masked_where(XLSM<0.5,YFLD[:,:])
-            #XU[:,:] = XFLD[:,:]
-            #XV[:,:] = YFLD[:,:]
+            XU[:,:] = XFLD[:,:]
+            XV[:,:] = YFLD[:,:]
 
     if l_do_tke:
         print '\nComputing TKE at T-points ...'
@@ -624,8 +622,14 @@ for jt in range(jt0,Nt):
     cf = plt.imshow(Xplot[:,:], cmap = pal_fld, norm = norm_fld, interpolation='none')
 
     if nemo_box.l_add_quiver:
-        XU = XU*XLSM ; XV = XV*XLSM 
-        cq = plt.quiver( VX[:ni:20], VY[:nj:20], XU[:nj:20,:ni:20], XV[:nj:20,:ni:20], scale=50, color='w', width=0.00075, linewidth=0.1 )
+        #idx_high = nmp.where(Xplot[:,:]>0.75*tmax)
+        idx_high = nmp.where(Xplot[:,:]>tmax)
+        XU[idx_high] = nmp.nan ; XV[idx_high] = nmp.nan
+        idx_miss = nmp.where(XLSM[:,:]<0.5)
+        XU[idx_miss] = nmp.nan ; XV[idx_miss] = nmp.nan
+        #XU = XU*XLSM ; XV = XV*XLSM 
+        nss=nemo_box.n_subsamp_qvr
+        cq = plt.quiver( VX[:ni:nss], VY[:nj:nss], XU[:nj:nss,:ni:nss], XV[:nj:nss,:ni:nss], scale=50, color='w', width=0.00075, linewidth=0.1 )
 
     #LOLO: rm ???
     if l_show_lsm or l_add_topo_land:

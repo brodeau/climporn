@@ -44,6 +44,7 @@ class nemo_hbox:
         l_add_logo_prc=True
 
         l_add_quiver = False
+        n_subsamp_qvr = 1
 
         cf_logo_on  = 'ocean-next_trans_white_281x191.png'
         cf_logo_ige = 'IGE_blanc_notext.png'
@@ -99,7 +100,7 @@ class nemo_hbox:
             l_add_logo_ige=False ; l_add_logo_prc=False
 
         elif box == 'Manche':
-            l_add_quiver = True
+            l_add_quiver = True ; n_subsamp_qvr=20
             i2=6300; j2=3700; i1=i2-1920 ; j1=j2-1080 ; rfact_zoom=1. ; vcb=[0.1, 0.06, 0.5, 0.02] ; font_rat=2.*rfact_zoom
             #i2=6300; j2=3700; i1=i2-200 ; j1=j2-100 ; rfact_zoom=7. ; vcb=[0.1, 0.06, 0.5, 0.02] ; font_rat=2.*rfact_zoom
             x_clock = 100 ; y_clock = 980
@@ -136,9 +137,15 @@ class nemo_hbox:
             l_show_exp = True ; x_exp = 70 ; y_exp = 1020
             cf_logo_on  = 'ocean-next_trans_white_210x142.png'
         
-        elif box == 'Brittany':
-            i1=5400; j1=2850; i2=5700 ; j2=3100 ; rfact_zoom=4.   ; vcb=[0.5, 0.875, 0.485, 0.02] ; font_rat=1.*rfact_zoom
-            x_clock = 30 ; y_clock = 1040 ; x_logo = 1500 ; y_logo = 16
+        elif box == 'Bretagne':
+            l_add_quiver = True ; n_subsamp_qvr=10
+            i1=5250; j1=2850; i2=i1+640 ; j2=j1+360 ; rfact_zoom=3 ; vcb=[0.53, 0.25, 0.44, 0.02] ; font_rat=0.8*rfact_zoom
+            #x_clock = 30 ; y_clock = 1040 ; x_logo = 1500 ; y_logo = 16
+            x_clock = 100 ; y_clock = 980
+            l_show_exp = True ; x_exp = 100 ; y_exp = 1030
+            l_add_logo_ige=False ; l_add_logo_prc=False
+            cf_logo_on  = 'ocean-next_trans_white_210x142.png' ; x_logo = 1670 ; y_logo  = 30
+
     
         elif box == 'Portrait':
             i1=2760; j1=1000; i2=4870; j2=4000 ; rfact_zoom=1.     ; vcb=[0.59, 0.1, 0.38, 0.018]  ; font_rat=1.*rfact_zoom
@@ -206,6 +213,7 @@ class nemo_hbox:
         self.l_fill_holes_k  = l_fill_holes_k
 
         self.l_add_quiver    = l_add_quiver
+        self.n_subsamp_qvr   = n_subsamp_qvr
 
         self.cf_logo_on  = cf_logo_on 
         self.cf_logo_ige = cf_logo_ige
