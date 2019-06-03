@@ -42,6 +42,8 @@ class nemo_hbox:
         l_add_logo=True
         l_add_logo_ige=True
         l_add_logo_prc=True
+        
+        c_imshow_interp = 'none'
 
         l_add_quiver = False
         n_subsamp_qvr = 1
@@ -137,15 +139,15 @@ class nemo_hbox:
             l_show_exp = True ; x_exp = 70 ; y_exp = 1020
             cf_logo_on  = 'ocean-next_trans_white_210x142.png'
         
-        elif box == 'Bretagne':
-            l_add_quiver = True ; n_subsamp_qvr=10
-            i1=5250; j1=2850; i2=i1+640 ; j2=j1+360 ; rfact_zoom=3 ; vcb=[0.53, 0.25, 0.44, 0.02] ; font_rat=0.8*rfact_zoom
+        elif box == 'Brest':
+            l_add_quiver = True ; n_subsamp_qvr=3
+            i2=5700; j2=3040; i1=i2-320 ; j1=j2-180 ; rfact_zoom=6 ; vcb=[0.6, 0.35, 0.38, 0.02] ; font_rat=0.4*rfact_zoom
             #x_clock = 30 ; y_clock = 1040 ; x_logo = 1500 ; y_logo = 16
-            x_clock = 100 ; y_clock = 980
-            l_show_exp = True ; x_exp = 100 ; y_exp = 1030
+            x_clock = 1200 ; y_clock = 550
+            l_show_exp = True ; x_exp = 1200 ; y_exp = 600
             l_add_logo_ige=False ; l_add_logo_prc=False
-            cf_logo_on  = 'ocean-next_trans_white_210x142.png' ; x_logo = 1670 ; y_logo  = 30
-
+            cf_logo_on  = 'ocean-next_trans_white_210x142.png' ; x_logo=1680 ; y_logo=450
+            c_imshow_interp = 'bicubic'
     
         elif box == 'Portrait':
             i1=2760; j1=1000; i2=4870; j2=4000 ; rfact_zoom=1.     ; vcb=[0.59, 0.1, 0.38, 0.018]  ; font_rat=1.*rfact_zoom
@@ -214,6 +216,8 @@ class nemo_hbox:
 
         self.l_add_quiver    = l_add_quiver
         self.n_subsamp_qvr   = n_subsamp_qvr
+
+        self.c_imshow_interp = c_imshow_interp
 
         self.cf_logo_on  = cf_logo_on 
         self.cf_logo_ige = cf_logo_ige

@@ -193,6 +193,7 @@ elif CWHAT == 'CSPEED':
     if CBOX ==  'AzoresS': tmax=1.2 ; df = 0.2 ; cb_jump = 1
     if CBOX == 'BlackSea': tmax=0.8 ; df = 0.1 ; cb_jump = 1
     if CBOX in ['Manche','Bretagne']:  tmax=2.4 ; df = 0.1 ; cb_jump = 2
+    if CBOX in ['Brest']:  tmax=2.4 ; df = 0.1 ; cb_jump = 2
 
 elif CWHAT == 'CSPEED_1000':
     l_do_cspd = True  ; # do current speed
@@ -617,25 +618,29 @@ for jt in range(jt0,Nt):
 
     plt.axis([ 0, ni, 0, nj])
 
-    Xplot[idx_land] = nmp.nan
     
-    cf = plt.imshow(Xplot[:,:], cmap = pal_fld, norm = norm_fld, interpolation='none')
+    if nemo_box.c_imshow_interp == 'none':
+        Xplot[idx_land] = nmp.nan
+    else:
+        bt.drown(Xplot, XMSK, k_ew=-1, nb_max_inc=10, nb_smooth=10)
+    
+    cf = plt.imshow( Xplot[:,:], cmap=pal_fld, norm=norm_fld, interpolation=nemo_box.c_imshow_interp )
 
     if nemo_box.l_add_quiver:
-        #idx_high = nmp.where(Xplot[:,:]>0.75*tmax)
         idx_high = nmp.where(Xplot[:,:]>tmax)
         XU[idx_high] = nmp.nan ; XV[idx_high] = nmp.nan
         idx_miss = nmp.where(XLSM[:,:]<0.5)
         XU[idx_miss] = nmp.nan ; XV[idx_miss] = nmp.nan
         #XU = XU*XLSM ; XV = XV*XLSM 
         nss=nemo_box.n_subsamp_qvr
-        cq = plt.quiver( VX[:ni:nss], VY[:nj:nss], XU[:nj:nss,:ni:nss], XV[:nj:nss,:ni:nss], scale=50, color='w', width=0.00075, linewidth=0.1 )
+        cq = plt.quiver( VX[:ni:nss], VY[:nj:nss], XU[:nj:nss,:ni:nss], XV[:nj:nss,:ni:nss], scale=50, color='w', width=0.001, linewidth=0.1 )
 
     #LOLO: rm ???
     if l_show_lsm or l_add_topo_land:
         if l_add_topo_land:
             clsm = plt.imshow(nmp.ma.masked_where(XLSM>0.0001, xtopo), cmap = pal_lsm, norm = norm_lsm, interpolation='none')
-            plt.contour(XLSM, [0.9], colors='k', linewidths=0.5)
+            if nemo_box.c_imshow_interp == 'none':
+                plt.contour(XLSM, [0.9], colors='k', linewidths=0.5)
         else:
             clsm = plt.imshow(nmp.ma.masked_where(XLSM>0.0001, XLSM), cmap = pal_lsm, norm = norm_lsm, interpolation='none')
 
