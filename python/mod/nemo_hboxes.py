@@ -138,11 +138,20 @@ class nemo_hbox:
             x_clock = 250 ; y_clock = 130 ; x_logo = 1700 ; y_logo = 930 ; l_add_logo_ige=False ; l_add_logo_prc=False
             l_show_exp = True ; x_exp = 70 ; y_exp = 1020
             cf_logo_on  = 'ocean-next_trans_white_210x142.png'
+
+
+        elif box == 'Bretagne':
+            l_add_quiver = True ; n_subsamp_qvr=10
+            i1=5250; j1=2850; i2=i1+640 ; j2=j1+360 ; rfact_zoom=3 ; vcb=[0.53, 0.25, 0.44, 0.02] ; font_rat=0.8*rfact_zoom
+            x_clock = 100 ; y_clock = 980
+            l_show_exp = True ; x_exp = 100 ; y_exp = 1030
+            l_add_logo_ige=False ; l_add_logo_prc=False
+            cf_logo_on  = 'ocean-next_trans_white_210x142.png' ; x_logo = 1670 ; y_logo  = 30
+
         
         elif box == 'Brest':
             l_add_quiver = True ; n_subsamp_qvr=3
             i2=5700; j2=3040; i1=i2-320 ; j1=j2-180 ; rfact_zoom=6 ; vcb=[0.6, 0.35, 0.38, 0.02] ; font_rat=0.4*rfact_zoom
-            #x_clock = 30 ; y_clock = 1040 ; x_logo = 1500 ; y_logo = 16
             x_clock = 1200 ; y_clock = 550
             l_show_exp = True ; x_exp = 1200 ; y_exp = 600
             l_add_logo_ige=False ; l_add_logo_prc=False

@@ -187,7 +187,7 @@ elif CWHAT == 'SST':
     if CBOX == 'Brittany': tmin=7. ;  tmax=13.
     if CBOX == 'GrlIcl':   tmax = 12.
     if CBOX in [ 'AzoresP','AzoresL','AzoresS']:  tmin = 15. ; tmax = 25. ; df=0.5
-    if CBOX in [ 'Bretagne']:  tmin = 10. ; tmax = 22. ; df=1.
+    if CBOX == 'Bretagne': tmin = 10. ; tmax = 22. ; df=1.
     
 elif CWHAT == 'T_1000':
     cv_in = 'votemper' ; cv_out = CWHAT ;
@@ -232,9 +232,9 @@ elif CWHAT == 'SSH':
     cb_jump = 1
     cunit = r'SSH [m]'
     if CBOX == 'Med' or CBOX == 'Med+BS': tmin=-0.7; tmax=0.2   ; df = 0.1
-    if CRUN[:4] == 'BLB0':                
-    if CBOX in [ 'Bretagne']:  tmin=-4; tmax=-tmin ; df = 0.5
-
+    if CRUN[:4] == 'BLB0':                tmin=-1.2; tmax=-tmin ; df = 0.2
+    if CBOX in [ 'Bretagne']:             tmin=-4.;  tmax=-tmin ; df = 0.5
+    
 elif CWHAT == 'GEOSSV':
     # Geostrophic velocity speed out of SSH
     cv_in = 'sossheig' ; cv_out = CWHAT ;
