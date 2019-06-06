@@ -177,7 +177,7 @@ elif CWHAT == 'CURLOF':
     #if CBOX ==     'ALLFR': tmin=-1. ;  tmax=-tmin ; df = 0.1 ; cb_jump = 2 ; cpal_fld='RdBu_r'; #; cpal_fld = 'bone'
     #if CBOX ==      'Med': tmin=-1. ;  tmax=-tmin ; df = 0.1 ; cb_jump = 2 ; cpal_fld='RdBu_r'
     if CBOX ==      'Med': tmin=-1. ;  tmax=-tmin ; df = 0.1 ; cb_jump = 2
-    if CBOX in ['AzoresP','MeddiesW','ALLFR']: tmin=-0.8 ;  tmax=-tmin ;  df = 0.1 ; cb_jump = 2
+    if CBOX in ['AzoresP','MeddiesW','ALLFR']: tmin=-0.8 ;  tmax=-tmin ;  df = 0.1 ; cb_jump = 1
     if CBOX == 'BlackSea': tmin=-0.6 ;  tmax=-tmin  ; df = 0.1 ; cb_jump = 1
     
 elif CWHAT == 'CURLOF_1000':
