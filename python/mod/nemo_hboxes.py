@@ -112,10 +112,10 @@ class nemo_hbox:
     
         elif box == 'Nordic':
             i1=2200; j2=4715; i2=i1+2560 ; j1=j2-1440 ; rfact_zoom=1. ; vcb=[0.25, 0.06, 0.5, 0.02] ; font_rat=2.*rfact_zoom
-            x_clock = 935 ; y_clock = 1100
-            l_show_exp = True ; x_exp = 935 ; y_exp = 1140
+            x_clock = 1010 ; y_clock = 1300
+            l_show_exp = True ; x_exp = 1010 ; y_exp = 1340
             l_add_logo_ige=False ; l_add_logo_prc=False
-            x_logo = 1000 ; y_logo  = 1250
+            x_logo = 50 ; y_logo  = 50
     
         elif box == 'Med+BS':
             i2=Ni0 ; i1=5400; j1=1530;  j2=3310 ; rfact_zoom=1080./float(j2-j1)   ; vcb=[0.025, 0.06, 0.4, 0.02] ; font_rat=3.*rfact_zoom

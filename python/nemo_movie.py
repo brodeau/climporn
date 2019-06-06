@@ -50,6 +50,7 @@ vml = [ 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ]
 fig_type='png'
 dpi = 110
 color_top = 'white'
+color_top_cb = 'white'
 #color_top = 'k'
 
 cv_out = 'unknown'
@@ -173,6 +174,7 @@ if   CWHAT == 'MLD':
     cv_in = 'somxl010' ; cv_out = 'MLD'
     tmin=0. ;  tmax=1800.  ;  df = 50. ; cpal_fld = 'ncview_hotres' ;     cb_jump = 4
     cunit = r'MLD [m]'
+    if CBOX == 'Nordic': tmin=0. ; tmax=1000. ; cb_jump = 2 ; cpal_fld = 'magma_r' ; color_top_cb='k'
 
 elif CWHAT == 'SST':
     cv_in = 'sosstsst' ; cv_out = CWHAT ; #in ['sosstsst','tos']:    
@@ -455,7 +457,7 @@ params = { 'font.family':'Helvetica Neue',
            'ytick.labelsize': int(9.*fontr),
            'axes.labelsize':  int(9.*fontr) }
 mpl.rcParams.update(params)
-cfont_clb  =  { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(7.*fontr), 'color':color_top}
+cfont_clb  =  { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(7.*fontr), 'color':color_top_cb}
 cfont_clock = { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(9.*fontr), 'color':color_top }
 cfont_exp= { 'fontname':'Open Sans'  , 'fontweight':'light', 'fontsize':int(9.*fontr), 'color':color_top }
 cfont_mail =  { 'fontname':'Times New Roman', 'fontweight':'normal', 'fontstyle':'italic', 'fontsize':int(14.*fontr), 'color':'0.8'}
@@ -684,10 +686,10 @@ for jt in range(jt0,Nt):
 
         clb.ax.set_xticklabels(cb_labs, **cfont_clb)
         clb.set_label(cunit, **cfont_clb)
-        clb.ax.yaxis.set_tick_params(color=color_top) ; # set colorbar tick color
-        clb.outline.set_edgecolor(color_top) ; # set colorbar edgecolor
-        clb.ax.tick_params(which = 'minor', length = 2, color = color_top )
-        clb.ax.tick_params(which = 'major', length = 4, color = color_top )
+        clb.ax.yaxis.set_tick_params(color=color_top_cb) ; # set colorbar tick color
+        clb.outline.set_edgecolor(color_top_cb) ; # set colorbar edgecolor
+        clb.ax.tick_params(which = 'minor', length = 2, color = color_top_cb )
+        clb.ax.tick_params(which = 'major', length = 4, color = color_top_cb )
 
 
     if nemo_box.l_show_clock:
