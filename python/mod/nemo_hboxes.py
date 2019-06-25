@@ -36,6 +36,7 @@ class nemo_hbox:
         rfact_zoom=1.
         
         l_show_exp = False
+        l_show_cb  = True
         l_fill_holes_k=False
         l_annotate_name=False
         l_show_clock = True
@@ -172,6 +173,11 @@ class nemo_hbox:
         elif box == 'EATL':
             i1=3100; j1=2160; i2=i1+1920; j2=j1+1200 ; rfact_zoom=1. ; vcb=[0.3, 0.06, 0.38, 0.018] ; font_rat = 2.
             x_clock = 1570 ; y_clock = 1150 ; x_logo = 1620 ; y_logo = 16
+        elif box == 'EATLcom':
+            i1=3100; j1=2160; i2=i1+1920; j2=j1+1200 ; rfact_zoom=1. ; vcb=[0.3, 0.06, 0.38, 0.018] ; font_rat = 2.
+            l_add_logo=False ; l_add_logo_ige=False ; l_add_logo_prc=False
+            l_show_exp = False ; l_fill_holes_k=True
+            l_show_cb=False ; l_show_clock=False
     
         elif box == 'EATL2':
             i1=2740; j1=1600; i2=i1+2560; j2=j1+1440 ; rfact_zoom=1. ; vcb=[0.3, 0.06, 0.38, 0.018] ; font_rat = 2.5
@@ -229,6 +235,7 @@ class nemo_hbox:
         self.l_show_exp      = l_show_exp
         self.exp             = (x_exp,y_exp)
         self.l_fill_holes_k  = l_fill_holes_k
+        self.l_show_cb       = l_show_cb
 
         self.l_add_quiver    = l_add_quiver
         self.n_subsamp_qvr   = n_subsamp_qvr

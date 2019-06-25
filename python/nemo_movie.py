@@ -62,7 +62,6 @@ jk=0
 l_get_name_of_run = False
 l_show_lsm = True
 l_do_ice  = False
-l_show_cb = True
 l_log_field = False
 l_pow_field = False
 
@@ -668,7 +667,7 @@ for jt in range(jt0,Nt):
         else:
             clsm = plt.imshow(nmp.ma.masked_where(XLSM>0.0001, XLSM), cmap = pal_lsm, norm = norm_lsm, interpolation='none')
 
-    if l_show_cb:
+    if nemo_box.l_show_cb:
         ax2 = plt.axes(nemo_box.vcb)
         clb = mpl.colorbar.ColorbarBase(ax2, ticks=vc_fld, cmap=pal_fld, norm=norm_fld, orientation='horizontal', extend=cb_extend)
         cb_labs = []
@@ -735,4 +734,4 @@ for jt in range(jt0,Nt):
 
     if l_show_lsm: del clsm
     del cf, fig, ax
-    if l_show_cb: del clb
+    if nemo_box.l_show_cb: del clb

@@ -58,7 +58,6 @@ i2=0
 j2=0
 l_get_name_of_run = False
 l_show_lsm = True
-l_show_cb = True
 l_log_field = False
 l_pow_field = False
 
@@ -179,7 +178,8 @@ elif CWHAT == 'CURLOF':
     if CBOX ==      'Med': tmin=-1. ;  tmax=-tmin ; df = 0.1 ; cb_jump = 2
     if CBOX in ['AzoresP','MeddiesW','ALLFR']: tmin=-0.8 ;  tmax=-tmin ;  df = 0.1 ; cb_jump = 1
     if CBOX == 'BlackSea': tmin=-0.6 ;  tmax=-tmin  ; df = 0.1 ; cb_jump = 1
-    
+    if CBOX ==  'EATLcom': tmin=-1. ;  tmax=-tmin ; df = 0.1 ; cb_jump = 2    
+
 elif CWHAT == 'CURLOF_1000':
     l_do_cof = True  ; # do curl/f
     cpal_fld = 'on2' ; tmin=-0.6 ;  tmax=-tmin ;  df = 0.1 ; cb_jump = 1
@@ -645,7 +645,7 @@ for jt in range(jt0,Nt):
         else:
             clsm = plt.imshow(nmp.ma.masked_where(XLSM>0.0001, XLSM), cmap = pal_lsm, norm = norm_lsm, interpolation='none')
 
-    if l_show_cb:
+    if nemo_box.l_show_cb:
         ax2 = plt.axes(nemo_box.vcb)
         clb = mpl.colorbar.ColorbarBase(ax2, ticks=vc_fld, cmap=pal_fld, norm=norm_fld, orientation='horizontal', extend=cb_extend)
         cb_labs = []
@@ -712,4 +712,4 @@ for jt in range(jt0,Nt):
 
     if l_show_lsm: del clsm
     del cf, fig, ax
-    if l_show_cb: del clb
+    if nemo_box.l_show_cb: del clb
