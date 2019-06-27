@@ -110,7 +110,7 @@ elif CNEMO == 'eNATL4':
     l_show_cb = False ; l_show_nm = False
 
 elif CNEMO == 'eNATL36':
-    i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 0.5 ; vcb = [0.6, 0.1, 0.39, 0.025] ; font_rat = 3.*rfact_zoom
+    i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 0.3 ; vcb = [0.6, 0.1, 0.39, 0.025] ; font_rat = 2.5*rfact_zoom
     x_cnf = 160. ; y_cnf = 4000. ; # where to put label of conf on Figure...
     l_show_cb = True ; l_show_nm = False
 
