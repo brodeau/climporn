@@ -104,11 +104,15 @@ elif CNEMO in [ 'CREG4' ] :
     l_scientific_mode = True ; l_show_ttl = True
     color_top = 'k'
 
-
 elif CNEMO == 'eNATL4':
     i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 0.25 ; vcb = [0.6, 0.11, 0.39, 0.025] ; font_rat = 0.5*rfact_zoom
     x_cnf = 20. ; y_cnf = 560. ; # where to put label of conf on Figure...
     l_show_cb = False ; l_show_nm = False
+
+elif CNEMO == 'eNATL36':
+    i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 0.5 ; vcb = [0.6, 0.1, 0.39, 0.025] ; font_rat = 3.*rfact_zoom
+    x_cnf = 160. ; y_cnf = 4000. ; # where to put label of conf on Figure...
+    l_show_cb = True ; l_show_nm = False
 
 elif CNEMO == 'eNATL60':
     i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 0.25 ; vcb = [0.6, 0.1, 0.39, 0.025] ; font_rat = 5.*rfact_zoom
@@ -221,7 +225,7 @@ elif cv_in == 'Bathymetry':
     bt.chck4f(cf_fld)
     print '\n *** Will build mask from "Bathymetry"...'
     id_fld = Dataset(cf_fld)
-    nb_dim = len(id_lsm.variables[cv_in].dimensions)
+    nb_dim = len(id_fld.variables[cv_in].dimensions)
     Ni = id_fld.dimensions['x'].size
     Nj = id_fld.dimensions['y'].size
     if i2 == 0: i2 = Ni
@@ -346,8 +350,9 @@ del XMSK
 print 'Ploting'
 cf = plt.imshow(XFLD[:,:], cmap = pal_fld, norm = norm_fld, interpolation='none')
 
-ccx = plt.contour(Xlon[:,:], 60, colors='k', linewidths=0.5)
-ccy = plt.contour(Xlat[:,:], 30, colors='k', linewidths=0.5)
+if l_show_msh:
+    ccx = plt.contour(Xlon[:,:], 60, colors='k', linewidths=0.5)
+    ccy = plt.contour(Xlat[:,:], 30, colors='k', linewidths=0.5)
 
 #vj = nmp.arange(0,Nj-20,20)
 #for jj in vj:
