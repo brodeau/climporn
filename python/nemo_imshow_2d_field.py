@@ -38,6 +38,7 @@ l_show_nm = True
 l_scientific_mode = False
 l_show_ttl = False
 
+l_show_msh = False
     
 
 
@@ -46,16 +47,31 @@ l_show_ttl = False
 
 
 
-
+l_read_lsm=False
 
 
 fig_type='png'
 
 narg = len(sys.argv)
-if narg < 6: print 'Usage: '+sys.argv[0]+' <CONF> <file> <variable> <snapshot> <LSM_file>'; sys.exit(0)
-CNEMO = sys.argv[1] ; cf_fld = sys.argv[2] ; cv_in=sys.argv[3] ; jt=int(sys.argv[4]) ; cf_lsm=sys.argv[5]
+if not narg in [5,6]:
+    print 'Usage: '+sys.argv[0]+' <CONF> <file> <variable> <snapshot> (<LSM_file>)'
+    sys.exit(0)
+CNEMO  = sys.argv[1]
+cf_fld = sys.argv[2]
+cv_in=sys.argv[3]
+jt=int(sys.argv[4])
+
+if narg ==6 :
+    l_read_lsm=True
+    cf_lsm=sys.argv[5]
 
 
+
+if not l_read_lsm and cv_in != 'Bathymetry':
+    print "It's only for variable 'Bathymetry' that you can skip providing the mesh_mask file!"
+    sys.exit(0)
+
+    
 i2=0
 j2=0
 
@@ -84,7 +100,7 @@ elif CNEMO in [ 'CREG4' ] :
     i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 2.
     vcb = [0.14, 0.05, 0.8, 0.02] ; font_rat = 0.5*rfact_zoom
     x_ttl = 210. ; y_ttl = 620. ; # where to put label of conf on Figure...
-    l_show_nm = False
+    l_show_nm = False ; l_show_msh = True
     l_scientific_mode = True ; l_show_ttl = True
     color_top = 'k'
 
@@ -183,24 +199,49 @@ else:
 id_fld.close()
 
 
+if l_read_lsm:
+    bt.chck4f(cf_lsm)
+    print '\n *** Reading "tmask" in meshmask file...'
+    id_lsm = Dataset(cf_lsm)
+    nb_dim = len(id_lsm.variables['tmask'].dimensions)
+    Ni = id_lsm.dimensions['x'].size
+    Nj = id_lsm.dimensions['y'].size
+    if i2 == 0: i2 = Ni
+    if j2 == 0: j2 = Nj
+    if nb_dim == 4: XMSK  = id_lsm.variables['tmask'][0,0,j1:j2,i1:i2] ; # t, y, x
+    if nb_dim == 3: XMSK  = id_lsm.variables['tmask'][0,  j1:j2,i1:i2] ; # t, y, x
+    if nb_dim == 2: XMSK  = id_lsm.variables['tmask'][    j1:j2,i1:i2] ; # t, y, x
+    if l_show_msh:
+        Xlon = id_lsm.variables['glamu'][0,j1:j2,i1:i2]
+        Xlat = id_lsm.variables['gphiv'][0,j1:j2,i1:i2]
+    id_lsm.close()
+    print '      done.'
 
+elif cv_in == 'Bathymetry':
+    bt.chck4f(cf_fld)
+    print '\n *** Will build mask from "Bathymetry"...'
+    id_fld = Dataset(cf_fld)
+    nb_dim = len(id_lsm.variables[cv_in].dimensions)
+    Ni = id_fld.dimensions['x'].size
+    Nj = id_fld.dimensions['y'].size
+    if i2 == 0: i2 = Ni
+    if j2 == 0: j2 = Nj
+    if nb_dim == 3: XBATH = id_fld.variables[cv_in][0,  j1:j2,i1:i2] ; # t, y, x
+    if nb_dim == 2: XBATH = id_fld.variables[cv_in][    j1:j2,i1:i2] ; # t, y, x
+    if l_show_msh:
+        Xlon = id_fld.variables['nav_lon'][j1:j2,i1:i2]
+        Xlat = id_fld.variables['nav_lat'][j1:j2,i1:i2]
+    id_fld.close()
+    XMSK = nmp.zeros((Nj,Ni))
+    idx_oce = nmp.where(XBATH>0.2)
+    XMSK[idx_oce] = 1.
+    del XBATH
+    print '      done.'
 
-
-
-bt.chck4f(cf_lsm)
-print '\n *** Reading "tmask" in meshmask file...'
-id_lsm = Dataset(cf_lsm)
-nb_dim = len(id_lsm.variables['tmask'].dimensions)
-Ni = id_lsm.dimensions['x'].size
-Nj = id_lsm.dimensions['y'].size
-if i2 == 0: i2 = Ni
-if j2 == 0: j2 = Nj
-if nb_dim == 4: XMSK  = id_lsm.variables['tmask'][0,0,j1:j2,i1:i2] ; # t, y, x
-if nb_dim == 3: XMSK  = id_lsm.variables['tmask'][0,  j1:j2,i1:i2] ; # t, y, x
-if nb_dim == 2: XMSK  = id_lsm.variables['tmask'][    j1:j2,i1:i2] ; # t, y, x
-id_lsm.close()
-print '      done.'
-
+    
+else:
+    print 'PROBLEM #1'; sys.exit(0)
+    
 
 print '\n According to "tmask" the shape of the domain is Ni, Nj =', Ni, Nj
 
@@ -304,6 +345,19 @@ del XMSK
 
 print 'Ploting'
 cf = plt.imshow(XFLD[:,:], cmap = pal_fld, norm = norm_fld, interpolation='none')
+
+ccx = plt.contour(Xlon[:,:], 60, colors='k', linewidths=0.5)
+ccy = plt.contour(Xlat[:,:], 30, colors='k', linewidths=0.5)
+
+#vj = nmp.arange(0,Nj-20,20)
+#for jj in vj:
+#    ccx = plt.plot(nmp.arange(len(Xlat[jj,:])), 5.*Xlat[jj,:], 'k', linewidth=0.5)
+
+#vi = nmp.arange(0,Ni-20,20)
+#for ii in vi:
+#    ccx = plt.plot(nmp.arange(len(Xlon[:,ii])), 5.*Xlon[:,ii], 'k', linewidth=0.5)
+
+
 del XFLD
 print 'Done!'
 
