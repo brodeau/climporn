@@ -435,7 +435,7 @@ print ' *** cn_sat_short =', cn_sat_short
 
 ii = bp.plot("pow_spectrum_ssh")(vk[idx], vps_mod, clab1=clabel_mod, clr1=clr_mod, lw1=5, \
                                  cfig_name=cfigure, cinfo=cinfrm, logo_on=False, \
-                                 L_min=10., L_max=1200., P_min_y=-8, P_max_y=1, \
+                                 L_min=10., L_max=1200., P_min_y=-6, P_max_y=1, \
                                  l_show_k4=False, l_show_k5=True, l_show_k11o3=False, l_show_k2=True, \
                                  vk2=vk[idx], vps2=vps_sat, clab2=clabel_sat, clr2=clr_sat, lw2=4)
 
