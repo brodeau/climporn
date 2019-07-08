@@ -31,6 +31,7 @@ l_add_AJ_h = False
 
 l_tapper      = True
 l_detrend_lin = True ; # apply a linear detrending on data segment before computing spectrum...
+#l_rm_inst_noise = True
 l_rm_inst_noise = False
 
 # Plots for each segment (only to debug!)
@@ -369,7 +370,7 @@ for js in vtreat:
 
 
     if l_plot_trck:
-        cfigure = dir_figs+'/'+cn_box+'_'+cseas+'_'+cn_model+'--'+cn_sat_short+'_seg'+cseg+'_track.'+fig_ext
+        cfigure = dir_figs+'/'+cn_box+'_'+cseas+'_'+cn_model+'--'+cn_sat_short+'_seg'+cseg+'_track'+cxtr_noise+'.'+fig_ext
         ii=Nsp/300
         ib=max(ii-ii%10,1)
         xticks_d=30.*ib
@@ -419,16 +420,17 @@ vps_sat = nmp.mean(x_all_spectra_s[:,:],axis=0)
 #cinfrm = cn_box+', '+cseas+' '+cyear+'\n  '+str(nb_v_seg)+' tracks\n  '+str(Nsp)+' points\n  '+r'$\Delta$L: '+str(round(rdist_sample,1))+' km'
 cinfrm = cseas+' '+cyear+'\n'+str(nb_v_seg)+' tracks\n'+str(Nsp)+' points\n'+r'$\Delta$L: '+str(round(rdist_sample,1))+' km'
 
-# Sample spacing rdist_sample
-cpout   = dir_figs+'/'+cn_box+'_MEAN_'+cn_model+'--'+cn_sat_short+'__'+cseas+cextra+'___pow-spectrum'
-cfigure = cpout+'.'+fig_ext
-
 
 # remove white noise at fine scale for satellite (instrument) [advice from Clement Ubelmann]
+cxtr_noise=''
 if l_rm_inst_noise:    
     rwn = nmp.mean(vps_sat[Nsp-15:Nsp])
     vps_sat = vps_sat - rwn
+    cxtr_noise='_denoised'
 
+# Sample spacing rdist_sample
+cpout   = dir_figs+'/'+cn_box+'_MEAN_'+cn_model+'--'+cn_sat_short+'__'+cseas+cextra+'___pow-spectrum'+cxtr_noise
+cfigure = cpout+'.'+fig_ext
 
 
 print ' *** cn_sat_short =', cn_sat_short    
@@ -441,4 +443,4 @@ ii = bp.plot("pow_spectrum_ssh")(vk[idx], vps_mod, clab1=clabel_mod, clr1=clr_mo
 
 
 nmp.savez( cpout+'_mod.npz', vk[idx], vps_mod )
-nmp.savez( cpout+'_sat.npz', vk[idx], vps_sat )
+nmp.savez( cpout+'_sat'+cxtr_noise+'.npz', vk[idx], vps_sat )
