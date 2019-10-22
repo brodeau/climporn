@@ -217,6 +217,11 @@ class nemo_hbox:
             i1=5750; j1=1880; i2=6470; j2=2600 ; rfact_zoom=1. ; vcb=[0.59, 0.1, 0.38, 0.018] ; font_rat = 2.
             x_clock = 1420 ; y_clock = 1030 ; x_logo = 1500 ; y_logo = 16
     
+        elif box == 'GulfMex':
+            i1=0; j1=600; i2=1920; j2=j1+1080 ; rfact_zoom=1. ; vcb=[0.05, 0.94, 0.38, 0.018] ; font_rat = 2.
+            x_clock = 50 ; y_clock = 40
+            cf_logo_on  = 'ocean-next_trans_white_210x142.png' ; x_logo = 1680 ; y_logo = 930 ; l_add_logo_ige=False ; l_add_logo_prc=False
+    
         else:
             print ' ERROR: unknow box "'+box+'" for config "'+config+'" !!!'
             exit(0)
