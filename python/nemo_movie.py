@@ -195,6 +195,12 @@ elif CWHAT == 'T_1000':
     tmin=0. ;  tmax=14.   ;  df = 1. ; cpal_fld = 'ncview_nrl' ; cb_jump = 1
     cunit = r'Potential temperature at 1000 m'
 
+elif CWHAT == 'T_60':
+    cv_in = 'votemper' ; cv_out = CWHAT ;
+    tmin=0. ;  tmax=14.   ;  df = 1. ; cpal_fld = 'ncview_nrl' ; cb_jump = 1
+    cunit = r'Potential temperature at 60 m'
+    if CBOX == 'BlackSea' : tmin=5. ; tmax=14. ;  df = 1.   ; cb_jump = 1 ; #cpal_fld = 'gist_stern_r'
+
 elif CWHAT == 'SSS':
     cv_in = 'sosaline' ; cv_out = CWHAT ; #in ['sosstsst','tos']:    
     tmin=20. ;  tmax=40.   ;  df = 2. ; cpal_fld = 'ncview_ssec' ; cb_jump = 2
