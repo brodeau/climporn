@@ -23,15 +23,10 @@ import barakuda_tool as bt
 reload(sys)
 sys.setdefaultencoding('utf8')
 
-
 cmodel = "eNATL60"
 
-l_add_AJ_d = False
-l_add_AJ_h = False
-
-l_tapper      = True
-l_detrend_lin = True ; # apply a linear detrending on data segment before computing spectrum...
-#l_rm_inst_noise = True
+l_tapper      = True ; # apply tappering !
+L_detrend_lin = True ; # apply a linear detrending on data segment before computing spectrum...
 l_rm_inst_noise = False
 
 # Plots for each segment (only to debug!)
@@ -39,8 +34,6 @@ l_plot_rawd = False
 l_plot_maps = False
 l_plot_trck = False ; # plots individual model and satellite tracks...
 l_plot_spct = False
-
-r2Pi = 2.*nmp.pi
 
 #dir_figs='/home/laurent/tmp/figs'
 #dir_figs='../tmp'
@@ -60,24 +53,19 @@ rcut_by_dist = 7.8 # same for distance (in km) between two consecutive points!
 
 nvalid_seg = 120  # specify the minimum number of values a segment should contain to be considered and used!
 
-dir_npz = './npz_AJ'
 
 r_max_amp_ssh = 1.5 # in meters
 
 clr_red = '#AD0000'
-#clr_sat = '#091459'
-#clr_mod = '#ED7C4C'
 
-# Before:
-#clr_mod = '#2C558A'
-#if cn_sat_short=='SARAL':     clr_sat = '#ED7C4C' # (orange)
-#if cn_sat_short=='Sentinel3': clr_sat = '#3DE079' # (green)
-# ON:
+# Color OceanNext style:
 clr_sat = '#ffed00'
 clr_mod = '#008ab8'
 
 rDPI=100.
 
+
+r2Pi = 2.*nmp.pi
 
 
 jt1=0 ; jt2=0
@@ -116,44 +104,7 @@ if ('JFM' in cfs) and not('JAS' in cfs) : cseas = 'JFM'; vseas = ['01','02','03'
 if ('JAS' in cfs) and not('JFM' in cfs) : cseas = 'JAS'; vseas = ['07','08','09']
 print ' *** Season: '+cseas+'\n'
 
-
-
-
 cextra = ''
-if l_add_AJ_d:
-    # reading AJ file for current box (Spectrum from DAILY SSH!):
-    cbox = str(int(cn_box[4:6]))
-    print ' Reading AJ spectra for cbox = ', cbox
-    jc=0
-    for cm in vseas:
-        cf_AJ = dir_npz+'/WaveSpec_Box_'+cbox+'_ssh_2013_'+cm+'.npz'
-        print ' *** loading file '+cf_AJ
-        data = nmp.load(cf_AJ)
-        vkspec = data['kspec']
-        vpspec = data['pspec']
-        if jc==0:
-            vkspec_3 = nmp.zeros((3,len(vkspec)))
-            vpspec_3 = nmp.zeros((3,len(vkspec)))
-        vkspec_3[jc,:] = vkspec[:]*1000. #*600. # he uses [m], I use [km]
-        vpspec_3[jc,:] = vpspec[:]/1000. #/100.  #lolo: why sqrt ????
-        jc=jc+1
-    vk_AJ = nmp.mean(vkspec_3,axis=0) ; # Seasonal mean
-    vp_AJ = nmp.mean(vpspec_3,axis=0) ; #      "
-    cextra = '__AJ_d'
-
-
-
-
-if l_add_AJ_h:
-    # reading AJ file for current box (Spectrum from HOURLY SSH!):
-    print ' Reading AJ spectra for cbox = ', cn_box
-    cf_AJ = dir_npz+'/'+cseas+'_SSH_Spectra_hourly_dataset_'+cn_box+'.npz'
-    print ' *** loading file '+cf_AJ
-    data = nmp.load(cf_AJ)
-    vk_AJ = data['kspec']*1000.
-    vp_AJ = data['pspec']/1000.
-    cextra = '__AJ_h'
-    
 
 id_in    = Dataset(cf_in)
 vt_epoch = id_in.variables['time'][:]
