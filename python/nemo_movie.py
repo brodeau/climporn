@@ -1,12 +1,12 @@
 #!/usr/bin/env python
-
+#
 #     CLIMPORN
 #
 #  Prepare 2D maps (monthly) that will later become a movie!
 #  NEMO output and observations needed
 #
 #    L. Brodeau, January 2019
-
+#
 import sys
 from os import path, getcwd, mkdir
 from string import replace
@@ -366,9 +366,6 @@ Nt = 1
 if not l_notime: Nt = len(vtime)
 
 
-
-
-bt.chck4f(cf_mm)
 id_lsm = Dataset(cf_mm)
 nb_dim = len(id_lsm.variables[cv_msk].dimensions)
 print ' The mesh_mask has '+str(nb_dim)+' dimmensions!'
