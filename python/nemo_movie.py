@@ -22,16 +22,14 @@ import matplotlib.colors as colors
 import matplotlib.image as image
 import matplotlib.cbook as cbook
 
-import warnings
-warnings.filterwarnings("ignore")
-
 from calendar import isleap
 import datetime
 
 from re import split
+import warnings
+warnings.filterwarnings("ignore")
 
 import barakuda_colmap as bcm
-
 import barakuda_tool as bt
 import barakuda_ncio as bnc
 
@@ -48,7 +46,7 @@ vmn = [ 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ]
 vml = [ 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ]
 
 fig_type='png'
-dpi = 110
+rDPI = 110
 color_top = 'white'
 color_top_cb = 'white'
 #color_top = 'k'
@@ -302,26 +300,21 @@ rnxr = rfz*nx_res ; # widt image (in pixels)
 rnyr = rfz*ny_res ; # height image (in pixels)
 
 # Target resolution for figure:
-rh_fig = round(rnyr/float(dpi),3) ; # width of figure
+rh_fig = round(rnyr/float(rDPI),3) ; # width of figure
 rw_fig = round(rh_fig*yx_ratio      ,3) ; # height of figure
-rh_img = rh_fig*float(dpi)
-rw_img = rw_fig*float(dpi)
+rh_img = rh_fig*float(rDPI)
+rw_img = rw_fig*float(rDPI)
 while rw_img < round(rnxr,0):
-    rw_fig = rw_fig + 0.01/float(dpi)
-    rw_img = rw_fig*float(dpi)
+    rw_fig = rw_fig + 0.01/float(rDPI)
+    rw_img = rw_fig*float(rDPI)
 while rh_img < round(rnyr,0):
-    rh_fig = rh_fig + 0.01/float(dpi)
-    rh_img = rh_fig*float(dpi)
+    rh_fig = rh_fig + 0.01/float(rDPI)
+    rh_img = rh_fig*float(rDPI)
     print ' *** size figure =>', rw_fig, rh_fig, '\n'
     print ' *** Forecasted dimension of image =>', rw_img, rh_img
 
 print '\n================================================================\n\n\n'
 
-
-
-cyr0=csd0[0:4]
-cmn0=csd0[4:6]
-cdd0=csd0[6:8]
 
 
 l_3d_field = False
@@ -486,16 +479,19 @@ if l_show_lsm or l_add_topo_land:
         pal_lsm = bcm.chose_colmap('land_dark')
         norm_lsm = colors.Normalize(vmin = 0., vmax = 1., clip = False)
 
+cyr0=csd0[0:4]
+cmn0=csd0[4:6]
+cdd0=csd0[6:8]
 
-if cdt == '3h':
+if cdt == '6h':
+    dt = 6
+elif cdt == '3h':
     dt = 3
 elif cdt == '1h':
     dt = 1
 else:
     print 'ERROR: unknown dt!'
 
-
-    
 ntpd = 24/dt
 
 vm = vmn
@@ -731,7 +727,7 @@ for jt in range(jt0,Nt):
         fig.figimage(im, x_logo-77, y_logo-140., zorder=9)
         del datafile, im
 
-    plt.savefig(cfig, dpi=dpi, orientation='portrait', facecolor='k')
+    plt.savefig(cfig, dpi=rDPI, orientation='portrait', facecolor='k')
     print cfig+' created!\n'
     plt.close(1)
 
