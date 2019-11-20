@@ -112,7 +112,7 @@ print('Done!\n')
 #vsporg = [0.03, 0.1, 1., 0.8]
 
 # For movie
-vfig_size = [ 11.32, 10.8 ]
+vfig_size = [ 7.54, 7.2 ]
 #vsporg = [0.001, 0.0011, 0.997, 0.999]
 vsporg = [0., 0., 1., 1.]
 
