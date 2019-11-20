@@ -286,12 +286,16 @@ for jt in range(jt0,Nt):
 
     idx_oce = nmp.where(XIFR  < rmin_ice)
     idx_ice = nmp.where(XIFR >= rmin_ice)
-    XSST[idx_ice] = nmp.nan
-    XIFR[idx_oce] = nmp.nan
 
+    #XSST[idx_ice] = nmp.nan
+    #XIFR[idx_oce] = nmp.nan
+    XSST = nmp.ma.masked_where(XIFR >= rmin_ice, XSST)
+    XIFR = nmp.ma.masked_where(XIFR  < rmin_ice, XIFR)
+    
+    
     ft = carte.pcolormesh(x0, y0, XSST, cmap = pal_sst, norm = nrm_sst )
     fi = carte.pcolormesh(x0, y0, XIFR, cmap = pal_ice, norm = nrm_ice )
-    #fi = carte.contour(x0, y0, XIFR, [ rmax_ice ], colors='k', linewidths=0.5 )
+    ##fi = carte.contour(x0, y0, XIFR, [ rmax_ice ], colors='k', linewidths=0.5 )
 
     carte.drawcoastlines(linewidth=0.5)
     carte.fillcontinents(color='grey')
