@@ -52,7 +52,7 @@ cpal_sst = 'on3'
 
 
 # Ice:
-rmin_ice=0.1
+rmin_ice=0.2
 rmax_ice=0.98
 #cpal_ice = 'ncview_bw'
 #cpal_ice = 'Blues_r'
