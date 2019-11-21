@@ -41,6 +41,8 @@ ldrown = True
 vmn = [ 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ]
 vml = [ 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ]
 
+
+on_logo="/home/laurent/Nextcloud/Graphic_Identity/0LOGO/Python/ocean-next_trans_white_120x82.png"
 fig_type='png'
 rDPI = 100
 color_top = 'white'
@@ -55,10 +57,10 @@ jt0 = 0
 # SST
 rmin_sst=-2.
 rmax_sst=14.
-dsst = 1. ; cb_jump = 1
+dsst = 1. ; cb_jump = 2
 #cpal_sst = 'ncview_nrl'
 cpal_sst = 'on3'
-cunit = r'$^{\circ}$C'
+cunit = r'[$^{\circ}$C]'
 
 cdt = '6h'
 l_get_name_of_run = True
@@ -184,8 +186,8 @@ params = { 'font.family':'Helvetica Neue',
            'ytick.labelsize': int(9.*fontr),
            'axes.labelsize':  int(9.*fontr) }
 mpl.rcParams.update(params)
-cfont_clb  =  { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(8.*fontr), 'color':color_top_cb}
-cfont_clock = { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(9.*fontr), 'color':color_top }
+cfont_clb  =  { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(9.*fontr), 'color':color_top_cb}
+cfont_clock = { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(9.5*fontr), 'color':color_top }
 #cfont_exp= { 'fontname':'Open Sans'  , 'fontweight':'light', 'fontsize':int(9.*fontr), 'color':color_top }
 #cfont_mail  =  { 'fontname':'Times New Roman', 'fontweight':'normal', 'fontstyle':'italic', 'fontsize':int(14.*fontr), 'color':'0.8'}
 cfont_titl1 = { 'fontname':'Open Sans', 'fontweight':'light', 'fontsize':int(18.*fontr), 'color':color_top }
@@ -302,10 +304,10 @@ for jt in range(jt0,Nt):
     #carte.drawlsmask(land_color='coral',ocean_color='aqua',lakes=True)
     #carte.drawmapboundary()
 
-    carte.drawmeridians(nmp.arange(-180,180,20), labels=[0,0,0,1])
-    carte.drawparallels(nmp.arange( -90, 90,10), labels=[1,0,0,0])
+    carte.drawmeridians(nmp.arange(-180,180,20), labels=[0,0,0,1], linewidth=0.3)
+    carte.drawparallels(nmp.arange( -90, 90,10), labels=[1,0,0,0], linewidth=0.3)
 
-    ax2 = plt.axes([0.64, 0.965, 0.35, 0.018])
+    ax2 = plt.axes([0.64, 0.965, 0.344, 0.018])
     clb = mpl.colorbar.ColorbarBase(ax2, ticks=vc_sst, cmap=pal_sst, norm=nrm_sst, orientation='horizontal', extend='both')
     cb_labs = []
     #if cb_jump > 1:                                                                                                                                  
@@ -326,10 +328,20 @@ for jt in range(jt0,Nt):
 
 
     
-    ax.annotate('Date: '+cday+' '+chour+':00', xy=(0.785, 0.015), xycoords='figure fraction', **cfont_clock)
-    ax.annotate('OPA - neXtSIM', xy=(0.02, 0.81 ), xycoords='figure fraction', **cfont_titl1)
-    ax.annotate(' (CREG025) '  , xy=(0.07, 0.76 ), xycoords='figure fraction', **cfont_titl2)
+    #ax.annotate('Date: '+cday+' '+chour+':00', xy=(0.785, 0.015), xycoords='figure fraction', **cfont_clock)
+    ax.annotate('Date: '+cday+' '+chour+':00', xy=(0.76, 0.88), xycoords='figure fraction', **cfont_clock)
+    
+    ry0 = 0.78
+    #ry0 = 0.9
+    ax.annotate('OPA - neXtSIM', xy=(0.02, ry0+0.05), xycoords='figure fraction', **cfont_titl1)
+    ax.annotate(' (CREG025) '  , xy=(0.07,  ry0 ), xycoords='figure fraction',    **cfont_titl2)
 
+    #
+    datafile = cbook.get_sample_data(on_logo, asfileobj=False)
+    im = image.imread(datafile)
+    fig.figimage(im, 627, 8, zorder=9)
+    del datafile, im
+    
     print(' Saving figure: '+cfig)
     plt.savefig(cfig, dpi=rDPI, orientation='portrait', transparent=False)
     plt.close(1)
