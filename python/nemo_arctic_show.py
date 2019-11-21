@@ -42,7 +42,9 @@ vmn = [ 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ]
 vml = [ 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ]
 
 
-on_logo="/home/laurent/Nextcloud/Graphic_Identity/0LOGO/Python/ocean-next_trans_white_120x82.png"
+#on_logo="/home/laurent/Nextcloud/Graphic_Identity/0LOGO/Python/ocean-next_trans_white_120x82.png"
+on_logo="/home/brodeau/util/logos/ocean-next_trans_white_120x82.png"
+
 fig_type='png'
 rDPI = 100
 color_top = 'white'
