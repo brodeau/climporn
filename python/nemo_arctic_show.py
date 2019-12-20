@@ -41,9 +41,9 @@ ldrown = True
 vmn = [ 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ]
 vml = [ 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ]
 
+l_show_ice_colbar = True
 
 l_show_logo = False
-#on_logo="/home/laurent/Nextcloud/Graphic_Identity/0LOGO/Python/ocean-next_trans_white_120x82.png"
 on_logo="/home/brodeau/util/logos/ocean-next_trans_white_120x82.png"
 
 fig_type='png'
@@ -59,21 +59,23 @@ jt0 = 0
 
 # SST
 rmin_sst=-2.
-rmax_sst=14.
+rmax_sst=16.
 dsst = 1. ; cb_jump = 2
 #cpal_sst = 'ncview_nrl'
 cpal_sst = 'on3'
-cunit = r'[$^{\circ}$C]'
+cunit = r'SST [$^{\circ}$C]'
 
 cdt = '6h'
 l_get_name_of_run = True
 
 # Ice:
-rmin_ice=0.2
-rmax_ice=0.98
+#rmin_ice=0.2
+rmin_ice=0.
+rmax_ice=1.
 #cpal_ice = 'ncview_bw'
 #cpal_ice = 'Blues_r'
-cpal_ice = 'bone'
+#cpal_ice = 'bone'
+cpal_ice = 'ice_on'
 
 vp =  ['nanuk', 'stere', -60., 40., 122., 57.,     75.,  -12., 10., 'h' ]  # North Pole
 
@@ -199,6 +201,9 @@ cfont_titl2 = { 'fontname':'Open Sans', 'fontweight':'light', 'fontsize':int(14.
 
 # for colorbar:
 vc_sst = nmp.arange(rmin_sst, rmax_sst + dsst, dsst)
+if l_show_ice_colbar: vc_ice = nmp.arange(rmin_ice, rmax_ice+0.1, 0.1)
+
+
 
 
 
@@ -209,7 +214,7 @@ vc_sst = nmp.arange(rmin_sst, rmax_sst + dsst, dsst)
 # For movie
 vfig_size = [ 7.54, 7.2 ]
 #vsporg = [0.001, 0.0011, 0.997, 0.999]
-vsporg = [0., 0., 1., 1.]
+vsporg = [0., 0.0001, 1., 1.001]
 
 
 vcbar = [0.05, 0.065, 0.92, 0.03]
@@ -227,6 +232,15 @@ elif cdt == '1h':
 else:
     print 'ERROR: unknown dt!'
 
+
+
+pal_sst = bcm.chose_colmap(cpal_sst)
+nrm_sst = colors.Normalize(vmin=rmin_sst, vmax=rmax_sst, clip=False)
+
+pal_ice = bcm.chose_colmap(cpal_ice, exp_ctrl=1.5)
+nrm_ice = colors.Normalize(vmin=rmin_ice, vmax=rmax_ice, clip = False)
+
+    
 ntpd = 24/dt
 
 vm = vmn
@@ -270,12 +284,6 @@ for jt in range(jt0,Nt):
     fig = plt.figure(num = 1, figsize=(vfig_size), dpi=None, facecolor='k', edgecolor='k')
     ax  = plt.axes(vsporg, facecolor = 'k')
 
-    pal_sst = bcm.chose_colmap(cpal_sst)
-    nrm_sst = colors.Normalize(vmin=rmin_sst, vmax=rmax_sst, clip=False)
-
-    pal_ice = bcm.chose_colmap(cpal_ice)
-    nrm_ice = colors.Normalize(vmin=rmin_ice, vmax=rmax_ice, clip = False)
-
     carte = Basemap(llcrnrlon=vp[2], llcrnrlat=vp[3], urcrnrlon=vp[4], urcrnrlat=vp[5], \
                     resolution=vp[9], area_thresh=1000., projection='stere', \
                     lat_0=vp[6], lon_0=vp[7])
@@ -289,13 +297,15 @@ for jt in range(jt0,Nt):
         bt.drown(XIFR, XMSK, k_ew=-1, nb_max_inc=10, nb_smooth=10)
         bt.drown(XSST, XMSK, k_ew=-1, nb_max_inc=10, nb_smooth=10)
 
-    idx_oce = nmp.where(XIFR  < rmin_ice)
-    idx_ice = nmp.where(XIFR >= rmin_ice)
-
+    #idx_oce = nmp.where(XIFR  < rmin_ice)
+    #idx_ice = nmp.where(XIFR >= rmin_ice)
     #XSST[idx_ice] = nmp.nan
     #XIFR[idx_oce] = nmp.nan
-    XSST = nmp.ma.masked_where(XIFR >= rmin_ice, XSST)
-    XIFR = nmp.ma.masked_where(XIFR  < rmin_ice, XIFR)
+    
+    #XSST = nmp.ma.masked_where(XIFR >= rmin_ice, XSST)
+    #XIFR = nmp.ma.masked_where(XIFR  < rmin_ice, XIFR)
+    XSST = nmp.ma.masked_where(XIFR >= 0.2, XSST)
+    XIFR = nmp.ma.masked_where(XIFR  < 0.2, XIFR)
     
     
     ft = carte.pcolormesh(x0, y0, XSST, cmap = pal_sst, norm = nrm_sst )
@@ -310,10 +320,10 @@ for jt in range(jt0,Nt):
     carte.drawmeridians(nmp.arange(-180,180,20), labels=[0,0,0,1], linewidth=0.3)
     carte.drawparallels(nmp.arange( -90, 90,10), labels=[1,0,0,0], linewidth=0.3)
 
+    # ----------- Color bar for SST -----------
     ax2 = plt.axes([0.64, 0.965, 0.344, 0.018])
     clb = mpl.colorbar.ColorbarBase(ax2, ticks=vc_sst, cmap=pal_sst, norm=nrm_sst, orientation='horizontal', extend='both')
     cb_labs = []
-    #if cb_jump > 1:                                                                                                                                  
     cpt = 0
     for rr in vc_sst:
         if cpt % cb_jump == 0:
@@ -328,6 +338,21 @@ for jt in range(jt0,Nt):
     clb.outline.set_edgecolor(color_top_cb) ; # set colorbar edgecolor                                                                                
     clb.ax.tick_params(which = 'minor', length = 2, color = color_top_cb )
     clb.ax.tick_params(which = 'major', length = 4, color = color_top_cb )
+
+
+    # ----------- Color bar for ICE fraction -----------
+    if l_show_ice_colbar:
+        ax3 = plt.axes([0.02, 0.965, 0.344, 0.018])
+        clb = mpl.colorbar.ColorbarBase(ax3, ticks=vc_ice, cmap=pal_ice, norm=nrm_ice, orientation='horizontal') #, extend='min')
+        cb_labs = clb.ax.get_xticklabels()
+        clb.ax.set_xticklabels(cb_labs, **cfont_clb)
+        clb.set_label('Ice fraction', **cfont_clb)
+        clb.ax.yaxis.set_tick_params(color=color_top_cb) ; # set colorbar tick color                                                                      
+        clb.outline.set_edgecolor(color_top_cb) ; # set colorbar edgecolor                                                                                
+        #clb.ax.tick_params(which = 'minor', length = 2, color = color_top_cb )
+        clb.ax.tick_params(which = 'major', length = 4, color = color_top_cb )
+
+
 
 
     
