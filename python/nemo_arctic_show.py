@@ -42,6 +42,7 @@ vmn = [ 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ]
 vml = [ 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ]
 
 
+l_show_logo = False
 #on_logo="/home/laurent/Nextcloud/Graphic_Identity/0LOGO/Python/ocean-next_trans_white_120x82.png"
 on_logo="/home/brodeau/util/logos/ocean-next_trans_white_120x82.png"
 
@@ -339,10 +340,11 @@ for jt in range(jt0,Nt):
     ax.annotate(' (CREG025) '  , xy=(0.07,  ry0 ), xycoords='figure fraction',    **cfont_titl2)
 
     #
-    datafile = cbook.get_sample_data(on_logo, asfileobj=False)
-    im = image.imread(datafile)
-    fig.figimage(im, 627, 8, zorder=9)
-    del datafile, im
+    if l_show_logo:
+        datafile = cbook.get_sample_data(on_logo, asfileobj=False)
+        im = image.imread(datafile)
+        fig.figimage(im, 627, 8, zorder=9)
+        del datafile, im
     
     print(' Saving figure: '+cfig)
     plt.savefig(cfig, dpi=rDPI, orientation='portrait', transparent=False)
