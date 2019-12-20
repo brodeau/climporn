@@ -36,7 +36,8 @@ import barakuda_colmap as bcm
 import barakuda_tool as bt
 import barakuda_ncio as bnc
 
-ldrown = True
+ldrown = False
+l_add_topo_land = True
 
 vmn = [ 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ]
 vml = [ 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ]
@@ -50,6 +51,10 @@ fig_type='png'
 rDPI = 100
 color_top = 'white'
 color_top_cb = 'white'
+if l_add_topo_land:
+    color_top = 'k'
+    color_top_cb = 'k'
+
 #color_top = 'k'
 
 cv_out = 'sst_+_ice'
@@ -77,6 +82,12 @@ rmax_ice=1.
 #cpal_ice = 'bone'
 cpal_ice = 'ice_on'
 
+# Continents:
+rof_log = 150.
+rof_dpt = 0.
+
+
+
 vp =  ['nanuk', 'stere', -60., 40., 122., 57.,     75.,  -12., 10., 'h' ]  # North Pole
 
 
@@ -103,6 +114,7 @@ cf_in = args.fin
 cf_mm = args.fmm
 csd0  = args.sd0
 jk    = args.lev
+#cf_topo_land = args.zld
 
 print ''
 print ' *** CNEMO = ', CNEMO
@@ -112,12 +124,16 @@ print ' *** cf_in = ', cf_in
 print ' *** cf_mm = ', cf_mm
 print ' *** csd0 = ', csd0
 print ' ***   jk  = ', jk
+#l_add_topo_land = False
+#if args.zld != None:
+#    print ' *** cf_topo_land = ', cf_topo_land
+#    l_add_topo_land = True
 l3d = False
 if jk > 0:
     l3d=True
 else:
     jk=0
-    ###############################################################################################################################################
+###############################################################################################################################################
 
 if not path.exists("figs"): mkdir("figs")
 cdir_figs = './figs'
@@ -180,6 +196,20 @@ id_lsm.close()
 
 print('Done!\n')
 
+#if l_add_topo_land:
+#    bt.chck4f(cf_topo_land)
+#    id_top = Dataset(cf_topo_land)
+#    print ' *** Reading "z" into:\n'+cf_topo_land
+#    xtopo = id_top.variables['z'][0,j1:j2,i1:i2]
+#    id_top.close()
+#    if nmp.shape(xtopo) != (nj,ni):
+#        print 'ERROR: topo and mask do not agree in shape!'; sys.exit(0)
+#    xtopo = xtopo*(1. - XMSK)
+#    #bnc.dump_2d_field('topo_'+CBOX+'.nc', xtopo, name='z')    
+#    if l3d: xtopo = xtopo + rof_dpt
+#    xtopo[nmp.where( XMSK > 0.01)] = nmp.nan
+#    if not l3d:
+#        xtopo[nmp.where( xtopo < 0.0)] = nmp.nan
 
 
 fontr=1.2
@@ -239,6 +269,16 @@ nrm_sst = colors.Normalize(vmin=rmin_sst, vmax=rmax_sst, clip=False)
 
 pal_ice = bcm.chose_colmap(cpal_ice, exp_ctrl=1.5)
 nrm_ice = colors.Normalize(vmin=rmin_ice, vmax=rmax_ice, clip = False)
+
+#if l_add_topo_land:
+#    xtopo = nmp.log10(xtopo+rof_log)
+#    pal_lsm = bcm.chose_colmap('gray_r')
+#    nrm_lsm = colors.Normalize(vmin = nmp.log10(-100. + rof_log), vmax = nmp.log10(4000.+rof_dpt + rof_log), clip = False)
+
+
+
+
+
 
     
 ntpd = 24/dt
@@ -305,15 +345,24 @@ for jt in range(jt0,Nt):
     #XSST = nmp.ma.masked_where(XIFR >= rmin_ice, XSST)
     #XIFR = nmp.ma.masked_where(XIFR  < rmin_ice, XIFR)
     XSST = nmp.ma.masked_where(XIFR >= 0.2, XSST)
+    XSST = nmp.ma.masked_where(XMSK <= 0.1, XSST)
     XIFR = nmp.ma.masked_where(XIFR  < 0.2, XIFR)
+    XIFR = nmp.ma.masked_where(XMSK <= 0.1, XIFR)
     
-    
+
+    if l_add_topo_land:
+        carte.etopo()
+        #carte.shadedrelief()
+        carte.drawlsmask(ocean_color='0.5',land_color=(255,255,255,1), alpha=1)
+        #carte.drawlsmask(land_color=(255,255,255,1))
+
     ft = carte.pcolormesh(x0, y0, XSST, cmap = pal_sst, norm = nrm_sst )
     fi = carte.pcolormesh(x0, y0, XIFR, cmap = pal_ice, norm = nrm_ice )
-    ##fi = carte.contour(x0, y0, XIFR, [ rmax_ice ], colors='k', linewidths=0.5 )
 
     carte.drawcoastlines(linewidth=0.5)
-    carte.fillcontinents(color='grey')
+
+    if not l_add_topo_land: carte.fillcontinents(color='grey') #, alpha=0)
+
     #carte.drawlsmask(land_color='coral',ocean_color='aqua',lakes=True)
     #carte.drawmapboundary()
 
@@ -372,5 +421,5 @@ for jt in range(jt0,Nt):
         del datafile, im
     
     print(' Saving figure: '+cfig)
-    plt.savefig(cfig, dpi=rDPI, orientation='portrait', transparent=False)
+    plt.savefig(cfig, dpi=rDPI, orientation='portrait', transparent=True)
     plt.close(1)
