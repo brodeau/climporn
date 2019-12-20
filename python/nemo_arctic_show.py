@@ -36,7 +36,7 @@ import barakuda_colmap as bcm
 import barakuda_tool as bt
 import barakuda_ncio as bnc
 
-ldrown = False
+ldrown = True
 l_add_topo_land = True
 
 vmn = [ 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ]
@@ -44,7 +44,7 @@ vml = [ 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ]
 
 l_show_ice_colbar = True
 
-l_show_logo = False
+l_show_logo = True
 on_logo="/home/brodeau/util/logos/ocean-next_trans_white_120x82.png"
 
 fig_type='png'
@@ -326,7 +326,7 @@ for jt in range(jt0,Nt):
 
     carte = Basemap(llcrnrlon=vp[2], llcrnrlat=vp[3], urcrnrlon=vp[4], urcrnrlat=vp[5], \
                     resolution=vp[9], area_thresh=1000., projection='stere', \
-                    lat_0=vp[6], lon_0=vp[7])
+                    lat_0=vp[6], lon_0=vp[7], epsg=None)
 
     x0,y0 = carte(Xlon,Xlat)
 
@@ -351,8 +351,10 @@ for jt in range(jt0,Nt):
     
 
     if l_add_topo_land:
-        carte.etopo()
-        #carte.shadedrelief()
+        #carte.arcgisimage(server='http://server.arcgisonline.com/ArcGIS', service='ESRI_Imagery_World_2D', xpixels=400, ypixels=None, dpi=96, verbose=True)
+        #carte.arcgisimage(service='ESRI_Imagery_World_2D', xpixels = 2000, verbose= True)
+        #carte.etopo()
+        carte.shadedrelief()
         carte.drawlsmask(ocean_color='0.5',land_color=(255,255,255,1), alpha=1)
         #carte.drawlsmask(land_color=(255,255,255,1))
 
