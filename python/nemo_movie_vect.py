@@ -258,7 +258,7 @@ CRUN = ''
 if l_get_name_of_run:
     # Name of RUN:
     vv = split('-|_', path.basename(cfx_in))
-    if vv[0] != CNEMO:
+    if vv[0] != CNEMO:          # 
         print 'ERROR: your file name is not consistent with "'+CNEMO+'" !!! ('+vv[0]+')' ; sys.exit(0)
     CRUN = vv[1]
     print '\n Run is called: "'+CRUN+'" !\n'
@@ -339,7 +339,7 @@ if l_show_lsm or l_do_crl or l_do_cof or l_do_cspd or l_do_tke or l_do_eke:
         e2v = id_lsm.variables['e2v'][0,j1:j2,i1:i2]
         e1u = id_lsm.variables['e1u'][0,j1:j2,i1:i2]
         e1f = id_lsm.variables['e1f'][0,j1:j2,i1:i2]
-        e2f = id_lsm.variables['e2f'][0,j1:j2,i1:i2]
+        e2f = id_lsm.variables['e2f'][0,j1:j2,i1:i2] # 
     if l_do_cof:
         ## Coriolis Parameter:
         ff  = id_lsm.variables['gphif'][0,j1:j2,i1:i2]
@@ -537,7 +537,7 @@ for jt in range(jt0,Nt):
 
     fig = plt.figure(num = 1, figsize=(rw_fig, rh_fig), dpi=None, facecolor='w', edgecolor='0.5')
 
-    ax  = plt.axes([0., 0., 1., 1.], axisbg = '0.85') ; # missing seas will be in "axisbg" !
+    ax  = plt.axes([0., 0., 1., 1.], facecolor = '0.85') ; # missing seas will be in "facecolor" !
 
     vc_fld = nmp.arange(tmin, tmax + df, df)
 
@@ -694,17 +694,17 @@ for jt in range(jt0,Nt):
         fig.figimage(im, x_logo, y_logo, zorder=9)
         del datafile, im
         #
-    if nemo_box.l_add_logo_ige:
-        datafile = cbook.get_sample_data(cdir_logos+'/'+nemo_box.cf_logo_ige, asfileobj=False)
-        im = image.imread(datafile)
-        fig.figimage(im, x_logo+144, y_logo-150., zorder=9)
-        del datafile, im
-        #
-    if nemo_box.l_add_logo_prc:
-        datafile = cbook.get_sample_data(cdir_logos+'/'+nemo_box.cf_logo_prc, asfileobj=False)
-        im = image.imread(datafile)
-        fig.figimage(im, x_logo-77, y_logo-140., zorder=9)
-        del datafile, im
+        if nemo_box.l_add_logo_ige:
+            datafile = cbook.get_sample_data(cdir_logos+'/'+nemo_box.cf_logo_ige, asfileobj=False)
+            im = image.imread(datafile)
+            fig.figimage(im, x_logo+144, y_logo-150., zorder=9)
+            del datafile, im
+            #
+        if nemo_box.l_add_logo_prc:
+            datafile = cbook.get_sample_data(cdir_logos+'/'+nemo_box.cf_logo_prc, asfileobj=False)
+            im = image.imread(datafile)
+            fig.figimage(im, x_logo-77, y_logo-140., zorder=9)
+            del datafile, im
 
     plt.savefig(cfig, dpi=dpi, orientation='portrait', facecolor='k')
     print cfig+' created!\n'
