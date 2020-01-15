@@ -144,7 +144,8 @@ nemo_box = nhb.nemo_hbox(CNEMO,CBOX)
 print " "+CNEMO+": Ni0,Nj0 => ", Ni0,Nj0
 
 (i1,j1, i2,j2) = nemo_box.idx()
-print " i1,j1, i2,j2 => ", i1,j1, i2,j2,'\n'
+print " i1,j1, i2,j2 => ", i1,j1, i2,j2
+print " Ni/Nj => ", float(i2-i1+1)/float(j2-j1+1), 16./9., '\n'
 
 if nemo_box.l_show_clock: (x_clock,y_clock) = nemo_box.clock
 #print ' x_clock,y_clock =', x_clock,y_clock

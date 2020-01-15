@@ -70,7 +70,7 @@ class nemo_hbox:
             l_fill_holes_k=True
 
         elif [ config, box ] == [ 'ORCA36', 'ALL']:
-            i1=0   ; j1=1000    ; i2=Ni0 ; j2=Nj0-1500  ; rfact_zoom=1920./float(Ni0) ; vcb=[0.02, 0.97, 0.23, 0.018]  ; font_rat=12.*rfact_zoom
+            i1=0   ; j1=900    ; i2=Ni0 ; j2=Nj0-982  ; rfact_zoom=1920./float(Ni0) ; vcb=[0.02, 0.91, 0.23, 0.018]  ; font_rat=12.*rfact_zoom
             l_show_clock=False; x_clock = 1600 ; y_clock = 200
             l_add_logo=False ; x_logo=2200 ; y_logo=1200
             l_show_exp = False ; x_exp = 1750 ; y_exp = 300
