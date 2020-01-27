@@ -10,3 +10,4 @@ make.macro
 *.bak
 out
 err
+*.png
