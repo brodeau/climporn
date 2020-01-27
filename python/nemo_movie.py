@@ -199,7 +199,7 @@ elif CWHAT == 'T_60':
     cv_in = 'votemper' ; cv_out = CWHAT ;
     tmin=0. ;  tmax=14.   ;  df = 1. ; cpal_fld = 'ncview_nrl' ; cb_jump = 1
     cunit = r'Potential temperature at 60 m'
-    if CBOX == 'BlackSea' : tmin=5. ; tmax=14. ;  df = 1.   ; cb_jump = 1 ; #cpal_fld = 'gist_stern_r'
+    if CBOX == 'BlackSea' : tmin=0. ; tmax=20. ;  df = 1.   ; cb_jump = 1 ; #cpal_fld = 'gist_stern_r'
 
 elif CWHAT == 'SSS':
     cv_in = 'sosaline' ; cv_out = CWHAT ; #in ['sosstsst','tos']:    
