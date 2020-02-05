@@ -17,8 +17,8 @@ import warnings
 warnings.filterwarnings("ignore")
 import time
 
-import barakuda_plot as bp
-import barakuda_tool as bt
+import clprn_plot as bp
+import clprn_tool as bt
 
 reload(sys)
 sys.setdefaultencoding('utf8')

@@ -2,7 +2,7 @@
 #
 #     CLIMPORN
 #
-#  Show SST + sea-ice concentration in the Arcti on a polar stereographic projection!
+#  Show SST + sea-ice concentration in the Arctic on a polar stereographic projection!
 #  NEMO output + mesh_mask needed.
 #
 #    L. Brodeau, November 2019
@@ -32,9 +32,9 @@ from re import split
 import warnings
 warnings.filterwarnings("ignore")
 
-import barakuda_colmap as bcm
-import barakuda_tool as bt
-import barakuda_ncio as bnc
+import clprn_colmap as bcm
+import clprn_tool as bt
+import clprn_ncio as bnc
 
 ldrown = True
 l_add_topo_land = True

@@ -29,10 +29,10 @@ import datetime
 
 from re import split
 
-import barakuda_colmap as bcm
+import clprn_colmap as bcm
 
-import barakuda_tool as bt
-import barakuda_ncio as bnc
+import clprn_tool as bt
+import clprn_ncio as bnc
 
 #l_smooth_sst = True ; nb_smooth_sst  = 10
 #l_smooth_msk = True ; nb_smooth_mask = 10

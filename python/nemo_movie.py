@@ -29,9 +29,9 @@ from re import split
 import warnings
 warnings.filterwarnings("ignore")
 
-import barakuda_colmap as bcm
-import barakuda_tool as bt
-import barakuda_ncio as bnc
+import clprn_colmap as bcm
+import clprn_tool as bt
+import clprn_ncio as bnc
 
 # ClimPorn:
 import nemo_hboxes as nhb
