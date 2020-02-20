@@ -242,7 +242,7 @@ elif CWHAT == 'SSH':
 
 elif CWHAT == 'CURLOF':
     cv_in = 'socurloverf' ; cv_out = CWHAT ;
-    tmin=-1. ;  tmax=-tmin  ;  df = 0.2  ; cb_jump = 1 ;
+    tmin=-0.8 ;  tmax=-tmin  ;  df = 0.1  ; cb_jump = 1 ;
     cpal_fld='RdBu_r' ; color_top_cb='k' ; # cpal_fld = 'on2' 
     cunit = r'$\zeta/f$'
     cv_msk = 'vmask'
