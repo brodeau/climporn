@@ -63,7 +63,6 @@ l_do_ice  = False
 l_log_field = False
 l_pow_field = False
 
-cdt = '1h'
 l_get_name_of_run = True
 
 cdir_logos = cwd+'/logos'
@@ -91,12 +90,13 @@ requiredNamed = parser.add_argument_group('required arguments')
 requiredNamed.add_argument('-i', '--fin' , required=True,                help='specify the NEMO netCDF file to read from...')
 requiredNamed.add_argument('-w', '--what', required=True, default="SST", help='specify the field/diagnostic to plot (ex: SST)')
 
-parser.add_argument('-C', '--conf', default="eNATL60",      help='specify NEMO config (ex: eNATL60)')
-parser.add_argument('-b', '--box' , default="ALL",          help='specify extraction box name (ex: ALL)')
-parser.add_argument('-m', '--fmm' , default="mesh_mask.nc", help='specify the NEMO mesh_mask file (ex: mesh_mask.nc)')
-parser.add_argument('-s', '--sd0' , default="20090101",     help='specify initial date as <YYYYMMDD>')
-parser.add_argument('-l', '--lev' , type=int, default=0,    help='specify the level to use if 3D field (default: 0 => 2D)')
-parser.add_argument('-z', '--zld' ,                         help='specify the topography netCDF file to use (field="z")')
+parser.add_argument('-C', '--conf', default="eNATL60",        help='specify NEMO config (ex: eNATL60)')
+parser.add_argument('-b', '--box' , default="ALL",            help='specify extraction box name (ex: ALL)')
+parser.add_argument('-m', '--fmm' , default="mesh_mask.nc",   help='specify the NEMO mesh_mask file (ex: mesh_mask.nc)')
+parser.add_argument('-s', '--sd0' , default="20090101",       help='specify initial date as <YYYYMMDD>')
+parser.add_argument('-l', '--lev' , type=int, default=0,      help='specify the level to use if 3D field (default: 0 => 2D)')
+parser.add_argument('-z', '--zld' ,                           help='specify the topography netCDF file to use (field="z")')
+parser.add_argument('-t', '--tstep', type=int, default=1, help='specify the time step (hours) in input file')
 
 args = parser.parse_args()
 
@@ -108,6 +108,7 @@ cf_mm = args.fmm
 csd0  = args.sd0
 jk    = args.lev
 cf_topo_land = args.zld
+dt    = args.tstep 
 
 print ''
 print ' *** CNEMO = ', CNEMO
@@ -492,15 +493,10 @@ cyr0=csd0[0:4]
 cmn0=csd0[4:6]
 cdd0=csd0[6:8]
 
-if cdt == '6h':
-    dt = 6
-elif cdt == '3h':
-    dt = 3
-elif cdt == '1h':
-    dt = 1
-else:
-    print 'ERROR: unknown dt!'
-
+# Time step as a string
+if not dt in [ 24, 6, 3, 1 ]:
+    print 'ERROR: unknown dt! '+str(dt)
+    sys.exit(0)
 ntpd = 24/dt
 
 vm = vmn
@@ -512,28 +508,27 @@ jm = int(cmn0)
 
 for jt in range(jt0,Nt):
 
-    jh = (jt*dt)%24
+    #---------------------- Calendar stuff --------------------------------------------
+    if dt < 24:
+        jh = (jt*dt)%24
+    else:
+        jh = 12
     jdc = (jt*dt)/24 + 1
-
     if jt%ntpd == 0: jd = jd + 1
-
     if jd == vm[jm-1]+1 and (jt)%ntpd == 0 :
         jd = 1
         jm = jm + 1
-
     ch = '%2.2i'%(jh)
-    #cdc= '%3.3i'%(jdc)
     cd = '%3.3i'%(jd)
     cm = '%2.2i'%(jm)
-
     #print '\n\n *** jt, ch, cd, cm =>', jt, ch, cd, cm
-
-
     ct = str(datetime.datetime.strptime(cyr0+'-'+cm+'-'+cd+' '+ch, '%Y-%m-%j %H'))
     ct=ct[:5]+cm+ct[7:] #lolo bug !!! need to do that to get the month and not "01"
     print ' ct = ', ct
     cday  = ct[:10]   ; print ' *** cday  :', cday
     chour = ct[11:13] ; print ' *** chour :', chour
+    #-----------------------------------------------------------------------------------
+
 
     if l3d:
         cfig = cdir_figs+'/'+cv_out+'_'+CNEMO+'-'+CRUN+'_lev'+str(jk)+'_'+CBOX+'_'+cday+'_'+chour+'_'+cpal_fld+'.'+fig_type
