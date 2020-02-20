@@ -240,6 +240,13 @@ elif CWHAT == 'SSH':
     if CRUN[:4] == 'BLB0':                tmin=-1.2; tmax=-tmin ; df = 0.2
     if CBOX in [ 'Bretagne']:             tmin=-4.;  tmax=-tmin ; df = 0.5
 
+elif CWHAT == 'CURLOF':
+    cv_in = 'socurloverf' ; cv_out = CWHAT ;
+    tmin=-1. ;  tmax=-tmin  ;  df = 0.2  ; cb_jump = 1 ;
+    cpal_fld='RdBu_r' ; color_top_cb='k' ; # cpal_fld = 'on2' 
+    cunit = r'$\zeta/f$'
+    cv_msk = 'vmask'
+
     
 elif CWHAT == 'GEOSSV':
     # Geostrophic velocity speed out of SSH
@@ -453,7 +460,7 @@ params = { 'font.family':'Helvetica Neue',
            'ytick.labelsize': int(9.*fontr),
            'axes.labelsize':  int(9.*fontr) }
 mpl.rcParams.update(params)
-cfont_clb  =  { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(7.*fontr), 'color':color_top_cb}
+cfont_clb  =  { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(8.*fontr), 'color':color_top_cb}
 cfont_clock = { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(9.*fontr), 'color':color_top }
 cfont_exp= { 'fontname':'Open Sans'  , 'fontweight':'light', 'fontsize':int(9.*fontr), 'color':color_top }
 cfont_mail =  { 'fontname':'Times New Roman', 'fontweight':'normal', 'fontstyle':'italic', 'fontsize':int(14.*fontr), 'color':'0.8'}
@@ -667,6 +674,7 @@ for jt in range(jt0,Nt):
         else:
             clsm = plt.imshow(nmp.ma.masked_where(XLSM>0.0001, XLSM), cmap = pal_lsm, norm = norm_lsm, interpolation='none')
 
+    ##### COLORBAR ######
     if nemo_box.l_show_cb:
         ax2 = plt.axes(nemo_box.vcb)
         clb = mpl.colorbar.ColorbarBase(ax2, ticks=vc_fld, cmap=pal_fld, norm=norm_fld, orientation='horizontal', extend=cb_extend)

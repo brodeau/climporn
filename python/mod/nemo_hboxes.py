@@ -23,6 +23,9 @@ class nemo_hbox:
         elif config == 'ORCA36':
             Ni0 = 12962
             Nj0 = 9173
+        elif config == 'EORCA12.L75':
+            Ni0 = 4322
+            Nj0 = 3147
         else:
             print 'ERROR: we do not know NEMO config "'+str(config)+'" !'
             exit(0)
@@ -44,8 +47,8 @@ class nemo_hbox:
         l_annotate_name=False
         l_show_clock = True
         l_add_logo=True
-        l_add_logo_ige=True
-        l_add_logo_prc=True
+        l_add_logo_ige=False
+        l_add_logo_prc=False
         
         c_imshow_interp = 'none'
 
@@ -246,6 +249,17 @@ class nemo_hbox:
             i1=0; j1=600; i2=1920; j2=j1+1080 ; rfact_zoom=1. ; vcb=[0.05, 0.94, 0.38, 0.018] ; font_rat = 2.
             x_clock = 50 ; y_clock = 40
             l_add_logo=False ; l_add_logo_ige=False ; l_add_logo_prc=False
+
+
+        elif [ config, box ] == [ 'EORCA12.L75', 'SATL']:
+            i1=2500 ; j1=700 ; i2=i1+1440 ; j2=j1+720 ; rfact_zoom=1 ; vcb=[0.25, 0.1, 0.5, 0.022]  ; font_rat=2.*rfact_zoom
+            l_show_clock=True; x_clock = 120 ; y_clock = 680
+            #l_add_logo=True ; x_logo=1200 ; y_logo= 20; cf_logo_on  = 'ocean-next_trans_white_210x142.png'
+            l_add_logo=True ; x_logo=1132 ; y_logo= 574; cf_logo_on  = 'ocean-next_trans_white_210x142.png'
+            l_show_exp = False ; x_exp = 1750 ; y_exp = 300
+            l_fill_holes_k=False
+
+
     
         else:
             print ' ERROR: unknow box "'+box+'" for config "'+config+'" !!!'
