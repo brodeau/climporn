@@ -242,7 +242,7 @@ elif CWHAT == 'SSH':
 
 elif CWHAT == 'CURLOF':
     cv_in = 'socurloverf' ; cv_out = CWHAT ;
-    tmin=-0.8 ;  tmax=-tmin  ;  df = 0.1  ; cb_jump = 1 ;
+    tmin=-0.8 ;  tmax=-tmin  ;  df = 0.1  ; cb_jump = 2 ;
     cpal_fld='RdBu_r' ; color_top_cb='k' ; # cpal_fld = 'on2' 
     cunit = r'$\zeta/f$'
     cv_msk = 'vmask'
@@ -460,7 +460,8 @@ params = { 'font.family':'Helvetica Neue',
            'ytick.labelsize': int(9.*fontr),
            'axes.labelsize':  int(9.*fontr) }
 mpl.rcParams.update(params)
-cfont_clb  =  { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(8.*fontr), 'color':color_top_cb}
+cfont_clb_tcks = { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(7.5*fontr), 'color':color_top_cb}
+cfont_clb  =  { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(8.5*fontr), 'color':color_top_cb}
 cfont_clock = { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(9.*fontr), 'color':color_top }
 cfont_exp= { 'fontname':'Open Sans'  , 'fontweight':'light', 'fontsize':int(9.*fontr), 'color':color_top }
 cfont_mail =  { 'fontname':'Times New Roman', 'fontweight':'normal', 'fontstyle':'italic', 'fontsize':int(14.*fontr), 'color':'0.8'}
@@ -691,7 +692,7 @@ for jt in range(jt0,Nt):
         #else:
         #    for rr in vc_fld: cb_labs.append(str(round(rr,int(nmp.ceil(nmp.log10(1./df)))+1) ))
 
-        clb.ax.set_xticklabels(cb_labs, **cfont_clb)
+        clb.ax.set_xticklabels(cb_labs, **cfont_clb_tcks)
         clb.set_label(cunit, **cfont_clb)
         clb.ax.yaxis.set_tick_params(color=color_top_cb) ; # set colorbar tick color
         clb.outline.set_edgecolor(color_top_cb) ; # set colorbar edgecolor
