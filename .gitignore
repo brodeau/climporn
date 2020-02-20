@@ -11,4 +11,5 @@ make.macro
 out
 err
 *.png
+*.sub
 logos
