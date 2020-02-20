@@ -747,14 +747,10 @@ def smoother(X, msk, nb_smooth=5):
 def symetric_range( pmin, pmax ):
     # Returns a symetric f-range that makes sense for the anomaly of "f" we're looking at...
     from math import floor, copysign, log, ceil
-    if pmax > 0. and pmin < 0.:        
-        zmax = max( abs(pmax) , abs(pmin) )
-        romagn = floor(log(zmax, 10)) ; # order of magnitude of the anomaly  we're dealing with
-        rmlt = 10.**(int(romagn)) / 2.
-        frng = copysign( ceil(abs(zmax)/rmlt)*rmlt , zmax)
-    else:
-        print('ERROR: symetric_range.clprn_tool.py => must have: pmax > 0 and pmin < 0 !')
-        sys.exit(0)
+    zmax = max( abs(pmax) , abs(pmin) )
+    romagn = floor(log(zmax, 10)) ; # order of magnitude of the anomaly  we're dealing with
+    rmlt = 10.**(int(romagn)) / 2.
+    frng = copysign( ceil(abs(zmax)/rmlt)*rmlt , zmax)
     return frng
 
 
