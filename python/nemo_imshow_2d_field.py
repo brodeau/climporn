@@ -22,9 +22,9 @@ import matplotlib.colors as colors
 import warnings
 warnings.filterwarnings("ignore")
 
-import barakuda_colmap as bcm
+import clprn_colmap as bcm
 
-import barakuda_tool as bt
+import clprn_tool as bt
 
 
 #CNEMO = 'NATL60'

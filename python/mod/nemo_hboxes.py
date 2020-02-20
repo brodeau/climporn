@@ -76,6 +76,7 @@ class nemo_hbox:
             l_show_exp = False ; x_exp = 1750 ; y_exp = 300
             l_fill_holes_k=False
         elif [ config, box ] == [ 'ORCA36', 'ALLFR']:
+            # FR = FullRes !
             i1=0   ; j1=1000    ; i2=Ni0 ; j2=Nj0-1500  ; rfact_zoom=1. ; vcb=[0.02, 0.97, 0.23, 0.018]  ; font_rat=12.*rfact_zoom
             l_show_clock=False; x_clock = 1600 ; y_clock = 200
             l_add_logo=False ; x_logo=2200 ; y_logo=1200
@@ -98,6 +99,7 @@ class nemo_hbox:
             x_clock = 30 ; y_clock = 1040 ; x_logo = 1500 ; y_logo = 16
             
         elif   [ config, box ] == [ 'eNATL60', 'ALLFR']:
+            # FR = FullRes !
             i1=0   ; j1=0    ; i2=Ni0 ; j2=Nj0  ; rfact_zoom=1. ; vcb=[0.59, 0.1, 0.39, 0.018]  ; font_rat=8.*rfact_zoom
             x_clock = 4000 ; y_clock = 200 ; x_logo = 6000 ; y_logo  = 50; 
             l_fill_holes_k=True
