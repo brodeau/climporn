@@ -239,6 +239,7 @@ elif CWHAT == 'SSH':
     if CBOX == 'Med' or CBOX == 'Med+BS': tmin=-0.7; tmax=0.2   ; df = 0.1
     if CRUN[:4] == 'BLB0':                tmin=-1.2; tmax=-tmin ; df = 0.2
     if CBOX in [ 'Bretagne']:             tmin=-4.;  tmax=-tmin ; df = 0.5
+
     
 elif CWHAT == 'GEOSSV':
     # Geostrophic velocity speed out of SSH
