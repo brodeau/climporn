@@ -243,7 +243,8 @@ elif CWHAT == 'SSH':
 
 elif CWHAT == 'CURLOF':
     cv_in = 'socurloverf' ; cv_out = CWHAT ;
-    tmin=-0.8 ;  tmax=-tmin  ;  df = 0.1  ; cb_jump = 2 ;
+    #tmin=-0.8 ;  tmax=-tmin  ;  df = 0.1  ; cb_jump = 2 ;
+    tmin=-0.7 ;  tmax=-tmin  ;  df = 0.1  ; cb_jump = 1
     cpal_fld='RdBu_r' ; color_top_cb='k' ; # cpal_fld = 'on2' 
     cunit = r'$\zeta/f$'
     cv_msk = 'vmask'
@@ -461,7 +462,7 @@ params = { 'font.family':'Helvetica Neue',
            'ytick.labelsize': int(9.*fontr),
            'axes.labelsize':  int(9.*fontr) }
 mpl.rcParams.update(params)
-cfont_clb_tcks = { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(7.5*fontr), 'color':color_top_cb}
+cfont_clb_tcks = { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(7.*fontr), 'color':color_top_cb}
 cfont_clb  =  { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(8.5*fontr), 'color':color_top_cb}
 cfont_clock = { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(9.*fontr), 'color':color_top }
 cfont_exp= { 'fontname':'Open Sans'  , 'fontweight':'light', 'fontsize':int(9.*fontr), 'color':color_top }

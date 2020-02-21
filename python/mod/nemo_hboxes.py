@@ -252,7 +252,7 @@ class nemo_hbox:
 
 
         elif [ config, box ] == [ 'EORCA12.L75', 'SATL']:
-            i1=2520 ; j1=700 ; i2=i1+1280 ; j2=j1+720 ; rfact_zoom=1 ; vcb=[0.25, 0.1, 0.5, 0.022]  ; font_rat=2.*rfact_zoom
+            i1=2520 ; j1=700 ; i2=i1+1280 ; j2=j1+720 ; rfact_zoom=1 ; vcb=[0.2, 0.1, 0.6, 0.024]  ; font_rat=2.*rfact_zoom
             l_show_clock=True; x_clock = 110 ; y_clock = 680
             #l_add_logo=True ; x_logo=1200 ; y_logo= 20; cf_logo_on  = 'ocean-next_trans_white_140x95.png'
             l_add_logo=True ; x_logo=1114 ; y_logo= 610; cf_logo_on  = 'ocean-next_trans_white_140x95.png'
