@@ -37,15 +37,15 @@ import clprn_tool as bt
 import clprn_ncio as bnc
 
 ldrown = True
-l_add_topo_land = True
-
-vmn = [ 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ]
-vml = [ 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ]
+l_add_topo_land = False
 
 l_show_ice_colbar = True
 
-l_show_logo = True
+l_show_logo = False
 on_logo="/home/brodeau/util/logos/ocean-next_trans_white_120x82.png"
+
+vmn = [ 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ]
+vml = [ 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ]
 
 fig_type='png'
 rDPI = 100
@@ -64,7 +64,7 @@ jt0 = 0
 
 # SST
 rmin_sst=-2.
-rmax_sst=16.
+rmax_sst=20.
 dsst = 1. ; cb_jump = 2
 #cpal_sst = 'ncview_nrl'
 cpal_sst = 'on3'
@@ -152,7 +152,7 @@ if l_get_name_of_run:
 # Test - beta development:
 #cf_in = '/data/gcm_output/CREG025/NANUK025-ILBOXE50_6h_gridT-2D_199506-199506.nc'
 #cf_mm = '/data/gcm_setup/CREG025/CREG025-I/mesh_mask_CREG025_3.6_NoMed.nc'
-if CNEMO == 'NANUK025':
+if CNEMO == 'NANUK025' or CNEMO == 'CREG025':
     jk=0
     j1=0 ; j2=603
     i1=0 ; i2=528
@@ -160,6 +160,10 @@ else:
     print('ERRO: unknow conf '+CNEMO)
     ###############################
 
+if CNEMO == 'NANUK025': cxtra_info1 = "OPA - neXtSIM" ; cxtra_info2 = "   (CREG025)"
+if CNEMO == 'CREG025':  cxtra_info1 = "OPA - LIM3"    ; cxtra_info2 = "(CREG025)"
+
+    
 
 bt.chck4f(cf_mm)
 
@@ -412,8 +416,8 @@ for jt in range(jt0,Nt):
     
     ry0 = 0.78
     #ry0 = 0.9
-    ax.annotate('OPA - neXtSIM', xy=(0.02, ry0+0.05), xycoords='figure fraction', **cfont_titl1)
-    ax.annotate(' (CREG025) '  , xy=(0.07,  ry0 ), xycoords='figure fraction',    **cfont_titl2)
+    ax.annotate(cxtra_info1, xy=(0.02, ry0+0.05), xycoords='figure fraction', **cfont_titl1)
+    ax.annotate(cxtra_info2, xy=(0.05, ry0 ),     xycoords='figure fraction', **cfont_titl2)
 
     #
     if l_show_logo:
@@ -423,5 +427,6 @@ for jt in range(jt0,Nt):
         del datafile, im
     
     print(' Saving figure: '+cfig)
-    plt.savefig(cfig, dpi=rDPI, orientation='portrait', transparent=True)
+    #plt.savefig(cfig, dpi=rDPI, orientation='portrait', transparent=True)
+    plt.savefig(cfig, dpi=rDPI, orientation='portrait', transparent=False)
     plt.close(1)
