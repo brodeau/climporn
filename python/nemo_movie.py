@@ -508,11 +508,8 @@ jm = int(cmn0)
 
 for jt in range(jt0,Nt):
 
-    #---------------------- Calendar stuff --------------------------------------------
-    if dt < 24:
-        jh = (jt*dt)%24
-    else:
-        jh = 12
+    #---------------------- Calendar stuff --------------------------------------------    
+    jh  = (jt*dt)%24
     jdc = (jt*dt)/24 + 1
     if jt%ntpd == 0: jd = jd + 1
     if jd == vm[jm-1]+1 and (jt)%ntpd == 0 :
@@ -521,19 +518,23 @@ for jt in range(jt0,Nt):
     ch = '%2.2i'%(jh)
     cd = '%3.3i'%(jd)
     cm = '%2.2i'%(jm)
-    #print '\n\n *** jt, ch, cd, cm =>', jt, ch, cd, cm
-    ct = str(datetime.datetime.strptime(cyr0+'-'+cm+'-'+cd+' '+ch, '%Y-%m-%j %H'))
-    ct=ct[:5]+cm+ct[7:] #lolo bug !!! need to do that to get the month and not "01"
-    print ' ct = ', ct
-    cday  = ct[:10]   ; print ' *** cday  :', cday
-    chour = ct[11:13] ; print ' *** chour :', chour
+    ct = str(datetime.datetime.strptime(cyr0+'-'+cm+'-'+cd+' '+ch, '%Y-%m-%j %H'))    
+    ct=ct[:5]+cm+ct[7:] #lolo bug !!! need to do that to get the month and not "01    
+    cday  = ct[:10]   ; #print ' *** cday  :', cday        
+    if dt >= 24:
+        cdate = cday
+        cdats = cday
+    else:
+        chour = ct[11:13] ; #print ' *** chour :', chour
+        cdate = cday+'_'+chour
+        cdats = cday+' '+chour+':00'
+    print '\n Current date = ', cdate+' !\n'
     #-----------------------------------------------------------------------------------
 
-
     if l3d:
-        cfig = cdir_figs+'/'+cv_out+'_'+CNEMO+'-'+CRUN+'_lev'+str(jk)+'_'+CBOX+'_'+cday+'_'+chour+'_'+cpal_fld+'.'+fig_type
+        cfig = cdir_figs+'/'+cv_out+'_'+CNEMO+'-'+CRUN+'_lev'+str(jk)+'_'+CBOX+'_'+cdate+'_'+cpal_fld+'.'+fig_type
     else:
-        cfig = cdir_figs+'/'+cv_out+'_'+CNEMO+'-'+CRUN+'_'+CBOX+'_'+cday+'_'+chour+'_'+cpal_fld+'.'+fig_type
+        cfig = cdir_figs+'/'+cv_out+'_'+CNEMO+'-'+CRUN+'_'+CBOX+'_'+cdate+'_'+cpal_fld+'.'+fig_type
 
     ###### FIGURE ##############
 
@@ -634,9 +635,9 @@ for jt in range(jt0,Nt):
 
     if l_save_nc:
         if l3d:
-            cf_out = 'nc/'+CWHAT+'_NEMO_'+CNEMO+'-'+CRUN+'_lev'+str(jk)+'_'+CBOX+'_'+cday+'_'+chour+'_'+cpal_fld+'.nc'
+            cf_out = 'nc/'+CWHAT+'_NEMO_'+CNEMO+'-'+CRUN+'_lev'+str(jk)+'_'+CBOX+'_'+cdate+'_'+cpal_fld+'.nc'
         else:
-            cf_out = 'nc/'+CWHAT+'_NEMO_'+CNEMO+'-'+CRUN+'_'+CBOX+'_'+cday+'_'+chour+'_'+cpal_fld+'.nc'
+            cf_out = 'nc/'+CWHAT+'_NEMO_'+CNEMO+'-'+CRUN+'_'+CBOX+'_'+cdate+'_'+cpal_fld+'.nc'
         print ' Saving in '+cf_out
         bnc.dump_2d_field(cf_out, Xplot, xlon=Xlon, xlat=Xlat, name=CWHAT)
         print ''
@@ -698,7 +699,7 @@ for jt in range(jt0,Nt):
     if nemo_box.l_show_clock:
         xl = float(x_clock)/rfz
         yl = float(y_clock)/rfz
-        ax.annotate('Date: '+cday+' '+chour+':00', xy=(1, 4), xytext=(xl,yl), **cfont_clock)
+        ax.annotate('Date: '+cdats, xy=(1, 4), xytext=(xl,yl), **cfont_clock)
 
     if l_get_name_of_run and nemo_box.l_show_exp:
         xl = float(x_exp)/rfz
