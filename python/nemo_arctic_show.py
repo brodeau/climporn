@@ -176,7 +176,9 @@ elif CWHAT == 'Qns':
     cv_in = 'nshfls'
     cv_if = 'ice_cover'
     cv_out = CWHAT
-    tmin=-1200 ;  tmax=100.   ;  df = 100. ; cpal_fld = 'plasma' ; cb_jump = 2
+    tmin=-1250 ;  tmax=250. ; df = 50. ; cb_jump = 5
+    #cpal_fld = 'plasma' ;
+    cpal_fld = 'gist_stern_r'
     cunit = r'Non-solar heat flux ($W/m^{2}$)'
     
 elif CWHAT == 'Qnet':
