@@ -1,12 +1,12 @@
 #!/usr/bin/env python
-
+#
 #     CLIMPORN
 #
 #  Prepare 2D maps (monthly) that will later become a movie!
 #  NEMO output and observations needed
 #
 #    L. Brodeau, January 2019
-
+#
 import sys
 from os import path, getcwd, mkdir
 from string import replace
@@ -31,21 +31,25 @@ import datetime
 from re import split
 
 import clprn_colmap as bcm
-
 import clprn_tool as bt
 import clprn_ncio as bnc
 
 # ClimPorn:
 import nemo_hboxes as nhb
 
+
+
 cwd = getcwd()
+
+l_smooth = False
 
 vmn = [ 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ]
 vml = [ 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ]
 
 fig_type='png'
-dpi = 110
+rDPI = 110
 color_top = 'white'
+color_top_cb = 'white'
 #color_top = 'k'
 
 cv_out = 'unknown'
@@ -54,14 +58,11 @@ jt0 = 0
 
 
 jk=0
-i2=0
-j2=0
 l_get_name_of_run = False
 l_show_lsm = True
 l_log_field = False
 l_pow_field = False
 
-cdt = '1h'
 l_get_name_of_run = True
 
 cdir_logos = cwd+'/logos'
@@ -88,12 +89,13 @@ requiredNamed.add_argument('-x', '--fldx', required=True, help='specify the name
 requiredNamed.add_argument('-y', '--fldy', required=True, help='specify the name of the NEMO V field in V file')
 requiredNamed.add_argument('-w', '--what', required=True, help='specify the field/diagnostic to plot (ex: CSPEED,CURLOF,ect.)')
 
-parser.add_argument('-C', '--conf', default="eNATL60",      help='specify NEMO config (ex: eNATL60)')
-parser.add_argument('-b', '--box' , default="ALL",          help='specify extraction box name (ex: ALL)')
-parser.add_argument('-m', '--fmm' , default="mesh_mask.nc", help='specify the NEMO mesh_mask file (ex: mesh_mask.nc)')
-parser.add_argument('-s', '--sd0' , default="20090101",     help='specify initial date as <YYYYMMDD>')
-parser.add_argument('-l', '--lev' , type=int, default=0,    help='specify the level to use if 3D field (default: 0 => 2D)')
-parser.add_argument('-z', '--zld' ,                         help='specify the topography netCDF file to use (field="z")')
+parser.add_argument('-C', '--conf', default="eNATL60",        help='specify NEMO config (ex: eNATL60)')
+parser.add_argument('-b', '--box' , default="ALL",            help='specify extraction box name (ex: ALL)')
+parser.add_argument('-m', '--fmm' , default="mesh_mask.nc",   help='specify the NEMO mesh_mask file (ex: mesh_mask.nc)')
+parser.add_argument('-s', '--sd0' , default="20090101",       help='specify initial date as <YYYYMMDD>')
+parser.add_argument('-l', '--lev' , type=int, default=0,      help='specify the level to use if 3D field (default: 0 => 2D)')
+parser.add_argument('-z', '--zld' ,                           help='specify the topography netCDF file to use (field="z")')
+parser.add_argument('-t', '--tstep', type=int, default=1, help='specify the time step (hours) in input file')
 
 args = parser.parse_args()
 
@@ -108,6 +110,7 @@ cf_mm = args.fmm
 csd0  = args.sd0
 jk    = args.lev
 cf_topo_land = args.zld
+dt    = args.tstep 
 
 print ''
 print ' *** CNEMO = ', CNEMO
@@ -136,6 +139,15 @@ cdir_figs = './figs/'+CWHAT
 if not path.exists(cdir_figs): mkdir(cdir_figs)
 
 
+CRUN = ''
+if l_get_name_of_run:
+    # Name of RUN:
+    vv = split('-|_', path.basename(cfx_in))
+    if vv[0] != CNEMO:
+        print 'ERROR: your file name is not consistent with "'+CNEMO+'" !!! ('+vv[0]+')' ; sys.exit(0)
+    CRUN = vv[1]
+    print '\n Run is called: "'+CRUN+'" !\n'
+
 #---------------------------------------------------------------
 
 nemo_box = nhb.nemo_hbox(CNEMO,CBOX)
@@ -144,8 +156,7 @@ nemo_box = nhb.nemo_hbox(CNEMO,CBOX)
 print " "+CNEMO+": Ni0,Nj0 => ", Ni0,Nj0
 
 (i1,j1, i2,j2) = nemo_box.idx()
-print " i1,j1, i2,j2 => ", i1,j1, i2,j2
-print " Ni/Nj => ", float(i2-i1+1)/float(j2-j1+1), 16./9., '\n'
+print " i1,j1, i2,j2 => ", i1,j1, i2,j2,'\n'
 
 if nemo_box.l_show_clock: (x_clock,y_clock) = nemo_box.clock
 #print ' x_clock,y_clock =', x_clock,y_clock
@@ -255,14 +266,6 @@ if l3d and not l_3d_field:
 
 
 
-CRUN = ''
-if l_get_name_of_run:
-    # Name of RUN:
-    vv = split('-|_', path.basename(cfx_in))
-    if vv[0] != CNEMO:          # 
-        print 'ERROR: your file name is not consistent with "'+CNEMO+'" !!! ('+vv[0]+')' ; sys.exit(0)
-    CRUN = vv[1]
-    print '\n Run is called: "'+CRUN+'" !\n'
     
 rfz   = nemo_box.rfact_zoom
 fontr = nemo_box.font_rat
@@ -285,16 +288,16 @@ rnxr = rfz*nx_res ; # widt image (in pixels)
 rnyr = rfz*ny_res ; # height image (in pixels)
 
 # Target resolution for figure:
-rh_fig = round(rnyr/float(dpi),3) ; # width of figure
+rh_fig = round(rnyr/float(rDPI),3) ; # width of figure
 rw_fig = round(rh_fig*yx_ratio      ,3) ; # height of figure
-rh_img = rh_fig*float(dpi)
-rw_img = rw_fig*float(dpi)
+rh_img = rh_fig*float(rDPI)
+rw_img = rw_fig*float(rDPI)
 while rw_img < round(rnxr,0):
-    rw_fig = rw_fig + 0.01/float(dpi)
-    rw_img = rw_fig*float(dpi)
+    rw_fig = rw_fig + 0.01/float(rDPI)
+    rw_img = rw_fig*float(rDPI)
 while rh_img < round(rnyr,0):
-    rh_fig = rh_fig + 0.01/float(dpi)
-    rh_img = rh_fig*float(dpi)
+    rh_fig = rh_fig + 0.01/float(rDPI)
+    rh_img = rh_fig*float(rDPI)
     print ' *** size figure =>', rw_fig, rh_fig, '\n'
     print ' *** Forecasted dimension of image =>', rw_img, rh_img
 
@@ -302,9 +305,7 @@ print '\n================================================================\n\n\n'
 
 
 
-cyr0=csd0[0:4]
-cmn0=csd0[4:6]
-cdd0=csd0[6:8]
+l_3d_field = False
 
 
 
@@ -316,11 +317,21 @@ bt.chck4f(cf_mm)
 bt.chck4f(cfx_in)
 bt.chck4f(cfy_in)
 
-id_fx = Dataset(cfx_in)
-vtime = id_fx.variables['time_counter'][:]
-id_fx.close()
+l_notime=False
+bt.chck4f(cf_in)
+id_fld = Dataset(cf_in)
+list_var = id_fld.variables.keys()
+if 'time_counter' in list_var:
+    vtime = id_fld.variables['time_counter'][:]
+elif 'time' in list_var:
+    vtime = id_fld.variables['time'][:]
+else:
+    l_notime=True
+    print 'Did not find a time variable! Assuming no time and Nt=1'
+id_fld.close()
 
-Nt = len(vtime)
+Nt = 1
+if not l_notime: Nt = len(vtime)
 
 if l_show_lsm or l_do_crl or l_do_cof or l_do_cspd or l_do_tke or l_do_eke:
     print "\nReading record metrics in "+cf_mm
@@ -404,7 +415,8 @@ params = { 'font.family':'Helvetica Neue',
            'ytick.labelsize': int(9.*fontr),
            'axes.labelsize':  int(9.*fontr) }
 mpl.rcParams.update(params)
-cfont_clb  =  { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(7.*fontr), 'color':color_top}
+cfont_clb_tcks = { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(7.5*fontr), 'color':color_top_cb}
+cfont_clb  =  { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(8.5*fontr), 'color':color_top_cb}
 cfont_clock = { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(9.*fontr), 'color':color_top }
 cfont_exp= { 'fontname':'Open Sans'  , 'fontweight':'light', 'fontsize':int(9.*fontr), 'color':color_top }
 cfont_mail =  { 'fontname':'Times New Roman', 'fontweight':'normal', 'fontstyle':'italic', 'fontsize':int(14.*fontr), 'color':'0.8'}
@@ -431,15 +443,22 @@ if l_show_lsm or l_add_topo_land:
         pal_lsm = bcm.chose_colmap('land_dark')
         norm_lsm = colors.Normalize(vmin = 0., vmax = 1., clip = False)
 
+cyr0=csd0[0:4]
+cmn0=csd0[4:6]
+cdd0=csd0[6:8]
 
-if cdt == '3h':
-    dt = 3
-elif cdt == '1h':
-    dt = 1
-else:
-    print 'ERROR: unknown dt!'
+# Time step as a string
+if not dt in [ 24, 6, 3, 1 ]:
+    print 'ERROR: unknown dt! '+str(dt)
+    sys.exit(0)
+ntpd = 24/dt
 
+vm = vmn
+if isleap(int(cyr0)): vm = vml
+#print ' year is ', vm, nmp.sum(vm)
 
+jd = int(cdd0) - 1
+jm = int(cmn0)
 
 
 
@@ -506,39 +525,39 @@ if nemo_box.l_add_quiver:
 
 for jt in range(jt0,Nt):
 
-    jh = (jt*dt)%24
+    #---------------------- Calendar stuff --------------------------------------------    
+    jh  = (jt*dt)%24
     jdc = (jt*dt)/24 + 1
-
     if jt%ntpd == 0: jd = jd + 1
-
     if jd == vm[jm-1]+1 and (jt)%ntpd == 0 :
         jd = 1
         jm = jm + 1
-
     ch = '%2.2i'%(jh)
-    #cdc= '%3.3i'%(jdc)
     cd = '%3.3i'%(jd)
     cm = '%2.2i'%(jm)
-
-    #print '\n\n *** jt, ch, cd, cm =>', jt, ch, cd, cm
-
-
-    ct = str(datetime.datetime.strptime(cyr0+'-'+cm+'-'+cd+' '+ch, '%Y-%m-%j %H'))
-    ct=ct[:5]+cm+ct[7:] #lolo bug !!! need to do that to get the month and not "01"
-    print ' ct = ', ct
-    cday  = ct[:10]   ; print ' *** cday  :', cday
-    chour = ct[11:13] ; print ' *** chour :', chour
+    ct = str(datetime.datetime.strptime(cyr0+'-'+cm+'-'+cd+' '+ch, '%Y-%m-%j %H'))    
+    ct=ct[:5]+cm+ct[7:] #lolo bug !!! need to do that to get the month and not "01    
+    cday  = ct[:10]   ; #print ' *** cday  :', cday        
+    if dt >= 24:
+        cdate = cday
+        cdats = cday
+    else:
+        chour = ct[11:13] ; #print ' *** chour :', chour
+        cdate = cday+'_'+chour
+        cdats = cday+' '+chour+':00'
+    print '\n Current date = ', cdate+' !\n'
+    #-----------------------------------------------------------------------------------
 
     if l3d:
-        cfig = cdir_figs+'/'+cv_out+'_'+CNEMO+'-'+CRUN+'_lev'+str(jk)+'_'+CBOX+'_'+cday+'_'+chour+'_'+cpal_fld+'.'+fig_type
+        cfig = cdir_figs+'/'+cv_out+'_'+CNEMO+'-'+CRUN+'_lev'+str(jk)+'_'+CBOX+'_'+cdate+'_'+cpal_fld+'.'+fig_type
     else:
-        cfig = cdir_figs+'/'+cv_out+'_'+CNEMO+'-'+CRUN+'_'+CBOX+'_'+cday+'_'+chour+'_'+cpal_fld+'.'+fig_type
+        cfig = cdir_figs+'/'+cv_out+'_'+CNEMO+'-'+CRUN+'_'+CBOX+'_'+cdate+'_'+cpal_fld+'.'+fig_type
 
     ###### FIGURE ##############
 
     fig = plt.figure(num = 1, figsize=(rw_fig, rh_fig), dpi=None, facecolor='w', edgecolor='0.5')
 
-    ax  = plt.axes([0., 0., 1., 1.], facecolor = '0.85') ; # missing seas will be in "facecolor" !
+    ax  = plt.axes([0., 0., 1., 1.], axisbg = '0.85') # missing seas will be in "axisbg" !
 
     vc_fld = nmp.arange(tmin, tmax + df, df)
 
@@ -603,12 +622,15 @@ for jt in range(jt0,Nt):
         
     del XFLD,YFLD
 
+    print ''
+    if not l_show_lsm and jt == jt0: ( nj , ni ) = nmp.shape(Xplot)
+    print '  *** dimension of array => ', ni, nj, nmp.shape(Xplot)
 
     if l_save_nc:
         if l3d:
-            cf_out = 'nc/'+CWHAT+'_NEMO_'+CNEMO+'-'+CRUN+'_lev'+str(jk)+'_'+CBOX+'_'+cday+'_'+chour+'_'+cpal_fld+'.nc'
+            cf_out = 'nc/'+CWHAT+'_NEMO_'+CNEMO+'-'+CRUN+'_lev'+str(jk)+'_'+CBOX+'_'+cdate+'_'+cpal_fld+'.nc'
         else:
-            cf_out = 'nc/'+CWHAT+'_NEMO_'+CNEMO+'-'+CRUN+'_'+CBOX+'_'+cday+'_'+chour+'_'+cpal_fld+'.nc'
+            cf_out = 'nc/'+CWHAT+'_NEMO_'+CNEMO+'-'+CRUN+'_'+CBOX+'_'+cdate+'_'+cpal_fld+'.nc'
         print ' Saving in '+cf_out
         bnc.dump_2d_field(cf_out, Xplot, xlon=Xlon, xlat=Xlat, name=CWHAT)
         print ''
@@ -646,6 +668,7 @@ for jt in range(jt0,Nt):
         else:
             clsm = plt.imshow(nmp.ma.masked_where(XLSM>0.0001, XLSM), cmap = pal_lsm, norm = norm_lsm, interpolation='none')
 
+    ##### COLORBAR ######
     if nemo_box.l_show_cb:
         ax2 = plt.axes(nemo_box.vcb)
         clb = mpl.colorbar.ColorbarBase(ax2, ticks=vc_fld, cmap=pal_fld, norm=norm_fld, orientation='horizontal', extend=cb_extend)
@@ -662,18 +685,18 @@ for jt in range(jt0,Nt):
         #else:
         #    for rr in vc_fld: cb_labs.append(str(round(rr,int(nmp.ceil(nmp.log10(1./df)))+1) ))
 
-        clb.ax.set_xticklabels(cb_labs, **cfont_clb)
+        clb.ax.set_xticklabels(cb_labs, **cfont_clb_tcks)
         clb.set_label(cunit, **cfont_clb)
-        clb.ax.yaxis.set_tick_params(color=color_top) ; # set colorbar tick color
-        clb.outline.set_edgecolor(color_top) ; # set colorbar edgecolor
-        clb.ax.tick_params(which = 'minor', length = 2, color = color_top )
-        clb.ax.tick_params(which = 'major', length = 4, color = color_top )
+        clb.ax.yaxis.set_tick_params(color=color_top_cb) ; # set colorbar tick color
+        clb.outline.set_edgecolor(color_top_cb) ; # set colorbar edgecolor
+        clb.ax.tick_params(which = 'minor', length = 2, color = color_top_cb )
+        clb.ax.tick_params(which = 'major', length = 4, color = color_top_cb )
 
 
     if nemo_box.l_show_clock:
         xl = float(x_clock)/rfz
         yl = float(y_clock)/rfz
-        ax.annotate('Date: '+cday+' '+chour+':00', xy=(1, 4), xytext=(xl,yl), **cfont_clock)
+        ax.annotate('Date: '+cdats, xy=(1, 4), xytext=(xl,yl), **cfont_clock)
 
     if l_get_name_of_run and nemo_box.l_show_exp:
         xl = float(x_exp)/rfz
@@ -707,7 +730,7 @@ for jt in range(jt0,Nt):
             fig.figimage(im, x_logo-77, y_logo-140., zorder=9)
             del datafile, im
 
-    plt.savefig(cfig, dpi=dpi, orientation='portrait', facecolor='k')
+    plt.savefig(cfig, dpi=rDPI, orientation='portrait', facecolor='k')
     print cfig+' created!\n'
     plt.close(1)
 

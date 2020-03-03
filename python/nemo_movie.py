@@ -22,12 +22,13 @@ import matplotlib.colors as colors
 import matplotlib.image as image
 import matplotlib.cbook as cbook
 
+import warnings
+warnings.filterwarnings("ignore")
+
 from calendar import isleap
 import datetime
 
 from re import split
-import warnings
-warnings.filterwarnings("ignore")
 
 import clprn_colmap as bcm
 import clprn_tool as bt
@@ -721,17 +722,17 @@ for jt in range(jt0,Nt):
         fig.figimage(im, x_logo, y_logo, zorder=9)
         del datafile, im
         #
-    if nemo_box.l_add_logo_ige:
-        datafile = cbook.get_sample_data(cdir_logos+'/'+nemo_box.cf_logo_ige, asfileobj=False)
-        im = image.imread(datafile)
-        fig.figimage(im, x_logo+144, y_logo-150., zorder=9)
-        del datafile, im
-        #
-    if nemo_box.l_add_logo_prc:
-        datafile = cbook.get_sample_data(cdir_logos+'/'+nemo_box.cf_logo_prc, asfileobj=False)
-        im = image.imread(datafile)
-        fig.figimage(im, x_logo-77, y_logo-140., zorder=9)
-        del datafile, im
+        if nemo_box.l_add_logo_ige:
+            datafile = cbook.get_sample_data(cdir_logos+'/'+nemo_box.cf_logo_ige, asfileobj=False)
+            im = image.imread(datafile)
+            fig.figimage(im, x_logo+144, y_logo-150., zorder=9)
+            del datafile, im
+            #
+        if nemo_box.l_add_logo_prc:
+            datafile = cbook.get_sample_data(cdir_logos+'/'+nemo_box.cf_logo_prc, asfileobj=False)
+            im = image.imread(datafile)
+            fig.figimage(im, x_logo-77, y_logo-140., zorder=9)
+            del datafile, im
 
     plt.savefig(cfig, dpi=rDPI, orientation='portrait', facecolor='k')
     print cfig+' created!\n'
