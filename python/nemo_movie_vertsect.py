@@ -64,7 +64,8 @@ l_show_clock = True
 
 cdir_logos = cwd+'/logos'
 l_add_logo_on = False
-cf_logo_on  = cdir_logos+'/ocean-next_trans_white_281x191.png'
+#cf_logo_on  = cdir_logos+'/ocean-next_trans_white_281x191.png'
+cf_logo_on  = cdir_logos+'/ocean-next_ALLwhite_140x95.png'
 l_add_logo_ige = False
 cf_logo_ige = cdir_logos+'/IGE_blanc_notext.png'
 l_add_logo_prace = False
@@ -173,11 +174,11 @@ if CNEMO == 'eNATL60':
 
     # Sections:
     if   CSEC == 'Azores':
-        i1=4175 ; j1=1000 ; i2=i1 ; j2=3000 ; k_stop=294 ; x_min = 22.5 ; x_max = 49.0 ; dx=2.
-        size_img_px=nmp.array([1920.,800.]) ; rfact_zoom=1. ; vcb=[0.4, 0.15, 0.5, 0.02]  ; font_rat=1.6
+        i1=4074 ; j1=1000 ; i2=i1 ; j2=3000 ; k_stop=294 ; x_min = 22.5 ; x_max = 49.0 ; dx=2.
+        size_img_px=nmp.array([1920.,800.]) ; rfact_zoom=1. ; vcb=[0.4, 0.15, 0.4, 0.02]  ; font_rat=1.6
         l_show_clock=True ; x_clock=0.75 ; y_clock=0.25
-        l_save_nc=True
-        l_annotate_name = True
+        l_save_nc=False
+        l_add_logo_on = True; x_logo = 1700 ; y_logo = 60
 
     else:
         print ' ERROR: unknow section "'+CSEC+'" for config "'+CNEMO+'" !!!'
@@ -188,8 +189,7 @@ elif CNEMO == 'eNATL4':
     Ni0 = 559
     Nj0 = 313
     l_add_logo_on = False
-    x_clock = 1600 ; y_clock = 200 ; x_logo = 2200 ; y_logo  = 50
-    cdt = '1h'
+    cdt = '1h'                  # 
 
     print 'FIX ME!!!'; sys.exit(0)
 
@@ -315,10 +315,20 @@ print nmp.shape(XMSK)
 Vdepth = nmp.squeeze( id_lsm.variables['gdept_1d'][0,0:k_stop] )
 Vlon   = nmp.squeeze( id_lsm.variables['glamt'][0,j1:j2,i1:i2] )
 Vlat   = nmp.squeeze( id_lsm.variables['gphit'][0,j1:j2,i1:i2] )
-
+mlon = nmp.mean( id_lsm.variables['glamt'][0,j1:j2,i1] )
 
 print ' Shape Vlon:', nmp.shape(Vlon)
 print ' Shape Vlat:', nmp.shape(Vlat)
+
+#mlon = Vlon[(i1+j2)/2]
+print 'mlon = ', mlon
+clon_u='E'
+if abs(mlon) < 180. and mlon<0.: clon_u='W'
+clon = r'Longitude = '+str(abs(int(round(mlon,2))))+r'$^{\circ}$'+clon_u
+print 'clon => ', clon
+#sys.exit(0)
+
+
 
 Vx = nmp.zeros(ni)
 if l_merid: Vx[:] = Vlat[:]
@@ -370,7 +380,7 @@ params = { 'font.family':'Helvetica Neue',
            'ytick.labelsize': int(9.*font_rat),
            'axes.labelsize':  int(9.*font_rat) }
 mpl.rcParams.update(params)
-cfont_clb  =  { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(9.*font_rat), 'color':color_top}
+cfont_clb  =  { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(10.*font_rat), 'color':color_top}
 cfont_ylb  =  { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(10.*font_rat), 'color':'k'}
 cfont_clock = { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(10.*font_rat), 'color':color_top }
 cfont_mail =  { 'fontname':'Times New Roman', 'fontweight':'normal', 'fontstyle':'italic', 'fontsize':int(14.*font_rat), 'color':'0.8'}
@@ -522,6 +532,9 @@ for jt in range(jt0,Nt):
         print 'Adding clock at:', x_clock, y_clock
         ax.annotate('Date: '+cday+' '+chour+':00', xy=(x_clock,y_clock),xycoords='axes fraction', xytext=(x_clock,y_clock),textcoords='axes fraction', **cfont_clock)
 
+    xl=x_clock-0.25 ; yl=y_clock
+    ax.annotate(clon, xy=(xl,yl),xycoords='axes fraction', xytext=(xl,yl),textcoords='axes fraction', **cfont_clock)    
+
     if l_show_cb:
         ax2 = plt.axes(vcb)
         clb = mpl.colorbar.ColorbarBase(ax2, ticks=vc_fld, cmap=pal_fld, norm=norm_fld, orientation='horizontal', extend=cb_extend)
@@ -581,12 +594,6 @@ for jt in range(jt0,Nt):
     del cf, fig, ax
     if l_show_cb: del clb
 
-    print 'EXIT(LOLO)'
-    sys.exit(0)
+    #print 'EXIT(LOLO)'; sys.exit(0)
 
 id_fld.close()
-
-
-
-
-
