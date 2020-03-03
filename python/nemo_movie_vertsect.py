@@ -37,6 +37,9 @@ import clprn_tool as bt
 import clprn_ncio as bnc
 
 
+l_use_dark_backgound = True
+
+
 cwd = getcwd()
 
 
@@ -60,7 +63,7 @@ l_show_lsm = True
 l_show_cb = False
 l_annotate_name = False
 l_show_clock = True
-
+l_show_exp = True
 
 cdir_logos = cwd+'/logos'
 l_add_logo_on = False
@@ -179,6 +182,7 @@ if CNEMO == 'eNATL60':
         l_show_clock=True ; x_clock=0.75 ; y_clock=0.25
         l_save_nc=False
         l_add_logo_on = True; x_logo = 1700 ; y_logo = 60
+        l_show_exp = True; x_exp=0.56 ; y_exp=0.35
 
     else:
         print ' ERROR: unknow section "'+CSEC+'" for config "'+CNEMO+'" !!!'
@@ -370,21 +374,23 @@ print 'Done!\n'
 
 idx_land = nmp.where( XMSK < 0.01)
 
+col_outside='k'
+if l_use_dark_backgound: col_outside='w'
 
-
-params = { 'font.family':'Helvetica Neue',
+params = { 'font.family':'Ubuntu Mono',
            'font.weight':    'normal',
-           'font.size':       int(9.*font_rat),
-           'legend.fontsize': int(9.*font_rat),
-           'xtick.labelsize': int(9.*font_rat),
-           'ytick.labelsize': int(9.*font_rat),
-           'axes.labelsize':  int(9.*font_rat) }
+           'font.size':       int(10.*font_rat),
+           'legend.fontsize': int(10.*font_rat),
+           'xtick.labelsize': int(10.*font_rat),
+           'ytick.labelsize': int(10.*font_rat),
+           'axes.labelsize':  int(10.*font_rat) }
 mpl.rcParams.update(params)
 cfont_clb  =  { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(10.*font_rat), 'color':color_top}
-cfont_ylb  =  { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(10.*font_rat), 'color':'k'}
 cfont_clock = { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(10.*font_rat), 'color':color_top }
+cfont_exp  =  { 'fontname':'Open Sans',   'fontweight':'normal', 'fontsize':int(12.*font_rat), 'color':color_top }
+cfont_ylb  =  { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(10.*font_rat), 'color':col_outside}
 cfont_mail =  { 'fontname':'Times New Roman', 'fontweight':'normal', 'fontstyle':'italic', 'fontsize':int(14.*font_rat), 'color':'0.8'}
-cfont_titl =  { 'fontname':'Helvetica Neue', 'fontweight':'light', 'fontsize':int(30.*font_rat), 'color':color_top }
+cfont_titl =  { 'fontname':'', 'fontweight':'light', 'fontsize':int(30.*font_rat), 'color':color_top }
 
 
 # Colormaps for fields:
@@ -451,6 +457,11 @@ for jt in range(jt0,Nt):
     cfig = 'figs/'+cv_in+'_'+CNEMO+'-'+CRUN+'_SECTION-'+CSEC+'_'+cday+'_'+chour+'_'+cpal_fld+'.'+fig_type
 
     ###### FIGURE ##############
+    
+    bg_canva='w'
+    if l_use_dark_backgound:
+        plt.style.use('dark_background')
+        bg_canva='k'
 
     fig = plt.figure(num = 1, figsize=(size_figure[0], size_figure[1]), dpi=None) ###, facecolor='0.5', edgecolor='k')
 
@@ -523,14 +534,11 @@ for jt in range(jt0,Nt):
 
     if l_merid: bp.__nice_latitude_axis__( ax, plt, x_min, x_max, dx, axt='x')
     if l_zonal: bp.__nice_longitude_axis__(ax, plt, x_min, x_max, dx, axt='x')
-    bp.__nice_depth_axis__(ax, plt, nmp.min(Vdepth), nmp.max(Vdepth), l_log=False, l_z_inc=False, cunit='Depth [m]', cfont=cfont_ylb)
+    bp.__nice_depth_axis__(ax, plt, 0., nmp.max(Vdepth), l_log=False, l_z_inc=False, cunit='Depth [m]', cfont=cfont_ylb)
 
     if l_show_lsm:
         clsm = plt.pcolormesh(Vx[:], Vdepth[:], nmp.ma.masked_where(XMSK>0.0001, XMSK), cmap=pal_lsm, norm=norm_lsm) ###, interpolation='none')
 
-    if l_show_clock:
-        print 'Adding clock at:', x_clock, y_clock
-        ax.annotate('Date: '+cday+' '+chour+':00', xy=(x_clock,y_clock),xycoords='axes fraction', xytext=(x_clock,y_clock),textcoords='axes fraction', **cfont_clock)
 
     xl=x_clock-0.25 ; yl=y_clock
     ax.annotate(clon, xy=(xl,yl),xycoords='axes fraction', xytext=(xl,yl),textcoords='axes fraction', **cfont_clock)    
@@ -562,8 +570,12 @@ for jt in range(jt0,Nt):
         clb.ax.tick_params(which = 'major', length = 4, color = color_top )
 
 
+    if l_show_clock:
+        print 'Adding clock at:', x_clock, y_clock
+        ax.annotate('Date: '+cday+' '+chour+':00', xy=(x_clock,y_clock),xycoords='axes fraction', xytext=(x_clock,y_clock),textcoords='axes fraction', **cfont_clock)
 
-    #ax.annotate('laurent.brodeau@ocean-next.fr', xy=(1, 4), xytext=(xl+150, 20), **cfont_mail)
+    if l_show_exp:
+        ax.annotate('Experiment: '+CNEMO+'-'+CRUN, xy=(x_exp,y_exp),xycoords='axes fraction', xytext=(x_exp,y_exp),textcoords='axes fraction', **cfont_exp)
 
     if l_annotate_name:
         xl = rnxr/20./rfact_zoom
@@ -589,7 +601,7 @@ for jt in range(jt0,Nt):
         fig.figimage(im, x_logo-77, y_logo-140., zorder=9)
         del datafile, im
 
-    plt.savefig( cfig, dpi=rDPI, orientation='portrait', facecolor='w', transparent=False) ; # white outside ploting region
+    plt.savefig( cfig, dpi=rDPI, orientation='portrait', facecolor=bg_canva, transparent=False) ; # white outside ploting region
     print cfig+' created!\n'
     plt.close(1)
 
