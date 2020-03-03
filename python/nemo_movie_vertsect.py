@@ -46,7 +46,7 @@ vmn = [ 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ]
 vml = [ 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ]
 
 fig_type='png'
-dpi = 110
+rDPI = 110
 color_top = 'white'
 #color_top = 'k'
 
@@ -175,8 +175,9 @@ if CNEMO == 'eNATL60':
     if   CSEC == 'Azores':
         i1=4175 ; j1=1000 ; i2=i1 ; j2=3000 ; k_stop=294 ; x_min = 22.5 ; x_max = 49.0 ; dx=2.
         size_img_px=nmp.array([1920.,800.]) ; rfact_zoom=1. ; vcb=[0.4, 0.15, 0.5, 0.02]  ; font_rat=1.6
-        l_show_clock=True ; x_clock=800 ; y_clock=300
-        l_save_nc=False
+        l_show_clock=True ; x_clock=0.75 ; y_clock=0.25
+        l_save_nc=True
+        l_annotate_name = True
 
     else:
         print ' ERROR: unknow section "'+CSEC+'" for config "'+CNEMO+'" !!!'
@@ -250,18 +251,18 @@ rnxr = rfact_zoom*nx_res ; # widt image (in pixels)
 rnyr = rfact_zoom*ny_res ; # height image (in pixels)
 
 # Target resolution for figure:
-size_figure = size_img_px/float(dpi)
+size_figure = size_img_px/float(rDPI)
 
-#rh_fig = round(rnyr/float(dpi),3) ; # width of figure
+#rh_fig = round(rnyr/float(rDPI),3) ; # width of figure
 #rw_fig = round(rh_fig*yx_ratio      ,3) ; # height of figure
-#rh_img = rh_fig*float(dpi)
-#rw_img = rw_fig*float(dpi)
+#rh_img = rh_fig*float(rDPI)
+#rw_img = rw_fig*float(rDPI)
 #while rw_img < round(rnxr,0):
-#    rw_fig = rw_fig + 0.01/float(dpi)
-#    rw_img = rw_fig*float(dpi)
+#    rw_fig = rw_fig + 0.01/float(rDPI)
+#    rw_img = rw_fig*float(rDPI)
 #while rh_img < round(rnyr,0):
-#    rh_fig = rh_fig + 0.01/float(dpi)
-#    rh_img = rh_fig*float(dpi)
+#    rh_fig = rh_fig + 0.01/float(rDPI)
+#    rh_img = rh_fig*float(rDPI)
 #    print ' *** size figure =>', rw_fig, rh_fig, '\n'
 #    print ' *** Forecasted dimension of image =>', rw_img, rh_img
 #
@@ -370,7 +371,8 @@ params = { 'font.family':'Helvetica Neue',
            'axes.labelsize':  int(9.*font_rat) }
 mpl.rcParams.update(params)
 cfont_clb  =  { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(9.*font_rat), 'color':color_top}
-cfont_clock = { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(9.*font_rat), 'color':color_top }
+cfont_ylb  =  { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(10.*font_rat), 'color':'k'}
+cfont_clock = { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(10.*font_rat), 'color':color_top }
 cfont_mail =  { 'fontname':'Times New Roman', 'fontweight':'normal', 'fontstyle':'italic', 'fontsize':int(14.*font_rat), 'color':'0.8'}
 cfont_titl =  { 'fontname':'Helvetica Neue', 'fontweight':'light', 'fontsize':int(30.*font_rat), 'color':color_top }
 
@@ -489,14 +491,13 @@ for jt in range(jt0,Nt):
     print '  *** dimension of array => ', ni, nj, nmp.shape(Xplot)
 
     if l_save_nc:
-        cf_out = 'nc/'+CWHAT+'_NEMO_'+CNEMO+'_'+CSEC+'_'+cday+'_'+chour+'_'+cpal_fld+'.nc'
+        cf_out = 'nc/'+CWHAT+'_NEMO_'+CNEMO+'_'+CSEC+'_'+cday+'_'+chour+'.nc'
         print ' Saving in '+cf_out
         bnc.dump_2d_field(cf_out, Xplot, xlon=Vx, xlat=Vdepth, name=CWHAT)
         bnc.dump_2d_field(cf_out, Xplot, name=CWHAT)
         print ''
 
 
-    
 
     print "Ploting"
 
@@ -512,10 +513,14 @@ for jt in range(jt0,Nt):
 
     if l_merid: bp.__nice_latitude_axis__( ax, plt, x_min, x_max, dx, axt='x')
     if l_zonal: bp.__nice_longitude_axis__(ax, plt, x_min, x_max, dx, axt='x')
-    bp.__nice_depth_axis__(ax, plt, nmp.min(Vdepth), nmp.max(Vdepth), l_log=False, l_z_inc=False, cunit='[m]') ; ###, cfont=cfont_clb)
+    bp.__nice_depth_axis__(ax, plt, nmp.min(Vdepth), nmp.max(Vdepth), l_log=False, l_z_inc=False, cunit='Depth [m]', cfont=cfont_ylb)
 
     if l_show_lsm:
         clsm = plt.pcolormesh(Vx[:], Vdepth[:], nmp.ma.masked_where(XMSK>0.0001, XMSK), cmap=pal_lsm, norm=norm_lsm) ###, interpolation='none')
+
+    if l_show_clock:
+        print 'Adding clock at:', x_clock, y_clock
+        ax.annotate('Date: '+cday+' '+chour+':00', xy=(x_clock,y_clock),xycoords='axes fraction', xytext=(x_clock,y_clock),textcoords='axes fraction', **cfont_clock)
 
     if l_show_cb:
         ax2 = plt.axes(vcb)
@@ -541,10 +546,6 @@ for jt in range(jt0,Nt):
         clb.ax.tick_params(which = 'major', length = 4, color = color_top )
 
 
-    if l_show_clock:
-        xl = float(x_clock)/rfact_zoom
-        yl = float(y_clock)/rfact_zoom
-        ax.annotate('Date: '+cday+' '+chour+':00', xy=(1, 4), xytext=(xl,yl), **cfont_clock)
 
     #ax.annotate('laurent.brodeau@ocean-next.fr', xy=(1, 4), xytext=(xl+150, 20), **cfont_mail)
 
@@ -572,13 +573,16 @@ for jt in range(jt0,Nt):
         fig.figimage(im, x_logo-77, y_logo-140., zorder=9)
         del datafile, im
 
-    plt.savefig(cfig, dpi=dpi, orientation='portrait', facecolor='w') ; # white outside ploting region
+    plt.savefig( cfig, dpi=rDPI, orientation='portrait', facecolor='w', transparent=False) ; # white outside ploting region
     print cfig+' created!\n'
     plt.close(1)
 
     #if l_show_lsm: del clsm
     del cf, fig, ax
     if l_show_cb: del clb
+
+    print 'EXIT(LOLO)'
+    sys.exit(0)
 
 id_fld.close()
 

@@ -1829,10 +1829,8 @@ def __nice_depth_axis__(ax_hndl, plt_hndl, z0, zK, l_log=False, l_z_inc=True, cu
         ax_hndl.set_ylim(zK+(zK-z0)/50. , z0)
     ax_hndl.grid(color='k', linestyle='-', linewidth=0.5)
     if not cunit is None:
-        if cfont is None:
-            plt_hndl.ylabel(cunit)
-        else:
-            plt_hndl.ylabel(cunit, **cfont)
+        if cfont is None: cfont  =  { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':10, 'color':'k'}
+        plt_hndl.ylabel(cunit, **cfont)
 
 def __nice_latitude_axis__(ax_hndl, plt_hndl, lmin, lmax, dl, axt='x'):
     if axt == 'x':
