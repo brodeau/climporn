@@ -542,15 +542,18 @@ for jt in range(jt0,Nt):
         if cb_jump > 1:
             cpt = 0
             for rr in vc_fld:
+                cval = ' '
                 if cpt % cb_jump == 0:
-                    if df >= 1.: cb_labs.append(str(int(rr)))
-                    if df <  1.: cb_labs.append(str(round(rr,int(nmp.ceil(nmp.log10(1./df)))+1) ))
-                else:
-                    cb_labs.append(' ')
+                    if df >= 1.: cval = str( int(rr) )
+                    if df <  1.: cval = str( round(rr,int(nmp.ceil(nmp.log10(1./df)))+1) )
+                    if abs(rr)<0.00001: cval='0'
+                cb_labs.append(cval)
                 cpt = cpt + 1
         else:
-            for rr in vc_fld: cb_labs.append(str(round(rr,int(nmp.ceil(nmp.log10(1./df)))+1) ))
-
+            for rr in vc_fld:
+                cval = str(round(rr,int(nmp.ceil(nmp.log10(1./df)))+1) )
+                if abs(rr)<0.00001: cval='0'
+                cb_labs.append(cval)                
         clb.ax.set_xticklabels(cb_labs, **cfont_clb)
         clb.set_label(cunit, **cfont_clb)
         clb.ax.yaxis.set_tick_params(color=color_top) ; # set colorbar tick color
