@@ -37,18 +37,19 @@ import clprn_tool as bt
 import clprn_ncio as bnc
 
 ldrown = True
-l_add_topo_land = True
+l_add_topo_land = False
+
+l_show_ice_colbar = True
+
+l_show_logo = False
+on_logo="/home/brodeau/util/logos/ocean-next_trans_white_120x82.png"
 
 vmn = [ 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ]
 vml = [ 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ]
 
-l_show_ice_colbar = True
-
-l_show_logo = True
-on_logo="/home/brodeau/util/logos/ocean-next_trans_white_120x82.png"
-
 fig_type='png'
-rDPI = 100
+rDPI = 180
+
 color_top = 'white'
 color_top_cb = 'white'
 if l_add_topo_land:
@@ -57,18 +58,10 @@ if l_add_topo_land:
 
 #color_top = 'k'
 
-cv_out = 'sst_+_ice'
 
 jt0 = 0
 
 
-# SST
-rmin_sst=-2.
-rmax_sst=16.
-dsst = 1. ; cb_jump = 2
-#cpal_sst = 'ncview_nrl'
-cpal_sst = 'on3'
-cunit = r'SST [$^{\circ}$C]'
 
 cdt = '6h'
 l_get_name_of_run = True
@@ -96,34 +89,35 @@ parser = ap.ArgumentParser(description='Generate pixel maps of a given scalar.')
 
 requiredNamed = parser.add_argument_group('required arguments')
 requiredNamed.add_argument('-i', '--fin' , required=True,                help='specify the NEMO netCDF file to read from...')
-#requiredNamed.add_argument('-w', '--what', required=True, default="sst", help='specify the field/diagnostic to plot (ex: sst)')
+requiredNamed.add_argument('-w', '--what', required=True, default="SST", help='specify the field/diagnostic to plot (ex: SST)')
 
 parser.add_argument('-C', '--conf', default="NANUK025",     help='specify NEMO config (ex: eNATL60)')
-#parser.add_argument('-b', '--box' , default="nanuk",        help='specify extraction box name (ex: ALL)')
 parser.add_argument('-m', '--fmm' , default="mesh_mask.nc", help='specify the NEMO mesh_mask file (ex: mesh_mask.nc)')
 parser.add_argument('-s', '--sd0' , default="19950101",     help='specify initial date as <YYYYMMDD>')
 parser.add_argument('-l', '--lev' , type=int, default=0,    help='specify the level to use if 3D field (default: 0 => 2D)')
-#parser.add_argument('-z', '--zld' ,                         help='specify the topography netCDF file to use (field="z")')
+parser.add_argument('-I', '--ice' , action='store_true',    help='draw sea-ice concentration layer onto the field')
 
 args = parser.parse_args()
 
 CNEMO = args.conf
 #CBOX  = args.box
-#CWHAT = args.what
+CWHAT = args.what
 cf_in = args.fin
 cf_mm = args.fmm
 csd0  = args.sd0
 jk    = args.lev
+lshow_ice = args.ice
 #cf_topo_land = args.zld
 
 print ''
 print ' *** CNEMO = ', CNEMO
 #print ' *** CBOX  = ', CBOX
-#print ' *** CWHAT = ', CWHAT
+print ' *** CWHAT = ', CWHAT
 print ' *** cf_in = ', cf_in
 print ' *** cf_mm = ', cf_mm
 print ' *** csd0 = ', csd0
 print ' ***   jk  = ', jk
+print ' *** Show ice? =>', lshow_ice
 #l_add_topo_land = False
 #if args.zld != None:
 #    print ' *** cf_topo_land = ', cf_topo_land
@@ -136,23 +130,24 @@ else:
 ###############################################################################################################################################
 
 if not path.exists("figs"): mkdir("figs")
-cdir_figs = './figs'
+cdir_figs = './figs/'+CWHAT
 if not path.exists(cdir_figs): mkdir(cdir_figs)
 
 
-# Name of RUN:
 CRUN = ''
 if l_get_name_of_run:
+    # Name of RUN:
     vv = split('-|_', path.basename(cf_in))
     if vv[0] != CNEMO:
         print 'ERROR: your file name is not consistent with "'+CNEMO+'" !!! ('+vv[0]+')' ; sys.exit(0)
     CRUN = vv[1]
     print '\n Run is called: "'+CRUN+'" !\n'
+
 #---------------------------------------------------------------
 # Test - beta development:
 #cf_in = '/data/gcm_output/CREG025/NANUK025-ILBOXE50_6h_gridT-2D_199506-199506.nc'
 #cf_mm = '/data/gcm_setup/CREG025/CREG025-I/mesh_mask_CREG025_3.6_NoMed.nc'
-if CNEMO == 'NANUK025':
+if CNEMO == 'NANUK025' or CNEMO == 'CREG025':
     jk=0
     j1=0 ; j2=603
     i1=0 ; i2=528
@@ -160,6 +155,45 @@ else:
     print('ERRO: unknow conf '+CNEMO)
     ###############################
 
+if CNEMO == 'NANUK025': cxtra_info1 = "OPA - neXtSIM" ; cxtra_info2 = "   (CREG025)"
+if CNEMO == 'CREG025':  cxtra_info1 = "OPA - LIM3"    ; cxtra_info2 = "(CREG025)"
+
+if   CWHAT == 'sst':
+    # SST
+    tmin=-2.
+    tmax=20.
+    cv_in = 'sst'
+    cv_if = 'iconc'
+    cv_out = CWHAT
+    df = 1. ; cb_jump = 2    
+    cpal_fld = 'on3'  #cpal_fld = 'ncview_nrl'
+    cunit = r'SST [$^{\circ}$C]'
+    #cv_in = 'somxl010' ; cv_out = 'MLD'
+    #tmin=0. ;  tmax=1800.  ;  df = 50. ; cpal_fld = 'ncview_hotres' ;     cb_jump = 4
+    #cunit = r'MLD [m]'
+
+elif CWHAT == 'Qns':
+    cv_in = 'nshfls'
+    cv_if = 'ice_cover'
+    cv_out = CWHAT
+    tmin=-1250 ;  tmax=250. ; df = 50. ; cb_jump = 5
+    #cpal_fld = 'plasma' ;
+    cpal_fld = 'gist_stern_r'
+    cunit = r'Non-solar heat flux ($W/m^{2}$)'
+    
+elif CWHAT == 'Qnet':
+    cv_in = 'qt'
+    cv_if = 'ice_cover'
+    cv_out = CWHAT
+    tmin=-1000 ;  tmax=1000. ;  df = 200. ; cb_jump = 2
+    #cpal_fld = 'Spectral_r'
+    cpal_fld = 'RdBu_r'
+    cunit = r'Net heat flux ($W/m^{2}$)'
+    
+else:
+    print 'ERROR: we do not know variable "'+str(cv_in)+'" !'
+    sys.exit(0)
+    
 
 bt.chck4f(cf_mm)
 
@@ -196,21 +230,6 @@ id_lsm.close()
 
 print('Done!\n')
 
-#if l_add_topo_land:
-#    bt.chck4f(cf_topo_land)
-#    id_top = Dataset(cf_topo_land)
-#    print ' *** Reading "z" into:\n'+cf_topo_land
-#    xtopo = id_top.variables['z'][0,j1:j2,i1:i2]
-#    id_top.close()
-#    if nmp.shape(xtopo) != (nj,ni):
-#        print 'ERROR: topo and mask do not agree in shape!'; sys.exit(0)
-#    xtopo = xtopo*(1. - XMSK)
-#    #bnc.dump_2d_field('topo_'+CBOX+'.nc', xtopo, name='z')    
-#    if l3d: xtopo = xtopo + rof_dpt
-#    xtopo[nmp.where( XMSK > 0.01)] = nmp.nan
-#    if not l3d:
-#        xtopo[nmp.where( xtopo < 0.0)] = nmp.nan
-
 
 fontr=1.2
 params = { 'font.family':'Helvetica Neue',
@@ -230,7 +249,8 @@ cfont_titl2 = { 'fontname':'Open Sans', 'fontweight':'light', 'fontsize':int(14.
 
 
 # for colorbar:
-vc_sst = nmp.arange(rmin_sst, rmax_sst + dsst, dsst)
+vc_fld = nmp.arange(tmin, tmax + df, df)
+l_show_ice_colbar = l_show_ice_colbar and lshow_ice
 if l_show_ice_colbar: vc_ice = nmp.arange(rmin_ice, rmax_ice+0.1, 0.1)
 
 
@@ -244,7 +264,8 @@ if l_show_ice_colbar: vc_ice = nmp.arange(rmin_ice, rmax_ice+0.1, 0.1)
 # For movie
 vfig_size = [ 7.54, 7.2 ]
 #vsporg = [0.001, 0.0011, 0.997, 0.999]
-vsporg = [0., 0.0001, 1., 1.001]
+#vsporg = [0., 0.0001, 1., 1.001]
+vsporg = [0., 0., 1., 1.]
 
 
 vcbar = [0.05, 0.065, 0.92, 0.03]
@@ -264,16 +285,12 @@ else:
 
 
 
-pal_sst = bcm.chose_colmap(cpal_sst)
-nrm_sst = colors.Normalize(vmin=rmin_sst, vmax=rmax_sst, clip=False)
+pal_fld = bcm.chose_colmap(cpal_fld)
+nrm_fld = colors.Normalize(vmin=tmin, vmax=tmax, clip=False)
 
-pal_ice = bcm.chose_colmap(cpal_ice, exp_ctrl=1.5)
-nrm_ice = colors.Normalize(vmin=rmin_ice, vmax=rmax_ice, clip = False)
-
-#if l_add_topo_land:
-#    xtopo = nmp.log10(xtopo+rof_log)
-#    pal_lsm = bcm.chose_colmap('gray_r')
-#    nrm_lsm = colors.Normalize(vmin = nmp.log10(-100. + rof_log), vmax = nmp.log10(4000.+rof_dpt + rof_log), clip = False)
+if lshow_ice:
+    pal_ice = bcm.chose_colmap(cpal_ice, exp_ctrl=1.5)
+    nrm_ice = colors.Normalize(vmin=rmin_ice, vmax=rmax_ice, clip = False)
 
 
 
@@ -312,10 +329,10 @@ for jt in range(jt0,Nt):
     else:
         cfig = cdir_figs+'/'+cv_out+'_'+CNEMO+'-'+CRUN+'_'+cday+'_'+chour+'.'+fig_type
 
-    # Getting SST and sea-ice concentration at time record "jt":
+    # Getting field and sea-ice concentration at time record "jt":
     id_in = Dataset(cf_in)
-    XSST = id_in.variables['sst']   [jt,j1:j2,i1:i2]
-    XIFR = id_in.variables['siconc'][jt,j1:j2,i1:i2]
+    XFLD = id_in.variables[cv_in]   [jt,j1:j2,i1:i2]
+    if lshow_ice: XIFR = id_in.variables[cv_if][jt,j1:j2,i1:i2]
     id_in.close()
 
     cjt = '%4.4i'%(jt)
@@ -334,20 +351,14 @@ for jt in range(jt0,Nt):
 
     if ldrown:
         print(' Drowning...')
-        bt.drown(XIFR, XMSK, k_ew=-1, nb_max_inc=10, nb_smooth=10)
-        bt.drown(XSST, XMSK, k_ew=-1, nb_max_inc=10, nb_smooth=10)
+        if lshow_ice: bt.drown(XIFR, XMSK, k_ew=-1, nb_max_inc=10, nb_smooth=10)
+        bt.drown(XFLD, XMSK, k_ew=-1, nb_max_inc=10, nb_smooth=10)
 
-    #idx_oce = nmp.where(XIFR  < rmin_ice)
-    #idx_ice = nmp.where(XIFR >= rmin_ice)
-    #XSST[idx_ice] = nmp.nan
-    #XIFR[idx_oce] = nmp.nan
-    
-    #XSST = nmp.ma.masked_where(XIFR >= rmin_ice, XSST)
-    #XIFR = nmp.ma.masked_where(XIFR  < rmin_ice, XIFR)
-    XSST = nmp.ma.masked_where(XIFR >= 0.2, XSST)
-    XSST = nmp.ma.masked_where(XMSK <= 0.1, XSST)
-    XIFR = nmp.ma.masked_where(XIFR  < 0.2, XIFR)
-    XIFR = nmp.ma.masked_where(XMSK <= 0.1, XIFR)
+    if lshow_ice: XFLD = nmp.ma.masked_where(XIFR >= 0.2, XFLD)
+    XFLD = nmp.ma.masked_where(XMSK <= 0.1, XFLD)
+    if lshow_ice:
+        XIFR = nmp.ma.masked_where(XIFR  < 0.2, XIFR)
+        XIFR = nmp.ma.masked_where(XMSK <= 0.1, XIFR)
     
 
     if l_add_topo_land:
@@ -358,8 +369,9 @@ for jt in range(jt0,Nt):
         carte.drawlsmask(ocean_color='0.5',land_color=(255,255,255,1), alpha=1)
         #carte.drawlsmask(land_color=(255,255,255,1))
 
-    ft = carte.pcolormesh(x0, y0, XSST, cmap = pal_sst, norm = nrm_sst )
-    fi = carte.pcolormesh(x0, y0, XIFR, cmap = pal_ice, norm = nrm_ice )
+    ft = carte.pcolormesh(x0, y0, XFLD, cmap = pal_fld, norm = nrm_fld )
+    #ft = carte.pcolor(x0, y0, XFLD, cmap = pal_fld, norm = nrm_fld )
+    if lshow_ice: fi = carte.pcolormesh(x0, y0, XIFR, cmap = pal_ice, norm = nrm_ice )
 
     carte.drawcoastlines(linewidth=0.5)
 
@@ -371,15 +383,15 @@ for jt in range(jt0,Nt):
     carte.drawmeridians(nmp.arange(-180,180,20), labels=[0,0,0,1], linewidth=0.3)
     carte.drawparallels(nmp.arange( -90, 90,10), labels=[1,0,0,0], linewidth=0.3)
 
-    # ----------- Color bar for SST -----------
+    # ----------- Color bar for field -----------
     ax2 = plt.axes([0.64, 0.965, 0.344, 0.018])
-    clb = mpl.colorbar.ColorbarBase(ax2, ticks=vc_sst, cmap=pal_sst, norm=nrm_sst, orientation='horizontal', extend='both')
+    clb = mpl.colorbar.ColorbarBase(ax2, ticks=vc_fld, cmap=pal_fld, norm=nrm_fld, orientation='horizontal', extend='both')
     cb_labs = []
     cpt = 0
-    for rr in vc_sst:
+    for rr in vc_fld:
         if cpt % cb_jump == 0:
-            if dsst >= 1.: cb_labs.append(str(int(rr)))
-            if dsst <  1.: cb_labs.append(str(round(rr,int(nmp.ceil(nmp.log10(1./dsst)))+1) ))
+            if df >= 1.: cb_labs.append(str(int(rr)))
+            if df <  1.: cb_labs.append(str(round(rr,int(nmp.ceil(nmp.log10(1./df)))+1) ))
         else:
             cb_labs.append(' ')
         cpt = cpt + 1
@@ -412,8 +424,8 @@ for jt in range(jt0,Nt):
     
     ry0 = 0.78
     #ry0 = 0.9
-    ax.annotate('OPA - neXtSIM', xy=(0.02, ry0+0.05), xycoords='figure fraction', **cfont_titl1)
-    ax.annotate(' (CREG025) '  , xy=(0.07,  ry0 ), xycoords='figure fraction',    **cfont_titl2)
+    ax.annotate(cxtra_info1, xy=(0.02, ry0+0.05), xycoords='figure fraction', **cfont_titl1)
+    ax.annotate(cxtra_info2, xy=(0.05, ry0 ),     xycoords='figure fraction', **cfont_titl2)
 
     #
     if l_show_logo:
@@ -423,5 +435,6 @@ for jt in range(jt0,Nt):
         del datafile, im
     
     print(' Saving figure: '+cfig)
-    plt.savefig(cfig, dpi=rDPI, orientation='portrait', transparent=True)
+    #plt.savefig(cfig, dpi=rDPI, orientation='portrait', transparent=True)
+    plt.savefig(cfig, dpi=rDPI, orientation='portrait', transparent=False)
     plt.close(1)
