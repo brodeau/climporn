@@ -147,8 +147,6 @@ elif CWHAT == 'W':
 elif CWHAT == 'T':
     cv_in = 'sosstsst' ; #in ['sosstsst','tos']:    
     tmin=-2 ;  tmax=30.   ;  df = 1. ; cpal_fld = 'ncview_nrl' ;     cb_jump = 2
-    #tmin=0. ;  tmax=32.   ;  df = 2. ; cpal_fld = 'viridis'
-    #tmin=4. ;  tmax=20.   ;  df = 1. ; cpal_fld = 'PuBu'
     cunit = r'T ($^{\circ}$C)'
     l_show_cb = True
 
@@ -157,8 +155,6 @@ elif CWHAT == 'GRAD_T':
     l_apply_hgrad = True
     l_smooth = True ; nb_smooth  = 5
     tmin=0. ;  tmax=0.001 ;  df = 0.0001 ; cpal_fld = 'ncview_hotres' ; cb_jump = 1
-    #tmin=0. ;  tmax=32.   ;  df = 2. ; cpal_fld = 'viridis'
-    #tmin=4. ;  tmax=20.   ;  df = 1. ; cpal_fld = 'PuBu'
     cunit = r'$\left|\vec{\nabla}T\right|$ (K/m)'
     l_show_cb = True
     
