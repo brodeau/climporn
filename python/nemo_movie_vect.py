@@ -318,8 +318,8 @@ bt.chck4f(cfx_in)
 bt.chck4f(cfy_in)
 
 l_notime=False
-bt.chck4f(cf_in)
-id_fld = Dataset(cf_in)
+bt.chck4f(cfx_in)
+id_fld = Dataset(cfx_in)
 list_var = id_fld.variables.keys()
 if 'time_counter' in list_var:
     vtime = id_fld.variables['time_counter'][:]

@@ -48,7 +48,7 @@ vmn = [ 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ]
 vml = [ 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ]
 
 fig_type='png'
-rDPI = 180
+rDPI = 150
 
 color_top = 'white'
 color_top_cb = 'white'
@@ -176,9 +176,9 @@ elif CWHAT == 'Qns':
     cv_in = 'nshfls'
     cv_if = 'ice_cover'
     cv_out = CWHAT
-    tmin=-1250 ;  tmax=250. ; df = 50. ; cb_jump = 5
-    #cpal_fld = 'plasma' ;
-    cpal_fld = 'gist_stern_r'
+    #tmin=-1250 ;  tmax=250. ; df = 50. ; cb_jump = 5 ; cpal_fld = 'gist_stern_r'
+    tmin=-300 ;  tmax=300. ; df = 50. ; cb_jump = 2 ; cpal_fld = 'RdBu_r'
+    #cpal_fld = 'plasma' ;    
     cunit = r'Non-solar heat flux ($W/m^{2}$)'
     
 elif CWHAT == 'Qnet':
