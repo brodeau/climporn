@@ -71,6 +71,9 @@ if not l_read_lsm and cv_in != 'Bathymetry':
     print "It's only for variable 'Bathymetry' that you can skip providing the mesh_mask file!"
     sys.exit(0)
 
+
+
+bathy_max = 5000. # m
     
 i2=0
 j2=0
@@ -129,6 +132,17 @@ elif CNEMO == 'eNATL1':
     vcb = [0.62, 0.11, 0.35, 0.025] ; font_rat = 0.12*rfact_zoom
     x_cnf = 4. ; y_cnf = 120. ; # where to put label of conf on Figure...
 
+elif CNEMO == 'SouthPac':
+    i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 1. ; vcb = [0.5, 0.875, 0.49, 0.02] ; font_rat = 0.16*rfact_zoom
+    x_cnf = 160. ; y_cnf = 4000. ; # where to put label of conf on Figure...
+    l_show_cb = False ; l_show_nm = False
+    bathy_max = 8000. # m
+    
+elif CNEMO == 'SPAC4':
+    i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 2. ; vcb = [0.15, 0.9, 0.7, 0.04] ; font_rat = 0.4*rfact_zoom
+    x_cnf = 160. ; y_cnf = 4000. ; # where to put label of conf on Figure...
+    l_show_cb = True ; l_show_nm = False
+    bathy_max = 8000. # m
     
 else:
     print '\n PROBLEM: "'+CNEMO+'" is an unknown config!!!'
@@ -156,9 +170,7 @@ if cv_in in ['sosstsst','tos']:
 
 elif cv_in in ['Bathymetry']:   # 
     cfield = 'Bathymetry'       # 
-    #tmin=100. ;  tmax=4500.   ;  df = 100.
-    tmin=0. ;  tmax=5000.   ;  df = 100.
-    if CNEMO == 'KANAK60': tmin=0. ;  tmax=6000.   ;  df = 100.
+    tmin=0. ;  tmax=bathy_max   ;  df = 100.
     #cpal_fld = 'ocean'
     #cpal_fld = 'Blues'
     #cpal_fld = 'PuBu'
@@ -281,7 +293,7 @@ idx_oce = nmp.where(XMSK[:,:] > 0.5)
 
 #font_rat
 #params = { 'font.family':'Ubuntu',
-params = { 'font.family':'Helvetica Neue',
+params = { 'font.family':'Open Sans',
            'font.weight':    'normal',
            'font.size':       int(12.*font_rat),
            'legend.fontsize': int(22.*font_rat),
