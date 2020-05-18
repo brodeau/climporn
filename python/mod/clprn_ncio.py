@@ -447,6 +447,7 @@ def write_2d_mask(cf_out, MSK, xlon=[], xlat=[], name='mask'):
 
     return
 
+
 def dump_2d_field( cf_out, XFLD, xlon=[], xlat=[], name='field', unit='', long_name='', mask=[] ):
 
     (nj,ni) = nmp.shape(XFLD)
@@ -520,8 +521,7 @@ def dump_2d_multi_field(cf_out, XFLD, vnames, vndim=[], xlon=[], xlat=[], vtime=
             cnm_dim_x = 'x'
             cnm_dim_y = 'y'    
     
-    # Dimensions:
-    
+    # Dimensions:    
     f_out.createDimension(cnm_dim_x, ni)
     f_out.createDimension(cnm_dim_y, nj)
     if l_add_time: f_out.createDimension('time_counter', None)
@@ -538,8 +538,6 @@ def dump_2d_multi_field(cf_out, XFLD, vnames, vndim=[], xlon=[], xlat=[], vtime=
             id_lon[:] = xlon[:]
             id_lat[:] = xlat[:]
 
-
-        
     if l_add_time:
         id_tim    = f_out.createVariable('time_counter' ,'f8',('time_counter',))
         id_tim[:] = vtime[:]
@@ -555,6 +553,93 @@ def dump_2d_multi_field(cf_out, XFLD, vnames, vndim=[], xlon=[], xlat=[], vtime=
         else:
             id_fld  = f_out.createVariable(vnames[jv] ,'f8',('time_counter',cnm_dim_y,cnm_dim_x,), zlib=True, complevel=5)
             id_fld[:,:,:] = XFLD[jv,:,:,:]
+            
+    f_out.about = 'Diagnostics created with Climporn (https://github.com/brodeau/climporn)'
+    f_out.close()
+
+    return
+
+
+
+
+
+
+
+
+def dump_3d_multi_field(cf_out, XFLD, vnames, vndim=[], xlon=[], xlat=[], vdepth=[], vtime=[]):
+    
+    if len(vtime)>0:
+        l_add_time = True
+        (nbfld, Nbt, nk, nj, ni) = nmp.shape(XFLD)
+        if Nbt != len(vtime): print 'ERROR (dump_3d_multi_field): array and time vector disagree!'; sys.exit(0)
+    else:
+        l_add_time = False
+        (nbfld,      nk, nj, ni) = nmp.shape(XFLD)
+
+    vnbdim = nmp.zeros(nbfld)
+    if vndim == []:
+        vnbdim[:] = 4 ; # default dim is 4 (time_counter,z,y,x)
+    else:
+        nn0 = len(vndim)
+        if nbfld != nn0: print 'ERROR (dump_3d_multi_field): vndim and main array dont agree in shape!'; sys.exit(0)
+        vnbdim[:] = vndim[:]
+        
+    nf = len(vnames)
+    if nbfld != nf: print 'ERROR (dump_3d_multi_field): list of names and main array dont agree in shape!'; sys.exit(0)
+
+    f_out = Dataset(cf_out, 'w', format='NETCDF4')
+
+
+    l_coord_2d = False
+    cnm_dim_x = 'lon'
+    cnm_dim_y = 'lat'
+    cnm_dim_z = 'depth'
+    
+    if (xlon != []) and (xlat != []):
+        if (xlon.shape == (nj,ni)) and (xlon.shape == xlat.shape):
+            l_coord_2d = True
+            cnm_dim_x = 'x'
+            cnm_dim_y = 'y'    
+
+    cnm_dim_z = 'z'
+                    
+    # Dimensions:    
+    f_out.createDimension(cnm_dim_x, ni)
+    f_out.createDimension(cnm_dim_y, nj)
+    f_out.createDimension(cnm_dim_z, nk)
+    if l_add_time: f_out.createDimension('time_counter', None)
+
+    if (xlon != []) and (xlat != []):
+        if l_coord_2d:
+            id_lon  = f_out.createVariable('nav_lon' ,'f4',(cnm_dim_y,cnm_dim_x,), zlib=True, complevel=5)
+            id_lat  = f_out.createVariable('nav_lat' ,'f4',(cnm_dim_y,cnm_dim_x,), zlib=True, complevel=5)            
+            id_lon[:,:] = xlon[:,:]
+            id_lat[:,:] = xlat[:,:]
+        else:
+            id_lon  = f_out.createVariable(cnm_dim_x ,'f4',(cnm_dim_x,), zlib=True, complevel=5)
+            id_lat  = f_out.createVariable(cnm_dim_y ,'f4',(cnm_dim_y,), zlib=True, complevel=5)
+            id_lon[:] = xlon[:]
+            id_lat[:] = xlat[:]
+
+    if (vdepth != []):
+        id_dep  = f_out.createVariable('deptht'  ,'f4',(cnm_dim_z,),           zlib=True, complevel=5)
+        id_dep[:]   = vdepth[:]
+        
+    if l_add_time:
+        id_tim    = f_out.createVariable('time_counter' ,'f8',('time_counter',))
+        id_tim[:] = vtime[:]
+        
+    #id_fld = nmp.zeros(nbfld, dtype=int)
+    for jv in range(nbfld):
+        if (not l_add_time) or (vnbdim[jv]==3):
+            id_fld  = f_out.createVariable(vnames[jv] ,'f8',(cnm_dim_z,cnm_dim_y,cnm_dim_x,), zlib=True, complevel=5)
+            if l_add_time:
+                id_fld[:,:,:] = XFLD[jv,0,:,:,:]
+            else:
+                id_fld[:,:,:] = XFLD[jv,:,:,:]
+        else:
+            id_fld  = f_out.createVariable(vnames[jv] ,'f8',('time_counter',cnm_dim_z,cnm_dim_y,cnm_dim_x,), zlib=True, complevel=5)
+            id_fld[:,:,:,:] = XFLD[jv,:,:,:,:]
             
     f_out.about = 'Diagnostics created with Climporn (https://github.com/brodeau/climporn)'
     f_out.close()
