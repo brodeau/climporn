@@ -138,11 +138,11 @@ elif CNEMO == 'SouthPac':
     l_show_cb = False ; l_show_nm = False
     bathy_max = 8000. # m
     
-elif CNEMO == 'SPAC4':
-    i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 2. ; vcb = [0.15, 0.9, 0.7, 0.04] ; font_rat = 0.4*rfact_zoom
+elif CNEMO == 'SWEPAC2':
+    i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 12. ; vcb = [0.15, 0.96, 0.8, 0.02] ; font_rat = 1./rfact_zoom*10.
     x_cnf = 160. ; y_cnf = 4000. ; # where to put label of conf on Figure...
     l_show_cb = True ; l_show_nm = False
-    bathy_max = 8000. # m
+    bathy_max = 6000. # m
     
 else:
     print '\n PROBLEM: "'+CNEMO+'" is an unknown config!!!'
