@@ -4,11 +4,13 @@
 #    L. Brodeau, 2018
 
 import sys
-from os import path as path
-from string import replace
+from os import path, getcwd, mkdir
+import argparse as ap
 import numpy as nmp
+#
 import scipy.signal as signal
 from netCDF4 import Dataset
+#
 import matplotlib as mpl
 mpl.use('Agg')
 import matplotlib.pyplot as plt
@@ -23,11 +25,9 @@ import clprn_tool as bt
 reload(sys)
 sys.setdefaultencoding('utf8')
 
-cmodel = "eNATL60"
-
 l_tapper      = True ; # apply tappering !
-L_detrend_lin = True ; # apply a linear detrending on data segment before computing spectrum...
-l_rm_inst_noise = False
+l_detrend_lin = True ; # apply a linear detrending on data segment before computing spectrum...
+l_rm_i_noise  = False
 
 # Plots for each segment (only to debug!)
 l_plot_rawd = False
@@ -35,17 +35,15 @@ l_plot_maps = False
 l_plot_trck = False ; # plots individual model and satellite tracks...
 l_plot_spct = False
 
-#dir_figs='/home/laurent/tmp/figs'
-#dir_figs='../tmp'
 dir_figs='./figs'
 fig_ext='svg'
 #fig_ext='png'
 
 
-rcut_by_time = 1.2 # specify in seconds the time gap between two obs that means a discontinuity and therefore
+rcut_by_time = 1.2 # specify in seconds the time gap between two obs to detect and discontinuity and therefore
 #                  # should be considered as a cut!
 
-rcut_by_dist = 7.8 # same for distance (in km) between two consecutive points!
+rcut_by_dist = 7.8 # same as rcut_by_time, but in terms of distance (in km) between two consecutive points!
 #                  # time criterion "rcut_by_time" would have been sufficient if SARAL data was not bugged!!!
 #                  # => in SARAL data, spotted two consecutive points with the usual dt and a huge dL !!!
 #                  #   => like if the satellite undergone an extremely short huge acceleration !!!
@@ -53,8 +51,12 @@ rcut_by_dist = 7.8 # same for distance (in km) between two consecutive points!
 
 nvalid_seg = 120  # specify the minimum number of values a segment should contain to be considered and used!
 
-
 r_max_amp_ssh = 1.5 # in meters
+
+r2Pi = 2.*nmp.pi
+
+
+# Look and feel for the plot:
 
 clr_red = '#AD0000'
 
@@ -65,56 +67,68 @@ clr_mod = '#008ab8'
 rDPI=100.
 
 
-r2Pi = 2.*nmp.pi
+#=============== en of configurable part ================================
+
+if not path.exists(dir_figs): mkdir(dir_figs)
 
 
-jt1=0 ; jt2=0
 
-narg = len(sys.argv)
+################## ARGUMENT PARSING / USAGE ################################################################################################
 
-if narg != 4 and narg != 6 :
-    print 'Usage: '+sys.argv[0]+' <file> <variable model> <variable satel> (<jt1> <jt2>)'; sys.exit(0)
+# Defaults before reading command-line arguments:
+cn_mod = "NEMO"
+cn_sat = "Altimetry"
+cn_box = "Unknown box"
+pow10_min_y = -8
+pow10_max_y =  2
 
-cf_in = sys.argv[1] ; cv_mdl=sys.argv[2] ; cv_eph=sys.argv[3]
-if narg == 6:
-    jt1=int(sys.argv[4]) ; jt2=int(sys.argv[5])
+parser = ap.ArgumentParser(description='Generate along-track spectral comparison of SSH, model versus satellite')
+#
+requiredNamed = parser.add_argument_group('required arguments')
+requiredNamed.add_argument('-i', '--fin' , required=True, help='specify output "result" file from interp_to_ground_track.x@SOSIE')
+requiredNamed.add_argument('-m', '--vmod', required=True, help='specify the name of the model variable for SSH' )
+requiredNamed.add_argument('-s', '--vsat', required=True, help='specify the name of the satellite variable for SSH')
+#
+parser.add_argument('-B', '--name_box', default=cn_box,   help='name of the rectangular region (box) considered')
+parser.add_argument('-M', '--name_mod', default=cn_mod,   help='name of the model (ex: NEMO-eNATL60)')
+parser.add_argument('-S', '--name_sat', default=cn_sat,   help='name of the satellite (ex: SARAL-Altika)')
+#parser.add_argument('-z', '--zld' ,                           help='specify the topography netCDF file to use (field="z")')
+parser.add_argument('-a', '--pmin_y', type=int, default=pow10_min_y, help='minimum y-axis value to display in terms of 10^pmin_y')
+parser.add_argument('-b', '--pmax_y', type=int, default=pow10_max_y, help='maximum y-axis value to display in terms of 10^pmax_y')
+#
+args = parser.parse_args()
 
-bt.chck4f(cf_in)
+cf_in  = args.fin
+cv_mod = args.vmod
+cv_sat = args.vsat
+cn_box = args.name_box
+cn_mod = args.name_mod
+cn_sat = args.name_sat
+pow10_min_y = args.pmin_y
+pow10_max_y = args.pmax_y
 
-cfs  = path.basename(cf_in) ; nfs = len(cfs)
-idx1 = nfs - find(cfs[nfs+1:0:-1],'_')
-idx2 = nfs - find(cfs[nfs+1:0:-1],'.')-1
-cn_satellite = cfs[idx1:idx2]
-print '\n *** Satellite: '+cn_satellite
 
-cn_sat_short = cn_satellite
-if cn_satellite == 'SARAL-Altika': cn_sat_short='SARAL'
-
-idx1 = find(cfs,'__')+2
-idx2 = find(cfs,cmodel)
-cn_box = cfs[idx1:idx2-1]
-print ' *** Box: '+cn_box
-idx1 = idx2
-idx2 = find(cfs[idx2:],'_')+idx2
-cn_model = cfs[idx1:idx2]
-print ' *** Model: '+cn_model
+cfs  = path.basename(cf_in)
 
 cseas = ''
 if ('JFM' in cfs) and not('JAS' in cfs) : cseas = 'JFM'; vseas = ['01','02','03']
 if ('JAS' in cfs) and not('JFM' in cfs) : cseas = 'JAS'; vseas = ['07','08','09']
-print ' *** Season: '+cseas+'\n'
+print '\n *** Season: '+cseas+'\n'
+
+
 
 cextra = ''
 
+print ' *** Opening file '+cf_in+'!'
 id_in    = Dataset(cf_in)
 vt_epoch = id_in.variables['time'][:]
-vmodel   = id_in.variables[cv_mdl][:]
-vsatel   = id_in.variables[cv_eph][:]
+vmodel   = id_in.variables[cv_mod][:]
+vsatel   = id_in.variables[cv_sat][:]
 vlon     = id_in.variables['longitude'][:]
 vlat     = id_in.variables['latitude'][:]
 vdist    = id_in.variables['distance'][:]
 id_in.close()
-print "  => READ!\n"
+print "  => Everything read!\n"
 
 
 # Debug: wave-signal with a wave-length of 150 km and 25 km (vdist in km)
@@ -150,14 +164,14 @@ if l_plot_rawd:
     ax1.set_xticks(vtime[::xticks_d])
     ax1.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d %H:%M:%S'))
     plt.xticks(rotation='60')
-    plt.plot(vtime, vsatel, '-', color=clr_sat, linewidth=2, label=cn_sat_short+' ("'+cv_eph+'")', zorder=10)
-    plt.plot(vtime, vmodel, '-', color=clr_mod, linewidth=2,  label=cn_model+' ("'+cv_mdl+'")', zorder=15)
+    plt.plot(vtime, vsatel, '-', color=clr_sat, linewidth=2, label=cn_sat+' ("'+cv_sat+'")', zorder=10)
+    plt.plot(vtime, vmodel, '-', color=clr_mod, linewidth=2,  label=cn_mod+' ("'+cv_mod+'")', zorder=15)
     ax1.set_ylim(-r_max_amp_ssh,r_max_amp_ssh) ; ax1.set_xlim(vtime[0],vtime[nbr-1])
     plt.xlabel('Time [seconds since 1970]')
     plt.ylabel('SSH [m]')
     ax1.grid(color='k', linestyle='-', linewidth=0.3)
     plt.legend(bbox_to_anchor=(0.55, 0.98), ncol=1, shadow=True, fancybox=True)
-    plt.savefig(dir_figs+'/fig_raw_data_'+cn_model+'--'+cn_sat_short+'.'+fig_ext, dpi=120, transparent=True)
+    plt.savefig(dir_figs+'/fig_raw_data_'+cn_mod+'--'+cn_sat+'.'+fig_ext, dpi=120, transparent=True)
     plt.close(1)
 
 
@@ -225,10 +239,11 @@ print ' ==> will use '+str(nb_v_seg)+' segments with a fixed length of '+str(Nsp
 x_all_spectra_s = nmp.zeros((nb_v_seg,Nsp)) # array to store all spectra in...
 x_all_spectra_m = nmp.zeros((nb_v_seg,Nsp)) # array to store all spectra in...
 
-clabel_sat=cn_sat_short+' ("'+cv_eph+'")'
-#clabel_mod=cn_model+'  ("'+cv_mdl+'"), 1D along-track'
-clabel_mod=cn_model+' (1D along-track)'
-#clabel3=cn_model+' (2D box)'
+clabel_mod=cn_mod+' ("'+cv_mod+'")'
+clabel_sat=cn_sat+' ("'+cv_sat+'")'
+#clabel_mod=cn_mod+'  ("'+cv_mod+'"), 1D along-track'
+#clabel_mod=cn_mod+' (1D along-track)'
+#clabel3=cn_mod+' (2D box)'
 
 
 
@@ -237,11 +252,13 @@ clabel_mod=cn_model+' (1D along-track)'
 
 jcpt = -1
 for js in vtreat:
+    
     jcpt= jcpt+1
     it1 = idx_seg_start[js]
     it2 = idx_seg_stop[js]
     nbp = it2-it1+1    
     cseg = '%2.2i'%(js+1)
+
     print '\n\n ###################################'
     print '  *** Seg #'+cseg+' of '+cn_box+':'
     print '  ***   => originally '+str(nbp)+' points in this segment (from '+str(it1)+' to '+str(it2)+')'
@@ -274,7 +291,7 @@ for js in vtreat:
     vs_m[:] = vmodel[it1:it2+1]
 
     # Linear detrending
-    if l_detrend_lin:        
+    if l_detrend_lin:
         vs_s[:] = signal.detrend(vs_s[:],type='linear')
         vs_m[:] = signal.detrend(vs_m[:],type='linear')
 
@@ -316,12 +333,12 @@ for js in vtreat:
         m.drawstates(linewidth=0.5)
         x, y = m(vlon[it1:it2+1], vlat[it1:it2+1])
         plt.plot(x, y, 'r-')
-        plt.savefig(dir_figs+'/'+cn_model+'--'+cn_sat_short+'_seg'+cseg+'_map.'+fig_ext, dpi=120, transparent=True)
+        plt.savefig(dir_figs+'/'+cn_mod+'--'+cn_sat+'_seg'+cseg+'_map.'+fig_ext, dpi=120, transparent=True)
         plt.close(1)
 
 
     if l_plot_trck:
-        cfigure = dir_figs+'/'+cn_box+'_'+cseas+'_'+cn_model+'--'+cn_sat_short+'_seg'+cseg+'_track'+cxtr_noise+'.'+fig_ext
+        cfigure = dir_figs+'/'+cn_box+'_'+cseas+'_'+cn_mod+'--'+cn_sat+'_seg'+cseg+'_track'+cxtr_noise+'.'+fig_ext
         ii=Nsp/300
         ib=max(ii-ii%10,1)
         xticks_d=30.*ib
@@ -341,8 +358,8 @@ for js in vtreat:
         ax1.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d %H:%M:%S'))
         plt.xticks(rotation='60')
         plt.plot(vtime, vtime*0., '-', color='k', linewidth=2, label=None)
-        plt.plot(vtime, vs_s[:], '-o', color=clr_sat, linewidth=2, label=cn_sat_short+' ("'+cv_eph+'")', zorder=10)
-        plt.plot(vtime, vs_m[:], '-o', color=clr_mod, linewidth=2,  label=cn_model+' ("'+cv_mdl+'")', zorder=15)
+        plt.plot(vtime, vs_s[:], '-o', color=clr_sat, linewidth=2, label=cn_sat+' ("'+cv_sat+'")', zorder=10)
+        plt.plot(vtime, vs_m[:], '-o', color=clr_mod, linewidth=2,  label=cn_mod+' ("'+cv_mod+'")', zorder=15)
         plt.yticks( nmp.arange(r_ssh_m, r_ssh_p+0.1, 0.1) )
         ax1.set_ylim(r_ssh_m*1.05,r_ssh_p*1.05)
         plt.ylabel('SSH [m]')
@@ -358,10 +375,10 @@ for js in vtreat:
 
     if l_plot_spct:
         # Figure that shows all the spectrum for each segment:
-        cfigure = dir_figs+'/'+cn_box+'_'+cseas+'_'+cn_model+'--'+cn_sat_short+'_seg'+cseg+'.'+fig_ext
+        cfigure = dir_figs+'/'+cn_box+'_'+cseas+'_'+cn_mod+'--'+cn_sat+'_seg'+cseg+'.'+fig_ext
         ii = bp.plot("pow_spectrum_ssh")(vk[idx], x_all_spectra_s[jcpt,:], cfig_name=cfigure, \
                                          clab1=clabel_sat, cinfo=str(Nsp)+' points ('+str(nbp)+')', \
-                                         L_min=13.5, L_max=1400., P_min_y=-8, P_max_y=2,    \
+                                         L_min=13.5, L_max=1400., P_min_y=pow10_min_y, P_max_y=pow10_max_y, \
                                          vk2=vk[idx], vps2=x_all_spectra_m[jcpt,:], clab2=clabel_mod)
         
 
@@ -374,21 +391,21 @@ cinfrm = cseas+' '+cyear+'\n'+str(nb_v_seg)+' tracks\n'+str(Nsp)+' points\n'+r'$
 
 # remove white noise at fine scale for satellite (instrument) [advice from Clement Ubelmann]
 cxtr_noise=''
-if l_rm_inst_noise:    
+if l_rm_i_noise:    
     rwn = nmp.mean(vps_sat[Nsp-15:Nsp])
     vps_sat = vps_sat - rwn
     cxtr_noise='_denoised'
 
 # Sample spacing rdist_sample
-cpout   = dir_figs+'/'+cn_box+'_MEAN_'+cn_model+'--'+cn_sat_short+'__'+cseas+cextra+'___pow-spectrum'+cxtr_noise
+cpout   = dir_figs+'/'+cn_box+'_MEAN_'+cn_mod+'--'+cn_sat+'__'+cseas+cextra+'___pow-spectrum'+cxtr_noise
 cfigure = cpout+'.'+fig_ext
 
 
-print ' *** cn_sat_short =', cn_sat_short    
+print ' *** cn_sat =', cn_sat    
 
 ii = bp.plot("pow_spectrum_ssh")(vk[idx], vps_mod, clab1=clabel_mod, clr1=clr_mod, lw1=5, \
                                  cfig_name=cfigure, cinfo=cinfrm, logo_on=False, \
-                                 L_min=10., L_max=1200., P_min_y=-6, P_max_y=1, \
+                                 L_min=10., L_max=1200., P_min_y=pow10_min_y, P_max_y=pow10_max_y, \
                                  l_show_k4=False, l_show_k5=True, l_show_k11o3=False, l_show_k2=True, \
                                  vk2=vk[idx], vps2=vps_sat, clab2=clabel_sat, clr2=clr_sat, lw2=4)
 
