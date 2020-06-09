@@ -40,7 +40,7 @@ l_show_ttl = False
 
 l_show_msh = False
     
-
+pt_sz_track = 20
 
 
 
@@ -144,6 +144,17 @@ elif CNEMO == 'SWEPAC2':
     l_show_cb = True ; l_show_nm = False
     bathy_max = 6000. # m
     
+elif CNEMO == 'Azores':
+    i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 2. ; vcb = [0.15, 0.96, 0.8, 0.02] ; font_rat = 1./rfact_zoom*10.
+    x_cnf = 0. ; y_cnf = 0. ; # where to put label of conf on Figure...
+    l_show_cb = False ; l_show_nm = False
+    bathy_max = 6000. # m
+
+elif CNEMO == 'GulfS':
+    i1 = 0 ; j1 = 420 ; i2 = 900 ; j2 = 980 ; rfact_zoom = 1. ; vcb = [0.15, 0.96, 0.8, 0.02] ; font_rat = 0.1
+    l_show_cb = False ; l_show_nm = False
+    pt_sz_track = 3
+    
 else:
     print '\n PROBLEM: "'+CNEMO+'" is an unknown config!!!'
     sys.exit(0)
@@ -185,7 +196,6 @@ elif cv_in in ['Bathymetry']:   #
     #l_log_field = False
     cextend='max'
     l_hide_cb_ticks=True
-
     
 elif cv_in == 'sossheig':
     cfield = 'SSH'
@@ -198,6 +208,14 @@ elif cv_in == 'somxl010':
     cfield == 'MLD'
     tmin=50. ;  tmax=1500. ;  df = 50.
     cpal_fld = 'viridis_r'
+
+if cv_in == 'track':
+    cfield = 'TRACK'
+    tmin=140. ;  tmax=24800.   ;  df = 1.
+    cpal_fld = 'viridis'    
+    cunit = r'SST ($^{\circ}$C)'
+    cb_jump = 1
+    fig_type='svg'
 
 else:
     print 'ERROR: variable '+cv_in+' is not known yet...'; sys.exit(0)
@@ -366,7 +384,14 @@ del XMSK
 
 
 print 'Ploting'
-cf = plt.imshow(XFLD[:,:], cmap = pal_fld, norm = norm_fld, interpolation='none')
+
+if cv_in == 'track':
+    indx = nmp.where( XFLD > 0 )
+    (idy,idx) = indx
+    cf = plt.scatter(idx, idy, c=XFLD[indx], cmap = pal_fld, norm = norm_fld, alpha=0.5, marker='.', s=pt_sz_track )
+    #
+else:
+    cf = plt.imshow(XFLD[:,:], cmap = pal_fld, norm = norm_fld, interpolation='none')
 
 if l_show_msh:
     ccx = plt.contour(Xlon[:,:], 60, colors='k', linewidths=0.5)
