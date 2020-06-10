@@ -58,12 +58,12 @@ if not narg in [5,6]:
     sys.exit(0)
 CNEMO  = sys.argv[1]
 cf_fld = sys.argv[2]
-cv_in=sys.argv[3]
+cv_in  = sys.argv[3]
 jt=int(sys.argv[4])
 
 if narg ==6 :
     l_read_lsm=True
-    cf_lsm=sys.argv[5]
+    cf_lsm = sys.argv[5]
 
 
 
@@ -144,6 +144,12 @@ elif CNEMO == 'SWEPAC2':
     l_show_cb = True ; l_show_nm = False
     bathy_max = 6000. # m
     
+elif CNEMO == 'MIDLIP1':
+    i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 5. ; vcb = [0.35, 0.94, 0.6, 0.04] ; font_rat = 4./rfact_zoom
+    x_cnf = 20. ; y_cnf = 8. ; # where to put label of conf on Figure...
+    l_show_cb = True ; l_show_nm = True ; l_scientific_mode=False
+    bathy_max = 6000. # m
+    
 elif CNEMO == 'Azores':
     i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 2. ; vcb = [0.15, 0.96, 0.8, 0.02] ; font_rat = 1./rfact_zoom*10.
     x_cnf = 0. ; y_cnf = 0. ; # where to put label of conf on Figure...
@@ -171,6 +177,8 @@ l_log_field = False
 l_pow_field = False
 cextend='both'
 l_hide_cb_ticks = False
+
+print ' cv_in = '+cv_in
 
 if cv_in in ['sosstsst','tos']:
     cfield = 'SST'
@@ -209,7 +217,7 @@ elif cv_in == 'somxl010':
     tmin=50. ;  tmax=1500. ;  df = 50.
     cpal_fld = 'viridis_r'
 
-if cv_in == 'track':
+elif cv_in == 'track':
     cfield = 'TRACK'
     tmin=140. ;  tmax=24800.   ;  df = 1.
     cpal_fld = 'viridis'    
@@ -293,10 +301,11 @@ ny_res = j2-j1
 yx_ratio = float(ny_res)/float(nx_res)
 nxr = int(rfact_zoom*nx_res) ; # widt image (in pixels)
 nyr = int(rfact_zoom*ny_res) ; # height image (in pixels)
-dpi = 110
+dpi = 100
 rh  = float(nxr)/float(dpi) ; # width of figure as for figure...
-###font_rat = nxr/1080.
 
+
+print '\n *** width and height of image to create:', nxr, nyr, '\n'
 
 
 
@@ -346,10 +355,11 @@ else:
     cfig = 'snapshot_'+str(jt)+'_'+cv_in+'_'+CNEMO+'_'+cpal_fld+'.'+fig_type    
 
 
-rextra_height = 1.
-if l_scientific_mode: rextra_height = 1.12
-    
-fig = plt.figure(num = 1, figsize=(rh,rh*yx_ratio*rextra_height), dpi=None, facecolor='w', edgecolor='0.5')
+#rextra_height = 1.
+#if l_scientific_mode: rextra_height = 1.12
+#fig = plt.figure(num = 1, figsize=(rh,rh*yx_ratio*rextra_height), dpi=None, facecolor='w', edgecolor='0.5')
+
+fig = plt.figure(num = 1, figsize=(rh,rh*yx_ratio), dpi=None, facecolor='w', edgecolor='0.5')
 
 if l_scientific_mode:
     ax  = plt.axes([0.09, 0.09, 0.9, 0.9], axisbg = 'r')
@@ -382,6 +392,8 @@ print '  *** Shape of field and mask => ', nmp.shape(XFLD)
 
 del XMSK
 
+(idy_nan,idx_nan) = nmp.where( nmp.isnan(XFLD) )
+
 
 print 'Ploting'
 
@@ -391,7 +403,9 @@ if cv_in == 'track':
     cf = plt.scatter(idx, idy, c=XFLD[indx], cmap = pal_fld, norm = norm_fld, alpha=0.5, marker='.', s=pt_sz_track )
     #
 else:
-    cf = plt.imshow(XFLD[:,:], cmap = pal_fld, norm = norm_fld, interpolation='none')
+    cf = plt.imshow(XFLD[:,:], cmap = pal_fld, norm = norm_fld, interpolation='nearest' ) #, interpolation='none')
+    if len(idy_nan) > 0:
+        plt.scatter(idx_nan, idy_nan, color='red', marker='s', s=int(rfact_zoom))
 
 if l_show_msh:
     ccx = plt.contour(Xlon[:,:], 60, colors='k', linewidths=0.5)
