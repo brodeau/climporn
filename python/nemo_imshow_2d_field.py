@@ -144,6 +144,12 @@ elif CNEMO == 'SWEPAC2':
     l_show_cb = True ; l_show_nm = False
     bathy_max = 6000. # m
     
+elif CNEMO == 'MIDLIP2':
+    i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 10. ; vcb = [0.35, 0.94, 0.6, 0.04] ; font_rat = 8./rfact_zoom
+    x_cnf = 20. ; y_cnf = 3. ; # where to put label of conf on Figure...
+    l_show_cb = True ; l_show_nm = True ; l_scientific_mode=False
+    bathy_max = 6000. # m
+    
 elif CNEMO == 'MIDLIP1':
     i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 5. ; vcb = [0.35, 0.94, 0.6, 0.04] ; font_rat = 4./rfact_zoom
     x_cnf = 20. ; y_cnf = 8. ; # where to put label of conf on Figure...
