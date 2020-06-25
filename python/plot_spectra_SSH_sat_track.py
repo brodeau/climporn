@@ -366,8 +366,8 @@ for js in vtreat:
         ax1.set_xlim(vtime[0],vtime[Nsp-1])
         ax1.grid(color='k', linestyle='-', linewidth=0.3)
         plt.legend(loc="best", ncol=1, shadow=True, fancybox=True)
-        cstart = str(round(bt.lon_180_180(vlon[it1]),2))+"$^{\circ}$E, "+str(round(vlat[it1],2))+"$^{\circ}$N"
-        cstop  = str(round(bt.lon_180_180(vlon[it2]),2))+"$^{\circ}$E, "+str(round(vlat[it2],2))+"$^{\circ}$N"
+        cstart = str(round(bt.long_to_m180_p180(vlon[it1]),2))+"$^{\circ}$E, "+str(round(vlat[it1],2))+"$^{\circ}$N"
+        cstop  = str(round(bt.long_to_m180_p180(vlon[it2]),2))+"$^{\circ}$E, "+str(round(vlat[it2],2))+"$^{\circ}$N"
         plt.title(r""+cn_box+": "+cstart+"  $\longrightarrow$ "+cstop)
         plt.savefig(cfigure, dpi=120, transparent=False)
         plt.close(1)

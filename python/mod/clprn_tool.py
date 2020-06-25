@@ -60,14 +60,12 @@ def int_as_multiple_of(x, base=5):
     return int(base * round(float(x)/base))
 
 
-def lon_180_180(x):
-    rsign = 1.
-    if 180.-x < 0.: rsign=-1.
-    return rsign*min(x,abs(x-360.))
-
-
-
-
+def long_to_m180_p180(xx):
+    ## Forces longitude to be in the -180:180 frame...
+    ## xx: longitude
+    xx   = xx % 360.
+    rlon = copysign(1.,180.-xx)*min(xx, abs(xx-360.)) ;
+    return rlon
 
 def get_sections_from_file(cfile):
     list_sections = []
