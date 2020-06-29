@@ -143,8 +143,8 @@ elif CNEMO == 'TROPICO2':
     bathy_max = 6000. # m
     
 elif CNEMO == 'TROPICO12':
-    i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 1. ; vcb = [0.35, 0.92, 0.6, 0.04] ; font_rat = 2./rfact_zoom
-    x_cnf = 60. ; y_cnf = 60. ; # where to put label of conf on Figure...
+    i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 1. ; vcb = [0.02, 0.15, 0.4, 0.04] ; font_rat = 2./rfact_zoom
+    x_cnf = 1200. ; y_cnf = 800. ; # where to put label of conf on Figure...
     l_show_cb = True ; l_show_nm = True ; l_scientific_mode=False
     bathy_max = 6000. # m
     
@@ -326,12 +326,12 @@ params = { 'font.family':'Open Sans',
            'ytick.labelsize': int(18.*font_rat),
            'axes.labelsize':  int(15.*font_rat) }
 mpl.rcParams.update(params)
-cfont_clb  = { 'fontname':'Helvetica Neue', 'fontweight':'medium', 'fontsize':int(18.*font_rat), 'color':color_top }
+cfont_clb  = { 'fontname':'Open Sans', 'fontweight':'medium', 'fontsize':int(18.*font_rat), 'color':color_top }
 cfont_date = { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(12.*font_rat), 'color':'w' }
 cfont_mail = { 'fontname':'Times New Roman', 'fontweight':'normal', 'fontstyle':'italic', 'fontsize':int(14.*font_rat), 'color':'0.8'}
-cfont_confname = { 'fontname':'Helvetica Neue', 'fontweight':'light', 'fontsize':int(50.*font_rat), 'color':'w' }
-cfont_axis  = { 'fontname':'Helvetica Neue', 'fontweight':'medium', 'fontsize':int(18.*font_rat), 'color':color_top }
-cfont_ttl = { 'fontname':'Helvetica Neue', 'fontweight':'medium', 'fontsize':int(25.*font_rat), 'color':color_top }
+cfont_cnfn = { 'fontname':'Open Sans', 'fontweight':'light', 'fontsize':int(50.*font_rat), 'color':'w' }
+cfont_axis  = { 'fontname':'Open Sans', 'fontweight':'medium', 'fontsize':int(18.*font_rat), 'color':color_top }
+cfont_ttl = { 'fontname':'Open Sans', 'fontweight':'medium', 'fontsize':int(25.*font_rat), 'color':color_top }
 
 
 # Colormaps for fields:
@@ -357,12 +357,12 @@ else:
 #if l_scientific_mode: rextra_height = 1.12
 #fig = plt.figure(num = 1, figsize=(rh,rh*yx_ratio*rextra_height), dpi=None, facecolor='w', edgecolor='0.5')
 
-fig = plt.figure(num = 1, figsize=(rh,rh*yx_ratio), dpi=None, facecolor='w', edgecolor='0.5')
+fig = plt.figure(num = 1, figsize=(rh,rh*yx_ratio), dpi=None, facecolor='w', edgecolor='k')
 
 if l_scientific_mode:
     ax  = plt.axes([0.09, 0.09, 0.9, 0.9], axisbg = 'r')
 else:
-    ax  = plt.axes([0., 0., 1., 1.],     axisbg = '0.5')
+    ax  = plt.axes([0., 0., 1., 1.],     axisbg = 'k')
 
 vc_fld = nmp.arange(tmin, tmax + df, df)
 
@@ -403,7 +403,7 @@ if cv_in == 'track':
 else:
     cf = plt.imshow(XFLD[:,:], cmap = pal_fld, norm = norm_fld, interpolation='nearest' ) #, interpolation='none')
     if len(idy_nan) > 0:
-        idy_nan = nmp.maxval(idy_nan,4)
+        idd = nmp.where(idy_nan==1); idy_nan[idd] = int(10./rfact_zoom)/2  # just so the boundary line is not too thin on plot...
         plt.scatter(idx_nan, idy_nan, color=clr_yellow, marker='s', s=int(10./rfact_zoom))
 
 if l_show_msh:
@@ -438,7 +438,7 @@ if l_scientific_mode:
 
 
 
-#plt.title('NEMO: '+cfield+', coupled '+CNEMO+', '+cday+' '+chour+':00', **cfont_confnamee)
+#plt.title('NEMO: '+cfield+', coupled '+CNEMO+', '+cday+' '+chour+':00', **cfont_cnfne)
 
 
 #ax2 = plt.axes([0.3, 0.08, 0.4, 0.025])
@@ -469,7 +469,7 @@ if l_show_cb:
 
 
 
-if l_show_nm:  ax.annotate(CNEMO, xy=(1, 4), xytext=(x_cnf, y_cnf), **cfont_confname)
+if l_show_nm:  ax.annotate(CNEMO, xy=(1, 4), xytext=(x_cnf, y_cnf), **cfont_cnfn)
 
 if l_show_ttl: ax.annotate(CNEMO, xy=(1, 4), xytext=(x_ttl, y_ttl), **cfont_ttl)
 
