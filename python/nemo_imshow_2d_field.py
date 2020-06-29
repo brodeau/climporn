@@ -26,11 +26,8 @@ import clprn_colmap as bcm
 
 import clprn_tool as bt
 
-
-#CNEMO = 'NATL60'
-#CNEMO = 'NANUK025'
-
 color_top = 'white'
+clr_yellow = '#ffed00'
 
 
 l_show_cb = True
@@ -41,11 +38,6 @@ l_show_ttl = False
 l_show_msh = False
     
 pt_sz_track = 20
-
-
-
-
-
 
 l_read_lsm=False
 
@@ -150,9 +142,9 @@ elif CNEMO == 'TROPICO2':
     l_show_cb = True ; l_show_nm = True ; l_scientific_mode=False
     bathy_max = 6000. # m
     
-elif CNEMO == 'TROPICO1':
-    i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 5. ; vcb = [0.35, 0.94, 0.6, 0.04] ; font_rat = 4./rfact_zoom
-    x_cnf = 20. ; y_cnf = 8. ; # where to put label of conf on Figure...
+elif CNEMO == 'TROPICO12':
+    i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 1. ; vcb = [0.35, 0.92, 0.6, 0.04] ; font_rat = 2./rfact_zoom
+    x_cnf = 60. ; y_cnf = 60. ; # where to put label of conf on Figure...
     l_show_cb = True ; l_show_nm = True ; l_scientific_mode=False
     bathy_max = 6000. # m
     
@@ -411,7 +403,8 @@ if cv_in == 'track':
 else:
     cf = plt.imshow(XFLD[:,:], cmap = pal_fld, norm = norm_fld, interpolation='nearest' ) #, interpolation='none')
     if len(idy_nan) > 0:
-        plt.scatter(idx_nan, idy_nan, color='red', marker='s', s=int(rfact_zoom))
+        idy_nan = nmp.maxval(idy_nan,4)
+        plt.scatter(idx_nan, idy_nan, color=clr_yellow, marker='s', s=int(10./rfact_zoom))
 
 if l_show_msh:
     ccx = plt.contour(Xlon[:,:], 60, colors='k', linewidths=0.5)
