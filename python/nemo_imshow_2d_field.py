@@ -162,7 +162,7 @@ elif CNEMO == 'GEBCO':
     i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 1. ; vcb = [0.2, 0.06, 0.6, 0.03] ; font_rat = 1.5/rfact_zoom
     x_cnf = 900. ; y_cnf = 1350. ; # where to put label of conf on Figure...
     l_show_cb = True ; l_show_nm = True ; l_scientific_mode=False
-    bathy_max = 3000. # m
+    bathy_max = 5000. # m
     
 elif CNEMO == 'Azores':
     i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 2. ; vcb = [0.15, 0.96, 0.8, 0.02] ; font_rat = 1./rfact_zoom*10.
@@ -218,6 +218,12 @@ elif cv_in in l_bathy_var:   #
     #l_log_field = False
     cextend='max'
     l_hide_cb_ticks=True
+    if cv_in == 'elevation':
+        #cpal_fld = 'ncview_hotres' ; l_pow_field = False
+        cpal_fld = 'ncview_nrl' ; l_pow_field = True
+        #cpal_fld = 'ocean' ; l_pow_field = False
+        
+
     
 elif cv_in == 'sossheig':
     cfield = 'SSH'
