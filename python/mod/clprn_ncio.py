@@ -27,13 +27,13 @@ def wrt_1d_series(vt, vd, cvar, cinfo,
         elif nsmooth == 5:
             vd_sm = bs.running_mean_5(vd, l_fill_bounds=False)
         else:
-            print 'ERROR: wrt_1d_series.clprn_ncio => smoothing with nsmooth='+str(nsmooth)+' not supported!'; sys.exit(0)
+            print('ERROR: wrt_1d_series.clprn_ncio => smoothing with nsmooth='+str(nsmooth)+' not supported!'); sys.exit(0)
 
 
     f_o = Dataset(cf_o, 'w', format='NETCDF4')
 
     nt = len(vt)
-    if len(vd) != nt:  print 'ERROR: wrt_1d_series.clprn_ncio => data & time have different lengths!'; sys.exit(0)
+    if len(vd) != nt:  print('ERROR: wrt_1d_series.clprn_ncio => data & time have different lengths!'); sys.exit(0)
 
     l_do_v2=False ; l_do_v3=False ; l_do_v4=False ; l_do_v5=False
     if len(vd2) == nt: l_do_v2=True
@@ -70,7 +70,7 @@ def wrt_1d_series(vt, vd, cvar, cinfo,
 
     f_o.Author = 'L. Brodeau (clprn_ncio.py of Climporn)'
     f_o.close()
-    print ' * wrt_1d_series => '+cf_o+' written!\n'
+    print(' * wrt_1d_series => '+cf_o+' written!\n')
 
     return 0
 
@@ -78,7 +78,7 @@ def wrt_1d_series(vt, vd, cvar, cinfo,
 
 def read_1d_series(cf_i, cv_i, cv_t='time', l_return_time=True):
 
-    if not path.exists(cf_i): print 'ERROR: read_1d_series.clprn_ncio => '+cf_i+' not found!'; sys.exit(0)
+    if not path.exists(cf_i): print('ERROR: read_1d_series.clprn_ncio => '+cf_i+' not found!'); sys.exit(0)
 
     id_i = Dataset(cf_i)
     list_variables = id_i.variables.keys()
@@ -88,7 +88,7 @@ def read_1d_series(cf_i, cv_i, cv_t='time', l_return_time=True):
     if cv_i in list_variables[:]:
         vd = id_i.variables[cv_i][:]
     else:
-        print 'WARNING: read_1d_series.clprn_ncio => '+cv_i+' not found into '+cf_i+' !'
+        print('WARNING: read_1d_series.clprn_ncio => '+cv_i+' not found into '+cf_i+' !')
         if l_return_time:
             vd = nmp.zeros(len(vt))
         else:
@@ -96,10 +96,10 @@ def read_1d_series(cf_i, cv_i, cv_t='time', l_return_time=True):
     id_i.close()
 
     if l_return_time:
-        print '  * read_1d_series => just read '+cv_t+' and '+cv_i+' into '+cf_i+'\n'
+        print('  * read_1d_series => just read '+cv_t+' and '+cv_i+' into '+cf_i+'\n')
         return vt, vd
     else:
-        print '  * read_1d_series => just read '+cv_i+' into '+cf_i+'\n'
+        print('  * read_1d_series => just read '+cv_i+' into '+cf_i+'\n')
         return vd
 
 
@@ -109,7 +109,7 @@ def read_1d_series(cf_i, cv_i, cv_t='time', l_return_time=True):
 
 def read_1d_series_2(cf_i, cv_i, cv_t='time'):
 
-    if not path.exists(cf_i): print 'ERROR: read_1d_series_2.clprn_ncio => '+cf_i+' not found!'; sys.exit(0)
+    if not path.exists(cf_i): print('ERROR: read_1d_series_2.clprn_ncio => '+cf_i+' not found!'); sys.exit(0)
 
     id_i = Dataset(cf_i)
     vt   = id_i.variables[cv_t][:]
@@ -121,7 +121,7 @@ def read_1d_series_2(cf_i, cv_i, cv_t='time'):
 
     id_i.close()
 
-    print '  * read_1d_series_2 => just read '+cv_t+' and '+cv_i+' into '+cf_i+'\n'
+    print('  * read_1d_series_2 => just read '+cv_t+' and '+cv_i+' into '+cf_i+'\n')
     return xout
 
 
@@ -143,7 +143,7 @@ def wrt_appnd_1d_series(vt, vd, cf, cvar1,  cu_t='year', cu_d='unknown', cln_d='
 
     Nt = len(vt)
     if len(vd) != Nt:
-        print 'ERROR: wrt_appnd_1d_series.clprn_ncio => data & time have different lengths!'
+        print('ERROR: wrt_appnd_1d_series.clprn_ncio => data & time have different lengths!')
         sys.exit(0)
 
     l_do_v2=False ; l_do_v3=False ; l_do_v4=False ; l_do_v5=False
@@ -265,7 +265,7 @@ def wrt_appnd_1d_series(vt, vd, cf, cvar1,  cu_t='year', cu_d='unknown', cln_d='
             if l_do_v10:v10[jrw] = vd10[jt]
     f_out.close()
 
-    print '   *** '+str(Nt)+' snapshots of fields saved into '+cf+' !\n'
+    print('   *** '+str(Nt)+' snapshots of fields saved into '+cf+' !\n')
 
 
 
@@ -289,7 +289,7 @@ def wrt_appnd_2dt_series(vx, vy, vt, xd, cf, cvar1, missing_val=-9999.,
     [ Nt, ny, nx ] = nmp.shape(xd)
 
     if Nt != len(vt):
-        print 'ERROR: wrt_appnd_2dt_series.clprn_ncio => data & time have different lengths!'
+        print('ERROR: wrt_appnd_2dt_series.clprn_ncio => data & time have different lengths!')
         sys.exit(0)
         
     l_do_v2=False ; l_do_v3=False ; l_do_v4=False ; l_do_v5=False
@@ -419,7 +419,7 @@ def wrt_appnd_2dt_series(vx, vy, vt, xd, cf, cvar1, missing_val=-9999.,
             if l_do_v10:x10[jrw,:,:] = xd10[jt,:,:]
     f_out.close()
 
-    print '   *** '+str(Nt)+' snapshots of fields saved into '+cf+' !\n'
+    print('   *** '+str(Nt)+' snapshots of fields saved into '+cf+' !\n')
 
 
 def write_2d_mask(cf_out, MSK, xlon=[], xlat=[], name='mask'):
@@ -489,7 +489,7 @@ def dump_2d_multi_field(cf_out, XFLD, vnames, vndim=[], xlon=[], xlat=[], vtime=
     if len(vtime)>0:
         l_add_time = True
         (nbfld, Nbt, nj, ni) = nmp.shape(XFLD)
-        if Nbt != len(vtime): print 'ERROR (dump_2d_multi_field): array and time vector disagree!'; sys.exit(0)
+        if Nbt != len(vtime): print('ERROR (dump_2d_multi_field): array and time vector disagree!'); sys.exit(0)
     else:
         l_add_time = False
         (nbfld,      nj, ni) = nmp.shape(XFLD)
@@ -500,13 +500,13 @@ def dump_2d_multi_field(cf_out, XFLD, vnames, vndim=[], xlon=[], xlat=[], vtime=
         vnbdim[:] = 3 ; # default dim is 3 (time_counter,y,x)
     else:
         nn0 = len(vndim)
-        if nbfld != nn0: print 'ERROR (dump_2d_multi_field): vndim and main array dont agree in shape!'; sys.exit(0)
+        if nbfld != nn0: print('ERROR (dump_2d_multi_field): vndim and main array dont agree in shape!'); sys.exit(0)
         vnbdim[:] = vndim[:]
 
 
         
     nf = len(vnames)
-    if nbfld != nf: print 'ERROR (dump_2d_multi_field): list of names and main array dont agree in shape!'; sys.exit(0)
+    if nbfld != nf: print('ERROR (dump_2d_multi_field): list of names and main array dont agree in shape!'); sys.exit(0)
 
     f_out = Dataset(cf_out, 'w', format='NETCDF4')
 
@@ -571,7 +571,7 @@ def dump_3d_multi_field(cf_out, XFLD, vnames, vndim=[], xlon=[], xlat=[], vdepth
     if len(vtime)>0:
         l_add_time = True
         (nbfld, Nbt, nk, nj, ni) = nmp.shape(XFLD)
-        if Nbt != len(vtime): print 'ERROR (dump_3d_multi_field): array and time vector disagree!'; sys.exit(0)
+        if Nbt != len(vtime): print('ERROR (dump_3d_multi_field): array and time vector disagree!'); sys.exit(0)
     else:
         l_add_time = False
         (nbfld,      nk, nj, ni) = nmp.shape(XFLD)
@@ -581,11 +581,11 @@ def dump_3d_multi_field(cf_out, XFLD, vnames, vndim=[], xlon=[], xlat=[], vdepth
         vnbdim[:] = 4 ; # default dim is 4 (time_counter,z,y,x)
     else:
         nn0 = len(vndim)
-        if nbfld != nn0: print 'ERROR (dump_3d_multi_field): vndim and main array dont agree in shape!'; sys.exit(0)
+        if nbfld != nn0: print('ERROR (dump_3d_multi_field): vndim and main array dont agree in shape!'); sys.exit(0)
         vnbdim[:] = vndim[:]
         
     nf = len(vnames)
-    if nbfld != nf: print 'ERROR (dump_3d_multi_field): list of names and main array dont agree in shape!'; sys.exit(0)
+    if nbfld != nf: print('ERROR (dump_3d_multi_field): list of names and main array dont agree in shape!'); sys.exit(0)
 
     f_out = Dataset(cf_out, 'w', format='NETCDF4')
 

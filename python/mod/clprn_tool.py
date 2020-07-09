@@ -18,9 +18,9 @@ def chck4f(cf, script_name=''):
     if script_name != '': cmesg = 'ERROR in script '+script_name+': File '+cf+' does not exist !!!'
 
     if not os.path.exists(cf):
-        print cmesg ; sys.exit(0)
+        print(cmesg) ; sys.exit(0)
     else:
-        print ' *** will open file '+cf
+        print(' *** will open file '+cf)
 
 
 
@@ -31,20 +31,20 @@ def check_env_var(cnm, list):
     #
     # Returns a dictionary containing the variable names and their respective content
 
-    print "\n In "+cnm+" :"
+    print("\n In "+cnm+" :")
 
     env_var_dic = {}  ; # empty dictionary
 
     for cv in list:
         cenv = os.getenv(cv)
         if cenv is None:
-            print " ERROR in "+cnm+":"
+            print(" ERROR in "+cnm+":")
             print("  => the {} environement is not set".format(cv))
             sys.exit(0)
         env_var_dic[cv] = cenv
-        print " *** "+cv+" => "+cenv
+        print(" *** "+cv+" => "+cenv)
 
-    print ""
+    print("")
     return env_var_dic
 
 
@@ -79,11 +79,11 @@ def get_sections_from_file(cfile):
             l_stop=True            
         elif cc[0] != '#':
             if cc != 'EOF' and cc[0:13] != 'ref_temp_sali':
-                print ls
+                print(ls)
                 list_sections.append(cc)
                 jl=jl+1 ; # to skip coordinates line
         else:
-            print '  ....  '
+            print('  ....  ')
         jl=jl+1    
     return list_sections
 
@@ -114,29 +114,29 @@ def monthly_2_annual(vtm, XDm):
         # XDm is an array
         [ nbcol, nt ] = nmp.shape(XDm)
 
-    #print nt
+    #print(nt
 
 
     if nt < nbm:
-        print 'ERROR: vmonthly_2_vannual.clprn_tool.py => vt and data disagree in size!'
-        print '      => size vt = '+str(nbm)+' / size data = '+str(nt)
+        print('ERROR: vmonthly_2_vannual.clprn_tool.py => vt and data disagree in size!')
+        print('      => size vt = '+str(nbm)+' / size data = '+str(nt))
         sys.exit(0)
     if nt > nbm:
-        print 'WARNING: vmonthly_2_vannual.clprn_tool.py => vt and data disagree in size!'
-        print '      => size vt = '+str(nbm)+' / size data = '+str(nt)
-        print '      => deleting the last '+str(nt-nbm)+' of data array data...'
+        print('WARNING: vmonthly_2_vannual.clprn_tool.py => vt and data disagree in size!')
+        print('      => size vt = '+str(nbm)+' / size data = '+str(nt))
+        print('      => deleting the last '+str(nt-nbm)+' of data array data...')
         #if nbcol == 1:
         XDm = nmp.delete(XDm, nmp.arange(nbm,nt))
-        print '      => new shape of data =', nmp.shape(XDm),'\n'
+        print('      => new shape of data =', nmp.shape(XDm),'\n')
 
 
-    if nbm%12 != 0: print 'ERROR: vmonthly_2_vannual.clprn_tool.py => not a multiple of 12!'; sys.exit(0)
+    if nbm%12 != 0: print('ERROR: vmonthly_2_vannual.clprn_tool.py => not a multiple of 12!'); sys.exit(0)
 
     nby = nbm/12
     vty = nmp.zeros(nby)
     XDy = nmp.zeros((nbcol,nby))
 
-    #print 'DEBUG: monthly_2_annual.clprn_tool.py => nbm, nby, nbcol:', nbm, nby, nbcol
+    #print('DEBUG: monthly_2_annual.clprn_tool.py => nbm, nby, nbcol:', nbm, nby, nbcol)
 
     for jy in range(nby):
         jt_jan = jy*12
@@ -150,7 +150,7 @@ def monthly_2_annual(vtm, XDm):
     if nbcol == 1:
         return vty, XDy[0,:]
     else:
-        #print 'DEBUG: monthly_2_annual.clprn_tool.py => shape(vty):', nmp.shape(vty)
+        #print('DEBUG: monthly_2_annual.clprn_tool.py => shape(vty):', nmp.shape(vty))
         return vty, XDy
 
 
@@ -159,8 +159,8 @@ def find_ij_region_box(vbox4, VX, VY):
 
     [x_min, y_min, x_max, y_max ] = vbox4
 
-    print ''
-    print 'clprn_tool.find_ij_region_box : x_min, y_min, x_max, y_max => ', x_min, y_min, x_max, y_max
+    print('')
+    print('clprn_tool.find_ij_region_box : x_min, y_min, x_max, y_max => ', x_min, y_min, x_max, y_max)
 
 
     # fixing longitude:
@@ -179,7 +179,7 @@ def find_ij_region_box(vbox4, VX, VY):
     jy_inc = 1
     if VY[1] < VY[0]: jy_inc = -1
 
-    #print jy_inc
+    #print(jy_inc
 
     #VYtmp = nmp.zeros(len(VY)) ; VYtmp[:] = VY[:]
 
@@ -189,16 +189,16 @@ def find_ij_region_box(vbox4, VX, VY):
     i_x_max = find_index_from_value( x_max, VXtmp )
 
     if i_x_min == -1 or i_x_max == -1 or j_y_min == -1 or j_y_max == -1:
-        print 'ERROR: clprn_tool.find_ij_region_box, indiex not found'
+        print('ERROR: clprn_tool.find_ij_region_box, indiex not found')
         sys.exit(0)
 
     if jy_inc == -1: jdum = j_y_min; j_y_min = j_y_max; j_y_max = jdum
 
-    #print '  * i_x_min = ', i_x_min, ' => ', VX[i_x_min]
-    #print '  * j_y_min = ', j_y_min, ' => ', VY[j_y_min]
-    #print '  * i_x_max = ', i_x_max, ' => ', VX[i_x_max]
-    #print '  * j_y_max = ', j_y_max, ' => ', VY[j_y_max]
-    #print '\n'
+    #print('  * i_x_min = ', i_x_min, ' => ', VX[i_x_min])
+    #print('  * j_y_min = ', j_y_min, ' => ', VY[j_y_min])
+    #print('  * i_x_max = ', i_x_max, ' => ', VX[i_x_max])
+    #print('  * j_y_max = ', j_y_max, ' => ', VY[j_y_max])
+    #print('\n')
 
     return [ i_x_min, j_y_min, i_x_max, j_y_max ]
 
@@ -221,7 +221,7 @@ def read_ascii_column(cfile, ivcol2read):
     cread_lines = f.readlines()
     f.close()
     #
-    nbcol = len(ivcol2read) ; #print "nbcol = ", nbcol
+    nbcol = len(ivcol2read) ; #print("nbcol = ", nbcol
     #
     # Need to know how many "non-comment" lines:
     jl = 0
@@ -229,7 +229,7 @@ def read_ascii_column(cfile, ivcol2read):
         ls = ll.split()
         if ls[0] != '#': jl = jl + 1
     nbl = jl
-    #print 'number of lines = ', nbl ; sys.exit
+    #print('number of lines = ', nbl ; sys.exit)
     #
     Xout  = nmp.zeros((nbcol,nbl))
     #
@@ -269,7 +269,7 @@ def get_min_max_df(ZZ, ndf):
 
     zmin0 = zmin ; zmax0 = zmax
 
-    #print ' Before in clprn_tool.get_min_max_df: zmin, zmax =', zmin, zmax
+    #print(' Before in clprn_tool.get_min_max_df: zmin, zmax =', zmin, zmax)
 
     rmagn = 10.**(int(math.log10(zmax)))
 
@@ -319,8 +319,8 @@ def get_min_max_df(ZZ, ndf):
 
 def find_index_from_value( val, VX ):
     if val > nmp.max(VX) or val < nmp.min(VX):
-        print 'ERROR: find_index_from_value.clprn_tool => value "'+str(val)+'"outside range of Vector!'
-        print VX[:] ; print ' => value =', val
+        print('ERROR: find_index_from_value.clprn_tool => value "'+str(val)+'"outside range of Vector!')
+        print(VX[:]) ; print(' => value =', val)
         sys.exit(0)
     jval = -1; jj = 0 ; lfound = False
     while not lfound:
@@ -361,7 +361,7 @@ def drown(X, mask, k_ew=-1, nb_max_inc=5, nb_smooth=5):
     nbdim = len(nmp.shape(X))
 
     if nbdim > 3 or nbdim <2:
-        print cmesg+' size of data array is wrong!!!'; sys.exit(0)
+        print(cmesg+' size of data array is wrong!!!'); sys.exit(0)
 
 
     nt = 1
@@ -370,15 +370,15 @@ def drown(X, mask, k_ew=-1, nb_max_inc=5, nb_smooth=5):
 
     if l_record:
         if nmp.shape(X[0,:,:]) != nmp.shape(mask):
-            print cmesg+' size of data and mask do not match!!!'; sys.exit(0)
+            print(cmesg+' size of data and mask do not match!!!'); sys.exit(0)
         (nt,nj,ni) = nmp.shape(X)
     else:
         if nmp.shape(X) != nmp.shape(mask):
-            print cmesg+' size of data and mask do not match!!!'; sys.exit(0)
+            print(cmesg+' size of data and mask do not match!!!'); sys.exit(0)
         (nj,ni) = nmp.shape(X)
 
     if nmp.sum(mask) == 0 :
-        print 'The mask does not have sea points! Skipping drown!'
+        print('The mask does not have sea points! Skipping drown!')
         return
 
     Xtemp = nmp.zeros((nj,ni))
@@ -510,7 +510,7 @@ def extend_domain(ZZ, ext_east_deg, skp_west_deg=0):
     vdim = ZZ.shape
     ndim = len(vdim)
 
-    if ndim < 1 or ndim > 3: print 'extend_conf.py: ERROR we only treat 1D or 2D arrays...'; sys.exit(0)
+    if ndim < 1 or ndim > 3: print('extend_conf.py: ERROR we only treat 1D or 2D arrays...'); sys.exit(0)
     if ndim == 3: [ nz , ny , nx ] = vdim
     if ndim == 2:      [ ny , nx ] = vdim
     if ndim == 1:           [ nx ] = vdim
@@ -561,13 +561,13 @@ def mk_zonal(XF, XMSK=[0.], r_mask_from_val=-9999.):
         (     ny, nx ) = vshp
         Nt = 1
     else:
-        print ' ERROR (mk_zonal of clprn_tool.py): dimension of your field is weird!'
+        print(' ERROR (mk_zonal of clprn_tool.py): dimension of your field is weird!')
         sys.exit(0)
     #
     if len(nmp.shape(XMSK)) == 2:
         (n2,n1) = XMSK.shape
         if n2 != ny or n1 != nx:
-            print 'ERROR: mk_zonal.clprn_tool.py => XF and XMSK do not agree in size!'
+            print('ERROR: mk_zonal.clprn_tool.py => XF and XMSK do not agree in size!')
             sys.exit(0)
     else:
         # Need to build the mask
@@ -636,7 +636,7 @@ def read_coor(cf, ctype='int', lTS_bounds=False):
                 vi2.append(float(ls[3]))
                 vj2.append(float(ls[4]))
             else:
-                print 'ERROR: read_coor => ctype must be "int" or "float"'
+                print('ERROR: read_coor => ctype must be "int" or "float"')
                 sys.exit(0)
             #
             if lTS_bounds:
@@ -653,7 +653,7 @@ def read_coor(cf, ctype='int', lTS_bounds=False):
                     vSs.append(float(33.)) ; # PSU
                     vSl.append(float(37.)) ; # PSU
                 else:
-                    print 'ERROR: read_coor => something wrong in line "'+ls[0]+'" !'
+                    print('ERROR: read_coor => something wrong in line "'+ls[0]+'" !')
                     sys.exit(0)
         #
         if ls[0] == 'EOF': leof = True
@@ -677,9 +677,9 @@ def test_nb_years(vt, cd):
         nb_m = -1
         nb_y = nb_rec
     else:
-        print 'ERROR: '+csn+' for diag='+cd
-        print '       => the time vector seems to be neither monthly nor annual!'
-        print '       => Nb. rec. = '+str(nb_rec)
+        print('ERROR: '+csn+' for diag='+cd)
+        print('       => the time vector seems to be neither monthly nor annual!')
+        print('       => Nb. rec. = '+str(nb_rec))
         sys.exit(0)
     ttick = iaxe_tick(nb_y)
     return (nb_y, nb_m, nb_rec, ttick)
@@ -718,7 +718,7 @@ def smoother(X, msk, nb_smooth=5):
     nbdim = len(nmp.shape(X))
 
     if nbdim != 2:
-        print cmesg+' size of data array is wrong!!!'; sys.exit(0)
+        print(cmesg+' size of data array is wrong!!!'); sys.exit(0)
     
     (nj,ni) = nmp.shape(X)
 
