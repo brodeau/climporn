@@ -132,7 +132,7 @@ class plot :
             XF = nmp.ma.masked_where(XMSK == 0, XF) ; # Masking where mask is zero!
 
         fig = plt.figure(num = 1, figsize=(WDTH_DEF , RAT_XY*5.), dpi=None, facecolor='w', edgecolor='k')
-        ax  = plt.axes([0.07, 0.06, 0.98, 0.88], axisbg=cbgcol)
+        ax  = plt.axes([0.07, 0.06, 0.98, 0.88], facecolor=cbgcol)
         vc  = __vcontour__(rmin, rmax, dc)
 
         # Colormap:
@@ -236,7 +236,7 @@ class plot :
         # FIGURE
         # ~~~~~~
         fig = plt.figure(num = 1, figsize=fig_size, dpi=None, facecolor='w', edgecolor='k')
-        ax  = plt.axes([0.05, 0.06, 1., 0.86], axisbg = '0.5')
+        ax  = plt.axes([0.05, 0.06, 1., 0.86], facecolor = '0.5')
 
         vc = __vcontour__(rmin, rmax, dc)
 
@@ -357,14 +357,14 @@ class plot :
             # Horizontal colorbar!
             if ctitle == '':
                 fig = plt.figure(num = 1, figsize=(12.4,7.*rat_vert), dpi=None, facecolor='w', edgecolor='k')
-                ax = plt.axes([0.05, -0.01, 0.93, 1.], axisbg = 'white')
+                ax = plt.axes([0.05, -0.01, 0.93, 1.], facecolor = 'white')
             else:
                 fig = plt.figure(num = 1, figsize=(12.4,7.4*rat_vert), dpi=None, facecolor='w', edgecolor='k')
-                ax = plt.axes([0.05, -0.01, 0.93, 0.96], axisbg = 'white')
+                ax = plt.axes([0.05, -0.01, 0.93, 0.96], facecolor = 'white')
         else:
             # Vertical colorbar!
             fig = plt.figure(num = 1, figsize=(12.4,6.*rat_vert), dpi=None, facecolor='w', edgecolor='k')
-            ax = plt.axes([0.046, 0.06, 1.02, 0.88], axisbg = 'white')
+            ax = plt.axes([0.046, 0.06, 1.02, 0.88], facecolor = 'white')
 
         vc = __vcontour__(rmin, rmax, dc)
 
@@ -457,7 +457,7 @@ class plot :
         # ~~~~~~
         fig = plt.figure(num = 1, figsize=(7.,6.*vert_rat), dpi=None, facecolor='w', edgecolor='k')
 
-        ax = plt.axes([0.07, 0.05, 0.9, 0.9], axisbg = 'gray')
+        ax = plt.axes([0.07, 0.05, 0.9, 0.9], facecolor = 'gray')
 
         vc = __vcontour__(rmin, rmax, dc); #print vc, '\n'
 
@@ -643,7 +643,7 @@ class plot :
 
 
         fig = plt.figure(num = 1, figsize=(vfig_size), dpi=None, facecolor='w', edgecolor='k')
-        ax  = plt.axes(vsporg, axisbg = 'w')
+        ax  = plt.axes(vsporg, facecolor = 'w')
 
 
         ## Colmap:
@@ -758,7 +758,7 @@ class plot :
         # ~~~~~~
         fig = plt.figure(num = 1, figsize=(7.,6.*vert_rat), dpi=None, facecolor='w', edgecolor='k')
 
-        ax = plt.axes([0.07, 0.05, 0.9, 0.9], axisbg = 'gray')
+        ax = plt.axes([0.07, 0.05, 0.9, 0.9], facecolor = 'gray')
 
         vc = __vcontour__(rmin, rmax, dc); #print vc, '\n'
 
@@ -834,7 +834,7 @@ class plot :
             font_ttl, font_xylb, font_clb, font_inf = __font_unity__(fig_dpi=DPI_DEF)
     
             fig = plt.figure(num = 1, figsize=(WDTH_DEF , RAT_XY*6.), dpi=None, facecolor='w', edgecolor='k') ; #trsp_sig_class
-            ax = plt.axes([0.075,  -0.025, 0.9, 0.98], axisbg = 'w')
+            ax = plt.axes([0.075,  -0.025, 0.9, 0.98], facecolor = 'w')
     
             vc = __vcontour__(rmin, rmax, dc)
     
@@ -896,7 +896,7 @@ class plot :
 
 
         fig = plt.figure(num = 1, figsize=fig_size, dpi=None, facecolor='w', edgecolor='k')
-        ax = plt.axes([0.1,  0.065,   0.92,       0.89], axisbg = 'gray')
+        ax = plt.axes([0.1,  0.065,   0.92,       0.89], facecolor = 'gray')
         vc = __vcontour__(rmin, rmax, dc)
 
         # Colmap:
@@ -955,7 +955,7 @@ class plot :
         XF = nmp.ma.masked_where(XMSK == 0, XF)
 
         fig = plt.figure(num = 1, figsize=(WDTH_DEF , RAT_XY*5.), dpi=None, facecolor='w', edgecolor='k')
-        ax  = plt.axes(vax, axisbg='gray')
+        ax  = plt.axes(vax, facecolor='gray')
         vc  = __vcontour__(rmin, rmax, dc)
 
         # Colormap:

@@ -461,7 +461,7 @@ for jt in range(jt0,Nt):
 
     fig = plt.figure(num = 1, figsize=(size_figure[0], size_figure[1]), dpi=None) ###, facecolor='0.5', edgecolor='k')
 
-    ax = plt.axes([0.05, 0.042, 0.94, 0.93], axisbg = '0.35') ; # '0.35' inside ploting region
+    ax = plt.axes([0.05, 0.042, 0.94, 0.93], facecolor = '0.35') ; # '0.35' inside ploting region
 
     vc_fld = nmp.arange(tmin, tmax + df, df)
 

@@ -72,7 +72,7 @@ print '\n Shape of the domain Nj,Ni = ', Nj,Ni
 #############################
 
 fig = plt.figure(num = 1, figsize=(8,8), dpi=None, facecolor='w', edgecolor='0.5')
-ax  = plt.axes([0., 0., 1., 1.], axisbg = '0.5')
+ax  = plt.axes([0., 0., 1., 1.], facecolor = '0.5')
 
 cf = plt.imshow(Xtemp[:,:], interpolation='none')
 

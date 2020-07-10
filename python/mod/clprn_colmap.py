@@ -26,22 +26,22 @@ def chose_colmap( cname, log_ctrl=0, exp_ctrl=0 ):
 
         # Maybe a climporn colormap ?
     elif cname in list_climporn or ( cname[-2:] == '_r' and cname[:-2] in list_climporn):
-        if l_debug: print '\n *** Getting Climporn colormap "'+cname+'" !'
+        if l_debug: print('\n *** Getting Climporn colormap "'+cname+'" !')
         x = brkd_cmap(cname)
         ColorMap = x.clrmp(log_ctrl=log_ctrl, exp_ctrl=exp_ctrl)
     else:
         # Then it must be a Matplotlib colormap:
-        if log_ctrl or exp_ctrl > 0: print 'WARNING: cannot use LOG or EXP colormap with Matplotlib colormaps...'
+        if log_ctrl or exp_ctrl > 0: print('WARNING: cannot use LOG or EXP colormap with Matplotlib colormaps...')
         from matplotlib.pylab import cm
         import matplotlib.pyplot as mp
         list = mp.colormaps()
         if cname in list:
             # Yes it is!
-            if l_debug: print '\n *** Getting Matplotlib colormap "'+cname+'" !'
+            if l_debug: print('\n *** Getting Matplotlib colormap "'+cname+'" !')
             fToCall = getattr(cm, cname)
             ColorMap = fToCall
         else:
-            print 'ERROR: (chose_colmap of clprn_colmap.py) do not know where to get colormap "'+cname+'" !'
+            print('ERROR: (chose_colmap of clprn_colmap.py) do not know where to get colormap "'+cname+'" !')
             sys.exit(0)
 
     return ColorMap
@@ -73,13 +73,13 @@ def ncview_cmap_to_array( cname ):
         print(" ERROR => the {} environement variable is not set".format('DIR_NCVIEW_CMAP'))
         sys.exit(0)
 
-    if cname[:7] != 'ncview_' : print ' ERROR: a ncview colormap should begin with "ncview_" !'; sys.exit(0)
+    if cname[:7] != 'ncview_' : print(' ERROR: a ncview colormap should begin with "ncview_" !'); sys.exit(0)
     ncview_name = cname[7:]
 
     cf_ncview_cmap = dir_ncview_cmap+'/colormaps_'+ncview_name+'.h'
     if not os.path.exists(cf_ncview_cmap):
-        print 'ERROR: NCVIEW colormap '+cf_ncview_cmap+' not found!' ; sys.exit(0)
-    if l_debug: print '\n *** Getting NCVIEW colormap "'+ncview_name+'" from file "'+cf_ncview_cmap+'"'
+        print('ERROR: NCVIEW colormap '+cf_ncview_cmap+' not found!'); sys.exit(0)
+    if l_debug: print('\n *** Getting NCVIEW colormap "'+ncview_name+'" from file "'+cf_ncview_cmap+'"')
 
     f = open(cf_ncview_cmap, 'r')
     cread_lines = f.readlines()
@@ -506,7 +506,7 @@ class brkd_cmap:
             ] )
 
         else:
-            print 'ERROR: (''clprn_colmap.py) => unknown "climporn" colormap: '+cname
+            print('ERROR: (''clprn_colmap.py) => unknown "climporn" colormap: '+cname)
             sys.exit(0)
 
         if lrev:

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 #       B a r a K u d a
 #
@@ -9,7 +9,6 @@
 
 import sys
 import os
-from string import replace
 import numpy as nmp
 
 from netCDF4 import Dataset
@@ -48,7 +47,7 @@ fig_type='png'
 
 narg = len(sys.argv)
 if not narg in [5,6]:
-    print 'Usage: '+sys.argv[0]+' <CONF> <file> <variable> <snapshot> (<LSM_file>)'
+    print('Usage: '+sys.argv[0]+' <CONF> <file> <variable> <snapshot> (<LSM_file>)')
     sys.exit(0)
 CNEMO  = sys.argv[1]
 cf_fld = sys.argv[2]
@@ -64,7 +63,7 @@ l_bathy_var = [ 'Bathymetry', 'elevation' ]
     
 
 if not l_read_lsm and ( not cv_in in l_bathy_var):
-    print "It's only for bathymetric fields that you can skip providing the mesh_mask file!"
+    print("It's only for bathymetric fields that you can skip providing the mesh_mask file!")
     sys.exit(0)
 
 
@@ -176,7 +175,7 @@ elif CNEMO == 'GulfS':
     pt_sz_track = 3
     
 else:
-    print '\n PROBLEM: "'+CNEMO+'" is an unknown config!!!'
+    print('\n PROBLEM: "'+CNEMO+'" is an unknown config!!!')
     sys.exit(0)
 
 
@@ -192,7 +191,7 @@ l_pow_field = False
 cextend='both'
 l_hide_cb_ticks = False
 
-print ' cv_in = '+cv_in
+print(' cv_in = '+cv_in)
 
 if cv_in in ['sosstsst','tos']:
     cfield = 'SST'
@@ -246,7 +245,7 @@ elif cv_in == 'track':
     fig_type='svg'
 
 else:
-    print 'ERROR: variable '+cv_in+' is not known yet...'; sys.exit(0)
+    print('ERROR: variable '+cv_in+' is not known yet...'); sys.exit(0)
 
 
 
@@ -258,12 +257,12 @@ list_var = id_fld.variables.keys()
 if 'time_counter' in list_var:    
     vtime = id_fld.variables['time_counter'][:]
     Nt = len(vtime)
-    print '\n There is a "time_counter" in file '+cf_fld+' !'
-    print '   => '+str(Nt)+' snapshots!'
-    if jt <= 0 or jt > Nt: print ' PROBLEM: your time record does not exist!', jt ; sys.exit(0)
+    print('\n There is a "time_counter" in file '+cf_fld+' !')
+    print('   => '+str(Nt)+' snapshots!')
+    if jt <= 0 or jt > Nt: print(' PROBLEM: your time record does not exist!', jt) ; sys.exit(0)
 else:
-    print '\nWARNING: there is NO "time_counter" in file '+cf_fld+' !'
-    print '   ==> setting Nt = 0 !\n'
+    print('\nWARNING: there is NO "time_counter" in file '+cf_fld+' !')
+    print('   ==> setting Nt = 0 !\n')
     Nt = 0
 id_fld.close()
 
@@ -271,7 +270,7 @@ ibath=1
 
 if l_read_lsm:
     bt.chck4f(cf_lsm)
-    print '\n *** Reading "tmask" in meshmask file...'
+    print('\n *** Reading "tmask" in meshmask file...')
     id_lsm = Dataset(cf_lsm)
     nb_dim = len(id_lsm.variables['tmask'].dimensions)
     Ni = id_lsm.dimensions['x'].size
@@ -285,18 +284,18 @@ if l_read_lsm:
         Xlon = id_lsm.variables['glamu'][0,j1:j2,i1:i2]
         Xlat = id_lsm.variables['gphiv'][0,j1:j2,i1:i2]
     id_lsm.close()
-    print '      done.'
+    print('      done.')
 
 elif cv_in in l_bathy_var:
     bt.chck4f(cf_fld)
-    print '\n *** Will build mask from "Bathymetry"...'
+    print('\n *** Will build mask from "Bathymetry"...')
     id_fld = Dataset(cf_fld)
-    list_dim = id_fld.dimensions.keys()
+    list_dim = list(id_fld.dimensions.keys()) ; #lolopy3
     nb_dim = len(id_fld.variables[cv_in].dimensions)
     for jd in range(nb_dim):
         if list_dim[jd] in ['x','lon','longitude','glamt']: cdim_x = list_dim[jd]
         if list_dim[jd] in ['y','lat','latitude' ,'gphit']: cdim_y = list_dim[jd]
-    print ' *** x, y dims =>', cdim_x, cdim_y
+    print(' *** x, y dims =>', cdim_x, cdim_y)
     #
     Ni = id_fld.dimensions[cdim_x].size
     Nj = id_fld.dimensions[cdim_y].size
@@ -312,12 +311,12 @@ elif cv_in in l_bathy_var:
     # Does bathymetry come as positive or negative in file???
     bt_max = nmp.max(XBATH[:,:])
     bt_min = nmp.min(XBATH[:,:])
-    print 'min, max bathy =>', bt_max, bt_min
+    print('min, max bathy =>', bt_max, bt_min)
 
     if abs(bt_max) > 12000. or abs(bt_min) > 12000.:
-        print 'PROBLEM #1: we dont know what do do with min and max of bathymetry!'; sys.exit(0)
+        print('PROBLEM #1: we dont know what do do with min and max of bathymetry!'); sys.exit(0)
     if abs(bt_min) > abs(bt_max):
-        print ' *** Bathymetry seems negative!'
+        print(' *** Bathymetry seems negative!')
         ibath = -1
         XBATH[:,:] = XBATH[:,:]*ibath
     
@@ -325,18 +324,18 @@ elif cv_in in l_bathy_var:
     idx_oce = nmp.where(XBATH > 0.2)
     XMSK[idx_oce] = 1.
     del XBATH
-    print '      done.'
+    print('      done.')
 
     
 else:
-    print 'PROBLEM #2'; sys.exit(0)
+    print('PROBLEM #2'); sys.exit(0)
 
 
-print '\n According to "tmask" the shape of the domain is Ni, Nj =', Ni, Nj
+print('\n According to "tmask" the shape of the domain is Ni, Nj =', Ni, Nj)
 
 
 # Stuff for size of figure respecting pixels...
-print '  *** we are going to show: i1,i2,j1,j2 =>', i1,i2,j1,j2, '\n'
+print('  *** we are going to show: i1,i2,j1,j2 =>', i1,i2,j1,j2, '\n')
 nx_res = i2-i1
 ny_res = j2-j1
 yx_ratio = float(ny_res)/float(nx_res)
@@ -346,7 +345,7 @@ dpi = 100
 rh  = float(nxr)/float(dpi) ; # width of figure as for figure...
 
 
-print '\n *** width and height of image to create:', nxr, nyr, '\n'
+print('\n *** width and height of image to create:', nxr, nyr, '\n')
 
 
 
@@ -403,32 +402,32 @@ else:
 fig = plt.figure(num = 1, figsize=(rh,rh*yx_ratio), dpi=None, facecolor='w', edgecolor='k')
 
 if l_scientific_mode:
-    ax  = plt.axes([0.09, 0.09, 0.9, 0.9], axisbg = 'r')
+    ax  = plt.axes([0.09, 0.09, 0.9, 0.9], facecolor = 'r')
 else:
-    ax  = plt.axes([0., 0., 1., 1.],     axisbg = 'k')
+    ax  = plt.axes([0., 0., 1., 1.],     facecolor = 'k')
 
 vc_fld = nmp.arange(tmin, tmax + df, df)
 
 
-print '\n *** Opening file '+cf_fld
+print('\n *** Opening file '+cf_fld)
 id_fld = Dataset(cf_fld)
 if Nt > 0:
-    print '    => Reading record #'+str(jt)+' of '+cv_in+' in '+cf_fld
+    print('    => Reading record #'+str(jt)+' of '+cv_in+' in '+cf_fld)
     XFLD  = id_fld.variables[cv_in][jt-1,j1:j2,i1:i2] ; # t, y, x
 else:
-    print '    => Reading 2D field '+cv_in+' in '+cf_fld+' (no time records...)'
+    print('    => Reading 2D field '+cv_in+' in '+cf_fld+' (no time records...)')
     XFLD  = id_fld.variables[cv_in][j1:j2,i1:i2] ; # t, y, x
 
 id_fld.close()
-print '          Done!\n'
+print('          Done!\n')
 
 
 if XMSK.shape != XFLD.shape:
-    print '\n PROBLEM: field and mask do not agree in shape!'
-    print XMSK.shape , XFLD.shape
+    print('\n PROBLEM: field and mask do not agree in shape!')
+    print(XMSK.shape , XFLD.shape)
     sys.exit(0)
 
-print '  *** Shape of field and mask => ', nmp.shape(XFLD)
+print('  *** Shape of field and mask => ', nmp.shape(XFLD))
 
 del XMSK
 
@@ -439,7 +438,7 @@ if cv_in in l_bathy_var and ibath==-1: XFLD = ibath*XFLD
 (idy_nan,idx_nan) = nmp.where( nmp.isnan(XFLD) )
 
 
-print 'Ploting'
+print('Ploting')
 
 if cv_in == 'track':
     indx = nmp.where( XFLD > 0 )
@@ -466,7 +465,7 @@ if l_show_msh:
 
 
 del XFLD
-print 'Done!'
+print('Done!')
 
 
 
@@ -526,7 +525,7 @@ if l_show_ttl: ax.annotate(CNEMO, xy=(1, 4), xytext=(x_ttl, y_ttl), **cfont_ttl)
 
 #plt.savefig(cfig, dpi=dpi, orientation='portrait', facecolor='b', transparent=True)
 plt.savefig(cfig, dpi=dpi, orientation='portrait', transparent=True)
-print cfig+' created!\n'
+print(cfig+' created!\n')
 plt.close(1)
 
 
