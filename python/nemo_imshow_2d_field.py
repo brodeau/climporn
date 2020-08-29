@@ -152,8 +152,8 @@ elif CNEMO == 'TROPICO05':
     bathy_max = 6000. # m
     
 elif CNEMO == 'TROPICO12':
-    i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 1. ; vcb = [0.02, 0.15, 0.4, 0.04] ; font_rat = 2./rfact_zoom
-    x_cnf = 1200. ; y_cnf = 800. ; # where to put label of conf on Figure...
+    i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 1. ; vcb = [0.02, 0.15, 0.4, 0.04] ; font_rat = 1.6/rfact_zoom
+    x_cnf = 1200. ; y_cnf = 860. ; # where to put label of conf on Figure...
     l_show_cb = True ; l_show_nm = True ; l_scientific_mode=False
     bathy_max = 6000. # m
 
@@ -371,7 +371,7 @@ mpl.rcParams.update(params)
 cfont_clb  = { 'fontname':'Open Sans', 'fontweight':'medium', 'fontsize':int(18.*font_rat), 'color':color_top }
 cfont_date = { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(12.*font_rat), 'color':'w' }
 cfont_mail = { 'fontname':'Times New Roman', 'fontweight':'normal', 'fontstyle':'italic', 'fontsize':int(14.*font_rat), 'color':'0.8'}
-cfont_cnfn = { 'fontname':'Open Sans', 'fontweight':'light', 'fontsize':int(50.*font_rat), 'color':'w' }
+cfont_cnfn = { 'fontname':'Open Sans', 'fontweight':'light', 'fontsize':int(35.*font_rat), 'color':'w' }
 cfont_axis  = { 'fontname':'Open Sans', 'fontweight':'medium', 'fontsize':int(18.*font_rat), 'color':color_top }
 cfont_ttl = { 'fontname':'Open Sans', 'fontweight':'medium', 'fontsize':int(25.*font_rat), 'color':color_top }
 
@@ -480,13 +480,6 @@ plt.axis([ 0, Ni, 0, Nj])
 if l_scientific_mode:
     plt.xlabel('i-points', **cfont_axis)
     plt.ylabel('j-points', **cfont_axis)
-
-
-
-#plt.title('NEMO: '+cfield+', coupled '+CNEMO+', '+cday+' '+chour+':00', **cfont_cnfne)
-
-
-#ax2 = plt.axes([0.3, 0.08, 0.4, 0.025])
 
 if l_show_cb:
 
