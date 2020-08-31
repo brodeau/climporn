@@ -173,6 +173,12 @@ elif CNEMO == 'GulfS':
     i1 = 0 ; j1 = 420 ; i2 = 900 ; j2 = 980 ; rfact_zoom = 1. ; vcb = [0.15, 0.96, 0.8, 0.02] ; font_rat = 0.1
     l_show_cb = False ; l_show_nm = False
     pt_sz_track = 3
+
+elif CNEMO == 'CALEDOZOOM':
+    i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = .2 ; vcb = [0.2, 0.06, 0.6, 0.03] ; font_rat = 1.5/rfact_zoom
+    x_cnf = 900. ; y_cnf = 1350. ; # where to put label of conf on Figure...
+    l_show_cb = False ; l_show_nm = False ; l_scientific_mode=False
+    bathy_max = 6000. # m
     
 else:
     print('\n PROBLEM: "'+CNEMO+'" is an unknown config!!!')
