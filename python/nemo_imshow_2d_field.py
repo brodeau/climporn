@@ -69,6 +69,9 @@ if not l_read_lsm and ( not cv_in in l_bathy_var):
 
 
 dir_conf = path.dirname(cf_fld)
+if dir_conf == '':  dir_conf = '.'
+print('\n *** dir_conf =',dir_conf,'\n')
+
 
 # lsm_LBC_TROPICO12.nc
     
@@ -509,7 +512,8 @@ if cfield == 'Bathymetry' and l_add_true_filled:
     cfl = plt.imshow(pfilled, cmap=pal_filled, norm=norm_filled, interpolation='none' ) #, interpolation='none')
 
 
-del pmsk, pfilled
+del pmsk
+if l_add_true_filled: del pfilled
 
 
 plt.axis([ 0, Ni, 0, Nj])
