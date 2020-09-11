@@ -8,7 +8,7 @@
 #    L. Brodeau, May 2018
 
 import sys
-import os
+from os import path
 import numpy as nmp
 
 from netCDF4 import Dataset
@@ -68,7 +68,9 @@ if not l_read_lsm and ( not cv_in in l_bathy_var):
 
 
 
+dir_conf = path.dirname(cf_fld)
 
+# lsm_LBC_TROPICO12.nc
     
 i2=0
 j2=0
@@ -153,7 +155,7 @@ elif CNEMO == 'TROPICO05':
     
 elif CNEMO == 'TROPICO12':
     i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 1. ; vcb = [0.02, 0.15, 0.4, 0.04] ; font_rat = 1.6/rfact_zoom
-    x_cnf = 1200. ; y_cnf = 860. ; # where to put label of conf on Figure...
+    x_cnf = 1400. ; y_cnf = 820. ; # where to put label of conf on Figure...
     l_show_cb = True ; l_show_nm = True ; l_scientific_mode=False
     bathy_max = 6000. # m
 
@@ -394,6 +396,9 @@ else:
 pal_lsm = bcm.chose_colmap('land_dark')
 norm_lsm = colors.Normalize(vmin = 0., vmax = 1., clip = False)
 
+pal_filled = bcm.chose_colmap('gray_r')
+norm_filled = colors.Normalize(vmin = 0., vmax = 0.1, clip = False)
+
 
 if Nt == 0:
     cfig = cv_in+'_'+CNEMO+'_'+cpal_fld+'.'+fig_type    
@@ -441,9 +446,23 @@ del XMSK
 if cv_in in l_bathy_var and ibath==-1: XFLD = ibath*XFLD
 
 
-(idy_nan,idx_nan) = nmp.where( nmp.isnan(XFLD) )
+if cfield == 'Bathymetry':
+    (idy_nan,idx_nan) = nmp.where( nmp.isnan(XFLD) )
+    #
+    # LSM with different masking for true lsm and filled lsm...
+    l_add_true_filled = False
+    cf_mask_lbc = dir_conf+'/lsm_LBC_'+CNEMO+'.nc'
+    if path.exists(cf_mask_lbc):
+        print('\n *** '+cf_mask_lbc+' found !!!')
+        l_add_true_filled = True 
+        id_filled = Dataset(cf_mask_lbc)
+        xtmp = id_filled.variables['lsm'][j1:j2,i1:i2]
+        id_filled.close()
+        pfilled = nmp.ma.masked_where(xtmp[:,:] != -1., xtmp[:,:]*0.+40.)
+        del xtmp
+        print('  => done filling "pfilled" !\n')
 
-
+    
 print('Ploting')
 
 if cv_in == 'track':
@@ -453,14 +472,19 @@ if cv_in == 'track':
     #
 else:
     cf = plt.imshow(XFLD[:,:], cmap = pal_fld, norm = norm_fld, interpolation='nearest' ) #, interpolation='none')
-    if len(idy_nan) > 0:
-        idd = nmp.where(idy_nan==1); idy_nan[idd] = int(10./rfact_zoom)/2  # just so the boundary line is not too thin on plot...
-        plt.scatter(idx_nan, idy_nan, color=clr_yellow, marker='s', s=int(10./rfact_zoom))
+    if cfield == 'Bathymetry':
+        #lulu
+        if len(idy_nan) > 0:
+            idd = nmp.where(idy_nan==1); idy_nan[idd] = int(10./rfact_zoom)/2  # just so the boundary line is not too thin on plot...
+            plt.scatter(idx_nan, idy_nan, color=clr_yellow, marker='s', s=int(10./rfact_zoom))
 
 if l_show_msh:
     ccx = plt.contour(Xlon[:,:], 60, colors='k', linewidths=0.5)
     ccy = plt.contour(Xlat[:,:], 30, colors='k', linewidths=0.5)
 
+
+
+    
 #vj = nmp.arange(0,Nj-20,20)
 #for jj in vj:
 #    ccx = plt.plot(nmp.arange(len(Xlat[jj,:])), 5.*Xlat[jj,:], 'k', linewidth=0.5)
@@ -478,7 +502,14 @@ print('Done!')
 
 cm = plt.imshow(pmsk, cmap = pal_lsm, norm = norm_lsm, interpolation='none')
 
-del pmsk
+
+#lulu
+if cfield == 'Bathymetry' and l_add_true_filled:
+    # Ocean that has been filled turns black:
+    cfl = plt.imshow(pfilled, cmap=pal_filled, norm=norm_filled, interpolation='none' ) #, interpolation='none')
+
+
+del pmsk, pfilled
 
 
 plt.axis([ 0, Ni, 0, Nj])
