@@ -159,7 +159,7 @@ elif CNEMO == 'TROPICO05':
 elif CNEMO == 'TROPICO12':
     i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 1. ; vcb = [0.02, 0.15, 0.4, 0.04] ; font_rat = 1.6/rfact_zoom
     x_cnf = 1400. ; y_cnf = 820. ; # where to put label of conf on Figure...
-    l_show_cb = True ; l_show_nm = True ; l_scientific_mode=False
+    l_show_cb = False ; l_show_nm = False ; l_scientific_mode=False
     bathy_max = 6000. # m
 
 elif CNEMO == 'GEBCO':
