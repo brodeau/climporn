@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 #     CLIMPORN
 #
@@ -6,10 +6,9 @@
 #  NEMO output + mesh_mask needed.
 #
 #    L. Brodeau, November 2019
-#
+
 import sys
 from os import path, getcwd, mkdir
-from string import replace
 import argparse as ap
 import numpy as nmp
 
@@ -109,19 +108,20 @@ jk    = args.lev
 lshow_ice = args.ice
 #cf_topo_land = args.zld
 
-print ''
-print ' *** CNEMO = ', CNEMO
-#print ' *** CBOX  = ', CBOX
-print ' *** CWHAT = ', CWHAT
-print ' *** cf_in = ', cf_in
-print ' *** cf_mm = ', cf_mm
-print ' *** csd0 = ', csd0
-print ' ***   jk  = ', jk
-print ' *** Show ice? =>', lshow_ice
+print('')
+print(' *** CNEMO = ', CNEMO)
+print(' *** CWHAT = ', CWHAT)
+print(' *** cf_in = ', cf_in)
+print(' *** cf_mm = ', cf_mm)
+print(' *** csd0 = ', csd0)
+print(' ***   jk  = ', jk)
+print(' *** Show ice? =>', lshow_ice)
+
 #l_add_topo_land = False
 #if args.zld != None:
-#    print ' *** cf_topo_land = ', cf_topo_land
+#    print(' *** cf_topo_land = ', cf_topo_land)
 #    l_add_topo_land = True
+
 l3d = False
 if jk > 0:
     l3d=True
@@ -139,9 +139,9 @@ if l_get_name_of_run:
     # Name of RUN:
     vv = split('-|_', path.basename(cf_in))
     if vv[0] != CNEMO:
-        print 'ERROR: your file name is not consistent with "'+CNEMO+'" !!! ('+vv[0]+')' ; sys.exit(0)
+        print('ERROR: your file name is not consistent with "'+CNEMO+'" !!! ('+vv[0]+')') ; sys.exit(0)
     CRUN = vv[1]
-    print '\n Run is called: "'+CRUN+'" !\n'
+    print('\n Run is called: "'+CRUN+'" !\n')
 
 #---------------------------------------------------------------
 # Test - beta development:
@@ -191,7 +191,7 @@ elif CWHAT == 'Qnet':
     cunit = r'Net heat flux ($W/m^{2}$)'
     
 else:
-    print 'ERROR: we do not know variable "'+str(cv_in)+'" !'
+    print('ERROR: we do not know variable "'+str(cv_in)+'" !')
     sys.exit(0)
     
 
@@ -207,11 +207,11 @@ elif 'time' in list_var:
     vtime = id_in.variables['time'][:]
 else:
     l_notime=True
-    print 'Did not find a time variable! Assuming no time and Nt=1'
+    print('Did not find a time variable! Assuming no time and Nt=1')
     id_in.close()
     Nt = 1
 if not l_notime: Nt = len(vtime)
-print(' Nt ='), Nt
+print(' Nt =', Nt)
 
 
 
@@ -226,7 +226,7 @@ Xlon = id_lsm.variables['glamt'][0,j1:j2,i1:i2]
 Xlat = id_lsm.variables['gphit'][0,j1:j2,i1:i2]
 id_lsm.close()
 
-(nj,ni) = nmp.shape(XMSK)  ; print('Shape Arrays => ni,nj ='), ni,nj
+(nj,ni) = nmp.shape(XMSK)  ; print('Shape Arrays => ni,nj =', ni,nj)
 
 print('Done!\n')
 
@@ -281,7 +281,7 @@ elif cdt == '3h':
 elif cdt == '1h':
     dt = 1
 else:
-    print 'ERROR: unknown dt!'
+    print('ERROR: unknown dt!')
 
 
 
@@ -302,7 +302,6 @@ ntpd = 24/dt
 
 vm = vmn
 if isleap(int(cyr0)): vm = vml
-#print ' year is ', vm, nmp.sum(vm)
 
 jd = int(cdd0) - 1
 jm = int(cmn0)
@@ -320,9 +319,9 @@ for jt in range(jt0,Nt):
     cm = '%2.2i'%(jm)
     ct = str(datetime.datetime.strptime(cyr0+'-'+cm+'-'+cd+' '+ch, '%Y-%m-%j %H'))
     ct=ct[:5]+cm+ct[7:] #lolo bug !!! need to do that to get the month and not "01"
-    print ' ct = ', ct
-    cday  = ct[:10]   ; print ' *** cday  :', cday
-    chour = ct[11:13] ; print ' *** chour :', chour
+    print(' ct = ', ct)
+    cday  = ct[:10]   ; print(' *** cday  :', cday)
+    chour = ct[11:13] ; print(' *** chour :', chour)
 
     if l3d:
         cfig = cdir_figs+'/'+cv_out+'_'+CNEMO+'-'+CRUN+'_lev'+str(jk)+'_'+cday+'_'+chour+'.'+fig_type
@@ -435,6 +434,6 @@ for jt in range(jt0,Nt):
         del datafile, im
     
     print(' Saving figure: '+cfig)
-    #plt.savefig(cfig, dpi=rDPI, orientation='portrait', transparent=True)
+
     plt.savefig(cfig, dpi=rDPI, orientation='portrait', transparent=False)
     plt.close(1)
