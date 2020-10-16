@@ -88,7 +88,7 @@ parser = ap.ArgumentParser(description='Generate pixel maps of a given scalar.')
 
 requiredNamed = parser.add_argument_group('required arguments')
 requiredNamed.add_argument('-i', '--fin' , required=True,                help='specify the NEMO netCDF file to read from...')
-requiredNamed.add_argument('-w', '--what', required=True, default="SST", help='specify the field/diagnostic to plot (ex: SST)')
+requiredNamed.add_argument('-w', '--what', required=True, default="sst", help='specify the field/diagnostic to plot (ex: sst)')
 
 parser.add_argument('-C', '--conf', default="NANUK025",     help='specify NEMO config (ex: eNATL60)')
 parser.add_argument('-m', '--fmm' , default="mesh_mask.nc", help='specify the NEMO mesh_mask file (ex: mesh_mask.nc)')
@@ -158,12 +158,12 @@ else:
 if CNEMO == 'NANUK025': cxtra_info1 = "OPA - neXtSIM" ; cxtra_info2 = "   (CREG025)"
 if CNEMO == 'CREG025':  cxtra_info1 = "OPA - LIM3"    ; cxtra_info2 = "(CREG025)"
 
-if   CWHAT == 'sst':
+if  CWHAT == 'sst':
     # SST
     tmin=-2.
     tmax=20.
     cv_in = 'sst'
-    cv_if = 'iconc'
+    cv_if = 'siconc'
     cv_out = CWHAT
     df = 1. ; cb_jump = 2    
     cpal_fld = 'on3'  #cpal_fld = 'ncview_nrl'
