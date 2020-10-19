@@ -35,7 +35,7 @@ import clprn_colmap as bcm
 import clprn_tool as bt
 import clprn_ncio as bnc
 
-ldrown = False
+ldrown = True
 l_add_topo_land = False
 
 l_show_ice_colbar = True
@@ -78,7 +78,8 @@ rmax_ice=1.
 #cpal_ice = 'bone'
 #cpal_ice = 'ice_on'
 #cpal_ice = 'ice2_on'
-cpal_ice = 'ice3_on'
+#cpal_ice = 'ice3_on'
+cpal_ice = 'ice4_on'
 
 # Continents:
 rof_log = 150.
@@ -166,8 +167,8 @@ else:
     print('ERRO: unknow conf '+CNEMO)
     ###############################
 
-if CNEMO == 'NANUK025': cxtra_info1 = "OPA - neXtSIM" ; cxtra_info2 = "   (CREG025)"
-if CNEMO == 'CREG025':  cxtra_info1 = "OPA - LIM3"    ; cxtra_info2 = "(CREG025)"
+if CNEMO == 'NANUK025': cxtra_info1 = "OPA - neXtSIM" ; #cxtra_info2 = "   (CREG025)"
+if CNEMO == 'CREG025':  cxtra_info1 = "OPA - LIM3"    ; #cxtra_info2 = "(CREG025)"
 
 if  CWHAT == 'sst':
     # SST
@@ -440,7 +441,7 @@ for jt in range(jt0,Nt):
     ry0 = 0.78
     #ry0 = 0.9
     ax.annotate(cxtra_info1, xy=(0.02, ry0+0.05), xycoords='figure fraction', **cfont_titl1)
-    ax.annotate(cxtra_info2, xy=(0.05, ry0 ),     xycoords='figure fraction', **cfont_titl2)
+    #ax.annotate(cxtra_info2, xy=(0.05, ry0 ),     xycoords='figure fraction', **cfont_titl2)
 
     #
     if l_show_logos:
