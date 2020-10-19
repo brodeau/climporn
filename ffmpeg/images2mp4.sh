@@ -63,6 +63,8 @@ while getopts i:t:h:c:f:C:p:v:d:D:n:h option; do
     esac
 done
 
+fprf=`basename ${FPREF}`
+
 if [ "${FPREF}" = "" ]; then usage; fi
 
 
@@ -107,7 +109,7 @@ else
 fi
 
 
-fo="${DIR_OUT}/movie_${FPREF}_${info}_${FRAMERATE_IN}fps_crf${CRF}.${FVID}"
+fo="${DIR_OUT}/movie_${fprf}_${info}_${FRAMERATE_IN}fps_crf${CRF}.${FVID}"
 
 rm -f ${fo}
 
