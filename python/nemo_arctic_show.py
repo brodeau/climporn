@@ -40,8 +40,12 @@ l_add_topo_land = False
 
 l_show_ice_colbar = True
 
-l_show_logo = False
-on_logo="/home/brodeau/util/logos/ocean-next_trans_white_120x82.png"
+l_show_logos = True
+f_logo_on    = 'ocean-next_trans_white_120x82.png'
+f_logo_ifrmr = 'IFREMER_blanc_small.png'
+f_logo_nersc = 'NERSC_white_120p.png'
+f_logo_ige   = 'IGE_blanc_small.png'
+
 
 vmn = [ 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ]
 vml = [ 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ]
@@ -81,6 +85,11 @@ rof_dpt = 0.
 
 
 vp =  ['nanuk', 'stere', -60., 40., 122., 57.,     75.,  -12., 10., 'h' ]  # North Pole
+
+
+# Normally logos should be found there:
+dir_logos = str.replace( path.dirname(path.realpath(__file__)) , 'climporn/python', 'climporn/misc/logos' )
+print("\n --- logos found into : "+dir_logos+" !\n")
 
 
 ################## ARGUMENT PARSING / USAGE ################################################################################################
@@ -251,7 +260,7 @@ cfont_titl2 = { 'fontname':'Open Sans', 'fontweight':'light', 'fontsize':int(14.
 # for colorbar:
 vc_fld = nmp.arange(tmin, tmax + df, df)
 l_show_ice_colbar = l_show_ice_colbar and lshow_ice
-if l_show_ice_colbar: vc_ice = nmp.arange(rmin_ice, rmax_ice+0.1, 0.1)
+if l_show_ice_colbar: vc_ice = nmp.arange(rmin_ice, rmax_ice+0.25, 0.25)
 
 
 
@@ -400,13 +409,18 @@ for jt in range(jt0,Nt):
     clb.outline.set_edgecolor(color_top_cb) ; # set colorbar edgecolor                                                                                
     clb.ax.tick_params(which = 'minor', length = 2, color = color_top_cb )
     clb.ax.tick_params(which = 'major', length = 4, color = color_top_cb )
-
+    del clb
 
     # ----------- Color bar for ICE fraction -----------
     if l_show_ice_colbar:
         ax3 = plt.axes([0.02, 0.965, 0.344, 0.018])
         clb = mpl.colorbar.ColorbarBase(ax3, ticks=vc_ice, cmap=pal_ice, norm=nrm_ice, orientation='horizontal') #, extend='min')
-        cb_labs = clb.ax.get_xticklabels()
+        cb_labs = []
+        for rr in vc_ice:
+            if rr == 1.:
+                cb_labs.append(str(int(rr)))
+            else:
+                cb_labs.append(str(rr))
         clb.ax.set_xticklabels(cb_labs, **cfont_clb)
         clb.set_label('Ice fraction', **cfont_clb)
         clb.ax.yaxis.set_tick_params(color=color_top_cb) ; # set colorbar tick color                                                                      
@@ -427,13 +441,30 @@ for jt in range(jt0,Nt):
     ax.annotate(cxtra_info2, xy=(0.05, ry0 ),     xycoords='figure fraction', **cfont_titl2)
 
     #
-    if l_show_logo:
-        datafile = cbook.get_sample_data(on_logo, asfileobj=False)
+    if l_show_logos:
+
+        datafile = cbook.get_sample_data(dir_logos+'/'+f_logo_ige, asfileobj=False)
         im = image.imread(datafile)
-        fig.figimage(im, 627, 8, zorder=9)
+        fig.figimage(im, 995, 860, zorder=9)
+        del datafile, im
+
+        datafile = cbook.get_sample_data(dir_logos+'/'+f_logo_nersc, asfileobj=False)
+        im = image.imread(datafile)
+        fig.figimage(im, 990, 775, zorder=9)
         del datafile, im
     
-    print(' Saving figure: '+cfig)
+        datafile = cbook.get_sample_data(dir_logos+'/'+f_logo_ifrmr, asfileobj=False)
+        im = image.imread(datafile)
+        fig.figimage(im, 990, 717, zorder=9)
+        del datafile, im
+    
+    
+        datafile = cbook.get_sample_data(dir_logos+'/'+f_logo_on, asfileobj=False)
+        im = image.imread(datafile)
+        fig.figimage(im, 990, 9, zorder=9)
+        del datafile, im
+    
+    print(' Saving figure: '+cfig+'\n\n')
 
     plt.savefig(cfig, dpi=rDPI, orientation='portrait', transparent=False)
     plt.close(1)
