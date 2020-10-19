@@ -9,7 +9,7 @@ import numpy as nmp
 
 # List of Climporn home-made colormaps:
 list_climporn = [ 'blk', 'land', 'land_dark', 'terre', 'cb1', 'eke', 'bathy', 'mld', 'tap1', 'tap2', 'jetblanc', 'amoc',
-                  'sst1', 'sst2', 'sst3', 'ice', 'ice_on', 'blanc', 'rms',
+                  'sst1', 'sst2', 'sst3', 'ice', 'ice_on', 'ice2_on', 'ice3_on', 'blanc', 'rms',
                   'sigtr', 'bbr', 'bbr2', 'bbr0', 'bbr_cold', 'bbr_warm',
                   'cold0', 'warm0', 'graylb', 'graylb2', 'sigma', 'sigma0', 'mask', 'on0', 'on1', 'on2', 'on3' ]
 
@@ -359,6 +359,32 @@ class brkd_cmap:
             M = nmp.array( [
                 [ 0.,0.,0. ],        # noir   (has to match with coldest color of "on3" !
                 [ 25./255. , 102./255. , 114./255. ],
+                [ 1.0 , 1.0 , 1.0 ]  # white
+            ] )
+        elif cname == 'ice2_on':
+            M = nmp.array( [
+                [ 14./255.,16./255.,16./255. ],        # Dark gray
+                [ 42./255.,42./255.,46./255. ],        # Dark gray
+                #[ 40./255. , 58./255. , 58./255. ],
+                [ 51./255. , 85./255. , 85./255. ],
+                [ 70./255. ,104./255. ,104./255. ],
+                [ 174./255. , 196./255. , 212./255. ], # light grey blueish
+                #[ 215./255. , 232./255. , 246./255. ], # light grey blueish
+                [ 90./255. , 90./255. , 90./255. ], # light grey
+                [ 1.0 , 1.0 , 1.0 ]  # white
+            ] )
+            #                [ 0.6 , 0.6 , 0.8 ], # light grey
+        elif cname == 'ice3_on':
+            M = nmp.array( [
+                [ 25./255.,25./255.,25./255. ],        # Dark gray
+                [ 70./255.,70./255.,70./255. ],        # Dark gray                
+                #[ 90./255. , 90./255. , 90./255. ], # light grey                
+                #[ 70./255. ,104./255. ,104./255. ],
+                #[ 174./255. , 196./255. , 212./255. ], # light grey blueish
+                #[ 215./255. , 232./255. , 246./255. ], # light grey blueish
+                [ 150./255.,150./255.,150./255. ],        # Light gray
+                [  95./255.,156./255.,156./255. ],
+                [ 51./255. , 85./255. , 85./255. ],
                 [ 1.0 , 1.0 , 1.0 ]  # white
             ] )
             #                [ 0.6 , 0.6 , 0.8 ], # light grey

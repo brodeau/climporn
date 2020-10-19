@@ -35,7 +35,7 @@ import clprn_colmap as bcm
 import clprn_tool as bt
 import clprn_ncio as bnc
 
-ldrown = True
+ldrown = False
 l_add_topo_land = False
 
 l_show_ice_colbar = True
@@ -76,7 +76,9 @@ rmax_ice=1.
 #cpal_ice = 'ncview_bw'
 #cpal_ice = 'Blues_r'
 #cpal_ice = 'bone'
-cpal_ice = 'ice_on'
+#cpal_ice = 'ice_on'
+#cpal_ice = 'ice2_on'
+cpal_ice = 'ice3_on'
 
 # Continents:
 rof_log = 150.
@@ -260,7 +262,7 @@ cfont_titl2 = { 'fontname':'Open Sans', 'fontweight':'light', 'fontsize':int(14.
 # for colorbar:
 vc_fld = nmp.arange(tmin, tmax + df, df)
 l_show_ice_colbar = l_show_ice_colbar and lshow_ice
-if l_show_ice_colbar: vc_ice = nmp.arange(rmin_ice, rmax_ice+0.25, 0.25)
+if l_show_ice_colbar: vc_ice = nmp.arange(rmin_ice, rmax_ice+0.2, 0.2)
 
 
 
@@ -298,7 +300,7 @@ pal_fld = bcm.chose_colmap(cpal_fld)
 nrm_fld = colors.Normalize(vmin=tmin, vmax=tmax, clip=False)
 
 if lshow_ice:
-    pal_ice = bcm.chose_colmap(cpal_ice, exp_ctrl=1.5)
+    pal_ice = bcm.chose_colmap(cpal_ice) ; #lolo, exp_ctrl=1.5)
     nrm_ice = colors.Normalize(vmin=rmin_ice, vmax=rmax_ice, clip = False)
 
 
@@ -420,7 +422,7 @@ for jt in range(jt0,Nt):
             if rr == 1.:
                 cb_labs.append(str(int(rr)))
             else:
-                cb_labs.append(str(rr))
+                cb_labs.append(str(round(rr,1)))
         clb.ax.set_xticklabels(cb_labs, **cfont_clb)
         clb.set_label('Ice fraction', **cfont_clb)
         clb.ax.yaxis.set_tick_params(color=color_top_cb) ; # set colorbar tick color                                                                      
