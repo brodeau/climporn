@@ -21,8 +21,9 @@ def chose_colmap( cname, log_ctrl=0, exp_ctrl=0 ):
 
     # 1st is it a ncview colormap ?
     if cname[:7] == 'ncview_':
-        #M = ncview_h_to_array( cname )
-        M = ncview_ncmap_to_array( cname )
+        lr = ( cname[-2:] == '_r' )
+        if lr: cname = cname[:-2]
+        M = ncview_ncmap_to_array( cname, l_rev=lr )
         ColorMap = __build_colormap__(M, log_ctrl=log_ctrl, exp_ctrl=exp_ctrl)
 
         # Maybe a climporn colormap ?
@@ -113,7 +114,7 @@ def ncview_h_to_array( cname ):
     return MM
 
 
-def ncview_ncmap_to_array( cname ):
+def ncview_ncmap_to_array( cname, l_rev=False ):
     #
     # Reads the *.ncmap files !
     #
@@ -135,9 +136,13 @@ def ncview_ncmap_to_array( cname ):
     cread_lines = f.readlines()
     f.close()
     #
-    lstarted = False
+    if l_rev:
+        vrlines = cread_lines[::-1]
+    else:
+        vrlines = cread_lines[:]
+    #
     vec = []
-    for ll in cread_lines:
+    for ll in vrlines:
         ls = re.split(' ',ll)
         for ve in ls[:]: vec.append(float(ve))
     #
@@ -146,7 +151,6 @@ def ncview_ncmap_to_array( cname ):
     while ii < len(vec):
         ctmp.append([vec[ii], vec[ii+1], vec[ii+2]])
         ii += 3
-    #
     MM = nmp.array(ctmp)/255.
     #
     return MM

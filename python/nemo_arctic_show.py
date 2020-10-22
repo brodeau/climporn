@@ -168,6 +168,8 @@ else:
 if CNEMO == 'NANUK025': cxtra_info1 = "OPA - neXtSIM" ; #cxtra_info2 = "   (CREG025)"
 if CNEMO == 'CREG025':  cxtra_info1 = "OPA - LIM3"    ; #cxtra_info2 = "(CREG025)"
 
+rmult = 1.
+
 if  CWHAT == 'sst':
     # SST
     tmin=-2.
@@ -184,9 +186,10 @@ elif CWHAT == 'Qns':
     cv_if = 'ice_cover'
     cv_out = CWHAT
     #tmin=-1250 ;  tmax=250. ; df = 50. ; cb_jump = 5 ; cpal_fld = 'gist_stern_r'
-    tmin=-500. ;  tmax=500. ; df = 100. ; cb_jump = 2 ; cpal_fld = 'ncview_parula'
-    #cpal_fld = 'plasma' ;    
+    #tmin=-500. ;  tmax=500. ; df = 100. ; cb_jump = 2 ; cpal_fld = 'ncview_parula'
+    tmin=-150. ;  tmax=0. ; df = 25. ; cb_jump = 1 ; cpal_fld = 'ncview_parula_r'
     cunit = r'     Non-solar heat flux [$W/m^{2}$]'
+    rmult = 1.
     
 elif CWHAT == 'Qnet':
     cv_in = 'qt'
@@ -257,6 +260,7 @@ cfont_titl2 = { 'fontname':'Open Sans', 'fontweight':'light', 'fontsize':int(14.
 
 # for colorbar:
 vc_fld = nmp.arange(tmin, tmax + df, df)
+
 l_show_ice_colbar = l_show_ice_colbar and lshow_ice
 if l_show_ice_colbar: vc_ice = nmp.arange(rmin_ice, rmax_ice+0.2, 0.2)
 
@@ -337,7 +341,7 @@ for jt in range(jt0,Nt):
 
     # Getting field and sea-ice concentration at time record "jt":
     id_in = Dataset(cf_in)
-    XFLD = id_in.variables[cv_in]   [jt,j1:j2,i1:i2]
+    XFLD = rmult * id_in.variables[cv_in]   [jt,j1:j2,i1:i2]
     if lshow_ice: XIFR = id_in.variables[cv_if][jt,j1:j2,i1:i2]
     id_in.close()
 
