@@ -156,9 +156,7 @@ if l_get_name_of_run:
     print('\n Run is called: "'+CRUN+'" !\n')
 
 #---------------------------------------------------------------
-# Test - beta development:
-#cf_in = '/data/gcm_output/CREG025/NANUK025-ILBOXE50_6h_gridT-2D_199506-199506.nc'
-#cf_mm = '/data/gcm_setup/CREG025/CREG025-I/mesh_mask_CREG025_3.6_NoMed.nc'
+
 if CNEMO == 'NANUK025' or CNEMO == 'CREG025':
     jk=0
     j1=0 ; j2=603
@@ -167,7 +165,7 @@ else:
     print('ERRO: unknow conf '+CNEMO)
     ###############################
 
-if CNEMO == 'NANUK025': cxtra_info1 = "OPA - neXtSIM" ; #cxtra_info2 = "   (CREG025)"
+if CNEMO == 'NANUK025': cxtra_info1 = "NEMO - neXtSIM" ; #cxtra_info2 = "   (CREG025)"
 if CNEMO == 'CREG025':  cxtra_info1 = "OPA - LIM3"    ; #cxtra_info2 = "(CREG025)"
 
 if  CWHAT == 'sst':
@@ -180,18 +178,15 @@ if  CWHAT == 'sst':
     df = 1. ; cb_jump = 2    
     cpal_fld = 'on3'  #cpal_fld = 'ncview_nrl'
     cunit = r'SST [$^{\circ}$C]'
-    #cv_in = 'somxl010' ; cv_out = 'MLD'
-    #tmin=0. ;  tmax=1800.  ;  df = 50. ; cpal_fld = 'ncview_hotres' ;     cb_jump = 4
-    #cunit = r'MLD [m]'
 
 elif CWHAT == 'Qns':
     cv_in = 'nshfls'
     cv_if = 'ice_cover'
     cv_out = CWHAT
     #tmin=-1250 ;  tmax=250. ; df = 50. ; cb_jump = 5 ; cpal_fld = 'gist_stern_r'
-    tmin=-300 ;  tmax=300. ; df = 50. ; cb_jump = 2 ; cpal_fld = 'RdBu_r'
+    tmin=-500. ;  tmax=500. ; df = 100. ; cb_jump = 2 ; cpal_fld = 'RdBu_r'
     #cpal_fld = 'plasma' ;    
-    cunit = r'Non-solar heat flux ($W/m^{2}$)'
+    cunit = r'     Non-solar heat flux [$W/m^{2}$]'
     
 elif CWHAT == 'Qnet':
     cv_in = 'qt'
@@ -200,7 +195,7 @@ elif CWHAT == 'Qnet':
     tmin=-1000 ;  tmax=1000. ;  df = 200. ; cb_jump = 2
     #cpal_fld = 'Spectral_r'
     cpal_fld = 'RdBu_r'
-    cunit = r'Net heat flux ($W/m^{2}$)'
+    cunit = r'Net heat flux [$W/m^{2}$]'
     
 else:
     print('ERROR: we do not know variable "'+str(cv_in)+'" !')
@@ -252,8 +247,8 @@ params = { 'font.family':'Helvetica Neue',
            'ytick.labelsize': int(9.*fontr),
            'axes.labelsize':  int(9.*fontr) }
 mpl.rcParams.update(params)
-cfont_clb  =  { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(9.*fontr), 'color':color_top_cb}
-cfont_clock = { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(9.5*fontr), 'color':color_top }
+cfont_clb  =  { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(8.5*fontr), 'color':color_top_cb}
+cfont_clock = { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(9.*fontr) , 'color':color_top }
 #cfont_exp= { 'fontname':'Open Sans'  , 'fontweight':'light', 'fontsize':int(9.*fontr), 'color':color_top }
 #cfont_mail  =  { 'fontname':'Times New Roman', 'fontweight':'normal', 'fontstyle':'italic', 'fontsize':int(14.*fontr), 'color':'0.8'}
 cfont_titl1 = { 'fontname':'Open Sans', 'fontweight':'light', 'fontsize':int(18.*fontr), 'color':color_top }
@@ -400,7 +395,7 @@ for jt in range(jt0,Nt):
     cb_labs = []
     cpt = 0
     for rr in vc_fld:
-        if cpt % cb_jump == 0:
+        if cpt % cb_jump == 0 or int(rr)==0:
             if df >= 1.: cb_labs.append(str(int(rr)))
             if df <  1.: cb_labs.append(str(round(rr,int(nmp.ceil(nmp.log10(1./df)))+1) ))
         else:
