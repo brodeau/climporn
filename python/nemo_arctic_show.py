@@ -169,6 +169,7 @@ if CNEMO == 'NANUK025': cxtra_info1 = "OPA - neXtSIM" ; #cxtra_info2 = "   (CREG
 if CNEMO == 'CREG025':  cxtra_info1 = "OPA - LIM3"    ; #cxtra_info2 = "(CREG025)"
 
 rmult = 1.
+l_only_over_ice = False ; # only plot fields in regions with sea-ice
 
 if  CWHAT == 'sst':
     # SST
@@ -189,6 +190,7 @@ elif CWHAT == 'Qns':
     #tmin=-500. ;  tmax=500. ; df = 100. ; cb_jump = 2 ; cpal_fld = 'ncview_parula'
     tmin=-150. ;  tmax=0. ; df = 25. ; cb_jump = 1 ; cpal_fld = 'ncview_parula_r'
     cunit = r'     Non-solar heat flux [$W/m^{2}$]'
+    l_only_over_ice = True
     rmult = 1.
     
 elif CWHAT == 'Qnet':
@@ -342,7 +344,7 @@ for jt in range(jt0,Nt):
     # Getting field and sea-ice concentration at time record "jt":
     id_in = Dataset(cf_in)
     XFLD = rmult * id_in.variables[cv_in]   [jt,j1:j2,i1:i2]
-    if lshow_ice: XIFR = id_in.variables[cv_if][jt,j1:j2,i1:i2]
+    if lshow_ice or l_only_over_ice: XIFR = id_in.variables[cv_if][jt,j1:j2,i1:i2]
     id_in.close()
 
     cjt = '%4.4i'%(jt)
@@ -370,6 +372,9 @@ for jt in range(jt0,Nt):
         XIFR = nmp.ma.masked_where(XIFR  < 0.2, XIFR)
         XIFR = nmp.ma.masked_where(XMSK <= 0.1, XIFR)
     
+    if l_only_over_ice:
+        XFLD = nmp.ma.masked_where(XIFR < 0.01, XFLD)
+
 
     if l_add_topo_land:
         #carte.arcgisimage(server='http://server.arcgisonline.com/ArcGIS', service='ESRI_Imagery_World_2D', xpixels=400, ypixels=None, dpi=96, verbose=True)
