@@ -165,7 +165,7 @@ else:
     print('ERRO: unknow conf '+CNEMO)
     ###############################
 
-if CNEMO == 'NANUK025': cxtra_info1 = "NEMO - neXtSIM" ; #cxtra_info2 = "   (CREG025)"
+if CNEMO == 'NANUK025': cxtra_info1 = "OPA - neXtSIM" ; #cxtra_info2 = "   (CREG025)"
 if CNEMO == 'CREG025':  cxtra_info1 = "OPA - LIM3"    ; #cxtra_info2 = "(CREG025)"
 
 if  CWHAT == 'sst':
@@ -184,7 +184,7 @@ elif CWHAT == 'Qns':
     cv_if = 'ice_cover'
     cv_out = CWHAT
     #tmin=-1250 ;  tmax=250. ; df = 50. ; cb_jump = 5 ; cpal_fld = 'gist_stern_r'
-    tmin=-500. ;  tmax=500. ; df = 100. ; cb_jump = 2 ; cpal_fld = 'RdBu_r'
+    tmin=-500. ;  tmax=500. ; df = 100. ; cb_jump = 2 ; cpal_fld = 'ncview_parula'
     #cpal_fld = 'plasma' ;    
     cunit = r'     Non-solar heat flux [$W/m^{2}$]'
     

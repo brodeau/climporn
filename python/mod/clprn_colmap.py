@@ -21,7 +21,8 @@ def chose_colmap( cname, log_ctrl=0, exp_ctrl=0 ):
 
     # 1st is it a ncview colormap ?
     if cname[:7] == 'ncview_':
-        M = ncview_cmap_to_array( cname )
+        #M = ncview_h_to_array( cname )
+        M = ncview_ncmap_to_array( cname )
         ColorMap = __build_colormap__(M, log_ctrl=log_ctrl, exp_ctrl=exp_ctrl)
 
         # Maybe a climporn colormap ?
@@ -48,7 +49,7 @@ def chose_colmap( cname, log_ctrl=0, exp_ctrl=0 ):
 
 
 
-def ncview_cmap_to_array( cname ):
+def ncview_h_to_array( cname ):
     #
     #########################################################################################
     #
@@ -109,6 +110,45 @@ def ncview_cmap_to_array( cname ):
 
     MM = nmp.array(ctmp)/255.
 
+    return MM
+
+
+def ncview_ncmap_to_array( cname ):
+    #
+    # Reads the *.ncmap files !
+    #
+    from os import path
+    import re
+
+    dir_scrpt = path.dirname(path.realpath(__file__))
+    dir_ncview_cmap = str.replace( dir_scrpt ,  'python/mod', 'misc/ncview_colormaps')
+
+    if cname[:7] != 'ncview_' : print(' ERROR: a ncview colormap should begin with "ncview_" !'); sys.exit(0)
+    ncview_name = cname[7:]
+    #
+    cf_ncview_cmap = dir_ncview_cmap+'/'+ncview_name+'.ncmap'
+    if not path.exists(cf_ncview_cmap):
+        print('ERROR: NCVIEW colormap '+cf_ncview_cmap+' not found!'); sys.exit(0)
+    if l_debug: print('\n *** Getting NCVIEW colormap "'+ncview_name+'" from file "'+cf_ncview_cmap+'"')
+    #
+    f = open(cf_ncview_cmap, 'r')
+    cread_lines = f.readlines()
+    f.close()
+    #
+    lstarted = False
+    vec = []
+    for ll in cread_lines:
+        ls = re.split(' ',ll)
+        for ve in ls[:]: vec.append(float(ve))
+    #
+    ctmp = []
+    ii = 0
+    while ii < len(vec):
+        ctmp.append([vec[ii], vec[ii+1], vec[ii+2]])
+        ii += 3
+    #
+    MM = nmp.array(ctmp)/255.
+    #
     return MM
 
 
