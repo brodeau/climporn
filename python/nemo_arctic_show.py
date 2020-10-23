@@ -168,8 +168,8 @@ else:
 if CNEMO == 'NANUK025': cxtra_info1 = "OPA - neXtSIM" ; #cxtra_info2 = "   (CREG025)"
 if CNEMO == 'CREG025':  cxtra_info1 = "OPA - LIM3"    ; #cxtra_info2 = "(CREG025)"
 
-rmult = 1.
 l_only_over_ice = False ; # only plot fields in regions with sea-ice
+rexp_ctrl = 0.
 
 if  CWHAT == 'sst':
     # SST
@@ -188,10 +188,10 @@ elif CWHAT == 'Qns':
     cv_out = CWHAT
     #tmin=-1250 ;  tmax=250. ; df = 50. ; cb_jump = 5 ; cpal_fld = 'gist_stern_r'
     #tmin=-500. ;  tmax=500. ; df = 100. ; cb_jump = 2 ; cpal_fld = 'ncview_parula'
-    tmin=-150. ;  tmax=0. ; df = 25. ; cb_jump = 1 ; cpal_fld = 'ncview_parula_r'
+    tmin=-100. ;  tmax=0. ; df = 25. ; cb_jump = 1 ; cpal_fld = 'ncview_parula_r' ; rexp_ctrl=3.
+    #tmin=-100. ;  tmax=0. ; df = 25. ; cb_jump = 1 ; cpal_fld = 'ncview_ssec_r'
     cunit = r'     Non-solar heat flux [$W/m^{2}$]'
     l_only_over_ice = True
-    rmult = 1.
     
 elif CWHAT == 'Qnet':
     cv_in = 'qt'
@@ -297,8 +297,11 @@ else:
     print('ERROR: unknown dt!')
 
 
+if rexp_ctrl > 0.:
+    pal_fld = bcm.chose_colmap(cpal_fld, exp_ctrl=rexp_ctrl)
+else:
+    pal_fld = bcm.chose_colmap(cpal_fld)
 
-pal_fld = bcm.chose_colmap(cpal_fld)
 nrm_fld = colors.Normalize(vmin=tmin, vmax=tmax, clip=False)
 
 if lshow_ice:
@@ -343,7 +346,7 @@ for jt in range(jt0,Nt):
 
     # Getting field and sea-ice concentration at time record "jt":
     id_in = Dataset(cf_in)
-    XFLD = rmult * id_in.variables[cv_in]   [jt,j1:j2,i1:i2]
+    XFLD = id_in.variables[cv_in]   [jt,j1:j2,i1:i2]
     if lshow_ice or l_only_over_ice: XIFR = id_in.variables[cv_if][jt,j1:j2,i1:i2]
     id_in.close()
 
@@ -373,7 +376,7 @@ for jt in range(jt0,Nt):
         XIFR = nmp.ma.masked_where(XMSK <= 0.1, XIFR)
     
     if l_only_over_ice:
-        XFLD = nmp.ma.masked_where(XIFR < 0.01, XFLD)
+        XFLD = nmp.ma.masked_where(XIFR < 0.05, XFLD)
 
 
     if l_add_topo_land:
