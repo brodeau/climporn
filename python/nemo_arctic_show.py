@@ -35,7 +35,7 @@ import clprn_colmap as bcm
 import clprn_tool as bt
 import clprn_ncio as bnc
 
-ldrown = True
+ldrown = False ; #lolo
 l_add_topo_land = False
 
 l_show_ice_colbar = True
@@ -87,7 +87,8 @@ rof_dpt = 0.
 
 
 
-vp =  ['nanuk', 'stere', -60., 40., 122., 57.,     75.,  -12., 10., 'h' ]  # North Pole
+vp =  ['nanuk1', 'stere', -60., 40., 122., 57.,    75.,  -12., 10., 'h' ]  # North Pole
+vp =  ['nanuk2', 'stere', -62., 54., 126., 60.,    90.,  -12., 10., 'h' ]  # North Pole
 
 
 # Normally logos should be found there:
@@ -423,7 +424,7 @@ for jt in range(jt0,Nt):
 
     # ----------- Color bar for ICE fraction -----------
     if l_show_ice_colbar:
-        ax3 = plt.axes([0.02, 0.965, 0.344, 0.018])
+        ax3 = plt.axes([0.02, 0.965, 0.29, 0.018])
         clb = mpl.colorbar.ColorbarBase(ax3, ticks=vc_ice, cmap=pal_ice, norm=nrm_ice, orientation='horizontal') #, extend='min')
         cb_labs = []
         for rr in vc_ice:
@@ -455,7 +456,7 @@ for jt in range(jt0,Nt):
 
         datafile = cbook.get_sample_data(dir_logos+'/'+f_logo_ige, asfileobj=False)
         im = image.imread(datafile)
-        fig.figimage(im, 995, 860, zorder=9)
+        fig.figimage(im, 1010, 855, zorder=9)
         del datafile, im
 
         datafile = cbook.get_sample_data(dir_logos+'/'+f_logo_nersc, asfileobj=False)
@@ -465,13 +466,16 @@ for jt in range(jt0,Nt):
     
         datafile = cbook.get_sample_data(dir_logos+'/'+f_logo_ifrmr, asfileobj=False)
         im = image.imread(datafile)
-        fig.figimage(im, 990, 717, zorder=9)
+        fig.figimage(im, 1010, 722, zorder=9)
         del datafile, im
     
-    
+        
         datafile = cbook.get_sample_data(dir_logos+'/'+f_logo_on, asfileobj=False)
         im = image.imread(datafile)
-        fig.figimage(im, 990, 9, zorder=9)
+        if vp[0] == 'nanuk1':
+            fig.figimage(im, 990, 9, zorder=9)
+        elif  vp[0] == 'nanuk2':
+            fig.figimage(im, 990, 620, zorder=9)
         del datafile, im
     
     print(' Saving figure: '+cfig+'\n\n')
