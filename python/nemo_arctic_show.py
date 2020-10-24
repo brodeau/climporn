@@ -88,7 +88,7 @@ rof_dpt = 0.
 
 
 vp =  ['nanuk1', 'stere', -60., 40., 122., 57.,    75.,  -12., 10., 'h' ]  # North Pole
-vp =  ['nanuk2', 'stere', -62., 54., 126., 60.,    90.,  -12., 10., 'h' ]  # North Pole
+#vp =  ['nanuk2', 'stere', -62., 54., 126., 60.,    90.,  -12., 10., 'h' ]  # North Pole
 
 
 # Normally logos should be found there:
@@ -104,6 +104,7 @@ requiredNamed.add_argument('-i', '--fin' , required=True,                help='s
 requiredNamed.add_argument('-w', '--what', required=True, default="sst", help='specify the field/diagnostic to plot (ex: sst)')
 
 parser.add_argument('-C', '--conf', default="NANUK025",     help='specify NEMO config (ex: eNATL60)')
+parser.add_argument('-N', '--name', default="X",            help='specify experiment name')
 parser.add_argument('-m', '--fmm' , default="mesh_mask.nc", help='specify the NEMO mesh_mask file (ex: mesh_mask.nc)')
 parser.add_argument('-s', '--sd0' , default="19950101",     help='specify initial date as <YYYYMMDD>')
 parser.add_argument('-l', '--lev' , type=int, default=0,    help='specify the level to use if 3D field (default: 0 => 2D)')
@@ -112,6 +113,7 @@ parser.add_argument('-I', '--ice' , action='store_true',    help='draw sea-ice c
 args = parser.parse_args()
 
 CNEMO = args.conf
+CEXP  = args.name
 #CBOX  = args.box
 CWHAT = args.what
 cf_in = args.fin
@@ -123,6 +125,7 @@ lshow_ice = args.ice
 
 print('')
 print(' *** CNEMO = ', CNEMO)
+print(' *** CEXP  = ', CEXP)
 print(' *** CWHAT = ', CWHAT)
 print(' *** cf_in = ', cf_in)
 print(' *** cf_mm = ', cf_mm)
@@ -147,14 +150,15 @@ cdir_figs = './figs/'+CWHAT
 if not path.exists(cdir_figs): mkdir(cdir_figs)
 
 
-CRUN = ''
 if l_get_name_of_run:
-    # Name of RUN:
-    vv = split('-|_', path.basename(cf_in))
-    if vv[0] != CNEMO:
-        print('ERROR: your file name is not consistent with "'+CNEMO+'" !!! ('+vv[0]+')') ; sys.exit(0)
-    CRUN = vv[1]
-    print('\n Run is called: "'+CRUN+'" !\n')
+    if CEXP == 'X':
+        # Name of RUN:
+        vv = split('-|_', path.basename(cf_in))
+        if vv[0] != CNEMO:
+            print('ERROR: your file name is not consistent with "'+CNEMO+'" !!! ('+vv[0]+')')
+            print(' ==> specify experiment name with "-N"\n'); sys.exit(0)
+        CEXP = vv[1]
+    print('\n Run is called: "'+CEXP+'" !\n')
 
 #---------------------------------------------------------------
 
@@ -183,13 +187,26 @@ if  CWHAT == 'sst':
     cpal_fld = 'on3'  #cpal_fld = 'ncview_nrl'
     cunit = r'SST [$^{\circ}$C]'
 
+if  CWHAT == 'sit':
+    # Sea Ice Thickness
+    cv_in = 'sit'
+    cv_if = 'sic'
+    cv_out = CWHAT
+    tmin=0. ; tmax=4.; df = 0.5 ; cb_jump = 1
+    cpal_fld = 'ncview_parula'
+    #cpal_fld = 'on3'
+    #cpal_fld = 'viridis'
+    #cpal_fld = 'cividis'
+    #cpal_fld = 'cubehelix'
+    cunit = 'Sea-Ice thickness [m]'
+
 elif CWHAT == 'Qns':
     cv_in = 'nshfls'
     cv_if = 'ice_cover'
     cv_out = CWHAT
     #tmin=-1250 ;  tmax=250. ; df = 50. ; cb_jump = 5 ; cpal_fld = 'gist_stern_r'
     #tmin=-500. ;  tmax=500. ; df = 100. ; cb_jump = 2 ; cpal_fld = 'ncview_parula'
-    tmin=-100. ;  tmax=0. ; df = 25. ; cb_jump = 1 ; cpal_fld = 'ncview_parula_r' ; rexp_ctrl=3.
+    tmin=-100. ;  tmax=0. ; df = 25. ; cb_jump = 1 ; cpal_fld = 'ncview_parula_r' ; rexp_ctrl=2.
     #tmin=-100. ;  tmax=0. ; df = 25. ; cb_jump = 1 ; cpal_fld = 'ncview_ssec_r'
     cunit = r'     Non-solar heat flux [$W/m^{2}$]'
     l_only_over_ice = True
@@ -341,9 +358,9 @@ for jt in range(jt0,Nt):
     chour = ct[11:13] ; print(' *** chour :', chour)
 
     if l3d:
-        cfig = cdir_figs+'/'+cv_out+'_'+CNEMO+'-'+CRUN+'_lev'+str(jk)+'_'+cday+'_'+chour+'.'+fig_type
+        cfig = cdir_figs+'/'+cv_out+'_'+CNEMO+'-'+CEXP+'_lev'+str(jk)+'_'+cday+'_'+chour+'.'+fig_type
     else:
-        cfig = cdir_figs+'/'+cv_out+'_'+CNEMO+'-'+CRUN+'_'+cday+'_'+chour+'.'+fig_type
+        cfig = cdir_figs+'/'+cv_out+'_'+CNEMO+'-'+CEXP+'_'+cday+'_'+chour+'.'+fig_type
 
     # Getting field and sea-ice concentration at time record "jt":
     id_in = Dataset(cf_in)
@@ -466,7 +483,10 @@ for jt in range(jt0,Nt):
     
         datafile = cbook.get_sample_data(dir_logos+'/'+f_logo_ifrmr, asfileobj=False)
         im = image.imread(datafile)
-        fig.figimage(im, 1010, 722, zorder=9)
+        if vp[0] == 'nanuk1':
+            fig.figimage(im, 999, 722, zorder=9)
+        elif vp[0] == 'nanuk2':
+            fig.figimage(im, 1010, 722, zorder=9)
         del datafile, im
     
         
