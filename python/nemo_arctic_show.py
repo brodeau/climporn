@@ -187,25 +187,26 @@ if  CWHAT == 'sst':
     cpal_fld = 'on3'  #cpal_fld = 'ncview_nrl'
     cunit = r'SST [$^{\circ}$C]'
 
-if  CWHAT == 'sit':
+elif CWHAT == 'sit':
     # Sea Ice Thickness
     cv_in = 'sit'
     cv_if = 'sic'
     cv_out = CWHAT
-    tmin=0. ; tmax=4.; df = 0.5 ; cb_jump = 1
+    tmin=0. ; tmax=5.; df = 1 ; cb_jump = 1
     cpal_fld = 'on3'
     #cpal_fld = 'viridis'
     #cpal_fld = 'cividis'
     #cpal_fld = 'cubehelix'
     cunit = 'Sea-Ice thickness [m]'
 
-if  CWHAT == 'damage':
+elif CWHAT == 'damage':
     # Sea Ice Thickness
     cv_in = 'damage'
     cv_if = 'sic'
     cv_out = CWHAT
     tmin=0. ; tmax=1.; df = 0.1 ; cb_jump = 2 ; rexp_ctrl = 3.5
-    cpal_fld = 'ncview_oslo_r' ; l_only_over_ice=True
+    #cpal_fld = 'ncview_oslo_r' ; l_only_over_ice=True
+    cpal_fld = 'ncview_bone_r' ; l_only_over_ice=True
     #cpal_fld = 'bone_r'
     cunit = 'Damage [-]'
 
@@ -374,7 +375,11 @@ for jt in range(jt0,Nt):
     # Getting field and sea-ice concentration at time record "jt":
     id_in = Dataset(cf_in)
     XFLD = id_in.variables[cv_in]   [jt,j1:j2,i1:i2]
-    if lshow_ice or l_only_over_ice: XIFR = id_in.variables[cv_if][jt,j1:j2,i1:i2]
+    if lshow_ice or l_only_over_ice:
+        XIFR = id_in.variables[cv_if][jt,j1:j2,i1:i2]
+        XIFR = nmp.ma.masked_where(XMSK <= 0.0001, XIFR)
+        XIFR_bkp = nmp.zeros(nmp.shape(XIFR)) ; XIFR_bkp[:,:] = XIFR[:,:]
+        XIFR_bkp = nmp.ma.masked_where(XMSK <= 0.0001, XIFR_bkp)
     id_in.close()
 
     cjt = '%4.4i'%(jt)
@@ -398,12 +403,14 @@ for jt in range(jt0,Nt):
 
     if lshow_ice: XFLD = nmp.ma.masked_where(XIFR >= 0.2, XFLD)
     XFLD = nmp.ma.masked_where(XMSK <= 0.1, XFLD)
+
     if lshow_ice:
-        XIFR = nmp.ma.masked_where(XIFR  < 0.2, XIFR)
-        XIFR = nmp.ma.masked_where(XMSK <= 0.1, XIFR)
+        r_oi_thr = 0.05
+        XIFR = nmp.ma.masked_where(XIFR  < r_oi_thr, XIFR)
     
     if l_only_over_ice:
-        XFLD = nmp.ma.masked_where(XIFR < 0.05, XFLD)
+        r_oi_thr = 0.05
+        XFLD = nmp.ma.masked_where(XIFR <  r_oi_thr, XFLD)
 
 
     if l_add_topo_land:
@@ -416,8 +423,15 @@ for jt in range(jt0,Nt):
 
     ft = carte.pcolormesh(x0, y0, XFLD, cmap = pal_fld, norm = nrm_fld )
     #ft = carte.pcolor(x0, y0, XFLD, cmap = pal_fld, norm = nrm_fld )
-    if lshow_ice: fi = carte.pcolormesh(x0, y0, XIFR, cmap = pal_ice, norm = nrm_ice )
+    if lshow_ice:
+        fi = carte.pcolormesh(x0, y0, XIFR, cmap = pal_ice, norm = nrm_ice )
+        fc = carte.contour(   x0, y0, XIFR_bkp, [r_oi_thr], colors='k', linewidths=1. )
 
+    if l_only_over_ice:
+        # A contour to make limit smoother...
+        #fc = carte.contour(x0, y0, XIFR, [r_oi_thr/2.], colors='red', linewidths=2.1 )
+        fc = carte.contour(x0, y0, XIFR_bkp, [0.005], colors='k', linewidths=3. )
+    
     carte.drawcoastlines(linewidth=0.5)
 
     if not l_add_topo_land: carte.fillcontinents(color='grey') #, alpha=0)
@@ -434,7 +448,7 @@ for jt in range(jt0,Nt):
     cb_labs = []
     cpt = 0
     for rr in vc_fld:
-        if cpt % cb_jump == 0 or int(rr)==0:
+        if cpt % cb_jump == 0 or ( (tmin == -tmax) and (int(rr) == 0 ) ):
             if df >= 1.: cb_labs.append(str(int(rr)))
             if df <  1.: cb_labs.append(str(round(rr,int(nmp.ceil(nmp.log10(1./df)))+1) ))
         else:
