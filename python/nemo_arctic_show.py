@@ -193,12 +193,21 @@ if  CWHAT == 'sit':
     cv_if = 'sic'
     cv_out = CWHAT
     tmin=0. ; tmax=4.; df = 0.5 ; cb_jump = 1
-    cpal_fld = 'ncview_parula'
-    #cpal_fld = 'on3'
+    cpal_fld = 'on3'
     #cpal_fld = 'viridis'
     #cpal_fld = 'cividis'
     #cpal_fld = 'cubehelix'
     cunit = 'Sea-Ice thickness [m]'
+
+if  CWHAT == 'damage':
+    # Sea Ice Thickness
+    cv_in = 'damage'
+    cv_if = 'sic'
+    cv_out = CWHAT
+    tmin=0. ; tmax=1.; df = 0.1 ; cb_jump = 2 ; rexp_ctrl = 3.5
+    cpal_fld = 'ncview_oslo_r' ; l_only_over_ice=True
+    #cpal_fld = 'bone_r'
+    cunit = 'Damage [-]'
 
 elif CWHAT == 'Qns':
     cv_in = 'nshfls'
