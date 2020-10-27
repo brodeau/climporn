@@ -35,7 +35,7 @@ import clprn_colmap as bcm
 import clprn_tool as bt
 import clprn_ncio as bnc
 
-ldrown = False ; #lolo
+ldrown = True ; #lolo
 l_add_topo_land = False
 
 l_show_ice_colbar = True
@@ -174,6 +174,7 @@ if CNEMO == 'NANUK025': cxtra_info1 = "OPA - neXtSIM" ; #cxtra_info2 = "   (CREG
 if CNEMO == 'CREG025':  cxtra_info1 = "OPA - LIM3"    ; #cxtra_info2 = "(CREG025)"
 
 l_only_over_ice = False ; # only plot fields in regions with sea-ice
+r_oi_thr = 0.01
 rexp_ctrl = 0.
 
 if  CWHAT == 'sst':
@@ -193,21 +194,22 @@ elif CWHAT == 'sit':
     cv_if = 'sic'
     cv_out = CWHAT
     tmin=0. ; tmax=5.; df = 1 ; cb_jump = 1
-    cpal_fld = 'on3'
-    #cpal_fld = 'viridis'
+    #cpal_fld = 'on3'
+    cpal_fld = 'viridis'
     #cpal_fld = 'cividis'
     #cpal_fld = 'cubehelix'
+    #cpal_fld = 'cool'
     cunit = 'Sea-Ice thickness [m]'
+    l_only_over_ice=True
 
 elif CWHAT == 'damage':
     # Sea Ice Thickness
     cv_in = 'damage'
     cv_if = 'sic'
     cv_out = CWHAT
-    tmin=0.5 ; tmax=1.; df = 0.1 ; cb_jump = 1 ; rexp_ctrl = 3.5
+    tmin=0.9 ; tmax=1.; df = 0.05 ; cb_jump = 1 ; rexp_ctrl = 2. ; #rexp_ctrl = 3.5
     #cpal_fld = 'ncview_oslo_r' ; l_only_over_ice=True
     cpal_fld = 'ncview_bone_r' ; l_only_over_ice=True
-    #cpal_fld = 'bone_r'
     cunit = 'Damage [-]'
 
 elif CWHAT == 'Qns':
@@ -385,8 +387,10 @@ for jt in range(jt0,Nt):
     cjt = '%4.4i'%(jt)
 
     #######################################################################################################
-    fig = plt.figure(num = 1, figsize=(vfig_size), dpi=None, facecolor='k', edgecolor='k')
-    ax  = plt.axes(vsporg, facecolor = 'k')
+    #col_bg = '#3b3b63'
+    col_bg = '#041a4d'
+    fig = plt.figure(num = 1, figsize=(vfig_size), dpi=None, facecolor=col_bg, edgecolor=col_bg)
+    ax  = plt.axes(vsporg, facecolor = col_bg)
 
     carte = Basemap(llcrnrlon=vp[2], llcrnrlat=vp[3], urcrnrlon=vp[4], urcrnrlat=vp[5], \
                     resolution=vp[9], area_thresh=1000., projection='stere', \
@@ -405,11 +409,9 @@ for jt in range(jt0,Nt):
     XFLD = nmp.ma.masked_where(XMSK <= 0.1, XFLD)
 
     if lshow_ice:
-        r_oi_thr = 0.05
         XIFR = nmp.ma.masked_where(XIFR  < r_oi_thr, XIFR)
     
     if l_only_over_ice:
-        r_oi_thr = 0.05
         XFLD = nmp.ma.masked_where(XIFR <  r_oi_thr, XFLD)
 
 
@@ -425,12 +427,12 @@ for jt in range(jt0,Nt):
     #ft = carte.pcolor(x0, y0, XFLD, cmap = pal_fld, norm = nrm_fld )
     if lshow_ice:
         fi = carte.pcolormesh(x0, y0, XIFR, cmap = pal_ice, norm = nrm_ice )
-        fc = carte.contour(   x0, y0, XIFR_bkp, [r_oi_thr], colors='k', linewidths=1. )
+        #fc = carte.contour(   x0, y0, XIFR_bkp, [r_oi_thr], colors='k', linewidths=1. )
 
-    if l_only_over_ice:
-        # A contour to make limit smoother...
-        #fc = carte.contour(x0, y0, XIFR, [r_oi_thr/2.], colors='red', linewidths=2.1 )
-        fc = carte.contour(x0, y0, XIFR_bkp, [0.005], colors='k', linewidths=3. )
+    #if l_only_over_ice:
+    #    # A contour to make limit smoother...
+    #    #fc = carte.contour(x0, y0, XIFR, [r_oi_thr/2.], colors='red', linewidths=2.1 )
+    #    fc = carte.contour(x0, y0, XIFR_bkp, [0.001], colors='k', linewidths=3. )
     
     carte.drawcoastlines(linewidth=0.5)
 
