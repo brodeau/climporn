@@ -173,18 +173,17 @@ else:
 if CNEMO == 'NANUK025': cxtra_info1 = "OPA - neXtSIM" ; #cxtra_info2 = "   (CREG025)"
 if CNEMO == 'CREG025':  cxtra_info1 = "OPA - LIM3"    ; #cxtra_info2 = "(CREG025)"
 
+#cv_bg = ''
 l_only_over_ice = False ; # only plot fields in regions with sea-ice
 r_oi_thr = 0.01
 rexp_ctrl = 0.
 
 if  CWHAT == 'sst':
     # SST
-    tmin=-2.
-    tmax=20.
     cv_in = 'sst'
     cv_if = 'siconc'
     cv_out = CWHAT
-    df = 1. ; cb_jump = 2    
+    tmin=-2. ;    tmax=20. ; df = 1. ; cb_jump = 2    
     cpal_fld = 'on3'  #cpal_fld = 'ncview_nrl'
     cunit = r'SST [$^{\circ}$C]'
 
@@ -206,6 +205,7 @@ elif CWHAT == 'damage':
     # Sea Ice Thickness
     cv_in = 'damage'
     cv_if = 'sic'
+    #cv_bg = 'sst'
     cv_out = CWHAT
     tmin=0.9 ; tmax=1.; df = 0.05 ; cb_jump = 1 ; rexp_ctrl = 2. ; #rexp_ctrl = 3.5
     #cpal_fld = 'ncview_oslo_r' ; l_only_over_ice=True
