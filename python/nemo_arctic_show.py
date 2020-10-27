@@ -145,9 +145,6 @@ else:
     jk=0
 ###############################################################################################################################################
 
-if not path.exists("figs"): mkdir("figs")
-cdir_figs = './figs/'+CWHAT
-if not path.exists(cdir_figs): mkdir(cdir_figs)
 
 
 if l_get_name_of_run:
@@ -162,7 +159,7 @@ if l_get_name_of_run:
 
 #---------------------------------------------------------------
 
-if CNEMO == 'NANUK025' or CNEMO == 'CREG025':
+if CNEMO in ['NANUK025', 'CREG025', 'CREG025.L75']:
     jk=0
     j1=0 ; j2=603
     i1=0 ; i2=528
@@ -171,7 +168,7 @@ else:
     ###############################
 
 if CNEMO == 'NANUK025': cxtra_info1 = "OPA - neXtSIM" ; #cxtra_info2 = "   (CREG025)"
-if CNEMO == 'CREG025':  cxtra_info1 = "OPA - LIM3"    ; #cxtra_info2 = "(CREG025)"
+if CNEMO[:7] == 'CREG025':  cxtra_info1 = "OPA - LIM3"    ; #cxtra_info2 = "(CREG025)"
 
 #cv_bg = ''
 l_only_over_ice = False ; # only plot fields in regions with sea-ice
@@ -187,11 +184,13 @@ if  CWHAT == 'sst':
     cpal_fld = 'on3'  #cpal_fld = 'ncview_nrl'
     cunit = r'SST [$^{\circ}$C]'
 
-elif CWHAT == 'sit':
+elif CWHAT in [ 'sit', 'sivolu' ] :
     # Sea Ice Thickness
-    cv_in = 'sit'
-    cv_if = 'sic'
-    cv_out = CWHAT
+    cv_in = CWHAT
+    if CWHAT=='sit'   : cv_if = 'sic'
+    if CWHAT=='sivolu': cv_if = 'siconc'
+    #
+    cv_out = 'sit'
     tmin=0. ; tmax=5.; df = 1 ; cb_jump = 1
     #cpal_fld = 'on3'
     cpal_fld = 'viridis'
@@ -212,10 +211,10 @@ elif CWHAT == 'damage':
     cpal_fld = 'ncview_bone_r' ; l_only_over_ice=True
     cunit = 'Damage [-]'
 
-elif CWHAT == 'Qns':
+elif CWHAT in [ 'Qns', 'nshfls' ]:
     cv_in = 'nshfls'
     cv_if = 'ice_cover'
-    cv_out = CWHAT
+    cv_out = 'Qns'
     #tmin=-1250 ;  tmax=250. ; df = 50. ; cb_jump = 5 ; cpal_fld = 'gist_stern_r'
     #tmin=-500. ;  tmax=500. ; df = 100. ; cb_jump = 2 ; cpal_fld = 'ncview_parula'
     tmin=-100. ;  tmax=0. ; df = 25. ; cb_jump = 1 ; cpal_fld = 'ncview_parula_r' ; rexp_ctrl=2.
@@ -238,6 +237,13 @@ else:
     
 
 bt.chck4f(cf_mm)
+
+
+if not path.exists("figs"): mkdir("figs")
+cdir_figs = './figs/'+cv_out
+if not path.exists(cdir_figs): mkdir(cdir_figs)
+
+
 
 l_notime=False
 bt.chck4f(cf_in)
