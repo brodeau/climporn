@@ -765,3 +765,9 @@ def symetric_range( pmin, pmax ):
     return frng
 
 
+def round_bounds_above(x, base=5):
+    #  141.2 =>  145
+    # -141.2 => -145
+    from math import copysign, ceil
+    return copysign( base * ceil(abs(x)/base) , x)
+
