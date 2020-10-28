@@ -206,7 +206,8 @@ elif CWHAT == 'damage':
     cv_if = 'sic'
     #cv_bg = 'sst'
     cv_out = CWHAT
-    tmin=0.9 ; tmax=1.; df = 0.05 ; cb_jump = 1 ; rexp_ctrl = 2. ; #rexp_ctrl = 3.5
+    #tmin=0.9 ; tmax=1.; df = 0.05 ; cb_jump = 1 ; rexp_ctrl = 2. ; #rexp_ctrl = 3.5
+    tmin=0.8 ; tmax=1.; df = 0.05 ; cb_jump = 1 ; rexp_ctrl = 3.5
     #cpal_fld = 'ncview_oslo_r' ; l_only_over_ice=True
     cpal_fld = 'ncview_bone_r' ; l_only_over_ice=True
     cunit = 'Damage [-]'
