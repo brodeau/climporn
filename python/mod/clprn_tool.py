@@ -78,18 +78,18 @@ def long_to_m180_p180_vct(xx):
     xx   = xx % 360.
     xlon = nmp.copysign(1.,180.-xx)*nmp.minimum(xx, nmp.abs(xx-360.)) ;
     return xlon
-                        
+
 
 def get_sections_from_file(cfile):
     list_sections = []
     f = open(cfile, 'r') ; cread_lines = f.readlines() ; f.close()
     jl=0 ; l_stop=False
-    while not l_stop:        
+    while not l_stop:
         ll = cread_lines[jl]
         ls = ll.split()
         cc = ls[0]
         if cc == 'EOF':
-            l_stop=True            
+            l_stop=True
         elif cc[0] != '#':
             if cc != 'EOF' and cc[0:13] != 'ref_temp_sali':
                 print(ls)
@@ -97,7 +97,7 @@ def get_sections_from_file(cfile):
                 jl=jl+1 ; # to skip coordinates line
         else:
             print('  ....  ')
-        jl=jl+1    
+        jl=jl+1
     return list_sections
 
 
@@ -323,7 +323,7 @@ def get_min_max_df(ZZ, ndf):
     # we want zmax and rmin to be mutilples of zdf :
     zmax = zdf*int(round(zmax/zdf))
     zmin = zdf*int(round(zmin/zdf))
-    
+
     return [ zmin, zmax, zdf ]
 
 
@@ -348,23 +348,23 @@ def drown(X, mask, k_ew=-1, nb_max_inc=5, nb_smooth=5):
     PURPOSE : fills continental areas of field X (defined by mask==0)
     -------   using nearest surrounding sea points (defined by mask==1)
               field X is absoluletly unchanged where mask==1
-        
+
     Input/Output :
     --------------
          * X    :  treated array (float)   / modified!            [2D array]
          * mask :  land-sea mask (integer) / unchanged            [2D array]
-    
+
      Optional :
      ----------
          * k_ew :  east-west periodicity on the input file/grid
                    k_ew = -1  --> no periodicity
                    k_ew >= 0  --> periodicity with overlap of k_ew points
-    
+
          * nb_max_inc : distance (in grid points) of incursion into the continents for the drowning...
 
          * nb_smooth : number of times the smoother is applied on masked region (mask=0)
                        => default: nb_smooth = 50
-    
+
     Author : Laurent BRODEAU, 2007, as part of SOSIE
              ported to python November 2013
     '''
@@ -601,7 +601,7 @@ def mk_zonal(XF, XMSK=[0.], r_mask_from_val=-9999.):
     idx0 = nmp.where(vweights == 0.)
     vweights[idx0] = 1.E12
     #
-    for jt in range(Nt):        
+    for jt in range(Nt):
         for jy in range(ny):
             if ndim == 3: rmean = nmp.sum(XF[jt,jy,:]*XMSK[jy,:])/vweights[jy]
             if ndim == 2: rmean = nmp.sum(XF[   jy,:]*XMSK[jy,:])/vweights[jy]
@@ -617,7 +617,7 @@ def read_coor(cf, ctype='int', lTS_bounds=False):
     # cf : file containing sections or coordinates (name lon1 lat1 lon2 lat2)
     # ctype: 'int' or 'float'
     # lTS_bounds: read and return the bounds (min and max) for T and S !
-    
+
     chck4f(cf)
 
     f = open(cf, 'r')
@@ -625,7 +625,7 @@ def read_coor(cf, ctype='int', lTS_bounds=False):
     f.close()
 
     vboxes = [] ; vi1 = [] ; vj1 = [] ; vi2 = [] ; vj2 = []
-    vTs = [] ; vTl = [] ; vSs = [] ; vSl = [] ; 
+    vTs = [] ; vTl = [] ; vSs = [] ; vSl = [] ;
     leof = False
     jl   = -1
 
@@ -718,21 +718,21 @@ def var_and_signs( csin ):
     isgn = []
     for cs in csgn: isgn.append(float(cs+'1'))
     return cvar, isgn
-    
+
 
 
 
 def smoother(X, msk, nb_smooth=5):
 
     ### Do boundaries!!!
-    
+
     cmesg = 'ERROR, clprn_tool.py => smoother :'
 
     nbdim = len(nmp.shape(X))
 
     if nbdim != 2:
         print(cmesg+' size of data array is wrong!!!'); sys.exit(0)
-    
+
     (nj,ni) = nmp.shape(X)
 
     xtmp = nmp.zeros((nj,ni))
@@ -746,7 +746,7 @@ def smoother(X, msk, nb_smooth=5):
                                     / nmp.maximum( msk[1:-1,2:] + msk[2:,1:-1] + msk[1:-1,:-2] + msk[:-2,1:-1] \
                                   + ris2*( msk[2:,2:]   + msk[:-2,2:]  + msk[:-2,:-2] + msk[2:,:-2]  ) \
                                            , 1.E-6 )
-                           
+
         X[:,:] = X[:,:]*msk[:,:]
 
     del xtmp
@@ -770,4 +770,10 @@ def round_bounds_above(x, base=5):
     # -141.2 => -145
     from math import copysign, ceil
     return copysign( base * ceil(abs(x)/base) , x)
+
+
+def round_bounds( x1, x2,  base=5, prec=3 ):
+    rmin =  base * round( floor(float(x1)/base), prec )
+    rmax =  base * round(  ceil(float(x2)/base), prec )
+    return rmin, rmax
 
