@@ -24,10 +24,13 @@ warnings.filterwarnings("ignore")
 import clprn_colmap as bcm
 
 import clprn_tool as bt
+import clprn_ncio as cn
+
+
 
 bathy_max = 5000. # m
 
-color_top = 'white'
+color_top = 'w'
 clr_yellow = '#ffed00'
 
 
@@ -73,7 +76,8 @@ if dir_conf == '':  dir_conf = '.'
 print('\n *** dir_conf =',dir_conf,'\n')
 
 
-# lsm_LBC_TROPICO12.nc
+l_add_topo_land = False
+rof_log = 150.
     
 i2=0
 j2=0
@@ -149,7 +153,7 @@ elif CNEMO == 'TROPICO2':
     x_cnf = 20. ; y_cnf = 3. ; # where to put label of conf on Figure...
     l_show_cb = True ; l_show_nm = True ; l_scientific_mode=False
     bathy_max = 6000. # m
-
+    
 elif CNEMO == 'TROPICO05':
     i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 3. ; vcb = [0.02, 0.15, 0.4, 0.04] ; font_rat = 2./rfact_zoom
     x_cnf = 280. ; y_cnf = 135. ; # where to put label of conf on Figure...
@@ -157,10 +161,11 @@ elif CNEMO == 'TROPICO05':
     bathy_max = 6000. # m
     
 elif CNEMO == 'TROPICO12':
-    i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 1. ; vcb = [0.02, 0.15, 0.4, 0.04] ; font_rat = 1.6/rfact_zoom
+    i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 1. ; vcb = [0.35, 0.08, 0.4, 0.03] ; font_rat = 1.1/rfact_zoom
     x_cnf = 1400. ; y_cnf = 820. ; # where to put label of conf on Figure...
-    l_show_cb = False ; l_show_nm = False ; l_scientific_mode=False
+    l_show_cb = True ; l_show_nm = False ; l_scientific_mode=False
     bathy_max = 6000. # m
+    l_add_topo_land = True ; ftopo = 'z_ETOPO1_21601x10801-TROPICO12_ice.nc' ; rof_log = 300.
 
 elif CNEMO == 'GEBCO':
     i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 1. ; vcb = [0.2, 0.06, 0.6, 0.03] ; font_rat = 1.5/rfact_zoom
@@ -345,6 +350,29 @@ else:
 print('\n According to "tmask" the shape of the domain is Ni, Nj =', Ni, Nj)
 
 
+
+# Show topo ?
+if l_add_topo_land:
+    cf_topo_land = dir_conf+'/'+ftopo
+    print('\n We are going to show topography:\n'+'  ==> '+cf_topo_land)
+
+    bt.chck4f(cf_topo_land)
+    id_top = Dataset(cf_topo_land)
+    print(' *** Reading "z" into:\n'+cf_topo_land)
+    xtopo = id_top.variables['z'][0,j1:j2,i1:i2]
+    id_top.close()
+    if nmp.shape(xtopo) != (Nj,Ni):
+        print('ERROR: topo and mask do not agree in shape!'); sys.exit(0)
+    xtopo = xtopo*(1. - XMSK)
+    xtopo[nmp.where( XMSK  > 0.01)] = nmp.nan
+    #xtopo[nmp.where( xtopo < 0.01)] = nmp.nan ; # checked the *_filled stuff instead...
+    print('')
+
+
+
+
+
+
 # Stuff for size of figure respecting pixels...
 print('  *** we are going to show: i1,i2,j1,j2 =>', i1,i2,j1,j2, '\n')
 nx_res = i2-i1
@@ -413,7 +441,7 @@ else:
 #if l_scientific_mode: rextra_height = 1.12
 #fig = plt.figure(num = 1, figsize=(rh,rh*yx_ratio*rextra_height), dpi=None, facecolor='w', edgecolor='0.5')
 
-fig = plt.figure(num = 1, figsize=(rh,rh*yx_ratio), dpi=None, facecolor='w', edgecolor='k')
+fig = plt.figure(num = 1, figsize=(rh,rh*yx_ratio), dpi=None, facecolor='k', edgecolor='k')
 
 if l_scientific_mode:
     ax  = plt.axes([0.09, 0.09, 0.9, 0.9], facecolor = 'r')
@@ -443,7 +471,6 @@ if XMSK.shape != XFLD.shape:
 
 print('  *** Shape of field and mask => ', nmp.shape(XFLD))
 
-del XMSK
 
 
 if cv_in in l_bathy_var and ibath==-1: XFLD = ibath*XFLD
@@ -462,7 +489,12 @@ if cfield == 'Bathymetry':
         xtmp = id_filled.variables['lsm'][j1:j2,i1:i2]
         id_filled.close()
         pfilled = nmp.ma.masked_where(xtmp[:,:] != -1., xtmp[:,:]*0.+40.)
+        if l_add_topo_land:
+            xtopo[nmp.where(xtmp[:,:] < -0.9)] = nmp.nan
+            XMSK[:,:] = 1
+            XMSK[nmp.where(xtmp[:,:]==0)] = 0 ; # updated mask
         del xtmp
+
         print('  => done filling "pfilled" !\n')
 
     
@@ -481,6 +513,7 @@ else:
             idd = nmp.where(idy_nan==1); idy_nan[idd] = int(10./rfact_zoom)/2  # just so the boundary line is not too thin on plot...
             plt.scatter(idx_nan, idy_nan, color=clr_yellow, marker='s', s=int(10./rfact_zoom))
 
+            
 if l_show_msh:
     ccx = plt.contour(Xlon[:,:], 60, colors='k', linewidths=0.5)
     ccy = plt.contour(Xlat[:,:], 30, colors='k', linewidths=0.5)
@@ -502,11 +535,24 @@ print('Done!')
 
 
 
+if l_add_topo_land:
+    print('Ploting topography over continents...')
+    #cn.dump_2d_field( 'xtopo.nc', xtopo ); #, xlon=[], xlat=[], name='field', unit='', long_name='', mask=[] )
+    #cn.dump_2d_field( 'xmsk.nc', XMSK ); #, xlon=[], xlat=[], name='field', unit='', long_name='', mask=[] )
+    xtopo = nmp.log10(xtopo+rof_log)
+    pal_topo = bcm.chose_colmap('gray_r')
+    norm_topo = colors.Normalize(vmin = nmp.log10(-100. + rof_log), vmax = nmp.log10(6000. + rof_log), clip = False)
+    cm = plt.imshow(xtopo, cmap=pal_topo, norm=norm_topo, interpolation='none')
+    plt.contour(XMSK, [0.9], colors='k', linewidths=0.5)
+    #
+else:
+    cm = plt.imshow(pmsk, cmap = pal_lsm, norm = norm_lsm, interpolation='none')
 
-cm = plt.imshow(pmsk, cmap = pal_lsm, norm = norm_lsm, interpolation='none')
+
+del XMSK
 
 
-#lulu
+
 if cfield == 'Bathymetry' and l_add_true_filled:
     # Ocean that has been filled turns black:
     cfl = plt.imshow(pfilled, cmap=pal_filled, norm=norm_filled, interpolation='none' ) #, interpolation='none')
