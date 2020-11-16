@@ -26,3 +26,6 @@ ${EXE} -u ${SAVE_DIR}/${PCONF}-TRPC5N00_${TTAG}_gridU.nc \
        -x uos -y vos -w ${var2plot} \
        -m ${CONF_I_DIR}/mesh_mask_TROPICO05_L31_trunk.nc -C ${PCONF} \
        -t ${cdt} -s ${ct0}
+
+
+# convert -crop 139x179+2+2 CURLOF_CALEDO10-6h_ALL_2009-01-01_00_on2.png aaa.png
