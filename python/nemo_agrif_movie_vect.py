@@ -57,12 +57,10 @@ jt0 = 0
 
 
 jk=0
-l_get_name_of_run = False
 l_show_lsm = True
 l_log_field = False
 l_pow_field = False
 
-l_get_name_of_run = True
 
 cdir_logos = cwd+'/logos'
 
@@ -71,7 +69,7 @@ rof_dpt = 0.
 
 l_3d_field = False
 
-l_save_nc = False ; # save the field we built in a netcdf file !!!
+l_save_nc = True ; # save the field we built in a netcdf file !!!
 
 romega = 2.*nmp.pi/86400.0
 
@@ -88,7 +86,7 @@ requiredNamed.add_argument('-x', '--fldx', required=True, help='specify the name
 requiredNamed.add_argument('-y', '--fldy', required=True, help='specify the name of the NEMO V field in V file')
 requiredNamed.add_argument('-w', '--what', required=True, help='specify the field/diagnostic to plot (ex: CSPEED,CURLOF,ect.)')
 
-parser.add_argument('-C', '--conf', default="eNATL60",        help='specify NEMO config (ex: eNATL60)')
+parser.add_argument('-C', '--conf', default="none",           help='specify NEMO config (ex: eNATL60)')
 parser.add_argument('-b', '--box' , default="ALL",            help='specify extraction box name (ex: ALL)')
 parser.add_argument('-m', '--fmm' , default="mesh_mask.nc",   help='specify the NEMO mesh_mask file (ex: mesh_mask.nc)')
 parser.add_argument('-s', '--sd0' , default="20090101",       help='specify initial date as <YYYYMMDD>')
@@ -137,13 +135,14 @@ if not path.exists('figs'): mkdir('figs')
 cdir_figs = './figs/'+CWHAT
 if not path.exists(cdir_figs): mkdir(cdir_figs)
 
+if l_save_nc and not path.exists('nc'): mkdir('nc')
 
 CRUN = ''
-if l_get_name_of_run:
+if CNEMO == 'none':
     # Name of RUN:
     vv = split('-|_', path.basename(cfx_in))
     if vv[0] != CNEMO:
-        print('ERROR: your file name is not consistent with ''+CNEMO+'' !!! ('+vv[0]+')'); sys.exit(0)
+        print('ERROR: your file name is not consistent with '+CNEMO+' !!! ('+vv[0]+')'); sys.exit(0)
     CRUN = vv[1]
     print('\n Run is called: ''+CRUN+'' !\n')
 
@@ -177,8 +176,9 @@ l_do_tke=False
 l_do_eke=False
 
 if   CWHAT == 'CURL':
+    cpal_fld = 'on2' ; tmin=-1.2 ;  tmax=-tmin ;  df = 0.1 ; cb_jump = 2
     l_do_crl = True  ; # do curl (relative-vorticity) !!!
-    
+
 elif CWHAT == 'CURLOF':
     l_do_cof = True  ; # do curl/f
     cpal_fld = 'on2' ; tmin=-1.2 ;  tmax=-tmin ;  df = 0.1 ; cb_jump = 2
@@ -624,17 +624,6 @@ for jt in range(jt0,Nt):
     print('')
     if not l_show_lsm and jt == jt0: ( nj , ni ) = nmp.shape(Xplot)
     print('  *** dimension of array => ', ni, nj, nmp.shape(Xplot))
-
-    if l_save_nc:
-        if l3d:
-            cf_out = 'nc/'+CWHAT+'_NEMO_'+CNEMO+'-'+CRUN+'_lev'+str(jk)+'_'+CBOX+'_'+cdate+'_'+cpal_fld+'.nc'
-        else:
-            cf_out = 'nc/'+CWHAT+'_NEMO_'+CNEMO+'-'+CRUN+'_'+CBOX+'_'+cdate+'_'+cpal_fld+'.nc'
-        print(' Saving in '+cf_out)
-        bnc.dump_2d_field(cf_out, Xplot, xlon=Xlon, xlat=Xlat, name=CWHAT)
-        print('')
-
-
     
 
     print('Ploting')
@@ -646,7 +635,17 @@ for jt in range(jt0,Nt):
         Xplot[idx_land] = nmp.nan
     else:
         bt.drown(Xplot, XMSK, k_ew=-1, nb_max_inc=10, nb_smooth=10)
-    
+
+    if l_save_nc:
+        if l3d:
+            cf_out = 'nc/'+CWHAT+'_NEMO_'+CNEMO+'-'+CRUN+'_lev'+str(jk)+'_'+CBOX+'_'+cdate+'_'+cpal_fld+'.nc'
+        else:
+            cf_out = 'nc/'+CWHAT+'_NEMO_'+CNEMO+'-'+CRUN+'_'+CBOX+'_'+cdate+'_'+cpal_fld+'.nc'
+        print(' Saving in '+cf_out)
+        bnc.dump_2d_field(cf_out, Xplot, xlon=Xlon, xlat=Xlat, name=CWHAT)
+        print('')
+
+        
     cf = plt.imshow( Xplot[:,:], cmap=pal_fld, norm=norm_fld, interpolation=nemo_box.c_imshow_interp )
 
     if nemo_box.l_add_quiver:
@@ -697,7 +696,7 @@ for jt in range(jt0,Nt):
         yl = float(y_clock)/rfz
         ax.annotate('Date: '+cdats, xy=(1, 4), xytext=(xl,yl), **cfont_clock)
 
-    if l_get_name_of_run and nemo_box.l_show_exp:
+    if nemo_box.l_show_exp:
         xl = float(x_exp)/rfz
         yl = float(y_exp)/rfz
         ax.annotate('Experiment: '+CNEMO+'-'+CRUN, xy=(1, 4), xytext=(xl,yl), **cfont_exp)
