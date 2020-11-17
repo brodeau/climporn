@@ -189,7 +189,8 @@ elif CWHAT == 'CURLOF':
     if CBOX ==      'Med': tmin=-1. ;  tmax=-tmin ; df = 0.1 ; cb_jump = 2
     if CBOX in ['AzoresP','MeddiesW','ALLFR']: tmin=-0.8 ;  tmax=-tmin ;  df = 0.1 ; cb_jump = 1
     if CBOX == 'BlackSea': tmin=-0.6 ;  tmax=-tmin  ; df = 0.1 ; cb_jump = 1
-    if CBOX ==  'EATLcom': tmin=-1. ;  tmax=-tmin ; df = 0.1 ; cb_jump = 2    
+    if CBOX ==  'EATLcom': tmin=-1. ;  tmax=-tmin ; df = 0.1 ; cb_jump = 2
+    if CNEMO in ['TROPICO05_NST','CALEDO10']: tmin=-0.5 ;  tmax=-tmin ; df = 0.05 ; cb_jump = 2    
 
 elif CWHAT == 'CURLOF_1000':
     l_do_cof = True  ; # do curl/f
@@ -420,6 +421,10 @@ cfont_clock = { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(
 cfont_exp= { 'fontname':'Open Sans'  , 'fontweight':'light', 'fontsize':int(9.*fontr), 'color':color_top }
 cfont_mail =  { 'fontname':'Times New Roman', 'fontweight':'normal', 'fontstyle':'italic', 'fontsize':int(14.*fontr), 'color':'0.8'}
 cfont_titl =  { 'fontname':'Open Sans', 'fontweight':'light', 'fontsize':int(30.*fontr), 'color':color_top }
+
+
+
+#print("lolo:", CBOX, tmin, tmax) ; sys.exit(0)
 
 
 # Colormaps for fields:

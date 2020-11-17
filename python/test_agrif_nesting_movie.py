@@ -32,14 +32,18 @@ npf = 2 ; # number of poins for frame...
 
 nratio  = 5
 
-nrim_chld = 1
-#nrim_chld = 3
+#nrim_chld = 1
+nrim_chld = 3
 #nrim_chld = 10
 
 ip = 35 ; # location (Fortran indexing) of bottom left corner AGRIF_FixedGrids.in)
 jp = 43 ; # of the child box into parent box in Agrif ! (as in 
 
 cdate = '2016-12-22_00'
+
+# Final box to keep (mind that for images it's flipped upside down!):
+j1b = 336 ; i1b = 0
+j2b = 680 ; i2b = int(16./9.*float(j2b-j1b))
 
 cf_chld = './figs/CURLOF/CURLOF_CALEDO10-_ALL_'+cdate+'_on2.png'
 cf_prnt = './figs/CURLOF/CURLOF_TROPICO05_NST-_ALL_'+cdate+'_on2.png'
@@ -117,7 +121,7 @@ xprnt[j1:j1+Ny,i1:i1+Nx,:] = XC[:,:,:]
 
 image_chld = Image.fromarray(xchld[nrim_chld:-nrim_chld,nrim_chld:-nrim_chld])
 
-image_all  = Image.fromarray(xprnt)
+image_all  = Image.fromarray(xprnt[j1b:j2b,i1b:i2b,:])
 
 
 
