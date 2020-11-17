@@ -1,6 +1,6 @@
 #!/bin/bash
 
-EXE="./nemo_agrif_movie_vect.py"
+EXE="./nemo_movie_vect.py"
 
 CONF_I_DIR="/MEDIA/data/TROPICO05/TROPICO05-I"
 SAVE_DIR="/MEDIA/tmp/nemo"
@@ -27,5 +27,6 @@ ${EXE} -u ${SAVE_DIR}/${PCONF}-TRPC5N00_${TTAG}_gridU.nc \
        -m ${CONF_I_DIR}/mesh_mask_TROPICO05_L31_trunk.nc -C ${PCONF} \
        -t ${cdt} -s ${ct0}
 
+echo; echo; echo; echo " TIME FOR MONTAGE !!!"; echo
+./mk_image_montage_agrif.py
 
-# convert -crop 139x179+2+2 CURLOF_CALEDO10-6h_ALL_2009-01-01_00_on2.png aaa.png
