@@ -8,29 +8,14 @@
 #    L. Brodeau, January 2019
 #
 import sys
-from os import path, getcwd
-
 import glob
-
-
 #import argparse as ap
 import numpy as nmp
 from PIL import Image
-
-#from netCDF4 import Dataset
-
-
-#import clprn_colmap as bcm
-from clprn_tool import chck4f
-import clprn_ncio as bnc
-
+#
 # ClimPorn:
+from clprn_tool import chck4f
 import nemo_hboxes as nhb
-
-# (0-255)     R   G   B  transparency
-#rgb_f = [ 0 , 0 , 0 , 255 ] ; # solid black
-rgb_f = [ 255, 237, 0 , 255 ] ; # yellow ON (255,237,0)
-npf = 2 ; # number of poins for frame...
 
 
 # About files to use:
@@ -56,6 +41,14 @@ cdate = '2016-12-22_00'
 # Final box to keep (mind that for images it's flipped upside down!):
 j1b = 336 ; i1b = 0
 j2b = 680 ; i2b = int(16./9.*float(j2b-j1b))
+
+# COLOR FOR THE NESTING BOX LINE:
+# (0-255)     R   G   B  transparency
+#rgb_f = [ 0 , 0 , 0 , 255 ] ; # solid black
+rgb_f = [ 255, 237, 0 , 255 ] ; # yellow ON (255,237,0)
+npf = 2 ; # number of poins for frame...
+
+
 
 
 
