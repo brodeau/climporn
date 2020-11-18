@@ -5,8 +5,8 @@
 #  Prepare 2D maps (monthly) that will later become a movie!
 #  NEMO output and observations needed
 #
-#    L. Brodeau, January 2019
-#
+#    L. Brodeau, November 2019
+
 import sys
 from os import path, getcwd, mkdir
 import argparse as ap
@@ -62,8 +62,6 @@ l_log_field = False
 l_pow_field = False
 
 
-cdir_logos = cwd+'/logos'
-
 rof_log = 150.
 rof_dpt = 0.
 
@@ -74,6 +72,10 @@ l_save_nc = False ; # save the field we built in a netcdf file !!!
 romega = 2.*nmp.pi/86400.0
 
 cb_extend = 'both' ;#colorbar extrema
+
+# Normally logos should be found there:
+dir_logos = str.replace( path.dirname(path.realpath(__file__)) , 'climporn/python', 'climporn/misc/logos' )
+print("\n --- logos found into : "+dir_logos+" !\n")
 
 
 ################## ARGUMENT PARSING / USAGE ################################################################################################
@@ -107,7 +109,7 @@ cf_mm = args.fmm
 csd0  = args.sd0
 jk    = args.lev
 cf_topo_land = args.zld
-dt    = args.tstep 
+dt    = args.tstep  ; # time step in hours
 
 print('')
 print(' *** CNEMO = ', CNEMO)
@@ -498,7 +500,6 @@ if l_do_eke:
 
 
     
-ntpd = 24/dt
 
 vm = vmn
 if isleap(int(cyr0)): vm = vml
@@ -526,8 +527,8 @@ if nemo_box.l_add_quiver:
 for jt in range(jt0,Nt):
 
     #---------------------- Calendar stuff --------------------------------------------    
-    jh  = (jt*dt)%24
-    jdc = (jt*dt)/24 + 1
+    #jh  = (jt*dt)%24
+    jh  = int( (float(jt)+0.5)*float(dt) ) % 24 ; # average is centered
     if jt%ntpd == 0: jd = jd + 1
     if jd == vm[jm-1]+1 and (jt)%ntpd == 0 :
         jd = 1
@@ -711,20 +712,20 @@ for jt in range(jt0,Nt):
         ax.annotate(CNEMO, xy=(1, 4), xytext=(xl, yl), **cfont_titl)
 
     if nemo_box.l_add_logo:
-        datafile = cbook.get_sample_data(cdir_logos+'/'+nemo_box.cf_logo_on, asfileobj=False)
+        datafile = cbook.get_sample_data(dir_logos+'/'+nemo_box.cf_logo_on, asfileobj=False)
         im = image.imread(datafile)
         #im[:, :, -1] = 0.5  # set the alpha channel
         fig.figimage(im, x_logo, y_logo, zorder=9)
         del datafile, im
         #
         if nemo_box.l_add_logo_ige:
-            datafile = cbook.get_sample_data(cdir_logos+'/'+nemo_box.cf_logo_ige, asfileobj=False)
+            datafile = cbook.get_sample_data(dir_logos+'/'+nemo_box.cf_logo_ige, asfileobj=False)
             im = image.imread(datafile)
             fig.figimage(im, x_logo+144, y_logo-150., zorder=9)
             del datafile, im
             #
         if nemo_box.l_add_logo_prc:
-            datafile = cbook.get_sample_data(cdir_logos+'/'+nemo_box.cf_logo_prc, asfileobj=False)
+            datafile = cbook.get_sample_data(dir_logos+'/'+nemo_box.cf_logo_prc, asfileobj=False)
             im = image.imread(datafile)
             fig.figimage(im, x_logo-77, y_logo-140., zorder=9)
             del datafile, im

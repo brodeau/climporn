@@ -88,16 +88,16 @@ class nemo_hbox:
 
             
         elif [ config, box ] == [ 'TROPICO05_NST', 'ALL']:
-            i1=0   ; j1=0    ; i2=Ni0 ; j2=Nj0  ; rfact_zoom=5 ; vcb=[0.61, 0.1, 0.36, 0.018]  ; font_rat=8.*rfact_zoom
-            l_show_cb  = False
-            l_show_clock=False
-            l_add_logo=False
+            i1=0   ; j1=0    ; i2=Ni0 ; j2=Nj0  ; rfact_zoom=5 ; font_rat=0.2*rfact_zoom
+            l_show_cb  = False ; vcb=[0.61, 0.1, 0.36, 0.018]
+            l_show_clock=True ; x_clock = 120 ; y_clock = 110
+            l_add_logo=True ; x_logo=520  ; y_logo=100; cf_logo_on  = 'ocean-next_trans_white_80x54.png'
             l_show_exp =False
             l_fill_holes_k=True
             #
         elif [ config, box ] == [ 'CALEDO10', 'ALL']:
-            i1=0   ; j1=0    ; i2=Ni0 ; j2=Nj0  ; rfact_zoom=1 ; vcb=[0.61, 0.1, 0.36, 0.018]  ; font_rat=8.*rfact_zoom
-            l_show_cb  = False
+            i1=0   ; j1=0    ; i2=Ni0 ; j2=Nj0  ; rfact_zoom=1 ; font_rat=8.*rfact_zoom
+            l_show_cb  = False ; vcb=[0.61, 0.1, 0.36, 0.018]
             l_show_clock=False
             l_add_logo=False
             l_show_exp =False
