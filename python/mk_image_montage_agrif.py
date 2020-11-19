@@ -17,6 +17,7 @@ from PIL import Image
 from clprn_tool import chck4f
 import nemo_hboxes as nhb
 
+#nghost = 3
 
 # About files to use:
 fpref_p = './figs/CURLOF/CURLOF_TROPICO05_NST-_ALL_'
@@ -25,13 +26,14 @@ fsuff_p = '_on2.png'
 fpref_c = './figs/CURLOF/CURLOF_CALEDO10-_ALL_'
 fsuff_c = '_on2.png'
 
-fpref_o = './figs/montage_CURLOF_TROPICO05-CALEDO10'
+fpref_o = './figs/montage_CURLOF_TROPICO05-CALEDO10_'
 
 nratio  = 5
 
-#nrim_chld = 1
-nrim_chld = 3
-#nrim_chld = 10
+ncrop_chld = 3
+#ncrop_chld = 1
+#ncrop_chld = 3
+#ncrop_chld = 10
 
 ipc = 35 ; # location (Fortran indexing) of bottom left corner AGRIF_FixedGrids.in)
 jpc = 43 ; # of the child box into parent box in Agrif ! (as in 
@@ -114,12 +116,19 @@ for j in range(nbf):
     #print(xprnt[100,100,:])
 
 
-    ip = ipc * nratio - 1
-    jp = jpc * nratio - 1
+    #ip = (ipc - 1) * nratio + nghost
+    #jp = (jpc - 1) * nratio + nghost
+    ip = (ipc + 1) * nratio + 2  # I have no fucking clue why ????
+    jp = (jpc + 1) * nratio + 2  # I have no fucking clue why ????
+    #ip = ipc * nratio
+    #jp = jpc * nratio
 
 
     # Child array we keep after croping:
-    XC = xchld[nrim_chld:-nrim_chld,nrim_chld:-nrim_chld]
+    if ncrop_chld >= 1:
+        XC = xchld[ncrop_chld:-ncrop_chld,ncrop_chld:-ncrop_chld]
+    else:
+        XC = xchld[:,:]
     (Ny,Nx,Nr) = nmp.shape(XC)
 
     #print(" shape XC =", Ny,Nx,Nr)
@@ -132,11 +141,9 @@ for j in range(nbf):
         XC[:,     0:npf,i] = rgb_f[i]
         XC[:,Nx-npf:Nx ,i] = rgb_f[i]
 
-    j1 = nyp-jp-Ny - 2*nrim_chld
-    i1 = ip        + nrim_chld 
+    j1 = nyp-jp-Ny - ncrop_chld
+    i1 = ip        + ncrop_chld 
     xprnt[j1:j1+Ny,i1:i1+Nx,:] = XC[:,:,:]
-
-    #image_chld = Image.fromarray(xchld[nrim_chld:-nrim_chld,nrim_chld:-nrim_chld])
 
     image_out  = Image.fromarray(xprnt[j1b:j2b,i1b:i2b,:])
 
