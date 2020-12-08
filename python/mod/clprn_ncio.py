@@ -422,7 +422,7 @@ def wrt_appnd_2dt_series(vx, vy, vt, xd, cf, cvar1, missing_val=-9999.,
     print('   *** '+str(Nt)+' snapshots of fields saved into '+cf+' !\n')
 
 
-def write_2d_mask(cf_out, MSK, xlon=[], xlat=[], name='mask'):
+def write_2d_mask( cf_out, MSK, xlon=[], xlat=[], name='mask', clon='nav_lon', clat='nav_lat' ):
 
     (nj,ni) = nmp.shape(MSK)
 
@@ -434,8 +434,8 @@ def write_2d_mask(cf_out, MSK, xlon=[], xlat=[], name='mask'):
 
     if (xlon != []) and (xlat != []):
         if (xlon.shape == (nj,ni)) and (xlon.shape == xlat.shape):
-            id_lon  = f_out.createVariable('nav_lon' ,'f4',('y','x',), zlib=True, complevel=5)
-            id_lat  = f_out.createVariable('nav_lat' ,'f4',('y','x',), zlib=True, complevel=5)
+            id_lon  = f_out.createVariable(clon ,'f4',('y','x',), zlib=True, complevel=5)
+            id_lat  = f_out.createVariable(clat ,'f4',('y','x',), zlib=True, complevel=5)
             id_lon[:,:] = xlon[:,:]
             id_lat[:,:] = xlat[:,:]
         
@@ -448,7 +448,7 @@ def write_2d_mask(cf_out, MSK, xlon=[], xlat=[], name='mask'):
     return
 
 
-def dump_2d_field( cf_out, XFLD, xlon=[], xlat=[], name='field', unit='', long_name='', mask=[] ):
+def dump_2d_field( cf_out, XFLD, xlon=[], xlat=[], name='field', unit='', long_name='', mask=[], clon='nav_lon', clat='nav_lat' ):
 
     (nj,ni) = nmp.shape(XFLD)
 
@@ -460,8 +460,8 @@ def dump_2d_field( cf_out, XFLD, xlon=[], xlat=[], name='field', unit='', long_n
 
     if (xlon != []) and (xlat != []):
         if (xlon.shape == (nj,ni)) and (xlon.shape == xlat.shape):
-            id_lon  = f_out.createVariable('nav_lon' ,'f4',('y','x',), zlib=True, complevel=5)
-            id_lat  = f_out.createVariable('nav_lat' ,'f4',('y','x',), zlib=True, complevel=5)
+            id_lon  = f_out.createVariable(clon ,'f4',('y','x',), zlib=True, complevel=5)
+            id_lat  = f_out.createVariable(clat ,'f4',('y','x',), zlib=True, complevel=5)
             id_lon[:,:] = xlon[:,:]
             id_lat[:,:] = xlat[:,:]
         
@@ -484,7 +484,7 @@ def dump_2d_field( cf_out, XFLD, xlon=[], xlat=[], name='field', unit='', long_n
 
 
 
-def dump_2d_multi_field(cf_out, XFLD, vnames, vndim=[], xlon=[], xlat=[], vtime=[]):
+def dump_2d_multi_field(cf_out, XFLD, vnames, vndim=[], xlon=[], xlat=[], vtime=[], clon='nav_lon', clat='nav_lat'):
     
     if len(vtime)>0:
         l_add_time = True
@@ -528,8 +528,8 @@ def dump_2d_multi_field(cf_out, XFLD, vnames, vndim=[], xlon=[], xlat=[], vtime=
 
     if (xlon != []) and (xlat != []):
         if l_coord_2d:
-            id_lon  = f_out.createVariable('nav_lon' ,'f4',(cnm_dim_y,cnm_dim_x,), zlib=True, complevel=5)
-            id_lat  = f_out.createVariable('nav_lat' ,'f4',(cnm_dim_y,cnm_dim_x,), zlib=True, complevel=5)
+            id_lon  = f_out.createVariable(clon ,'f4',(cnm_dim_y,cnm_dim_x,), zlib=True, complevel=5)
+            id_lat  = f_out.createVariable(clat ,'f4',(cnm_dim_y,cnm_dim_x,), zlib=True, complevel=5)
             id_lon[:,:] = xlon[:,:]
             id_lat[:,:] = xlat[:,:]
         else:
@@ -566,7 +566,7 @@ def dump_2d_multi_field(cf_out, XFLD, vnames, vndim=[], xlon=[], xlat=[], vtime=
 
 
 
-def dump_3d_multi_field(cf_out, XFLD, vnames, vndim=[], xlon=[], xlat=[], vdepth=[], vtime=[]):
+def dump_3d_multi_field(cf_out, XFLD, vnames, vndim=[], xlon=[], xlat=[], vdepth=[], vtime=[], clon='nav_lon', clat='nav_lat'):
     
     if len(vtime)>0:
         l_add_time = True
@@ -611,8 +611,8 @@ def dump_3d_multi_field(cf_out, XFLD, vnames, vndim=[], xlon=[], xlat=[], vdepth
 
     if (xlon != []) and (xlat != []):
         if l_coord_2d:
-            id_lon  = f_out.createVariable('nav_lon' ,'f4',(cnm_dim_y,cnm_dim_x,), zlib=True, complevel=5)
-            id_lat  = f_out.createVariable('nav_lat' ,'f4',(cnm_dim_y,cnm_dim_x,), zlib=True, complevel=5)            
+            id_lon  = f_out.createVariable(clon ,'f4',(cnm_dim_y,cnm_dim_x,), zlib=True, complevel=5)
+            id_lat  = f_out.createVariable(clat ,'f4',(cnm_dim_y,cnm_dim_x,), zlib=True, complevel=5)            
             id_lon[:,:] = xlon[:,:]
             id_lat[:,:] = xlat[:,:]
         else:
