@@ -107,11 +107,12 @@ class nemo_hbox:
             l_fill_holes_k=True
 
         elif [ config, box ] == [ 'CALEDO60', 'ALL']:
-            i1=2 ; j1=10  ;  i2=Ni0-2 ; j2=Nj0-10  ; rfact_zoom=1 ; font_rat=8.*rfact_zoom
-            l_show_cb  = False ; vcb=[0.61, 0.1, 0.36, 0.018]
-            l_show_clock=False
+            i1=4 ; j1=18  ;  i2=Ni0-4 ; j2=Nj0-15  ; rfact_zoom=1 ; font_rat=1.5*rfact_zoom
+            l_show_cb  = True ; vcb=[0.15, 0.07, 0.7, 0.018]
+            l_show_clock=True ; x_clock = 50 ; y_clock = 800
             l_add_logo=False
-            l_show_exp =False
+            #l_annotate_name=True
+            l_show_exp=False ; x_exp = 50 ; y_exp = 800
             l_fill_holes_k=True
 
             

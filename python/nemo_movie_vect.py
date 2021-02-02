@@ -193,6 +193,7 @@ elif CWHAT == 'CURLOF':
     if CBOX == 'BlackSea': tmin=-0.6 ;  tmax=-tmin  ; df = 0.1 ; cb_jump = 1
     if CBOX ==  'EATLcom': tmin=-1. ;  tmax=-tmin ; df = 0.1 ; cb_jump = 2
     if CNEMO in ['TROPICO05_NST','CALEDO10']: tmin=-0.5 ;  tmax=-tmin ; df = 0.05 ; cb_jump = 2    
+    if CNEMO in ['CALEDO60']: tmin=-1. ;  tmax=-tmin ; df = 0.1 ; cb_jump = 2    
 
 elif CWHAT == 'CURLOF_1000':
     l_do_cof = True  ; # do curl/f
