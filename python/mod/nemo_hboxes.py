@@ -32,10 +32,13 @@ class nemo_hbox:
         elif config == 'CALEDO10':
             Ni0 = 143
             Nj0 = 183
+        elif config == 'CALEDO60':
+            Ni0 = 788
+            Nj0 = 853
         else:
             print('ERROR: we do not know NEMO config "'+str(config)+'" !')
             exit(0)
-        #
+            #
         return  (Ni0,Nj0)
 
                     
@@ -103,6 +106,13 @@ class nemo_hbox:
             l_show_exp =False
             l_fill_holes_k=True
 
+        elif [ config, box ] == [ 'CALEDO60', 'ALL']:
+            i1=0   ; j1=0    ; i2=Ni0 ; j2=Nj0  ; rfact_zoom=1 ; font_rat=8.*rfact_zoom
+            l_show_cb  = False ; vcb=[0.61, 0.1, 0.36, 0.018]
+            l_show_clock=False
+            l_add_logo=False
+            l_show_exp =False
+            l_fill_holes_k=True
 
             
         elif [ config, box ] == [ 'ORCA36', 'ALLFR']:
