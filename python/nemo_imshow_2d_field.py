@@ -155,9 +155,9 @@ elif CNEMO == 'TROPICO2':
     bathy_max = 6000. # m
     
 elif CNEMO == 'TROPICO05':
-    i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 3. ; vcb = [0.02, 0.15, 0.4, 0.04] ; font_rat = 2./rfact_zoom
+    i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 5. ; vcb = [0.35, 0.09, 0.4, 0.03] ; font_rat = 4./rfact_zoom
     x_cnf = 280. ; y_cnf = 135. ; # where to put label of conf on Figure...
-    l_show_cb = False ; l_show_nm = False ; l_scientific_mode=False
+    l_show_cb = True ; l_show_nm = False ; l_scientific_mode=False
     bathy_max = 6000. # m
     
 elif CNEMO == 'TROPICO12':
@@ -184,6 +184,12 @@ elif CNEMO == 'GulfS':
     l_show_cb = False ; l_show_nm = False
     pt_sz_track = 3
 
+elif CNEMO == 'CALEDO10':
+    i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 1. ; vcb = [0.2, 0.06, 0.6, 0.03] ; font_rat = 1.5/rfact_zoom
+    x_cnf = 900. ; y_cnf = 1350. ; # where to put label of conf on Figure...
+    l_show_cb = False ; l_show_nm = False ; l_scientific_mode=False
+    bathy_max = 6000. # m
+    
 elif CNEMO == 'CALEDO60':
     i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 1. ; vcb = [0.2, 0.06, 0.6, 0.03] ; font_rat = 1.5/rfact_zoom
     x_cnf = 900. ; y_cnf = 1350. ; # where to put label of conf on Figure...

@@ -30,8 +30,8 @@ class nemo_hbox:
             Ni0 = 297
             Nj0 = 156
         elif config == 'CALEDO10':
-            Ni0 = 143
-            Nj0 = 183
+            Ni0 = 138
+            Nj0 = 153
         elif config == 'CALEDO60':
             Ni0 = 788
             Nj0 = 853
