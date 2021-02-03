@@ -210,6 +210,7 @@ elif CWHAT == 'CSPEED':
     if CBOX == 'BlackSea': tmax=0.8 ; df = 0.1 ; cb_jump = 1
     if CBOX in ['Manche','Bretagne']:  tmax=2.4 ; df = 0.1 ; cb_jump = 2
     if CBOX in ['Brest']:  tmax=2.4 ; df = 0.1 ; cb_jump = 2
+    if CNEMO in ['CALEDO60']: tmax=0.8 ; df = 0.1 ; cb_jump = 1
 
 elif CWHAT == 'CSPEED_1000':
     l_do_cspd = True  ; # do current speed
@@ -555,186 +556,194 @@ for jt in range(jt0,Nt):
     else:
         cfig = cdir_figs+'/'+cv_out+'_'+CNEMO+'-'+CRUN+'_'+CBOX+'_'+cdate+'_'+cpal_fld+'.'+fig_type
 
+
+
+    # lulu cfig
+
+    if not path.exists(cfig):
     ###### FIGURE ##############
-
-    fig = plt.figure(num = 1, figsize=(rw_fig, rh_fig), dpi=None, facecolor='w', edgecolor='0.5')
-
-    ax  = plt.axes([0., 0., 1., 1.], facecolor = '0.85') # missing seas will be in 'facecolor' !
-
-    vc_fld = nmp.arange(tmin, tmax + df, df)
-
-
-    print('Reading record #'+str(jt)+' of '+cvx_in+' in '+cfx_in)
-    if l3d: print('            => at level #'+str(jk)+' ('+cdepth+')!')
-    id_fx = Dataset(cfx_in)
-    if not l_3d_field:
-        XFLD  = id_fx.variables[cvx_in][jt,j1:j2,i1:i2] ; # t, y, x
-    else:
-        print('j1:j2 =', j1,j2)
-        print('i1:i2 =', i1,i2)
-        XFLD  = id_fx.variables[cvx_in][jt,jk,j1:j2,i1:i2] ; # t, y, x
-    id_fx.close()
-    print('Done!')
-
-    print('Reading record #'+str(jt)+' of '+cvy_in+' in '+cfy_in)
-    if l3d: print('            => at level #'+str(jk)+' ('+cdepth+')!')
-    id_fy = Dataset(cfy_in)
-    if not l_3d_field:
-        YFLD  = id_fy.variables[cvy_in][jt,j1:j2,i1:i2] ; # t, y, x
-    else:
-        YFLD  = id_fy.variables[cvy_in][jt,jk,j1:j2,i1:i2] ; # t, y, x
-    id_fy.close()
-    print('Done!')
-
-
-    lx = nmp.zeros((nj,ni))
-    ly = nmp.zeros((nj,ni))
-
-    if l_do_crl or l_do_cof:
-        print('\nComputing curl...')
-        lx[:,1:ni-1] =   e2v[:,2:ni]*YFLD[:,2:ni] - e2v[:,1:ni-1]*YFLD[:,1:ni-1]
-        ly[1:nj-1,:] = - e1u[2:nj,:]*XFLD[2:nj,:] + e1u[1:nj-1,:]*XFLD[1:nj-1,:]
-        if l_do_cof: Xplot[:,:] = ( lx[:,:] + ly[:,:] )*XMSK[:,:] / ( e1f[:,:]*e2f[:,:]*ff[:,:] ) # Relative Vorticity...
-        if l_do_crl: Xplot[:,:] = ( lx[:,:] + ly[:,:] )*XMSK[:,:] / ( e1f[:,:]*e2f[:,:] ) * 1000. # Curl...
-
-    if l_do_cspd:
-        print('\nComputing current speed at T-points ...')
-        lx[:,2:ni] = 0.5*( XFLD[:,1:ni-1] + XFLD[:,2:ni] )
-        ly[2:nj,:] = 0.5*( YFLD[1:nj-1,:] + YFLD[2:nj,:] )
-        Xplot[:,:] = nmp.sqrt( lx[:,:]*lx[:,:] + ly[:,:]*ly[:,:] ) * XMSK[:,:]
-        if nemo_box.l_add_quiver:
-            XU[:,:] = XFLD[:,:]
-            XV[:,:] = YFLD[:,:]
-
-    if l_do_tke:
-        print('\nComputing TKE at T-points ...')
-        lx[:,2:ni] = 0.5*( XFLD[:,1:ni-1] + XFLD[:,2:ni] )
-        ly[2:nj,:] = 0.5*( YFLD[1:nj-1,:] + YFLD[2:nj,:] )
-        Xplot[:,:] = ( lx[:,:]*lx[:,:] + ly[:,:]*ly[:,:] ) * XMSK[:,:]
-
-
-    if l_do_eke:
-        print('\nComputing TKE at T-points ...')
-        lx[:,2:ni] = 0.5*( XFLD[:,1:ni-1] + XFLD[:,2:ni] ) - Umean[:,2:ni]
-        ly[2:nj,:] = 0.5*( YFLD[1:nj-1,:] + YFLD[2:nj,:] ) - Vmean[2:nj,:]
-        Xplot[:,:] = ( lx[:,:]*lx[:,:] + ly[:,:]*ly[:,:] ) * XMSK[:,:]
-
-    del lx, ly
-    print('... '+cv_out+' computed!\n')
-        
-    del XFLD,YFLD
-
-    print('')
-    if not l_show_lsm and jt == jt0: ( nj , ni ) = nmp.shape(Xplot)
-    print('  *** dimension of array => ', ni, nj, nmp.shape(Xplot))
     
-
-    print('Ploting')
-
-    plt.axis([ 0, ni, 0, nj])
-
+        fig = plt.figure(num = 1, figsize=(rw_fig, rh_fig), dpi=None, facecolor='w', edgecolor='0.5')
     
-    if nemo_box.c_imshow_interp == 'none':
-        Xplot[idx_land] = nmp.nan
-    else:
-        bt.drown(Xplot, XMSK, k_ew=-1, nb_max_inc=10, nb_smooth=10)
-
-    if l_save_nc:
-        if l3d:
-            cf_out = 'nc/'+CWHAT+'_NEMO_'+CNEMO+'-'+CRUN+'_lev'+str(jk)+'_'+CBOX+'_'+cdate+'_'+cpal_fld+'.nc'
+        ax  = plt.axes([0., 0., 1., 1.], facecolor = '0.85') # missing seas will be in 'facecolor' !
+    
+        vc_fld = nmp.arange(tmin, tmax + df, df)
+    
+    
+        print('Reading record #'+str(jt)+' of '+cvx_in+' in '+cfx_in)
+        if l3d: print('            => at level #'+str(jk)+' ('+cdepth+')!')
+        id_fx = Dataset(cfx_in)
+        if not l_3d_field:
+            XFLD  = id_fx.variables[cvx_in][jt,j1:j2,i1:i2] ; # t, y, x
         else:
-            cf_out = 'nc/'+CWHAT+'_NEMO_'+CNEMO+'-'+CRUN+'_'+CBOX+'_'+cdate+'_'+cpal_fld+'.nc'
-        print(' Saving in '+cf_out)
-        bnc.dump_2d_field(cf_out, Xplot, xlon=Xlon, xlat=Xlat, name=CWHAT)
+            print('j1:j2 =', j1,j2)
+            print('i1:i2 =', i1,i2)
+            XFLD  = id_fx.variables[cvx_in][jt,jk,j1:j2,i1:i2] ; # t, y, x
+        id_fx.close()
+        print('Done!')
+    
+        print('Reading record #'+str(jt)+' of '+cvy_in+' in '+cfy_in)
+        if l3d: print('            => at level #'+str(jk)+' ('+cdepth+')!')
+        id_fy = Dataset(cfy_in)
+        if not l_3d_field:
+            YFLD  = id_fy.variables[cvy_in][jt,j1:j2,i1:i2] ; # t, y, x
+        else:
+            YFLD  = id_fy.variables[cvy_in][jt,jk,j1:j2,i1:i2] ; # t, y, x
+        id_fy.close()
+        print('Done!')
+    
+    
+        lx = nmp.zeros((nj,ni))
+        ly = nmp.zeros((nj,ni))
+    
+        if l_do_crl or l_do_cof:
+            print('\nComputing curl...')
+            lx[:,1:ni-1] =   e2v[:,2:ni]*YFLD[:,2:ni] - e2v[:,1:ni-1]*YFLD[:,1:ni-1]
+            ly[1:nj-1,:] = - e1u[2:nj,:]*XFLD[2:nj,:] + e1u[1:nj-1,:]*XFLD[1:nj-1,:]
+            if l_do_cof: Xplot[:,:] = ( lx[:,:] + ly[:,:] )*XMSK[:,:] / ( e1f[:,:]*e2f[:,:]*ff[:,:] ) # Relative Vorticity...
+            if l_do_crl: Xplot[:,:] = ( lx[:,:] + ly[:,:] )*XMSK[:,:] / ( e1f[:,:]*e2f[:,:] ) * 1000. # Curl...
+    
+        if l_do_cspd:
+            print('\nComputing current speed at T-points ...')
+            lx[:,2:ni] = 0.5*( XFLD[:,1:ni-1] + XFLD[:,2:ni] )
+            ly[2:nj,:] = 0.5*( YFLD[1:nj-1,:] + YFLD[2:nj,:] )
+            Xplot[:,:] = nmp.sqrt( lx[:,:]*lx[:,:] + ly[:,:]*ly[:,:] ) * XMSK[:,:]
+            if nemo_box.l_add_quiver:
+                XU[:,:] = XFLD[:,:]
+                XV[:,:] = YFLD[:,:]
+    
+        if l_do_tke:
+            print('\nComputing TKE at T-points ...')
+            lx[:,2:ni] = 0.5*( XFLD[:,1:ni-1] + XFLD[:,2:ni] )
+            ly[2:nj,:] = 0.5*( YFLD[1:nj-1,:] + YFLD[2:nj,:] )
+            Xplot[:,:] = ( lx[:,:]*lx[:,:] + ly[:,:]*ly[:,:] ) * XMSK[:,:]
+    
+    
+        if l_do_eke:
+            print('\nComputing TKE at T-points ...')
+            lx[:,2:ni] = 0.5*( XFLD[:,1:ni-1] + XFLD[:,2:ni] ) - Umean[:,2:ni]
+            ly[2:nj,:] = 0.5*( YFLD[1:nj-1,:] + YFLD[2:nj,:] ) - Vmean[2:nj,:]
+            Xplot[:,:] = ( lx[:,:]*lx[:,:] + ly[:,:]*ly[:,:] ) * XMSK[:,:]
+    
+        del lx, ly
+        print('... '+cv_out+' computed!\n')
+            
+        del XFLD,YFLD
+    
         print('')
-
-
-    cf = plt.imshow( Xplot[:,:], cmap=pal_fld, norm=norm_fld, interpolation=nemo_box.c_imshow_interp )
-
-    if nemo_box.l_add_quiver:
-        idx_high = nmp.where(Xplot[:,:]>tmax)
-        XU[idx_high] = nmp.nan ; XV[idx_high] = nmp.nan
-        idx_miss = nmp.where(XLSM[:,:]<0.5)
-        XU[idx_miss] = nmp.nan ; XV[idx_miss] = nmp.nan
-        #XU = XU*XLSM ; XV = XV*XLSM 
-        nss=nemo_box.n_subsamp_qvr
-        cq = plt.quiver( VX[:ni:nss], VY[:nj:nss], XU[:nj:nss,:ni:nss], XV[:nj:nss,:ni:nss], scale=50, color='w', width=0.001, linewidth=0.1 )
-
-    #LOLO: rm ???
-    if l_show_lsm or l_add_topo_land:
-        if l_add_topo_land:
-            clsm = plt.imshow(nmp.ma.masked_where(XLSM>0.0001, xtopo), cmap = pal_lsm, norm = norm_lsm, interpolation='none')
-            if nemo_box.c_imshow_interp == 'none':
-                plt.contour(XLSM, [0.9], colors='k', linewidths=0.5)
+        if not l_show_lsm and jt == jt0: ( nj , ni ) = nmp.shape(Xplot)
+        print('  *** dimension of array => ', ni, nj, nmp.shape(Xplot))
+        
+    
+        print('Ploting')
+    
+        plt.axis([ 0, ni, 0, nj])
+    
+        
+        if nemo_box.c_imshow_interp == 'none':
+            Xplot[idx_land] = nmp.nan
         else:
-            clsm = plt.imshow(nmp.ma.masked_where(XLSM>0.0001, XLSM), cmap = pal_lsm, norm = norm_lsm, interpolation='none')
-
-    ##### COLORBAR ######
-    if nemo_box.l_show_cb:
-        ax2 = plt.axes(nemo_box.vcb)
-        clb = mpl.colorbar.ColorbarBase(ax2, ticks=vc_fld, cmap=pal_fld, norm=norm_fld, orientation='horizontal', extend=cb_extend)
-        cb_labs = []
-        #if cb_jump > 1:
-        cpt = 0
-        for rr in vc_fld:
-            if cpt % cb_jump == 0:
-                if df >= 1.: cb_labs.append(str(int(rr)))
-                if df <  1.: cb_labs.append(str(round(rr,int(nmp.ceil(nmp.log10(1./df)))+1) ))
+            bt.drown(Xplot, XMSK, k_ew=-1, nb_max_inc=10, nb_smooth=10)
+    
+        if l_save_nc:
+            if l3d:
+                cf_out = 'nc/'+CWHAT+'_NEMO_'+CNEMO+'-'+CRUN+'_lev'+str(jk)+'_'+CBOX+'_'+cdate+'_'+cpal_fld+'.nc'
             else:
-                cb_labs.append(' ')
-            cpt = cpt + 1
-        #else:
-        #    for rr in vc_fld: cb_labs.append(str(round(rr,int(nmp.ceil(nmp.log10(1./df)))+1) ))
-
-        clb.ax.set_xticklabels(cb_labs, **cfont_clb_tcks)
-        clb.set_label(cunit, **cfont_clb)
-        clb.ax.yaxis.set_tick_params(color=color_top_cb) ; # set colorbar tick color
-        clb.outline.set_edgecolor(color_top_cb) ; # set colorbar edgecolor
-        clb.ax.tick_params(which = 'minor', length = 2, color = color_top_cb )
-        clb.ax.tick_params(which = 'major', length = 4, color = color_top_cb )
-
-
-    if nemo_box.l_show_clock:
-        xl = float(x_clock)/rfz
-        yl = float(y_clock)/rfz
-        ax.annotate('Date: '+cdats, xy=(1, 4), xytext=(xl,yl), **cfont_clock)
-
-    if nemo_box.l_show_exp:
-        xl = float(x_exp)/rfz
-        yl = float(y_exp)/rfz
-        ax.annotate('Experiment: '+CNEMO+'-'+CRUN, xy=(1, 4), xytext=(xl,yl), **cfont_exp)
-
-
-    #ax.annotate('laurent.brodeau@ocean-next.fr', xy=(1, 4), xytext=(xl+150, 20), **cfont_mail)
-
-    if nemo_box.l_annotate_name:
-        xl = rnxr/20./rfz
-        yl = rnyr/1.33/rfz
-        ax.annotate(CNEMO, xy=(1, 4), xytext=(xl, yl), **cfont_titl)
-
-    if nemo_box.l_add_logo:
-        datafile = cbook.get_sample_data(dir_logos+'/'+nemo_box.cf_logo_on, asfileobj=False)
-        im = image.imread(datafile)
-        #im[:, :, -1] = 0.5  # set the alpha channel
-        fig.figimage(im, x_logo, y_logo, zorder=9)
-        del datafile, im
-        #
-        if nemo_box.l_add_logo_ige:
-            datafile = cbook.get_sample_data(dir_logos+'/'+nemo_box.cf_logo_ige, asfileobj=False)
+                cf_out = 'nc/'+CWHAT+'_NEMO_'+CNEMO+'-'+CRUN+'_'+CBOX+'_'+cdate+'_'+cpal_fld+'.nc'
+            print(' Saving in '+cf_out)
+            bnc.dump_2d_field(cf_out, Xplot, xlon=Xlon, xlat=Xlat, name=CWHAT)
+            print('')
+    
+    
+        cf = plt.imshow( Xplot[:,:], cmap=pal_fld, norm=norm_fld, interpolation=nemo_box.c_imshow_interp )
+    
+        if nemo_box.l_add_quiver:
+            idx_high = nmp.where(Xplot[:,:]>tmax)
+            XU[idx_high] = nmp.nan ; XV[idx_high] = nmp.nan
+            idx_miss = nmp.where(XLSM[:,:]<0.5)
+            XU[idx_miss] = nmp.nan ; XV[idx_miss] = nmp.nan
+            #XU = XU*XLSM ; XV = XV*XLSM 
+            nss=nemo_box.n_subsamp_qvr
+            cq = plt.quiver( VX[:ni:nss], VY[:nj:nss], XU[:nj:nss,:ni:nss], XV[:nj:nss,:ni:nss], scale=50, color='w', width=0.001, linewidth=0.1 )
+    
+        #LOLO: rm ???
+        if l_show_lsm or l_add_topo_land:
+            if l_add_topo_land:
+                clsm = plt.imshow(nmp.ma.masked_where(XLSM>0.0001, xtopo), cmap = pal_lsm, norm = norm_lsm, interpolation='none')
+                if nemo_box.c_imshow_interp == 'none':
+                    plt.contour(XLSM, [0.9], colors='k', linewidths=0.5)
+            else:
+                clsm = plt.imshow(nmp.ma.masked_where(XLSM>0.0001, XLSM), cmap = pal_lsm, norm = norm_lsm, interpolation='none')
+    
+        ##### COLORBAR ######
+        if nemo_box.l_show_cb:
+            ax2 = plt.axes(nemo_box.vcb)
+            clb = mpl.colorbar.ColorbarBase(ax2, ticks=vc_fld, cmap=pal_fld, norm=norm_fld, orientation='horizontal', extend=cb_extend)
+            cb_labs = []
+            #if cb_jump > 1:
+            cpt = 0
+            for rr in vc_fld:
+                if cpt % cb_jump == 0:
+                    if df >= 1.: cb_labs.append(str(int(rr)))
+                    if df <  1.: cb_labs.append(str(round(rr,int(nmp.ceil(nmp.log10(1./df)))+1) ))
+                else:
+                    cb_labs.append(' ')
+                cpt = cpt + 1
+            #else:
+            #    for rr in vc_fld: cb_labs.append(str(round(rr,int(nmp.ceil(nmp.log10(1./df)))+1) ))
+    
+            clb.ax.set_xticklabels(cb_labs, **cfont_clb_tcks)
+            clb.set_label(cunit, **cfont_clb)
+            clb.ax.yaxis.set_tick_params(color=color_top_cb) ; # set colorbar tick color
+            clb.outline.set_edgecolor(color_top_cb) ; # set colorbar edgecolor
+            clb.ax.tick_params(which = 'minor', length = 2, color = color_top_cb )
+            clb.ax.tick_params(which = 'major', length = 4, color = color_top_cb )
+    
+    
+        if nemo_box.l_show_clock:
+            xl = float(x_clock)/rfz
+            yl = float(y_clock)/rfz
+            ax.annotate('Date: '+cdats, xy=(1, 4), xytext=(xl,yl), **cfont_clock)
+    
+        if nemo_box.l_show_exp:
+            xl = float(x_exp)/rfz
+            yl = float(y_exp)/rfz
+            ax.annotate('Experiment: '+CNEMO+'-'+CRUN, xy=(1, 4), xytext=(xl,yl), **cfont_exp)
+    
+    
+        #ax.annotate('laurent.brodeau@ocean-next.fr', xy=(1, 4), xytext=(xl+150, 20), **cfont_mail)
+    
+        if nemo_box.l_annotate_name:
+            xl = rnxr/20./rfz
+            yl = rnyr/1.33/rfz
+            ax.annotate(CNEMO, xy=(1, 4), xytext=(xl, yl), **cfont_titl)
+    
+        if nemo_box.l_add_logo:
+            datafile = cbook.get_sample_data(dir_logos+'/'+nemo_box.cf_logo_on, asfileobj=False)
             im = image.imread(datafile)
-            fig.figimage(im, x_logo+144, y_logo-150., zorder=9)
+            #im[:, :, -1] = 0.5  # set the alpha channel
+            fig.figimage(im, x_logo, y_logo, zorder=9)
             del datafile, im
             #
-        if nemo_box.l_add_logo_prc:
-            datafile = cbook.get_sample_data(dir_logos+'/'+nemo_box.cf_logo_prc, asfileobj=False)
-            im = image.imread(datafile)
-            fig.figimage(im, x_logo-77, y_logo-140., zorder=9)
-            del datafile, im
+            if nemo_box.l_add_logo_ige:
+                datafile = cbook.get_sample_data(dir_logos+'/'+nemo_box.cf_logo_ige, asfileobj=False)
+                im = image.imread(datafile)
+                fig.figimage(im, x_logo+144, y_logo-150., zorder=9)
+                del datafile, im
+                #
+            if nemo_box.l_add_logo_prc:
+                datafile = cbook.get_sample_data(dir_logos+'/'+nemo_box.cf_logo_prc, asfileobj=False)
+                im = image.imread(datafile)
+                fig.figimage(im, x_logo-77, y_logo-140., zorder=9)
+                del datafile, im
+    
+        plt.savefig(cfig, dpi=rDPI, orientation='portrait', facecolor='k')
+        print(cfig+' created!\n')
+        plt.close(1)
 
-    plt.savefig(cfig, dpi=rDPI, orientation='portrait', facecolor='k')
-    print(cfig+' created!\n')
-    plt.close(1)
+        if l_show_lsm: del clsm
+        del cf, fig, ax
+        if nemo_box.l_show_cb: del clb
 
-    if l_show_lsm: del clsm
-    del cf, fig, ax
-    if nemo_box.l_show_cb: del clb
+    else:
+        print('\n Figure '+cfig+' already there!\n')
