@@ -526,6 +526,13 @@ if nemo_box.l_add_quiver:
     XU = nmp.zeros((nj,ni))
     XV = nmp.zeros((nj,ni))
 
+
+
+# Opening netCDF files:
+id_fx = Dataset(cfx_in)
+id_fy = Dataset(cfy_in)
+
+
 for jt in range(jt0,Nt):
 
     #---------------------- Calendar stuff --------------------------------------------    
@@ -572,24 +579,21 @@ for jt in range(jt0,Nt):
     
         print('Reading record #'+str(jt)+' of '+cvx_in+' in '+cfx_in)
         if l3d: print('            => at level #'+str(jk)+' ('+cdepth+')!')
-        id_fx = Dataset(cfx_in)
+
         if not l_3d_field:
             XFLD  = id_fx.variables[cvx_in][jt,j1:j2,i1:i2] ; # t, y, x
         else:
             print('j1:j2 =', j1,j2)
             print('i1:i2 =', i1,i2)
             XFLD  = id_fx.variables[cvx_in][jt,jk,j1:j2,i1:i2] ; # t, y, x
-        id_fx.close()
         print('Done!')
     
         print('Reading record #'+str(jt)+' of '+cvy_in+' in '+cfy_in)
         if l3d: print('            => at level #'+str(jk)+' ('+cdepth+')!')
-        id_fy = Dataset(cfy_in)
         if not l_3d_field:
             YFLD  = id_fy.variables[cvy_in][jt,j1:j2,i1:i2] ; # t, y, x
         else:
             YFLD  = id_fy.variables[cvy_in][jt,jk,j1:j2,i1:i2] ; # t, y, x
-        id_fy.close()
         print('Done!')
     
     
@@ -747,3 +751,8 @@ for jt in range(jt0,Nt):
 
     else:
         print('\n Figure '+cfig+' already there!\n')
+
+
+id_fx.close()
+id_fy.close()
+
