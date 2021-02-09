@@ -468,6 +468,13 @@ def drown(X, mask, k_ew=-1, nb_max_inc=5, nb_smooth=5):
             maskv[idx_coast] = 1
 
         # Smoothing the what's been done on land:
+
+        n   = 2 ; # number of points frame to ignore in smoothing:
+        np1 =  n+1
+        nm1 =  n-1
+        nk1 = -n+1
+        nl1 = -n-1
+        
         if nb_smooth >= 1:
 
             dold[:,:] = Xtemp[:,:]
@@ -476,15 +483,18 @@ def drown(X, mask, k_ew=-1, nb_max_inc=5, nb_smooth=5):
 
                 xtmp[:,:] = Xtemp[:,:]
 
-                Xtemp[1:-1,1:-1] = 0.35*xtmp[1:-1,1:-1] + 0.65*0.25*( xtmp[1:-1,2:] + xtmp[2:,1:-1] + xtmp[1:-1,:-2] + xtmp[:-2,1:-1] )
+                Xtemp[n:-n,n:-n] = 0.35*xtmp[n:-n,n:-n] \
+                    + 0.65*0.25*( xtmp[n:-n,np1:nk1] + xtmp[np1:nk1,n:-n] + xtmp[n:-n,nm1:nl1] + xtmp[nm1:nl1,n:-n] )
 
                 if k_ew != -1:   # we can use east-west periodicity
-                    Xtemp[1:-1,0] = 0.35*xtmp[1:-1,0] + 0.65*0.25*( xtmp[1:-1,1] + xtmp[2:,1] + xtmp[1:-1,ni-1-k_ew] + xtmp[:-2,1] )
+                    Xtemp[n:-n,0] = 0.35*xtmp[n:-n,0] \
+                        + 0.65*0.25*( xtmp[n:-n,1] + xtmp[np1:nk1,1] + xtmp[n:-n,ni-1-k_ew] + xtmp[nm1:nl1,1] )
 
-                    Xtemp[1:-1,ni-1] = 0.35*xtmp[1:-1,ni-1] + 0.65*0.25*( xtmp[1:-1,k_ew] + xtmp[2:,ni-1] + xtmp[1:-1,ni-2] + xtmp[:-2,ni-1] )
+                    Xtemp[n:-n,ni-1] = 0.35*xtmp[n:-n,ni-1] \
+                        + 0.65*0.25*( xtmp[n:-n,k_ew] + xtmp[np1:nk1,ni-1] + xtmp[n:-n,ni-2] + xtmp[nm1:nl1,ni-1] )
 
 
-            Xtemp[1:-1,:] = mask[1:-1,:]*dold[1:-1,:] - (mask[1:-1,:]-1)*Xtemp[1:-1,:]
+            Xtemp[n:-n,:] = mask[n:-n,:]*dold[n:-n,:] - (mask[n:-n,:]-1)*Xtemp[n:-n,:]
 
 
         del maskv, dold, mask_coast, xtmp
