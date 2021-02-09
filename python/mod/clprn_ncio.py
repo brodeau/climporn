@@ -484,7 +484,8 @@ def dump_2d_field( cf_out, XFLD, xlon=[], xlat=[], name='field', unit='', long_n
 
 
 
-def dump_2d_multi_field(cf_out, XFLD, vnames, vndim=[], xlon=[], xlat=[], vtime=[], clon='nav_lon', clat='nav_lat'):
+def dump_2d_multi_field( cf_out, XFLD, vnames, vndim=[], xlon=[], xlat=[], vtime=[], \
+                         clon='nav_lon', clat='nav_lat', rfillval=None ):
     
     if len(vtime)>0:
         l_add_time = True
@@ -545,13 +546,13 @@ def dump_2d_multi_field(cf_out, XFLD, vnames, vndim=[], xlon=[], xlat=[], vtime=
     #id_fld = nmp.zeros(nbfld, dtype=int)
     for jv in range(nbfld):
         if (not l_add_time) or (vnbdim[jv]==2):
-            id_fld  = f_out.createVariable(vnames[jv] ,'f8',(cnm_dim_y,cnm_dim_x,), zlib=True, complevel=5)
+            id_fld  = f_out.createVariable(vnames[jv] ,'f8',(cnm_dim_y,cnm_dim_x,), fill_value=rfillval, zlib=True, complevel=5)
             if l_add_time:
                 id_fld[:,:] = XFLD[jv,0,:,:]
             else:
                 id_fld[:,:] = XFLD[jv,:,:]
         else:
-            id_fld  = f_out.createVariable(vnames[jv] ,'f8',('time_counter',cnm_dim_y,cnm_dim_x,), zlib=True, complevel=5)
+            id_fld  = f_out.createVariable(vnames[jv] ,'f8',('time_counter',cnm_dim_y,cnm_dim_x,), fill_value=rfillval, zlib=True, complevel=5)
             id_fld[:,:,:] = XFLD[jv,:,:,:]
             
     f_out.about = 'Diagnostics created with Climporn (https://github.com/brodeau/climporn)'
