@@ -485,7 +485,7 @@ def dump_2d_field( cf_out, XFLD, xlon=[], xlat=[], name='field', unit='', long_n
 
 
 def dump_2d_multi_field( cf_out, XFLD, vnames, vndim=[], xlon=[], xlat=[], vtime=[], \
-                         clon='nav_lon', clat='nav_lat', rfillval=None ):
+                         clon='nav_lon', clat='nav_lat', dim_nm=['lat','lon'], rfillval=None ):
     
     if len(vtime)>0:
         l_add_time = True
@@ -513,8 +513,8 @@ def dump_2d_multi_field( cf_out, XFLD, vnames, vndim=[], xlon=[], xlat=[], vtime
 
 
     l_coord_2d = False
-    cnm_dim_x = 'lon'
-    cnm_dim_y = 'lat'
+    cnm_dim_y = dim_nm[0]
+    cnm_dim_x = dim_nm[1]
     
     if (xlon != []) and (xlat != []):
         if (xlon.shape == (nj,ni)) and (xlon.shape == xlat.shape):
@@ -565,9 +565,8 @@ def dump_2d_multi_field( cf_out, XFLD, vnames, vndim=[], xlon=[], xlat=[], vtime
 
 
 
-
-
-def dump_3d_multi_field(cf_out, XFLD, vnames, vndim=[], xlon=[], xlat=[], vdepth=[], vtime=[], clon='nav_lon', clat='nav_lat'):
+def dump_3d_multi_field( cf_out, XFLD, vnames, vndim=[], xlon=[], xlat=[], vdepth=[], vtime=[], \
+                         clon='nav_lon', clat='nav_lat', dim_nm=['depth','lat','lon'] ):
     
     if len(vtime)>0:
         l_add_time = True
@@ -592,9 +591,10 @@ def dump_3d_multi_field(cf_out, XFLD, vnames, vndim=[], xlon=[], xlat=[], vdepth
 
 
     l_coord_2d = False
-    cnm_dim_x = 'lon'
-    cnm_dim_y = 'lat'
-    cnm_dim_z = 'depth'
+    cnm_dim_z = dim_nm[0]
+    cnm_dim_y = dim_nm[2]
+    cnm_dim_x = dim_nm[3]
+
     
     if (xlon != []) and (xlat != []):
         if (xlon.shape == (nj,ni)) and (xlon.shape == xlat.shape):
