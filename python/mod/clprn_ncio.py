@@ -449,7 +449,7 @@ def write_2d_mask( cf_out, MSK, xlon=[], xlat=[], name='mask', clon='nav_lon', c
 
 
 def dump_2d_field( cf_out, XFLD, xlon=[], xlat=[], name='field', unit='', long_name='', mask=[], clon='nav_lon', clat='nav_lat' ):
-
+    #
     (nj,ni) = nmp.shape(XFLD)
 
     f_out = Dataset(cf_out, 'w', format='NETCDF4')
@@ -470,10 +470,14 @@ def dump_2d_field( cf_out, XFLD, xlon=[], xlat=[], name='field', unit='', long_n
     if unit      != '': id_fld.units     = unit
 
     if mask != []:
+        xtmp = nmp.zeros((nj,ni))
+        xtmp[:,:] = XFLD[:,:]
         idx_land = nmp.where( mask < 0.5)
-        XFLD[idx_land] = nmp.nan
-    
-    id_fld[:,:] = XFLD[:,:]
+        xtmp[idx_land] = nmp.nan
+        id_fld[:,:] = xtmp[:,:]
+        del xtmp
+    else:
+        id_fld[:,:] = XFLD[:,:]
 
     f_out.about = 'Diagnostics created with Climporn (https://github.com/brodeau/climporn)'
     f_out.close()
