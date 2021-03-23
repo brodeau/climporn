@@ -69,7 +69,9 @@ def long_to_m180_p180(xx):
     ## Forces longitude to be in the -180:180 frame...
     ## xx: longitude
     xx   = xx % 360.
-    rlon = copysign(1.,180.-xx)*min(xx, abs(xx-360.)) ;
+    rsign = 1.
+    if 180.-xx<0: rsign = -1.
+    rlon = rsign*min(xx, abs(xx-360.)) ;
     return rlon
 #
 def long_to_m180_p180_vct(xx):

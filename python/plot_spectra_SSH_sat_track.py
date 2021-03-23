@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- Mode: Python; coding: utf-8; indent-tabs-mode: nil; tab-width: 4 -*-
 
 #    L. Brodeau, 2018
@@ -14,7 +14,6 @@ from netCDF4 import Dataset
 import matplotlib as mpl
 mpl.use('Agg')
 import matplotlib.pyplot as plt
-from string import find
 import warnings
 warnings.filterwarnings("ignore")
 import time
@@ -22,15 +21,12 @@ import time
 import clprn_plot as bp
 import clprn_tool as bt
 
-reload(sys)
-sys.setdefaultencoding('utf8')
-
 l_tapper      = True ; # apply tappering !
 l_detrend_lin = True ; # apply a linear detrending on data segment before computing spectrum...
 l_rm_i_noise  = False
 
 # Plots for each segment (only to debug!)
-l_plot_rawd = False
+l_plot_rawd = True
 l_plot_maps = False
 l_plot_trck = False ; # plots individual model and satellite tracks...
 l_plot_spct = False
@@ -49,7 +45,8 @@ rcut_by_dist = 7.8 # same as rcut_by_time, but in terms of distance (in km) betw
 #                  #   => like if the satellite undergone an extremely short huge acceleration !!!
 #                  #   => ex: 3rd of August 2016 around 07:53:43 !!!
 
-nvalid_seg = 120  # specify the minimum number of values a segment should contain to be considered and used!
+#nlen_valid_seg = 120  # specify the minimum number of values a segment should contain to be considered and used!
+nlen_valid_seg = 18  # specify the minimum number of values a segment should contain to be considered and used!
 
 r_max_amp_ssh = 1.5 # in meters
 
@@ -113,13 +110,13 @@ cfs  = path.basename(cf_in)
 cseas = ''
 if ('JFM' in cfs) and not('JAS' in cfs) : cseas = 'JFM'; vseas = ['01','02','03']
 if ('JAS' in cfs) and not('JFM' in cfs) : cseas = 'JAS'; vseas = ['07','08','09']
-print '\n *** Season: '+cseas+'\n'
+print('\n *** Season: '+cseas+'\n')
 
 
 
 cextra = ''
 
-print ' *** Opening file '+cf_in+'!'
+print(' *** Opening file '+cf_in+'!')
 id_in    = Dataset(cf_in)
 vt_epoch = id_in.variables['time'][:]
 vmodel   = id_in.variables[cv_mod][:]
@@ -128,7 +125,7 @@ vlon     = id_in.variables['longitude'][:]
 vlat     = id_in.variables['latitude'][:]
 vdist    = id_in.variables['distance'][:]
 id_in.close()
-print "  => Everything read!\n"
+print("  => Everything read!\n")
 
 
 # Debug: wave-signal with a wave-length of 150 km and 25 km (vdist in km)
@@ -150,7 +147,7 @@ cyear = time.strftime("%Y", time.localtime(vt_epoch[2]))
 
 
 
-ii=nbr/300
+ii=nbr//300
 ib=max(ii-ii%10,1)
 xticks_d=30.*ib
 
@@ -183,10 +180,13 @@ vmask = vmodel.mask
 
 (idx_ok,) = nmp.where(vmask==False) # indexes with valid values!
 
+#print(vmodel[:])
+#print(idx_ok)
+#sys.exit(0)
 
 nbr_v = len(idx_ok)
 
-print ' *** '+str(nbr_v)+' valid points out of '+str(nbr)+' !'
+print(' *** '+str(nbr_v)+' valid points out of '+str(nbr)+' !')
 
 # Will extract the N valid data segments:
 nb_seg=0
@@ -198,42 +198,47 @@ while jr < nbr:
     # Ignoring masked values and zeros...
     if (not vmask[jr]) and (vmodel[jr]!=0.0) and (vmodel[jr]<100.):
         nb_seg = nb_seg + 1
-        print '\n --- found seg #'+str(nb_seg)+' !'
+        print('\n --- found seg #'+str(nb_seg)+' !')
         idx_seg_start.append(jr)
-        print ' => starting at jt='+str(jr)
+        print(' => starting at jt='+str(jr))
         #while (not vmask[jr+1]) and (vmodel[jr+1]!=0.0) and (vt_epoch[jr+1]-vt_epoch[jr] < rcut_by_time) and (vmodel[jr]<100.) :
         while (not vmask[jr+1]) and (vmodel[jr+1]!=0.0) and (vt_epoch[jr+1]-vt_epoch[jr] < rcut_by_time) and (vdist[jr+1]-vdist[jr] < rcut_by_dist) and (vmodel[jr]<100.) :
             jr = jr+1
             if jr==nbr-1: break
         idx_seg_stop.append(jr)
-        print ' => and stoping at jt='+str(jr)
+        print(' => and stoping at jt='+str(jr))
     jr = jr+1
 
-if len(idx_seg_start) != nb_seg: print ' ERROR #1!'; sys.exit(1)
+if len(idx_seg_start) != nb_seg: print(' ERROR #1!'); sys.exit(1)
 
 
 
 # Maximum number of poins in the segments:
 
 isd = nmp.asarray(idx_seg_stop[:]) - nmp.asarray(idx_seg_start[:]) + 1
-print '\n lengths =>', isd[:]
+print('\n lengths =>', isd[:])
 nbp_max = max(isd)
-print '\n *** Longest segments has nbp_max='+str(nbp_max)+' points!\n'
+print('\n *** Longest segments has nbp_max='+str(nbp_max)+' points!\n')
 
-# Treat only segments with at least nvalid_seg points:
-(vtreat,) = nmp.where(isd >= nvalid_seg)
+# Treat only segments with at least nlen_valid_seg points:
+(vtreat,) = nmp.where(isd >= nlen_valid_seg)
 nb_v_seg = len(vtreat)
+
+if nb_v_seg==0:
+    print('PROBLEM: could not find any valid segment with nlen_valid_seg = '+str(nlen_valid_seg)+' !')
+    sys.exit(0)        
+
 rN = nmp.mean(isd[vtreat])
-print '\nMean segment-length for the '+str(nb_v_seg)+' segments with at least '+str(nvalid_seg)+' points:', round(rN,1)
+print('\nMean segment-length for the '+str(nb_v_seg)+' segments with at least '+str(nlen_valid_seg)+' points:', round(rN,1))
 
 Nsp = int(rN/10.)*10
-print '  ==> Nsp = '+str(Nsp)
+print('  ==> Nsp = '+str(Nsp))
 (vtreat,) = nmp.where(isd >= Nsp)
 nb_v_seg = len(vtreat)
-print ' ==> will use '+str(nb_v_seg)+' segments with a fixed length of '+str(Nsp)+' point!\n'
+print(' ==> will use '+str(nb_v_seg)+' segments with a fixed length of '+str(Nsp)+' point!\n')
 
 
-#print ' *** will treat '+str(nb_v_seg)+' segments out of '+str(nb_seg)+' (need at least '+str(nvalid_seg)+' points)'
+#print(' *** will treat '+str(nb_v_seg)+' segments out of '+str(nb_seg)+' (need at least '+str(nlen_valid_seg)+' points)')
 
 
 x_all_spectra_s = nmp.zeros((nb_v_seg,Nsp)) # array to store all spectra in...
@@ -259,24 +264,24 @@ for js in vtreat:
     nbp = it2-it1+1    
     cseg = '%2.2i'%(js+1)
 
-    print '\n\n ###################################'
-    print '  *** Seg #'+cseg+' of '+cn_box+':'
-    print '  ***   => originally '+str(nbp)+' points in this segment (from '+str(it1)+' to '+str(it2)+')'
+    print('\n\n ###################################')
+    print('  *** Seg #'+cseg+' of '+cn_box+':')
+    print('  ***   => originally '+str(nbp)+' points in this segment (from '+str(it1)+' to '+str(it2)+')')
 
     # nb of points in excess / Nsp:
     nxcs = nbp - Nsp
-    jmp_strt = nxcs/2
-    jmp_stop = nxcs/2 + nxcs%2
+    jmp_strt = nxcs//2
+    jmp_stop = nxcs//2 + nxcs%2
     it1 = it1+jmp_strt
     it2 = it2-jmp_stop
-    print '  ***   => we only retain '+str(it2-it1+1)+' points from '+str(it1)+' to '+str(it2)+'!'
+    print('  ***   => we only retain '+str(it2-it1+1)+' points from '+str(it1)+' to '+str(it2)+'!')
     
     # Checking the typical distance (in km) between two measures:
     dmean = nmp.mean(vdist[it1+1:it2+1]-vdist[it1:it2])
-    print '\n Mean distance between two consecutive points is '+str(dmean)+' km\n'
+    print('\n Mean distance between two consecutive points is '+str(dmean)+' km\n')
     # Sample spacing in [km] (inverse of the sampling rate):
     rdist_sample = round(dmean,3)
-    print ' => will use a spatial sample spacing of '+str(rdist_sample)+' km\n'
+    print(' => will use a spatial sample spacing of '+str(rdist_sample)+' km\n')
 
     if l_plot_trck:
         # Create Matplotlib time array:
@@ -285,7 +290,7 @@ for js in vtreat:
 
     # First centering the two time-series about 0, and tappering at extremities (filling with zeros)
     vs_s = nmp.zeros(Nsp) ; vs_m = nmp.zeros(Nsp)
-    print '             (length = '+str(len(vsatel[it1:it2+1]))+' / '+str(Nsp)+')'
+    print('             (length = '+str(len(vsatel[it1:it2+1]))+' / '+str(Nsp)+')')
     
     vs_s[:] = vsatel[it1:it2+1]
     vs_m[:] = vmodel[it1:it2+1]
@@ -338,10 +343,10 @@ for js in vtreat:
 
 
     if l_plot_trck:
-        cfigure = dir_figs+'/'+cn_box+'_'+cseas+'_'+cn_mod+'--'+cn_sat+'_seg'+cseg+'_track'+cxtr_noise+'.'+fig_ext
-        ii=Nsp/300
+        cfigure = dir_figs+'/'+cn_box+'_'+cseas+'_'+cn_mod+'--'+cn_sat+'_seg'+cseg+'_track.'+fig_ext
+        ii=Nsp//300
         ib=max(ii-ii%10,1)
-        xticks_d=30.*ib
+        xticks_d=30*ib
         # Finding appropriate amplitude as a multiple of 0.25:    
         rmult = 0.2
         rmax    = max( nmp.max(vs_m[:]) , nmp.max(vs_s[:])  )
@@ -401,7 +406,7 @@ cpout   = dir_figs+'/'+cn_box+'_MEAN_'+cn_mod+'--'+cn_sat+'__'+cseas+cextra+'___
 cfigure = cpout+'.'+fig_ext
 
 
-print ' *** cn_sat =', cn_sat    
+print(' *** cn_sat =', cn_sat)
 
 ii = bp.plot("pow_spectrum_ssh")(vk[idx], vps_mod, clab1=clabel_mod, clr1=clr_mod, lw1=5, \
                                  cfig_name=cfigure, cinfo=cinfrm, logo_on=False, \
