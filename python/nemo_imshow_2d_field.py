@@ -184,6 +184,16 @@ elif CNEMO == 'GulfS':
     l_show_cb = False ; l_show_nm = False
     pt_sz_track = 3
 
+elif CNEMO == 'Faroe':
+    i1 = 0 ; j1 = 0 ; i2 = 421 ; j2 = 351 ; rfact_zoom = 1. ; vcb = [0.15, 0.96, 0.8, 0.02] ; font_rat = 0.1
+    l_show_cb = False ; l_show_nm = False
+    pt_sz_track = 3
+
+elif CNEMO == 'ORCA1':
+    i1 = 0 ; j1 = 0 ; i2 = 362 ; j2 = 292 ; rfact_zoom = 2.5 ; vcb = [0.15, 0.96, 0.8, 0.02] ; font_rat = 0.1
+    l_show_cb = False ; l_show_nm = False
+    pt_sz_track = 3
+
 elif CNEMO == 'CALEDO10':
     i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 1. ; vcb = [0.2, 0.06, 0.6, 0.03] ; font_rat = 1.5/rfact_zoom
     x_cnf = 900. ; y_cnf = 1350. ; # where to put label of conf on Figure...
@@ -447,6 +457,10 @@ else:
 #if l_scientific_mode: rextra_height = 1.12
 #fig = plt.figure(num = 1, figsize=(rh,rh*yx_ratio*rextra_height), dpi=None, facecolor='w', edgecolor='0.5')
 
+
+print('figsize =', (rh,rh*yx_ratio) )
+#sys.exit(0)
+
 fig = plt.figure(num = 1, figsize=(rh,rh*yx_ratio), dpi=None, facecolor='k', edgecolor='k')
 
 if l_scientific_mode:
@@ -481,12 +495,12 @@ print('  *** Shape of field and mask => ', nmp.shape(XFLD))
 
 if cv_in in l_bathy_var and ibath==-1: XFLD = ibath*XFLD
 
+l_add_true_filled = False
 
 if cfield == 'Bathymetry':
     (idy_nan,idx_nan) = nmp.where( nmp.isnan(XFLD) )
     #
     # LSM with different masking for true lsm and filled lsm...
-    l_add_true_filled = False
     cf_mask_lbc = dir_conf+'/lsm_LBC_'+CNEMO+'.nc'
     if path.exists(cf_mask_lbc):
         print('\n *** '+cf_mask_lbc+' found !!!')
