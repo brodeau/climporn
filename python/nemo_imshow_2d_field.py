@@ -190,7 +190,7 @@ elif CNEMO == 'Faroe':
     pt_sz_track = 3
 
 elif CNEMO == 'ORCA1':
-    i1 = 0 ; j1 = 0 ; i2 = 362 ; j2 = 292 ; rfact_zoom = 2.5 ; vcb = [0.15, 0.96, 0.8, 0.02] ; font_rat = 0.1
+    i1 = 0 ; j1 = 0 ; i2 = 362 ; j2 = 292 ; rfact_zoom = 1.8 ; vcb = [0.15, 0.96, 0.8, 0.02] ; font_rat = 0.1
     l_show_cb = False ; l_show_nm = False
     pt_sz_track = 3
 

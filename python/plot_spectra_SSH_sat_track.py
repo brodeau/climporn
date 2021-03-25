@@ -149,7 +149,7 @@ cyear = time.strftime("%Y", time.localtime(vt_epoch[2]))
 
 ii=nbr//300
 ib=max(ii-ii%10,1)
-xticks_d=30.*ib
+xticks_d=30*ib
 
 
 if l_plot_rawd:
