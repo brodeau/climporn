@@ -222,6 +222,7 @@ l_log_field = False
 l_pow_field = False
 cextend='both'
 l_hide_cb_ticks = False
+tmin=0. ; tmax=1. ; df=0.01
 
 print(' cv_in = '+cv_in)
 
@@ -270,8 +271,7 @@ elif cv_in == 'somxl010':
 
 elif cv_in == 'track':
     cfield = 'TRACK'
-    tmin=140. ;  tmax=24800.   ;  df = 1.
-    cpal_fld = 'viridis'    
+    cpal_fld = 'nipy_spectral'
     cunit = r'SST ($^{\circ}$C)'
     cb_jump = 1
     fig_type='svg'
@@ -521,10 +521,16 @@ if cfield == 'Bathymetry':
 print('Ploting')
 
 if cv_in == 'track':
+    #lilo        
     indx = nmp.where( XFLD > 0 )
     (idy,idx) = indx
+    
+    tmin=nmp.amin(XFLD[indx]) ;  tmax=nmp.amax(XFLD[indx])
+    norm_fld = colors.Normalize(vmin = tmin, vmax = tmax, clip = False)
+
     cf = plt.scatter(idx, idy, c=XFLD[indx], cmap = pal_fld, norm = norm_fld, alpha=0.5, marker='.', s=pt_sz_track )
-    #
+
+
 else:
     cf = plt.imshow(XFLD[:,:], cmap = pal_fld, norm = norm_fld, interpolation='nearest' ) #, interpolation='none')
     if cfield == 'Bathymetry':
