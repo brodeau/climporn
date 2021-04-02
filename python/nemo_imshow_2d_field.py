@@ -65,9 +65,9 @@ if narg ==6 :
 l_bathy_var = [ 'Bathymetry', 'elevation' ]
     
 
-if not l_read_lsm and ( not cv_in in l_bathy_var):
-    print("It's only for bathymetric fields that you can skip providing the mesh_mask file!")
-    sys.exit(0)
+#if not l_read_lsm and ( not cv_in in l_bathy_var):
+#    print("It's only for bathymetric fields that you can skip providing the mesh_mask file!")
+#    sys.exit(0)
 
 
 
@@ -363,10 +363,17 @@ elif cv_in in l_bathy_var:
     del XBATH
     print('      done.')
 
+elif cv_in == 'track':
+    bt.chck4f(cf_fld)
+    id_fld = Dataset(cf_fld)
+    xtmp = id_fld.variables[cv_in][:,:]
+    (Nj,Ni) = xtmp.shape
+    XMSK = nmp.zeros((Nj,Ni), dtype=nmp.int) ; XMSK[:,:] = 1
+    XMSK[nmp.where(xtmp==-100.)] = 0
+    del xtmp
     
 else:
     print('PROBLEM #2'); sys.exit(0)
-
 
 print('\n According to "tmask" the shape of the domain is Ni, Nj =', Ni, Nj)
 
