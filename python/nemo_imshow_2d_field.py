@@ -18,15 +18,7 @@ mpl.use('Agg')
 import matplotlib.pyplot as plt
 import matplotlib.colors as colors
 
-import warnings
-warnings.filterwarnings("ignore")
-
-import clprn_colmap as bcm
-
-import clprn_tool as bt
-import clprn_ncio as cn
-
-
+import climporn as cp
 
 bathy_max = 5000. # m
 
@@ -293,7 +285,7 @@ else:
 
 
 # Time record stuff...
-bt.chck4f(cf_fld)
+cp.chck4f(cf_fld)
 id_fld = Dataset(cf_fld)
 list_var = id_fld.variables.keys()
 if 'time_counter' in list_var:    
@@ -311,7 +303,7 @@ id_fld.close()
 ibath=1
 
 if l_read_lsm:
-    bt.chck4f(cf_lsm)
+    cp.chck4f(cf_lsm)
     print('\n *** Reading "tmask" in meshmask file...')
     id_lsm = Dataset(cf_lsm)
     nb_dim = len(id_lsm.variables['tmask'].dimensions)
@@ -329,7 +321,7 @@ if l_read_lsm:
     print('      done.')
 
 elif cv_in in l_bathy_var:
-    bt.chck4f(cf_fld)
+    cp.chck4f(cf_fld)
     print('\n *** Will build mask from "Bathymetry"...')
     id_fld = Dataset(cf_fld)
     list_dim = list(id_fld.dimensions.keys()) ; #lolopy3
@@ -369,7 +361,7 @@ elif cv_in in l_bathy_var:
     print('      done.')
 
 elif cv_in == 'track':
-    bt.chck4f(cf_fld)
+    cp.chck4f(cf_fld)
     id_fld = Dataset(cf_fld)
     xtmp = id_fld.variables[cv_in][:,:]
     (Nj,Ni) = xtmp.shape
@@ -389,7 +381,7 @@ if l_add_topo_land:
     cf_topo_land = dir_conf+'/'+ftopo
     print('\n We are going to show topography:\n'+'  ==> '+cf_topo_land)
 
-    bt.chck4f(cf_topo_land)
+    cp.chck4f(cf_topo_land)
     id_top = Dataset(cf_topo_land)
     print(' *** Reading "z" into:\n'+cf_topo_land)
     xtopo = id_top.variables['z'][0,j1:j2,i1:i2]
@@ -449,7 +441,7 @@ cfont_ttl = { 'fontname':'Open Sans', 'fontweight':'medium', 'fontsize':int(25.*
 
 
 # Colormaps for fields:
-pal_fld = bcm.chose_colmap(cpal_fld)
+pal_fld = cp.chose_colmap(cpal_fld)
 if l_log_field:
     norm_fld = colors.LogNorm(  vmin = tmin, vmax = tmax, clip = False)
 if l_pow_field:
@@ -457,10 +449,10 @@ if l_pow_field:
 else:
     norm_fld = colors.Normalize(vmin = tmin, vmax = tmax, clip = False)
 
-pal_lsm = bcm.chose_colmap('land_dark')
+pal_lsm = cp.chose_colmap('land_dark')
 norm_lsm = colors.Normalize(vmin = 0., vmax = 1., clip = False)
 
-pal_filled = bcm.chose_colmap('gray_r')
+pal_filled = cp.chose_colmap('gray_r')
 norm_filled = colors.Normalize(vmin = 0., vmax = 0.1, clip = False)
 
 
@@ -580,10 +572,10 @@ print('Done!')
 
 if l_add_topo_land:
     print('Ploting topography over continents...')
-    #cn.dump_2d_field( 'xtopo.nc', xtopo ); #, xlon=[], xlat=[], name='field', unit='', long_name='', mask=[] )
-    #cn.dump_2d_field( 'xmsk.nc', XMSK ); #, xlon=[], xlat=[], name='field', unit='', long_name='', mask=[] )
+    #cp.dump_2d_field( 'xtopo.nc', xtopo ); #, xlon=[], xlat=[], name='field', unit='', long_name='', mask=[] )
+    #cp.dump_2d_field( 'xmsk.nc', XMSK ); #, xlon=[], xlat=[], name='field', unit='', long_name='', mask=[] )
     xtopo = nmp.log10(xtopo+rof_log)
-    pal_topo = bcm.chose_colmap('gray_r')
+    pal_topo = cp.chose_colmap('gray_r')
     norm_topo = colors.Normalize(vmin = nmp.log10(-100. + rof_log), vmax = nmp.log10(6000. + rof_log), clip = False)
     cm = plt.imshow(xtopo, cmap=pal_topo, norm=norm_topo, interpolation='none')
     plt.contour(XMSK, [0.9], colors='k', linewidths=0.5)

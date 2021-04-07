@@ -29,12 +29,7 @@ import datetime
 
 from re import split
 
-import clprn_colmap as bcm
-import clprn_tool as bt
-import clprn_ncio as bnc
-
-# ClimPorn:
-import nemo_hboxes as nhb
+import climporn as cp
 
 
 
@@ -150,7 +145,7 @@ if CNEMO == 'none':
 
 #---------------------------------------------------------------
 
-nemo_box = nhb.nemo_hbox(CNEMO,CBOX)
+nemo_box = cp.nemo_hbox(CNEMO,CBOX)
 
 (Ni0,Nj0) = nemo_box.size()
 print(' '+CNEMO+': Ni0,Nj0 => ', Ni0,Nj0)
@@ -317,9 +312,9 @@ l_3d_field = False
 
 
 
-bt.chck4f(cf_mm)
-bt.chck4f(cfx_in)
-bt.chck4f(cfy_in)
+cp.chck4f(cf_mm)
+cp.chck4f(cfx_in)
+cp.chck4f(cfy_in)
 
 l_notime=False
 id_f = Dataset(cfx_in)
@@ -393,7 +388,7 @@ idx_land = nmp.where( XMSK <  0.5 )
 XLSM = nmp.zeros((nj,ni)) ; # will define real continents not NEMO mask...
 
 if l_add_topo_land:
-    bt.chck4f(cf_topo_land)
+    cp.chck4f(cf_topo_land)
     id_top = Dataset(cf_topo_land)
     print(' *** Reading "z" into:\n'+cf_topo_land)
     xtopo = id_top.variables['z'][0,j1:j2,i1:i2]
@@ -401,7 +396,7 @@ if l_add_topo_land:
     if nmp.shape(xtopo) != (nj,ni):
         print('ERROR: topo and mask do not agree in shape!'); sys.exit(0)
     xtopo = xtopo*(1. - XMSK)
-    #bnc.dump_2d_field('topo_'+CBOX+'.nc', xtopo, name='z')    
+    #cp.dump_2d_field('topo_'+CBOX+'.nc', xtopo, name='z')    
     if l3d: xtopo = xtopo + rof_dpt
     xtopo[nmp.where( XMSK > 0.01)] = nmp.nan
     if nemo_box.l_fill_holes_k and not l3d:
@@ -428,7 +423,7 @@ cfont_titl =  { 'fontname':'Open Sans', 'fontweight':'light', 'fontsize':int(30.
 
 
 # Colormaps for fields:
-pal_fld = bcm.chose_colmap(cpal_fld)
+pal_fld = cp.chose_colmap(cpal_fld)
 if   l_log_field:
     norm_fld = colors.LogNorm(                   vmin=tmin, vmax=tmax, clip=False)
 elif l_pow_field:
@@ -440,11 +435,11 @@ else:
 if l_show_lsm or l_add_topo_land:
     if l_add_topo_land:
         xtopo = nmp.log10(xtopo+rof_log)
-        pal_lsm = bcm.chose_colmap('gray_r')
+        pal_lsm = cp.chose_colmap('gray_r')
         #norm_lsm = colors.Normalize(vmin = nmp.log10(min(-100.+rof_dpt/3.,0.) + rof_log), vmax = nmp.log10(4000.+rof_dpt + rof_log), clip = False)
         norm_lsm = colors.Normalize(vmin = nmp.log10(-100. + rof_log), vmax = nmp.log10(4000.+rof_dpt + rof_log), clip = False)
     else:
-        pal_lsm = bcm.chose_colmap('land_dark')
+        pal_lsm = cp.chose_colmap('land_dark')
         norm_lsm = colors.Normalize(vmin = 0., vmax = 1., clip = False)
 
 cyr0=csd0[0:4]
@@ -643,7 +638,7 @@ for jt in range(jt0,Nt):
         if nemo_box.c_imshow_interp == 'none':
             Xplot[idx_land] = nmp.nan
         else:
-            bt.drown(Xplot, XMSK, k_ew=-1, nb_max_inc=10, nb_smooth=10)
+            cp.drown(Xplot, XMSK, k_ew=-1, nb_max_inc=10, nb_smooth=10)
     
         if l_save_nc:
             if l3d:
@@ -651,7 +646,7 @@ for jt in range(jt0,Nt):
             else:
                 cf_out = 'nc/'+CWHAT+'_NEMO_'+CNEMO+'-'+CRUN+'_'+CBOX+'_'+cdate+'_'+cpal_fld+'.nc'
             print(' Saving in '+cf_out)
-            bnc.dump_2d_field(cf_out, Xplot, xlon=Xlon, xlat=Xlat, name=CWHAT)
+            cp.dump_2d_field(cf_out, Xplot, xlon=Xlon, xlat=Xlat, name=CWHAT)
             print('')
     
     

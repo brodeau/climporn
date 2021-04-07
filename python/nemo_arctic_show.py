@@ -31,9 +31,7 @@ from re import split
 import warnings
 warnings.filterwarnings("ignore")
 
-import clprn_colmap as bcm
-import clprn_tool as bt
-import clprn_ncio as bnc
+import climporn as cp
 
 ldrown = True ; #lolo
 l_add_topo_land = False
@@ -237,7 +235,7 @@ else:
     sys.exit(0)
     
 
-bt.chck4f(cf_mm)
+cp.chck4f(cf_mm)
 
 
 if not path.exists("figs"): mkdir("figs")
@@ -247,7 +245,7 @@ if not path.exists(cdir_figs): mkdir(cdir_figs)
 
 
 l_notime=False
-bt.chck4f(cf_in)
+cp.chck4f(cf_in)
 id_in = Dataset(cf_in)
 list_var = id_in.variables.keys()
 if 'time_counter' in list_var:
@@ -335,14 +333,14 @@ else:
 
 
 if rexp_ctrl > 0.:
-    pal_fld = bcm.chose_colmap(cpal_fld, exp_ctrl=rexp_ctrl)
+    pal_fld = cp.chose_colmap(cpal_fld, exp_ctrl=rexp_ctrl)
 else:
-    pal_fld = bcm.chose_colmap(cpal_fld)
+    pal_fld = cp.chose_colmap(cpal_fld)
 
 nrm_fld = colors.Normalize(vmin=tmin, vmax=tmax, clip=False)
 
 if lshow_ice:
-    pal_ice = bcm.chose_colmap(cpal_ice) ; #lolo, exp_ctrl=1.5)
+    pal_ice = cp.chose_colmap(cpal_ice) ; #lolo, exp_ctrl=1.5)
     nrm_ice = colors.Normalize(vmin=rmin_ice, vmax=rmax_ice, clip = False)
 
 
@@ -409,8 +407,8 @@ for jt in range(jt0,Nt):
 
     if ldrown:
         print(' Drowning...')
-        if lshow_ice: bt.drown(XIFR, XMSK, k_ew=-1, nb_max_inc=10, nb_smooth=10)
-        bt.drown(XFLD, XMSK, k_ew=-1, nb_max_inc=10, nb_smooth=10)
+        if lshow_ice: cp.drown(XIFR, XMSK, k_ew=-1, nb_max_inc=10, nb_smooth=10)
+        cp.drown(XFLD, XMSK, k_ew=-1, nb_max_inc=10, nb_smooth=10)
 
     if lshow_ice: XFLD = nmp.ma.masked_where(XIFR >= 0.2, XFLD)
     XFLD = nmp.ma.masked_where(XMSK <= 0.1, XFLD)

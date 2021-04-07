@@ -1,10 +1,133 @@
 import numpy as nmp
 import sys
 
-from netCDF4 import Dataset
+from netCDF4 import Dataset, num2date
 
 from os import path
 from os import stat
+
+
+def ToEpochTime( vt, units, calendar ):
+    '''
+    # INPUT:
+    #   * vt: time vector provided as something like: "days since ..."
+    #   * units, calendar:
+    #
+    # OUTPUT:
+    #   * vet: time vector converted to UNIX epoch time,
+    #          aka "seconds since 1970-01-01 00:00:00"
+    #          => as FLOAT !! not INTEGER !!!
+    '''
+    cfrmt = '%Y-%m-%d %H:%M:%S'
+    #
+    lvect = not (nmp.shape(vt)==())
+    #
+    if lvect:
+        nt = len(vt)
+        t0 = vt[0]
+    else:
+        t0 = vt
+    print(' *** [ToEpochTime()]: original t0 as "'+units+'" => ', t0)
+    t0d = num2date( t0, units, calendar )
+    print(' *** [ToEpochTime()]: intitial date in datetime format => ', t0d)
+
+    # We need to round this to the nearest second, because our target format is Epoch time (seconds since 1970)
+    # and we want an integer!
+    rdec = t0d.microsecond*1.E-6
+    #print('LOLO: rmicros ', t0d.microsecond ) ; print('LOLO: rdec =', rdec)
+    # t0 as "float" UNIX time:
+    t0E = float( timegm( dtm.strptime( t0d.strftime(cfrmt) , cfrmt ).timetuple() ) + rdec )
+    #print(' *** [ToEpochTime()]: intitial date in "Epoch Time" => ', t0E)
+
+    if lvect:
+        # we are not going to convert the whole array but instead:
+        if   units[0:10] == 'days since':
+            vdt = (vt[1:] - vt[0])*86400.
+        elif units[0:11] == 'hours since':
+            vdt = (vt[1:] - vt[0])*3600.
+        elif units[0:13] == 'seconds since':
+            vdt =  vt[1:] - vt[0]
+        else:
+            MsgExit('[ToEpochTime()] => unknown time unit: '+units)
+        vet = nmp.zeros(nt)
+        vet[0]  = t0E
+        vet[1:] = t0E + vdt[:]
+        del vdt
+    else:
+        vet = t0E
+    #
+    return vet
+
+
+
+def GetTimeInfo( ncfile ):
+    '''
+    # Inspect time dimension
+    # Get number of time-records, first and last date
+    # Return them + dates as UNIX epoch time, aka "seconds since 1970-01-01 00:00:00" (float)
+    '''
+    if ldebug: print(' *** [GetTimeInfo()] Getting calendar/time info in '+ncfile+' ...')
+    id_f = Dataset(ncfile)
+    list_dim = id_f.dimensions.keys()
+    list_var = id_f.variables.keys()
+    for cd in [ 'time', 'time_counter', 'TIME', 'record', 't', 'none' ]:
+        if cd in list_dim: break
+    if cd == 'none': MsgExit('found no time-record dimension in file '+ncfile)
+    if ldebug: print('   => time/record dimension is "'+cd+'"')
+    nt = id_f.dimensions[cd].size
+    cv = cd ; # ASSUMING VAR == DIM !!! Is it bad???
+    if not cv in list_var: MsgExit('name of time variable is different than name of time dimension')
+    clndr = id_f.variables[cv]
+    dt1 = num2date( clndr[0], clndr.units, clndr.calendar ) ; dt2 = num2date( clndr[nt-1], clndr.units, clndr.calendar )
+    rt1 = ToEpochTime( clndr[0],    clndr.units, clndr.calendar )
+    rt2 = ToEpochTime( clndr[nt-1], clndr.units, clndr.calendar )    
+    id_f.close()
+    #
+    if ldebug: print('   => first and last time records: ',dt1,'--',dt2,' (UNIX epoch: ', rt1,'--',rt2,')\n')
+    #
+    return nt, (rt1,rt2)
+
+
+
+def GetTimeEpochVector( ncfile, kt1=0, kt2=0, isubsamp=1, lquiet=False ):
+    '''
+    # Get the time vector in the netCDF file, (from index kt1 to kt2, if these 2 are != 0!)
+    # returns it as:
+    # isubsamp: subsampling !!!
+    # lquiet: shut the f* up!
+    #  => ivt: time as UNIX epoch time, aka "seconds since 1970-01-01 00:00:00" (integer)
+    '''
+    ltalk = ( ldebug and not lquiet )
+    cv_t_test = [ 'time', 'time_counter', 'TIME', 'record', 't', 'none' ]
+    id_f = Dataset(ncfile)
+    list_var = id_f.variables.keys()
+    for cv in cv_t_test:
+        if cv in list_var:
+            clndr = id_f.variables[cv]
+            cunt  = clndr.units
+            ccal  = clndr.calendar
+            if ltalk: print(' *** [GetTimeEpochVector()] reading "'+cv+'" in '+ncfile+' and converting it to Epoch time...')
+            if kt1>0 and kt2>0:
+                if kt1>=kt2: MsgExit('mind the indices when calling GetTimeEpochVector()')
+                #vdate = num2date( clndr[kt1:kt2+1:isubsamp], clndr.units, clndr.calendar )
+                vdate = clndr[kt1:kt2+1:isubsamp]
+                cc = 'read...'
+            else:
+                #vdate = num2date( clndr[::isubsamp],         clndr.units, clndr.calendar )
+                vdate = clndr[::isubsamp]
+                cc = 'in TOTAL!'
+            break
+    id_f.close()
+    if cv == 'none': MsgExit('found no time-record variable in file '+ncfile+' (possible fix: "cv_t_test" in "GetTimeEpochVector()")')
+    #
+    # Create the Unix Epoch time version:
+    rvte = ToEpochTime( vdate, cunt, ccal )
+    #
+    if ltalk: print('   => '+str(len(rvte))+' records '+cc+'\n')
+    return rvte
+
+
+
 
 
 
@@ -653,3 +776,39 @@ def dump_3d_multi_field( cf_out, XFLD, vnames, vndim=[], xlon=[], xlat=[], vdept
 
 
 
+def SaveTimeSeries( ivt, xd, vvar, ncfile, time_units='unknown', vunits=[], vlnm=[], missing_val=-9999. ):
+    '''
+    #  * ivt: time vector of length Nt, unit: UNIX Epoch time            [integer]
+    #         => aka "seconds since 1970-01-01 00:00:00"
+    #  *  xd: 2D numpy array that contains Nf time series of length Nt   [real]
+    #          => hence of shape (Nf,Nt)
+    #  * vvar: vector of length Nf of the Nf variable names                         [string]
+    #  * vunits, vlnm: vectors of length Nf of the Nf variable units and long names [string]
+    #  * missing_val: value for missing values...                        [real]
+    '''
+    (Nf,Nt) = xd.shape
+    if len(ivt) != Nt: MsgExit('SaveTimeSeries() => disagreement in the number of records between "ivt" and "xd"')
+    if len(vvar)!= Nf: MsgExit('SaveTimeSeries() => disagreement in the number of fields between "vvar" and "xd"')
+    l_f_units = (nmp.shape(vunits)==(Nf,)) ; l_f_lnm = (nmp.shape(vlnm)==(Nf,))
+    #
+    print('\n *** About to write file "'+ncfile+'"...')
+    f_o = Dataset(ncfile, 'w', format='NETCDF4')
+    f_o.createDimension('time', None)
+    id_t = f_o.createVariable('time','f8',('time',))
+    id_t.calendar = 'gregorian' ; id_t.units = time_units
+    #
+    id_d = []
+    for jf in range(Nf):
+        id_d.append( f_o.createVariable(vvar[jf],'f4',('time',), fill_value=missing_val, zlib=True, complevel=5) )
+        if l_f_units: id_d[jf].units   = vunits[jf]
+        if l_f_lnm:   id_d[jf].long_name = vlnm[jf]
+    #
+    print('   ==> writing "time"')
+    id_t[:] = ivt.astype(nmp.float64)
+    for jf in range(Nf):
+        print('   ==> writing "'+vvar[jf]+'"')
+        id_d[jf][:] = xd[jf,:]
+    f_o.about = cabout_nc
+    f_o.close()
+    print(' *** "'+ncfile+'" successfully written!\n')
+    return 0

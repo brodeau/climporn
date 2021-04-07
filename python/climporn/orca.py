@@ -1,3 +1,11 @@
+#!/usr/bin/env python3
+# -*- Mode: Python; coding: utf-8; indent-tabs-mode: nil; tab-width: 4 -*-
+#
+#   ///// https://github.com/brodeau/climporn \\\\\
+#
+#       L. Brodeau, 2021
+#
+############################################################################
 
 import sys
 import numpy as nmp
@@ -30,11 +38,11 @@ def lon_reorg_orca(ZZ, Xlong, ilon_ext=0, v_jx_jump_p=170., v_jx_jump_m=-170.):
     # ====
     # ZZx     : re-organized array, mind the possibility of modified x dimension !
     #
-    import clprn_tool as bt
+    import climporn.utils as cpu
     #
     idim_lon = len(nmp.shape(Xlong))
     if idim_lon not in [ 1 , 2 ]:
-        print 'util_orca.lon_reorg_orca: ERROR => longitude array "Xlong" must be 1D or 2D !'; sys.exit(0)
+        print('util_orca.lon_reorg_orca: ERROR => longitude array "Xlong" must be 1D or 2D !'); sys.exit(0)
     #
     if idim_lon == 2: (nj,ni) = nmp.shape(Xlong)
     if idim_lon == 1:      ni = len(Xlong)
@@ -51,7 +59,7 @@ def lon_reorg_orca(ZZ, Xlong, ilon_ext=0, v_jx_jump_p=170., v_jx_jump_m=-170.):
             jx_jump = ji + 1
             lfound_jx_jump = True
         ji = ji + 1
-    print "  *** clprn_orca.lon_reorg_orca >> Longitude jump at ji = ", jx_jump
+    print('  *** clprn_orca.lon_reorg_orca >> Longitude jump at ji = ', jx_jump)
     #
     lfound_jx_zero = False
     ji=0
@@ -60,7 +68,7 @@ def lon_reorg_orca(ZZ, Xlong, ilon_ext=0, v_jx_jump_p=170., v_jx_jump_m=-170.):
             jx_zero = ji + 1
             lfound_jx_zero = True
         ji = ji + 1
-    print "  *** clprn_orca.lon_reorg_orca >> Longitude zero at ji = ", jx_zero
+    print('  *** clprn_orca.lon_reorg_orca >> Longitude zero at ji = ', jx_zero)
     #
     del vlon
     
@@ -69,7 +77,7 @@ def lon_reorg_orca(ZZ, Xlong, ilon_ext=0, v_jx_jump_p=170., v_jx_jump_m=-170.):
     ndim = len(vdim)
 
     if ndim < 1 or ndim > 4:
-        print 'util_orca.lon_reorg_orca: ERROR we only treat 1D, 2D, 3D or 4D arrays...'
+        print('util_orca.lon_reorg_orca: ERROR we only treat 1D, 2D, 3D or 4D arrays...')
 
     if ndim == 4:
         #
@@ -88,7 +96,7 @@ def lon_reorg_orca(ZZ, Xlong, ilon_ext=0, v_jx_jump_p=170., v_jx_jump_m=-170.):
     if ndim == 3:
         #
         [ nz , ny , nx ] = vdim ;     nx0 = nx - jx_oo
-        #print 'nx, ny, nz = ', nx, ny, nz
+        #print('nx, ny, nz = ', nx, ny, nz
         #
         ZZx  = nmp.zeros(nx0*ny*nz) ;  ZZx.shape = [nz, ny, nx0]
         ZZx_ext  = nmp.zeros((nx0+ilon_ext)*ny*nz) ;  ZZx_ext.shape = [nz, ny, (nx0+ilon_ext)]
@@ -104,7 +112,7 @@ def lon_reorg_orca(ZZ, Xlong, ilon_ext=0, v_jx_jump_p=170., v_jx_jump_m=-170.):
     if ndim == 2:
         #
         [ ny , nx ] = vdim ;     nx0 = nx - jx_oo
-        #print 'nx, ny = ', nx, ny
+        #print('nx, ny = ', nx, ny
         #
         ZZx  = nmp.zeros(nx0*ny) ;  ZZx.shape = [ny, nx0]
         ZZx_ext  = nmp.zeros((nx0+ilon_ext)*ny) ;  ZZx_ext.shape = [ny, (nx0+ilon_ext)]
@@ -120,19 +128,19 @@ def lon_reorg_orca(ZZ, Xlong, ilon_ext=0, v_jx_jump_p=170., v_jx_jump_m=-170.):
     if ndim == 1:
         #
         [ nx ] = vdim ;     nx0 = nx - jx_oo
-        #print 'nx = ', nx
+        #print('nx = ', nx
         #
         ZZx  = nmp.zeros(nx0) ;  ZZx.shape = [nx0]
         ZZx_ext  = nmp.zeros(nx0+ilon_ext) ;  ZZx_ext.shape = [nx0+ilon_ext]
         #
         for jx in range(jx_zero,nx):
             ZZx[jx-jx_zero] = ZZ[jx]
-            #print jx-jx_zero, 'prend', jx, '    ', vlon[jx]
+            #print(jx-jx_zero, 'prend', jx, '    ', vlon[jx]
             #
-        #print ''
+        #print(''
         for jx in range(jx_oo,jx_zero):
             ZZx[jx+(nx-jx_zero)-jx_oo] = ZZ[jx]
-            #print jx+(nx-jx_zero)-jx_oo, 'prend', jx, '    ', vlon[jx]
+            #print(jx+(nx-jx_zero)-jx_oo, 'prend', jx, '    ', vlon[jx]
         #
         if ilon_ext == 0: ZZx_ext[:] = ZZx[:]
         #iwa = nmp.where(vlon0 < 0.) ; vlon0[iwa] = vlon0[iwa] + 360.
@@ -140,7 +148,7 @@ def lon_reorg_orca(ZZ, Xlong, ilon_ext=0, v_jx_jump_p=170., v_jx_jump_m=-170.):
         #
         #
         # Now longitude extenstion:
-    if ilon_ext > 0: ZZx_ext = bt.extend_domain(ZZx, ilon_ext)
+    if ilon_ext > 0: ZZx_ext = cpu.extend_domain(ZZx, ilon_ext)
     del ZZx
 
     return ZZx_ext
@@ -158,7 +166,7 @@ def conf_exp(ccexp):
     #
     i = 0 ; conf = ''
     while i < len(ccexp) and ccexp[i] != '-' : conf = conf+ccexp[i]; i=i+1
-    #print 'conf =', conf, '\n'
+    #print('conf =', conf, '\n'
     return conf
 
 
@@ -174,10 +182,10 @@ def mean_3d(XD, LSM, XVOL):
     ( lt, lz, ly, lx ) = nmp.shape(XD)
 
     if nmp.shape(LSM) != ( lz, ly, lx ):
-        print 'ERROR: mean_3d.clprn_orca.py => XD and LSM do not agree in shape!'
+        print('ERROR: mean_3d.clprn_orca.py => XD and LSM do not agree in shape!')
         sys.exit(0)
     if nmp.shape(XVOL) != ( lz, ly, lx ):
-        print 'ERROR: mean_3d.clprn_orca.py => XD and XVOL do not agree in shape!'
+        print('ERROR: mean_3d.clprn_orca.py => XD and XVOL do not agree in shape!')
         sys.exit(0)
 
     vmean = nmp.zeros(lt)
@@ -205,10 +213,10 @@ def mean_2d(XD, LSM, XAREA):
     ( lt, ly, lx ) = nmp.shape(XD)
 
     if nmp.shape(LSM) != ( ly, lx ):
-        print 'ERROR: mean_2d.clprn_orca.py => XD and LSM do not agree in shape!'
+        print('ERROR: mean_2d.clprn_orca.py => XD and LSM do not agree in shape!')
         sys.exit(0)
     if nmp.shape(XAREA) != ( ly, lx ):
-        print 'ERROR: mean_2d.clprn_orca.py => XD and XAREA do not agree in shape!'
+        print('ERROR: mean_2d.clprn_orca.py => XD and XAREA do not agree in shape!')
         sys.exit(0)
 
     vmean = nmp.zeros(lt)
@@ -287,7 +295,7 @@ def transect_zon_or_med(x1, x2, y1, y2, xlon, xlat): #, rmin, rmax, dc):
     if x1 == x2: lvert = True
     #
     if not (lhori or lvert) :
-        print 'transect_zon_or_med only supports horizontal or vertical sections!'
+        print('transect_zon_or_med only supports horizontal or vertical sections!')
         sys.exit(0)
     #
     (ji1,jj1) = ij_from_xy(x1, y1, xlon, xlat)
@@ -311,7 +319,7 @@ def shrink_domain(LSM):
     ( ly, lx ) = nmp.shape(LSM)
     #
     #if nmp.shape(LSM) != ( lz, ly, lx ):
-    #    print 'ERROR: shrink_domain.clprn_orca.py => XD and LSM do not agree in shape!'
+    #    print('ERROR: shrink_domain.clprn_orca.py => XD and LSM do not agree in shape!'
     #    sys.exit(0)
     (vjj , vji)  = nmp.where(LSM[:,:]>0.5)
     j1 = max( nmp.min(vjj)-2 , 0    )
@@ -320,7 +328,7 @@ def shrink_domain(LSM):
     i2 = min( nmp.max(vji)+2 , lx-1 ) + 1
     #
     if (i1,j1,i2,j2) != (0,0,lx,ly):
-        print '       ===> zooming on i1,j1 -> i2,j2:', i1,j1,'->',i2,j2
+        print('       ===> zooming on i1,j1 -> i2,j2:', i1,j1,'->',i2,j2)
     if (i1,i2) == (0,lx): i2 = i2-2 ; # Mind east-west periodicity overlap of 2 points...
     #
     return (i1,j1,i2,j2)

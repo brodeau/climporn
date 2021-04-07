@@ -3,7 +3,7 @@
 
 #    L. Brodeau, 2018
 
-import sys
+from sys import exit
 from os import path, getcwd, mkdir
 import argparse as ap
 import numpy as nmp
@@ -18,18 +18,19 @@ import warnings
 warnings.filterwarnings("ignore")
 import time
 
-import clprn_plot as cp
-import clprn_tool as ct
+import matplotlib.dates as mdates
+
+import climporn as cp
 
 l_tapper      = True ; # apply tappering !
 l_detrend_lin = True ; # apply a linear detrending on data segment before computing spectrum...
 l_rm_i_noise  = False
 
-# Plots for each segment (only to debug!)
-l_plot_rawd = False
-l_plot_maps = False
+l_plot_rawd = False ; # plot the whole SSH times series of model and satellite 
+# Plots for each segment (only to debug!):
 l_plot_trck = False ; # plots model and satellite tracks for each segment
 l_plot_spct = False ; # plot spectra for each segment
+l_plot_maps = False
 
 dir_figs='./figs'
 fig_ext='svg'
@@ -53,8 +54,7 @@ rcut_by_dist = 7.8 # same as rcut_by_time, but in terms of distance (in km) betw
 #                  #   => ex: 3rd of August 2016 around 07:53:43 !!!
 
 nlen_valid_seg = 120  # specify the minimum number of values a segment should contain to be considered and used!
-#nlen_valid_seg = 50  # specify the minimum number of values a segment should contain to be considered and used!
-#nlen_valid_seg = 18  # specify the minimum number of values a segment should contain to be considered and used!
+#nlen_valid_seg = 70  # specify the minimum number of values a segment should contain to be considered and used!
 
 r_max_amp_ssh = 1.5 # in meters
 
@@ -118,7 +118,7 @@ cfs  = path.basename(cf_in)
 cseas = ''
 if ('JFM' in cfs) and not('JAS' in cfs) : cseas = 'JFM'; vseas = ['01','02','03']
 if ('JAS' in cfs) and not('JFM' in cfs) : cseas = 'JAS'; vseas = ['07','08','09']
-print('\n *** Season: '+cseas+'\n')
+if cseas != '': print('\n *** Season: '+cseas+'\n')
 
 
 
@@ -138,6 +138,16 @@ print("  => Everything read!\n")
 
 nbr = len(vt_epoch)
 
+# Once for all, convertion from Epoch Unix time to "day since 0001":
+VT = mdates.epoch2num(vt_epoch)
+
+#lilo1:
+#print('LOLOdebug => vt_epoch, VT =')
+#for jt in range(len(vt_epoch)): print(vt_epoch[jt], cp.EpochT2Str(vt_epoch[jt]), VT[jt])
+#exit(0)
+
+
+
 # Analysing time...
 #print('\n\n jr, time, dt, d_dist')
 #for jr in range(1,nbr):
@@ -154,13 +164,9 @@ nbr = len(vt_epoch)
 # Initial raw plot:
 # Create Matplotlib time array:
 
-
-if l_plot_rawd or l_plot_trck:
-    import matplotlib.dates as mdates
-
 cyear = time.strftime("%Y", time.localtime(vt_epoch[2]))
 
-
+print(' *** Year = '+cyear+'\n')
 
 
 ii=nbr//300
@@ -169,24 +175,21 @@ xticks_d=30*ib
 
 
 if l_plot_rawd:
-    vtime = nmp.zeros(nbr)
-    for jt in range(nbr): vtime[jt] = mdates.epoch2num(vt_epoch[jt])
-    #
     fig = plt.figure(num = 1, figsize=(12,7), facecolor='w', edgecolor='k')
     ax1 = plt.axes([0.07, 0.24, 0.9, 0.75])
-    ax1.set_xticks(vtime[::xticks_d])
+    ax1.set_xticks(VT[::xticks_d])
     ax1.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d %H:%M:%S'))
     plt.xticks(rotation='60')
-    plt.plot(vtime, vsatel, '.', color=clr_sat, markersize=4, label=cn_sat+' ("'+cv_sat+'")', zorder=10)
-    plt.plot(vtime, vmodel, '.', color=clr_mod, markersize=4,  label=cn_mod+' ("'+cv_mod+'")', zorder=15)
-    ax1.set_ylim(-r_max_amp_ssh,r_max_amp_ssh) ; ax1.set_xlim(vtime[0],vtime[nbr-1])
+    plt.plot(VT, vsatel, '.', color=clr_sat, markersize=4, label=cn_sat+' ("'+cv_sat+'")', zorder=10)
+    plt.plot(VT, vmodel, '.', color=clr_mod, markersize=4,  label=cn_mod+' ("'+cv_mod+'")', zorder=15)
+    ax1.set_ylim(-r_max_amp_ssh,r_max_amp_ssh) ; ax1.set_xlim(VT[0],VT[nbr-1])
     plt.ylabel('SSH [m]')
     ax1.grid(color='k', linestyle='-', linewidth=0.3)
     plt.legend(bbox_to_anchor=(0.55, 0.98), ncol=1, shadow=True, fancybox=True)
     plt.savefig(dir_figs+'/fig_raw_data_'+cn_mod+'--'+cn_sat+'.'+fig_ext, dpi=120, transparent=True)
     plt.close(1)
 
-
+    #exit(0); #lilo
 
 
 
@@ -195,7 +198,7 @@ vmask = vmodel.mask
 
 (idx_ok,) = nmp.where(vmask==False) # indexes with valid values!
 
-#print(vmodel[:]) ; print(idx_ok) ; sys.exit(0)
+#print(vmodel[:]) ; print(idx_ok) ; exit(0)
 
 nbr_v = len(idx_ok)
 
@@ -218,15 +221,15 @@ while jr < nbr:
             print('\n --- found seg #'+str(nb_seg)+' !')
             idx_seg_start.append(jr)
             print(' => starting at jt='+str(jr))
-            #while (not vmask[jr+1]) and (vmodel[jr+1]!=0.) and (vt_epoch[jr+1]-vt_epoch[jr] < rcut_by_time) and (vdist[jr+1]-vdist[jr] < rcut_by_dist) and (vm<100.) :
-            while (not vmask[jr+1]) and (vmodel[jr+1]!=0.):
+            while (not vmask[jr+1]) and (vmodel[jr+1]!=0.) and (vt_epoch[jr+1]-vt_epoch[jr] < rcut_by_time) and (vdist[jr+1]-vdist[jr] < rcut_by_dist) and (vm<100.) :
+            #while (not vmask[jr+1]) and (vmodel[jr+1]!=0.):
                 jr = jr+1
                 if jr==nbr-1: break
             idx_seg_stop.append(jr)
             print(' => and stoping at jt='+str(jr))
     jr = jr+1
 
-if len(idx_seg_start) != nb_seg: print(' ERROR #1!'); sys.exit(1)
+if len(idx_seg_start) != nb_seg: print(' ERROR #1!'); exit(1)
 
 
 
@@ -243,7 +246,7 @@ nb_v_seg = len(vtreat)
 
 if nb_v_seg==0:
     print('PROBLEM: could not find any valid segment with nlen_valid_seg = '+str(nlen_valid_seg)+' !')
-    sys.exit(0)        
+    exit(0)        
 
 rN = nmp.mean(isd[vtreat])
 print('\nMean segment-length for the '+str(nb_v_seg)+' segments with at least '+str(nlen_valid_seg)+' points:', round(rN,1))
@@ -300,11 +303,6 @@ for js in vtreat:
     rdist_sample = round(dmean,3)
     print(' => will use a spatial sample spacing of '+str(rdist_sample)+' km\n')
 
-    if l_plot_trck:
-        # Create Matplotlib time array:
-        vtime = nmp.zeros(Nsp)
-        for jt in range(Nsp): vtime[jt] = mdates.epoch2num(vt_epoch[it1+jt])
-
     # First centering the two time-series about 0, and tappering at extremities (filling with zeros)
     vs_s = nmp.zeros(Nsp) ; vs_m = nmp.zeros(Nsp)
     print('             (length = '+str(len(vsatel[it1:it2+1]))+' / '+str(Nsp)+')')
@@ -359,7 +357,13 @@ for js in vtreat:
         plt.close(1)
 
 
+        
     if l_plot_trck:
+        #
+        # Create Matplotlib time array:
+        vtime = nmp.zeros(Nsp)
+        for jt in range(Nsp): vtime[jt] = VT[it1+jt]
+        #
         cfigure = dir_figs+'/'+cn_box+'_'+cseas+'_'+cn_mod+'--'+cn_sat+'_seg'+cseg+'_track.'+fig_ext
         ii=Nsp//300
         ib=max(ii-ii%10,1)
@@ -367,11 +371,11 @@ for js in vtreat:
         # Finding appropriate amplitude as a multiple of 0.25:    
         rmult = 0.2
         rmax    = max( nmp.max(vs_m[:]) , nmp.max(vs_s[:])  )
-        r_ssh_p = ct.round_to_multiple_of(rmax, prec=1, base=rmult)
+        r_ssh_p = cp.round_to_multiple_of(rmax, prec=1, base=rmult)
         if rmax > r_ssh_p: r_ssh_p = r_ssh_p + rmult/2.
     
         rmin    = min( nmp.min(vs_m[:]) , nmp.min(vs_s[:])  )
-        r_ssh_m = ct.round_to_multiple_of(rmin, prec=1, base=rmult)
+        r_ssh_m = cp.round_to_multiple_of(rmin, prec=1, base=rmult)
         if rmin < r_ssh_m: r_ssh_m = r_ssh_m - rmult/2.
     
         fig = plt.figure(num = 1, figsize=(12,7.4), facecolor='w', edgecolor='k')
@@ -388,13 +392,12 @@ for js in vtreat:
         ax1.set_xlim(vtime[0],vtime[Nsp-1])
         ax1.grid(color='k', linestyle='-', linewidth=0.3)
         plt.legend(loc="best", ncol=1, shadow=True, fancybox=True)
-        cstart = str(round(ct.long_to_m180_p180(vlon[it1]),2))+"$^{\circ}$E, "+str(round(vlat[it1],2))+"$^{\circ}$N"
-        cstop  = str(round(ct.long_to_m180_p180(vlon[it2]),2))+"$^{\circ}$E, "+str(round(vlat[it2],2))+"$^{\circ}$N"
+        cstart = str(round(cp.degE_to_degWE(vlon[it1]),2))+"$^{\circ}$E, "+str(round(vlat[it1],2))+"$^{\circ}$N"
+        cstop  = str(round(cp.degE_to_degWE(vlon[it2]),2))+"$^{\circ}$E, "+str(round(vlat[it2],2))+"$^{\circ}$N"
         plt.title(r""+cn_box+": "+cstart+"  $\longrightarrow$ "+cstop)
         plt.savefig(cfigure, dpi=120, transparent=False)
         plt.close(1)
-
-
+        
     if l_plot_spct:
         # Figure that shows all the spectrum for each segment:
         cfigure = dir_figs+'/'+cn_box+'_'+cseas+'_'+cn_mod+'--'+cn_sat+'_seg'+cseg+'.'+fig_ext
@@ -404,11 +407,20 @@ for js in vtreat:
                                          vk2=vk[idx], vps2=x_all_spectra_m[jcpt,:], clab2=clabel_mod)
         
 
+    #print('LOLOdebug => vtime =')
+    #for jt in range(len(vtime)): print(vtime[jt])
+    #exit(0)
+
+
+        
 # Plotting mean spectrum:
 vps_mod = nmp.mean(x_all_spectra_m[:,:],axis=0)
 vps_sat = nmp.mean(x_all_spectra_s[:,:],axis=0) 
 #cinfrm = cn_box+', '+cseas+' '+cyear+'\n  '+str(nb_v_seg)+' tracks\n  '+str(Nsp)+' points\n  '+r'$\Delta$L: '+str(round(rdist_sample,1))+' km'
-cinfrm = cseas+' '+cyear+'\n'+str(nb_v_seg)+' tracks\n'+str(Nsp)+' points\n'+r'$\Delta$L: '+str(round(rdist_sample,1))+' km'
+
+ctime = ''
+if cseas != '': ctime=cseas+' '+cyear+'\n'
+cinfrm = ctime+str(nb_v_seg)+' segments\n'+str(Nsp)+' points/segment\n'+r'$\Delta$d sat.: '+str(round(rdist_sample,1))+' km'
 
 
 # remove white noise at fine scale for satellite (instrument) [advice from Clement Ubelmann]

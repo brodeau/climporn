@@ -1,17 +1,11 @@
+#!/usr/bin/env python3
 # -*- Mode: Python; coding: utf-8; indent-tabs-mode: nil; tab-width: 4 -*-
 #
-########################################################################
+#   ///// https://github.com/brodeau/climporn \\\\\
 #
-#   B a r a K u d a
+#       L. Brodeau, 2021
 #
-#   Ploting functions and utilities
-#
-## Authors:
-#  --------
-# 2010-2015: Laurent Brodeau (original primitive code)
-#      2016: Saeed Falahat   (update to fancy grown-up coding!) :D
-#
-#######################################################################
+############################################################################
 
 import os
 import sys
@@ -22,8 +16,7 @@ mpl.use('Agg')
 import matplotlib.pyplot as plt
 import matplotlib.colors as colors
 
-#reload(sys)
-#sys.setdefaultencoding('utf8')
+import climporn.colmap as bcm
 
 # Some defaults:
 #WDTH_DEF     = 10.
@@ -112,8 +105,6 @@ class plot :
                        zmin = 0., zmax = 5000., l_zlog=False, cfig_type='png',
                        czunit=' ', ctitle=' ', lforce_lim=False, i_cb_subsamp=1, l_z_increase=False ):
 
-        import clprn_colmap as bcm
-
         font_ttl, font_xylb, font_clb, font_inf = __font_unity__(fig_dpi=DPI_DEF)
 
         zVZ = __prepare_z_log_axis__(l_zlog, VZ)
@@ -141,7 +132,7 @@ class plot :
 
 
         if lkcont:
-            from clprn_tool import drown
+            from climporn.utils import drown
             Xtmp = nmp.zeros(nmp.shape(XF))
             Xtmp[:,:] = XF[:,:]
             drown(Xtmp, XMSK, k_ew=2, nb_max_inc=5, nb_smooth=5)
@@ -188,9 +179,9 @@ class plot :
         #
         # if VX = [0] and VY = [0] => ignoring lon and lat...
 
-        import clprn_tool   as bt
-        import clprn_orca   as bo
-        import clprn_colmap as bcm
+        import climporn.utils   as bt
+        import climporn.orca   as bo
+        
 
 
         font_ttl, font_xylb, font_clb, font_inf = __font_unity__(fig_dpi=DPI_DEF)
@@ -324,8 +315,8 @@ class plot :
                  lpix=False, l_continent_pixel=True, colorbar_fs=14,
                  col_min='k', col_max='k', vcont_spec = []):
 
-        import clprn_tool   as bt
-        import clprn_colmap as bcm
+        import climporn.utils   as bt
+        
 
         font_ttl, font_xylb, font_clb, font_inf = __font_unity__()
 
@@ -433,7 +424,7 @@ class plot :
                  i_cb_subsamp=1, cfig_type='pdf', lcontours=True,
                  x_offset=0., y_offset=0., vcont_spec = [], lcont_mask=False):
 
-        import clprn_colmap as bcm
+        
 
 
 
@@ -524,7 +515,7 @@ class plot :
         font_ttl, font_xylb, font_clb, font_inf = __font_unity__(fig_dpi=DPI_DEF)
 
         ny = len(VYn)
-        if len(VZn) != ny: print('ERROR: plot_zonal.clprn_plot => VYn and VZn do not agree in size'); sys.exit(0)
+        if len(VZn) != ny: print('ERROR: plot_zonal.plot => VYn and VZn do not agree in size'); sys.exit(0)
 
         lp1=False ; lp2=False ; lp3=False
         if len(VZ1) > 1 and len(VZ1)==len(VY1): lp1=True
@@ -589,7 +580,7 @@ class plot :
 
         from mpl_toolkits.basemap import Basemap
         from mpl_toolkits.basemap import shiftgrid
-        import clprn_colmap as bcm
+        
 
         font_ttl, font_xylb, font_clb, font_inf = __font_unity__(fig_dpi=dpi_fig)
 
@@ -665,11 +656,11 @@ class plot :
                               resolution=vp[9],area_thresh=1000.,projection='stere',\
                               lat_0=vp[6],lon_0=vp[7])
         elif vp[1] == 'kav' :
-            print(' *** plot_nproj.clprn_plot => Projection '+vp[0]+' / '+str(vp[7])+' / '+vp[9])
+            print(' *** plot_nproj.plot => Projection '+vp[0]+' / '+str(vp[7])+' / '+vp[9])
             carte = Basemap(projection=vp[0],lon_0=vp[7],resolution=vp[9])
 
         else:
-            print('ERROR: clprn_plot.py => proj type '+vp[1]+' unknown!!!'); sys.exit(0)
+            print('ERROR: plot.py => proj type '+vp[1]+' unknown!!!'); sys.exit(0)
 
         x0,y0 = carte(LON_2D,LAT_2D)
 
@@ -728,11 +719,11 @@ class plot :
         # Take 2 fields as imput and shows contours of second field (vcont_spec2) on top of field 1
 
         import matplotlib.colors as colors   # colmap and co.
-        import clprn_colmap as bcm
+        
 
 
         if nmp.shape(XF1) != nmp.shape(XF2):
-            print('ERROR clprn_plot.plot_2d_box_2f: fields F1 and F2 dont have the same shape!')
+            print('ERROR plot.plot_2d_box_2f: fields F1 and F2 dont have the same shape!')
             sys.exit(0)
 
 
@@ -829,7 +820,7 @@ class plot :
         else:
             
             import matplotlib.colors as colors   # colmap and co.
-            import clprn_colmap as bcm
+            
     
             font_ttl, font_xylb, font_clb, font_inf = __font_unity__(fig_dpi=DPI_DEF)
     
@@ -884,7 +875,7 @@ class plot :
                              cfig_type='pdf', czunit=' ', ctitle=' ', lforce_lim=False, fig_size=(8.,8.) ):
 
         import matplotlib.colors as colors   # colmap and co.
-        import clprn_colmap as bcm
+        
 
         zVZ = __prepare_z_log_axis__(l_zlog, VZ)
 
@@ -940,7 +931,7 @@ class plot :
         # lkcont : use contours rather than "pcolormesh"
         #
 
-        import clprn_colmap as bcm
+        #
 
         font_ttl, font_xylb, font_clb, font_inf = __font_unity__(fig_dpi=DPI_DEF)
 
@@ -979,7 +970,7 @@ class plot :
         elif c_y_is == 'latitude':
             __nice_latitude_axis__(ax, plt, ymin, ymax, dy, axt='y')
         else:
-            print('ERROR: plot_hoevmoller.clprn_plot => axis "'+c_y_is+'" not supported!'); sys.exit(0)
+            print('ERROR: plot_hoevmoller.plot => axis "'+c_y_is+'" not supported!'); sys.exit(0)
 
         plt.title(ctitle, **font_ttl)
         plt.savefig(cfignm+'.'+cfig_type, dpi=DPI_DEF, orientation='portrait', transparent=False) ; #vert_section
@@ -1002,7 +993,7 @@ class plot :
         font_ttl, font_xylb, font_clb, font_inf = __font_unity__(fig_dpi=DPI_DEF)
 
         Nt = len(VT)
-        if len(VF) != Nt: print('ERROR: oscillation_index.clprn_plot => VT and VF do not agree in size'); sys.exit(0)
+        if len(VF) != Nt: print('ERROR: oscillation_index.plot => VT and VF do not agree in size'); sys.exit(0)
 
         vf_plus = nmp.zeros(Nt) ; vf_mins = nmp.zeros(Nt)
         vf_plus[:] = VF[:]   ; vf_mins[:] = VF[:]
@@ -1050,8 +1041,8 @@ class plot :
 
         Nt1 = len(VTm) ; Nt2 = len(VTy)
 
-        if len(VTm) != len(VDm): print('ERROR: plot_1d_mon_ann.clprn_plot => VTm and VDm do not agree in size'); sys.exit(0)
-        if len(VTy) != len(VDy): print('ERROR: plot_1d_mon_ann.clprn_plot => VTy and VDy do not agree in size'); sys.exit(0)
+        if len(VTm) != len(VDm): print('ERROR: plot_1d_mon_ann.plot => VTm and VDm do not agree in size'); sys.exit(0)
+        if len(VTy) != len(VDy): print('ERROR: plot_1d_mon_ann.plot => VTy and VDy do not agree in size'); sys.exit(0)
 
         l_add_monthly = True
         if Nt1 == Nt2: l_add_monthly = False
@@ -1136,10 +1127,10 @@ class plot :
 
         # Number of lines to plot:
         [ nb_plt, nbt ] = XD.shape
-        if len(vt) != nbt: print('ERROR: plot_1d_multi.clprn_plot.py => vt and XD do not agree in shape! =>', len(vt), nbt,'\n'); sys.exit(0)
-        if len(vlabels) != nb_plt: print('ERROR: plot_1d_multi.clprn_plot.py => wrong number of labels...'); sys.exit(0)
+        if len(vt) != nbt: print('ERROR: plot_1d_multi.plot.py => vt and XD do not agree in shape! =>', len(vt), nbt,'\n'); sys.exit(0)
+        if len(vlabels) != nb_plt: print('ERROR: plot_1d_multi.plot.py => wrong number of labels...'); sys.exit(0)
         n0 = len(line_styles)
-        if n0 > 0 and n0 != nb_plt: print('ERROR: plot_1d_multi.clprn_plot.py => wrong number line styles!!!'); sys.exit(0)
+        if n0 > 0 and n0 != nb_plt: print('ERROR: plot_1d_multi.plot.py => wrong number line styles!!!'); sys.exit(0)
         nb_col, nb_row = __nb_col_row_legend__(nb_plt) ; # nb of columns and rows for legend
 
         # Do we put the legend outside of the plot?
@@ -1166,7 +1157,7 @@ class plot :
 
         
         if n0 <= 0 and nb_plt > nmax_colors:
-            print('ERROR: plot_1d_multi.clprn_plot => not enough colors defined in "v_dflt_colors", extend it!!!')
+            print('ERROR: plot_1d_multi.plot => not enough colors defined in "v_dflt_colors", extend it!!!')
             sys.exit(0)
 
         for jp in range(nb_plt):
@@ -1234,7 +1225,7 @@ class plot :
         # Number of lines to plot:
         nbt = len(VF)
 
-        if len(vt) != nbt: print('ERROR: plot_1d.clprn_plot.py => vt and VF do not agree in shape!'); sys.exit(0)
+        if len(vt) != nbt: print('ERROR: plot_1d.plot.py => vt and VF do not agree in shape!'); sys.exit(0)
 
 
         # Masking the time-series shorter than others (masked with -999.)
@@ -1297,7 +1288,7 @@ class plot :
 
         if nnoise != 1 and nl95 != 1:
             if nl95 != len(Vspec) or nl95 != nnoise:
-                print("ERROR: plot_spectrum.clprn_plot.py => length of 95 CI array and/or noise array doesnt match spectrum length!")
+                print("ERROR: plot_spectrum.plot.py => length of 95 CI array and/or noise array doesnt match spectrum length!")
                 sys.exit(0)
             l_do_ci95 = True
             l_do_ci95m = True
@@ -1746,7 +1737,7 @@ def __subsample_axis__(plt_hndl, cax, i_sbsmp, icpt=1):
     elif cax == 'y':
         locs, labels = plt_hndl.yticks()
     else:
-        print(' Error: __subsample_axis__.clprn_plot => only "x" or "y" please'); sys.exit(0)
+        print(' Error: __subsample_axis__.plot => only "x" or "y" please'); sys.exit(0)
     cpt = icpt # with ipct = 1: tick priting will start at y1+dt on x axis rather than y1
     for rr in locs:
         if cpt % i_sbsmp == 0:
@@ -1838,7 +1829,7 @@ def __nice_latitude_axis__(ax_hndl, plt_hndl, lmin, lmax, dl, axt='x'):
     elif axt == 'y':
         ax_hndl.get_yaxis().get_major_formatter().set_useOffset(False)
     else:
-        print('ERROR clprn_plot.__nice_latitude_axis__: only accepts "x" or "y" for axt!')
+        print('ERROR plot.__nice_latitude_axis__: only accepts "x" or "y" for axt!')
         sys.exit(0)
     [vvl, ctck] =  __name_latitude_ticks__(lat_min=lmin, lat_max=lmax, dlat=dl)
     if axt == 'x':
@@ -1855,7 +1846,7 @@ def __nice_longitude_axis__(ax_hndl, plt_hndl, lmin, lmax, dl, axt='x'):
     elif axt == 'y':
         ax_hndl.get_yaxis().get_major_formatter().set_useOffset(False)
     else:
-        print('ERROR clprn_plot.__nice_longitude_axis__: only accepts "x" or "y" for axt!')
+        print('ERROR plot.__nice_longitude_axis__: only accepts "x" or "y" for axt!')
         sys.exit(0)
     [vvl, ctck] =  __name_longitude_ticks__(lon_min=lmin, lon_max=lmax, dlon=dl)
     if axt == 'x':

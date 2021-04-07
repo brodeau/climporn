@@ -1,5 +1,13 @@
+#!/usr/bin/env python3
+# -*- Mode: Python; coding: utf-8; indent-tabs-mode: nil; tab-width: 4 -*-
+#
+#   ///// https://github.com/brodeau/climporn \\\\\
+#
+#       L. Brodeau, 2021
+#
+############################################################################
 
-# BaraKuda statistics misc. functions...
+# CLIMPORN statistics misc. functions...
 
 import sys
 import numpy as nmp
@@ -7,7 +15,7 @@ import random
 
 def least_sqr_line(ZX,ZY):
     Nx = len(ZX) ; Ny = len(ZY)
-    if Nx != Ny: print 'clprn_stat.least_sqr_line: ERROR in size!'; sys.exit(0)
+    if Nx != Ny: print('clprn_stat.least_sqr_line: ERROR in size!'); sys.exit(0)
     Sx  = nmp.sum(ZX[:])       ; Sy  = nmp.sum(ZY[:])
     Sxx = nmp.sum(ZX[:]*ZX[:]) ; Sxy = nmp.sum(ZX[:]*ZY[:])
     rA = ( Sx*Sy - Nx*Sxy ) / ( Sx*Sx - Nx*Sxx )
@@ -33,7 +41,7 @@ def stat_serie(ZX,ZY):
     # Ecart-type des Y:
     sigma = nmp.sqrt(nmp.sum((ZYn[:] - moy_y)*(ZYn[:] - moy_y))/nt)
 
-    print 'A, B, moy_y, sigma_y =', A, B, moy_y, sigma
+    print('A, B, moy_y, sigma_y =', A, B, moy_y, sigma)
 
     ZYn = (ZYn - moy_y)/sigma
 
@@ -55,7 +63,7 @@ def correl(VX,VY, Np_force=0):
 
     # Compute the Pearson correlation coefficient
     Nx = len(VX)      ; Ny = len(VY)
-    if Nx != Ny: print 'clprn_stat.correl: ERROR in size! => ', Nx, Ny; sys.exit(0)
+    if Nx != Ny: print('clprn_stat.correl: ERROR in size! => ', Nx, Ny); sys.exit(0)
 
     Np = Nx
     if Np_force > 1: Np = Np_force
@@ -72,7 +80,7 @@ def cross_correl(VX, VY, klag):
     # Cross-correlation for a lag of klag points...
 
     Np = len(VX)
-    if Np != len(VY): print 'clprn_stat.cross_correl: ERROR in size! => ', Np, len(VY); sys.exit(0)
+    if Np != len(VY): print('clprn_stat.cross_correl: ERROR in size! => ', Np, len(VY)); sys.exit(0)
 
     if klag >= 0:
         Rxyl = correl(VX[:Np-klag], VY[klag:])

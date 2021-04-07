@@ -14,8 +14,8 @@ import numpy as nmp
 from PIL import Image
 #
 # ClimPorn:
-from clprn_tool import chck4f
-import nemo_hboxes as nhb
+from   climporn.utils import chck4f
+import climporn.nemo_hboxes as nhb
 
 #nghost = 3
 
