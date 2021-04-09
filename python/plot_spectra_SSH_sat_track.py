@@ -22,6 +22,8 @@ import matplotlib.dates as mdates
 
 import climporn as cp
 
+ivrb = 0
+
 l_tapper      = True ; # apply tappering !
 l_detrend_lin = True ; # apply a linear detrending on data segment before computing spectrum...
 l_rm_i_noise  = False
@@ -53,8 +55,8 @@ rcut_by_dist = 7.8 # same as rcut_by_time, but in terms of distance (in km) betw
 #                  #   => like if the satellite undergone an extremely short huge acceleration !!!
 #                  #   => ex: 3rd of August 2016 around 07:53:43 !!!
 
-nlen_valid_seg = 120  # specify the minimum number of values a segment should contain to be considered and used!
-#nlen_valid_seg = 70  # specify the minimum number of values a segment should contain to be considered and used!
+nlen_valid_seg_default = 120  # specify the minimum number of points a segment should contain to be considered and used!
+
 
 r_max_amp_ssh = 1.5 # in meters
 
@@ -73,6 +75,45 @@ rDPI=100.
 
 
 #=============== en of configurable part ================================
+
+
+def FindValidSegments( VTe, VM, Vmsk, rcut_time=1.2, rcut_dist=7.8 ):
+
+    # Will extract the N valid data segments:
+    nb_seg        = 0
+    idx_seg_start = [] ; # index of first valid point of the segment
+    idx_seg_stop  = [] ; # index of last  valid point of the segment
+
+    jr=0
+    while jr < nbr:
+        # Ignoring masked values and zeros...
+        if (not Vmsk[jr]):
+            vm = VM[jr]
+            if (vm!=0.) and (vm<100.):
+                nb_seg = nb_seg + 1
+                if ivrb>1:
+                    print('\n --- found seg #'+str(nb_seg)+' !')
+                    print(' => starting at jt='+str(jr))
+                idx_seg_start.append(jr)            
+                while (not Vmsk[jr+1]) and (VM[jr+1]!=0.) and (VTe[jr+1]-VTe[jr] < rcut_time) and (vdist[jr+1]-vdist[jr] < rcut_dist) and (vm<100.) :
+                    jr = jr+1
+                    if jr==nbr-1: break
+                idx_seg_stop.append(jr)
+                if ivrb>1: print(' => and stoping at jt='+str(jr))
+        jr = jr+1
+
+    if len(idx_seg_start) != nb_seg: print(' ERROR #1!'); exit(1)
+
+    return nb_seg, nmp.array(idx_seg_start, dtype=nmp.int64), nmp.array(idx_seg_stop, dtype=nmp.int64)
+
+
+#======================================================================================
+
+
+
+
+
+
 
 if not path.exists(dir_figs): mkdir(dir_figs)
 
@@ -94,6 +135,7 @@ requiredNamed.add_argument('-i', '--fin' , required=True, help='specify output "
 requiredNamed.add_argument('-m', '--vmod', required=True, help='specify the name of the model variable for SSH' )
 requiredNamed.add_argument('-s', '--vsat', required=True, help='specify the name of the satellite variable for SSH')
 #
+parser.add_argument('-n', '--npseg', type=int, default=nlen_valid_seg_default, help='minimum number of points for a valid segment (default: '+str(nlen_valid_seg_default)+')')
 parser.add_argument('-B', '--name_box', default=cn_box,   help='name of the rectangular region (box) considered')
 parser.add_argument('-M', '--name_mod', default=cn_mod,   help='name of the model (ex: NEMO-eNATL60)')
 parser.add_argument('-S', '--name_sat', default=cn_sat,   help='name of the satellite (ex: SARAL-Altika)')
@@ -106,6 +148,7 @@ args = parser.parse_args()
 cf_in  = args.fin
 cv_mod = args.vmod
 cv_sat = args.vsat
+nlen_valid_seg = args.npseg
 cn_box = args.name_box
 cn_mod = args.name_mod
 cn_sat = args.name_sat
@@ -189,10 +232,6 @@ if l_plot_rawd:
     plt.savefig(dir_figs+'/fig_raw_data_'+cn_mod+'--'+cn_sat+'.'+fig_ext, dpi=120, transparent=True)
     plt.close(1)
 
-    #exit(0); #lilo
-
-
-
 
 vmask = vmodel.mask
 
@@ -207,38 +246,15 @@ print(' *** '+str(nbr_v)+' valid points out of '+str(nbr)+' !')
 
 
 # Will extract the N valid data segments:
-nb_seg        = 0
-idx_seg_start = [] ; # index of first valid point of the segment
-idx_seg_stop  = [] ; # index of last  valid point of the segment
-
-jr=0
-while jr < nbr:
-    # Ignoring masked values and zeros...
-    if (not vmask[jr]):
-        vm = vmodel[jr]
-        if (vm!=0.) and (vm<100.):
-            nb_seg = nb_seg + 1
-            print('\n --- found seg #'+str(nb_seg)+' !')
-            idx_seg_start.append(jr)
-            print(' => starting at jt='+str(jr))
-            while (not vmask[jr+1]) and (vmodel[jr+1]!=0.) and (vt_epoch[jr+1]-vt_epoch[jr] < rcut_by_time) and (vdist[jr+1]-vdist[jr] < rcut_by_dist) and (vm<100.) :
-            #while (not vmask[jr+1]) and (vmodel[jr+1]!=0.):
-                jr = jr+1
-                if jr==nbr-1: break
-            idx_seg_stop.append(jr)
-            print(' => and stoping at jt='+str(jr))
-    jr = jr+1
-
-if len(idx_seg_start) != nb_seg: print(' ERROR #1!'); exit(1)
-
+nb_seg, idx_seg_start, idx_seg_stop = FindValidSegments( vt_epoch, vmodel, vmask, rcut_time=rcut_by_time, rcut_dist=rcut_by_dist )
 
 
 # Maximum number of poins in the segments:
 
 isd = nmp.asarray(idx_seg_stop[:]) - nmp.asarray(idx_seg_start[:]) + 1
-print('\n lengths =>', isd[:])
+if ivrb>1: print('\n lengths =>', isd[:])
 nbp_max = max(isd)
-print('\n *** Longest segments has nbp_max='+str(nbp_max)+' points!\n')
+if ivrb>0: print('\n *** Longest segments has nbp_max='+str(nbp_max)+' points!\n')
 
 # Treat only segments with at least nlen_valid_seg points:
 (vtreat,) = nmp.where(isd >= nlen_valid_seg)
@@ -284,9 +300,10 @@ for js in vtreat:
     nbp = it2-it1+1    
     cseg = '%2.2i'%(js+1)
 
-    print('\n\n ###################################')
-    print('  *** Seg #'+cseg+' of '+cn_box+':')
-    print('  ***   => originally '+str(nbp)+' points in this segment (from '+str(it1)+' to '+str(it2)+')')
+    if ivrb>0:
+        print('\n\n ###################################')
+        print('  *** Seg #'+cseg+' of '+cn_box+':')
+        print('  ***   => originally '+str(nbp)+' points in this segment (from '+str(it1)+' to '+str(it2)+')')
 
     # nb of points in excess / Nsp:
     nxcs = nbp - Nsp
@@ -294,18 +311,18 @@ for js in vtreat:
     jmp_stop = nxcs//2 + nxcs%2
     it1 = it1+jmp_strt
     it2 = it2-jmp_stop
-    print('  ***   => we only retain '+str(it2-it1+1)+' points from '+str(it1)+' to '+str(it2)+'!')
+    if ivrb>0: print('  ***   => we only retain '+str(it2-it1+1)+' points from '+str(it1)+' to '+str(it2)+'!')
     
     # Checking the typical distance (in km) between two measures:
     dmean = nmp.mean(vdist[it1+1:it2+1]-vdist[it1:it2])
-    print('\n Mean distance between two consecutive points is '+str(dmean)+' km\n')
+    if ivrb>0: print('\n Mean distance between two consecutive points is '+str(dmean)+' km\n')
     # Sample spacing in [km] (inverse of the sampling rate):
     rdist_sample = round(dmean,3)
-    print(' => will use a spatial sample spacing of '+str(rdist_sample)+' km\n')
+    if ivrb>0: print(' => will use a spatial sample spacing of '+str(rdist_sample)+' km\n')
 
     # First centering the two time-series about 0, and tappering at extremities (filling with zeros)
     vs_s = nmp.zeros(Nsp) ; vs_m = nmp.zeros(Nsp)
-    print('             (length = '+str(len(vsatel[it1:it2+1]))+' / '+str(Nsp)+')')
+    if ivrb>0: print('             (length = '+str(len(vsatel[it1:it2+1]))+' / '+str(Nsp)+')')
     
     vs_s[:] = vsatel[it1:it2+1]
     vs_m[:] = vmodel[it1:it2+1]
@@ -407,10 +424,6 @@ for js in vtreat:
                                          vk2=vk[idx], vps2=x_all_spectra_m[jcpt,:], clab2=clabel_mod)
         
 
-    #print('LOLOdebug => vtime =')
-    #for jt in range(len(vtime)): print(vtime[jt])
-    #exit(0)
-
 
         
 # Plotting mean spectrum:
@@ -435,7 +448,7 @@ cpout   = dir_figs+'/'+cn_box+'_MEAN_'+cn_mod+'--'+cn_sat+'__'+cseas+cextra+'___
 cfigure = cpout+'.'+fig_ext
 
 
-print(' *** cn_sat =', cn_sat)
+if ivrb>1: print(' *** cn_sat =', cn_sat)
 
 ii = cp.plot("pow_spectrum_ssh")(vk[idx], vps_mod, clab1=clabel_mod, clr1=clr_mod, lw1=5, \
                                  cfig_name=cfigure, cinfo=cinfrm, logo_on=False, \

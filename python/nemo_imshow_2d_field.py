@@ -118,11 +118,6 @@ elif CNEMO == 'eNATL60':
     x_cnf = 160. ; y_cnf = 4000. ; # where to put label of conf on Figure...
     l_show_cb = False ; l_show_nm = False
 
-elif CNEMO == 'KANAK60':
-    i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 1. ; vcb = [0.5, 0.1, 0.45, 0.025] ; font_rat = 1.*rfact_zoom
-    x_cnf = 160. ; y_cnf = 4000. ; # where to put label of conf on Figure...
-    l_show_cb = True ; l_show_nm = False
-
 elif CNEMO == 'eNATL1':
     i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 6.
     vcb = [0.62, 0.11, 0.35, 0.025] ; font_rat = 0.12*rfact_zoom
