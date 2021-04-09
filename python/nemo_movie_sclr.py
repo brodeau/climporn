@@ -183,6 +183,7 @@ elif CWHAT == 'SST':
     if CBOX == 'GrlIcl':   tmax = 12.
     if CBOX in [ 'AzoresP','AzoresL','AzoresS']:  tmin = 15. ; tmax = 25. ; df=0.5
     if CBOX == 'Bretagne': tmin = 10. ; tmax = 22. ; df=1.
+    if CNEMO == "CALEDO60": l_do_ice = False ; tmin=18. ;  tmax=30. ; cb_jump=1 ; df=1 ; cv_in = 'tos'
     
 elif CWHAT == 'T_1000':
     cv_in = 'votemper' ; cv_out = CWHAT ;
@@ -435,7 +436,7 @@ XLSM = nmp.zeros((nj,ni)) ; # will define real continents not NEMO mask...
 if l_add_topo_land:
     cp.chck4f(cf_topo_land)
     id_top = Dataset(cf_topo_land)
-    print(' *** Reading 'z' into:\n'+cf_topo_land)
+    print(' *** Reading "z" into:\n'+cf_topo_land)
     xtopo = id_top.variables['z'][0,j1:j2,i1:i2]
     id_top.close()
     if nmp.shape(xtopo) != (nj,ni):
@@ -543,12 +544,12 @@ for jt in range(jt0,Nt):
 
         fig = plt.figure(num = 1, figsize=(rw_fig, rh_fig), dpi=None, facecolor='w', edgecolor='0.5')
     
-        ax  = plt.axes([0., 0., 1., 1.], facecolor = '0.85') # missing seas will be in 'facecolor' !
+        ax  = plt.axes([0., 0., 1., 1.], facecolor = '0.7') # missing seas will be in 'facecolor' !
     
         vc_fld = nmp.arange(tmin, tmax + df, df)
     
     
-        print('Reading record #'+str(jt)+' of '+cvx_in+' in '+cfx_in)
+        print('Reading record #'+str(jt)+' of '+cv_in+' in '+cf_in)
         if l3d: print('            => at level #'+str(jk)+' ('+cdepth+')!')
     
         if l_notime:
