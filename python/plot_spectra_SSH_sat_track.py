@@ -28,11 +28,10 @@ l_tapper      = True ; # apply tappering !
 l_detrend_lin = True ; # apply a linear detrending on data segment before computing spectrum...
 l_rm_i_noise  = False
 
-l_plot_rawd = False ; # plot the whole SSH times series of model and satellite 
+l_plot_rawd = True ; # plot the whole SSH times series of model and satellite 
 # Plots for each segment (only to debug!):
-l_plot_trck = False ; # plots model and satellite tracks for each segment
+l_plot_trck = True ; # plots model and satellite tracks for each segment
 l_plot_spct = False ; # plot spectra for each segment
-l_plot_maps = False
 
 dir_figs='./figs'
 fig_ext='svg'
@@ -58,32 +57,21 @@ rcut_by_dist = 7.8 # same as rcut_by_time, but in terms of distance (in km) betw
 nlen_valid_seg_default = 120  # specify the minimum number of points a segment should contain to be considered and used!
 
 
-r_max_amp_ssh = 1.5 # in meters
-
-r2Pi = 2.*nmp.pi
-
-
 # Look and feel for the plot:
-
-clr_red = '#AD0000'
-
-# Color OceanNext style:
-clr_sat = '#ffed00'
+clr_sat = '#AD0000'
 clr_mod = '#008ab8'
-
-rDPI=100.
-
 
 #=============== en of configurable part ================================
 
 
 def FindValidSegments( VTe, VM, Vmsk, rcut_time=1.2, rcut_dist=7.8 ):
-
+    '''
+    # Bla bla
+    '''
     # Will extract the N valid data segments:
-    nb_seg        = 0
-    idx_seg_start = [] ; # index of first valid point of the segment
-    idx_seg_stop  = [] ; # index of last  valid point of the segment
-
+    nb_seg   = 0
+    idx_strt = [] ; # index of first valid point of the segment
+    idx_stop = [] ; # index of last  valid point of the segment    
     jr=0
     while jr < nbr:
         # Ignoring masked values and zeros...
@@ -94,18 +82,63 @@ def FindValidSegments( VTe, VM, Vmsk, rcut_time=1.2, rcut_dist=7.8 ):
                 if ivrb>1:
                     print('\n --- found seg #'+str(nb_seg)+' !')
                     print(' => starting at jt='+str(jr))
-                idx_seg_start.append(jr)            
+                idx_strt.append(jr)            
                 while (not Vmsk[jr+1]) and (VM[jr+1]!=0.) and (VTe[jr+1]-VTe[jr] < rcut_time) and (vdist[jr+1]-vdist[jr] < rcut_dist) and (vm<100.) :
                     jr = jr+1
                     if jr==nbr-1: break
-                idx_seg_stop.append(jr)
+                idx_stop.append(jr)
                 if ivrb>1: print(' => and stoping at jt='+str(jr))
         jr = jr+1
+    if len(idx_strt) != nb_seg: cp.MsgExit('[FindValidSegments()] => len(idx_strt) != nb_seg')
+    return nmp.array(idx_strt, dtype=nmp.int64), nmp.array(idx_stop, dtype=nmp.int64)
 
-    if len(idx_seg_start) != nb_seg: print(' ERROR #1!'); exit(1)
 
-    return nb_seg, nmp.array(idx_seg_start, dtype=nmp.int64), nmp.array(idx_seg_stop, dtype=nmp.int64)
+def PlotInputSeries(vt, VS, VM, cfig, clabS='Satellite', clabM='Model' ):
+    ymin, ymax, dy = cp.sym_round_bounds(min(nmp.min(VM[:]),nmp.min(VS[:])), max(nmp.max(VM[:]), nmp.max(VS[:])), base=0.1 )
+    fig = plt.figure(num = 1, figsize=(12,7), facecolor='w', edgecolor='k')
+    ax  = plt.axes([0.07, 0.24, 0.9, 0.75])
+    #ax.set_xticks(vt[::xticks_d])
+    ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d %H:%M:%S'))
+    plt.xticks(rotation='60')
+    plt.plot(vt, VS, '.', color=clr_sat, markersize=4, label=clabS, zorder=10)
+    plt.plot(vt, VM, '.', color=clr_mod, markersize=4, label=clabM, zorder=15)
+    plt.yticks( nmp.arange(ymin, ymax+dy, dy) )
+    ax.set_ylim(ymin,ymax)
+    ax.set_xlim(vt[0],vt[nbr-1])
+    plt.ylabel('SSH [m]')
+    ax.grid(color='k', linestyle='-', linewidth=0.3)
+    plt.legend(bbox_to_anchor=(0.55, 0.98), ncol=1, shadow=True, fancybox=True)
+    plt.savefig(cfig, dpi=120, transparent=False)
+    plt.close(1)
+    return 0
 
+
+
+def PlotSegmentTrack( vt, VS, VM, cfig, ctitle='', clabS='Satellite', clabM='Model' ):
+    '''
+    '''
+    ii=len(vt)//300 ; xticks_d=5*max(ii-ii%10,1)
+    #
+    ymin, ymax, dy = cp.sym_round_bounds( min(nmp.min(VM[:]),nmp.min(VS[:])), max(nmp.max(VM[:]), nmp.max(VS[:])), base=0.1 )
+    #
+    fig = plt.figure(num = 1, figsize=(12,7.4), facecolor='w', edgecolor='k')
+    ax = plt.axes([0.07, 0.22, 0.88, 0.73])
+    ax.set_xticks(vt[::xticks_d])
+    ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d %H:%M:%S'))
+    plt.xticks(rotation='60')
+    plt.plot(vt, vt*0., '-', color='k', linewidth=2, label=None)
+    plt.plot(vt, VS[:], '-o', color=clr_sat, linewidth=2, label=clabS, zorder=10)
+    plt.plot(vt, VM[:], '-o', color=clr_mod, linewidth=2, label=clabM, zorder=15)
+    plt.yticks( nmp.arange(ymin, ymax+dy, dy) )
+    ax.set_ylim(ymin,ymax)
+    plt.ylabel('SSH [m]')
+    ax.set_xlim(vt[0],vt[-1])
+    ax.grid(color='k', linestyle='-', linewidth=0.3)
+    plt.legend(loc="best", ncol=1, shadow=True, fancybox=True)
+    plt.title(ctitle)
+    plt.savefig(cfig, dpi=120, transparent=False)
+    plt.close(1)
+    return 0
 
 #======================================================================================
 
@@ -184,24 +217,6 @@ nbr = len(vt_epoch)
 # Once for all, convertion from Epoch Unix time to "day since 0001":
 VT = mdates.epoch2num(vt_epoch)
 
-#lilo1:
-#print('LOLOdebug => vt_epoch, VT =')
-#for jt in range(len(vt_epoch)): print(vt_epoch[jt], cp.EpochT2Str(vt_epoch[jt]), VT[jt])
-#exit(0)
-
-
-
-# Analysing time...
-#print('\n\n jr, time, dt, d_dist')
-#for jr in range(1,nbr):
-#    print( jr, vt_epoch[jr], vt_epoch[jr]-vt_epoch[jr-1], vdist[jr]-vdist[jr-1])
-#exit(0)
-
-
-# Debug: wave-signal with a wave-length of 150 km and 25 km (vdist in km)
-#vmodel = 0.25*nmp.cos(vdist*r2Pi/150.) + 0.75*nmp.cos(vdist*r2Pi/25.)
-
-
 
 
 # Initial raw plot:
@@ -212,57 +227,36 @@ cyear = time.strftime("%Y", time.localtime(vt_epoch[2]))
 print(' *** Year = '+cyear+'\n')
 
 
-ii=nbr//300
-ib=max(ii-ii%10,1)
-xticks_d=30*ib
-
-
+# Plot time-series of SSH as found in input file:
 if l_plot_rawd:
-    fig = plt.figure(num = 1, figsize=(12,7), facecolor='w', edgecolor='k')
-    ax1 = plt.axes([0.07, 0.24, 0.9, 0.75])
-    ax1.set_xticks(VT[::xticks_d])
-    ax1.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d %H:%M:%S'))
-    plt.xticks(rotation='60')
-    plt.plot(VT, vsatel, '.', color=clr_sat, markersize=4, label=cn_sat+' ("'+cv_sat+'")', zorder=10)
-    plt.plot(VT, vmodel, '.', color=clr_mod, markersize=4,  label=cn_mod+' ("'+cv_mod+'")', zorder=15)
-    ax1.set_ylim(-r_max_amp_ssh,r_max_amp_ssh) ; ax1.set_xlim(VT[0],VT[nbr-1])
-    plt.ylabel('SSH [m]')
-    ax1.grid(color='k', linestyle='-', linewidth=0.3)
-    plt.legend(bbox_to_anchor=(0.55, 0.98), ncol=1, shadow=True, fancybox=True)
-    plt.savefig(dir_figs+'/fig_raw_data_'+cn_mod+'--'+cn_sat+'.'+fig_ext, dpi=120, transparent=True)
-    plt.close(1)
+    cfigure = dir_figs+'/fig_raw_data_'+cn_mod+'--'+cn_sat+'.'+fig_ext
+    ii = PlotInputSeries(VT, vsatel, vmodel, cfigure, \
+                         clabS=cn_sat+' ("'+cv_sat+'")', clabM=cn_mod+' ("'+cv_mod+'")')
 
 
 vmask = vmodel.mask
-
 (idx_ok,) = nmp.where(vmask==False) # indexes with valid values!
-
-#print(vmodel[:]) ; print(idx_ok) ; exit(0)
-
 nbr_v = len(idx_ok)
-
 print(' *** '+str(nbr_v)+' valid points out of '+str(nbr)+' !')
 
 
 
 # Will extract the N valid data segments:
-nb_seg, idx_seg_start, idx_seg_stop = FindValidSegments( vt_epoch, vmodel, vmask, rcut_time=rcut_by_time, rcut_dist=rcut_by_dist )
+idx_seg_start, idx_seg_stop = FindValidSegments( vt_epoch, vmodel, vmask, rcut_time=rcut_by_time, rcut_dist=rcut_by_dist )
 
 
 # Maximum number of poins in the segments:
-
 isd = nmp.asarray(idx_seg_stop[:]) - nmp.asarray(idx_seg_start[:]) + 1
 if ivrb>1: print('\n lengths =>', isd[:])
 nbp_max = max(isd)
 if ivrb>0: print('\n *** Longest segments has nbp_max='+str(nbp_max)+' points!\n')
 
+
 # Treat only segments with at least nlen_valid_seg points:
 (vtreat,) = nmp.where(isd >= nlen_valid_seg)
 nb_v_seg = len(vtreat)
 
-if nb_v_seg==0:
-    print('PROBLEM: could not find any valid segment with nlen_valid_seg = '+str(nlen_valid_seg)+' !')
-    exit(0)        
+if nb_v_seg==0: cp.MsgExit('could not find any valid segment with nlen_valid_seg = '+str(nlen_valid_seg))
 
 rN = nmp.mean(isd[vtreat])
 print('\nMean segment-length for the '+str(nb_v_seg)+' segments with at least '+str(nlen_valid_seg)+' points:', round(rN,1))
@@ -274,21 +268,18 @@ nb_v_seg = len(vtreat)
 print(' ==> will use '+str(nb_v_seg)+' segments with a fixed length of '+str(Nsp)+' point!\n')
 
 
-#print(' *** will treat '+str(nb_v_seg)+' segments out of '+str(nb_seg)+' (need at least '+str(nlen_valid_seg)+' points)')
+print(' *** will treat '+str(nb_v_seg)+' segments out of '+str(len(idx_seg_start))+' (need at least '+str(nlen_valid_seg)+' points)')
 
-
+vseg            = nmp.zeros(nb_v_seg, dtype='U2')
+vit1            = nmp.zeros(nb_v_seg, dtype=nmp.int32)
+vit2            = nmp.zeros(nb_v_seg, dtype=nmp.int32)
+x_all_ssh_s     = nmp.zeros((nb_v_seg,Nsp))
+x_all_ssh_m     = nmp.zeros((nb_v_seg,Nsp))
 x_all_spectra_s = nmp.zeros((nb_v_seg,Nsp)) # array to store all spectra in...
 x_all_spectra_m = nmp.zeros((nb_v_seg,Nsp)) # array to store all spectra in...
 
-clabel_mod=cn_mod+' ("'+cv_mod+'")'
-clabel_sat=cn_sat+' ("'+cv_sat+'")'
-#clabel_mod=cn_mod+'  ("'+cv_mod+'"), 1D along-track'
-#clabel_mod=cn_mod+' (1D along-track)'
-#clabel3=cn_mod+' (2D box)'
-
-
-
-
+clbl_sat = cn_sat+' ("'+cv_sat+'")'
+clbl_mod = cn_mod+' ("'+cv_mod+'")'
 
 
 jcpt = -1
@@ -341,6 +332,8 @@ for js in vtreat:
         wdw =  signal.tukey(Nsp,0.5)
         vs_s = vs_s*wdw
         vs_m = vs_m*wdw
+
+
         
     # Power Spectrum:
     vYf_s = 2.*(rdist_sample/float(Nsp)) * nmp.abs(nmp.fft.fft(vs_s))**2
@@ -352,76 +345,42 @@ for js in vtreat:
         idx = nmp.argsort(vk)
 
     # Saving for current segment:
+    vseg[jcpt] = cseg
+    vit1[jcpt] = it1
+    vit2[jcpt] = it2
+    x_all_ssh_s[jcpt,:]     = vs_s[:]
+    x_all_ssh_m[jcpt,:]     = vs_m[:]
     x_all_spectra_s[jcpt,:] = vYf_s[idx]
     x_all_spectra_m[jcpt,:] = vYf_m[idx]
+                    
 
 
 
-    
-    # Maps:
-    if l_plot_maps:
-        from mpl_toolkits.basemap import Basemap
-        fig = plt.figure(num = 1, figsize=(12,8.3), facecolor='w', edgecolor='k')
-        ax1 = plt.axes([0.01, 0.01, 0.98, 0.98])
-        m = Basemap(projection='lcc', llcrnrlat=18, urcrnrlat=60, llcrnrlon=-77, urcrnrlon=+25,lat_0=45.,lon_0=-40., resolution='c', area_thresh=1000.)
-        m.bluemarble()
-        m.drawcoastlines(linewidth=0.5)
-        m.drawcountries(linewidth=0.5)
-        m.drawstates(linewidth=0.5)
-        x, y = m(vlon[it1:it2+1], vlat[it1:it2+1])
-        plt.plot(x, y, 'r-')
-        plt.savefig(dir_figs+'/'+cn_mod+'--'+cn_sat+'_seg'+cseg+'_map.'+fig_ext, dpi=120, transparent=True)
-        plt.close(1)
 
 
-        
+# Everything is computed, time for control plots:
+for jcpt in range(nb_v_seg):
+
+    it1 = vit1[jcpt]
+    it2 = vit2[jcpt]
+
     if l_plot_trck:
-        #
-        # Create Matplotlib time array:
-        vtime = nmp.zeros(Nsp)
-        for jt in range(Nsp): vtime[jt] = VT[it1+jt]
-        #
-        cfigure = dir_figs+'/'+cn_box+'_'+cseas+'_'+cn_mod+'--'+cn_sat+'_seg'+cseg+'_track.'+fig_ext
-        ii=Nsp//300
-        ib=max(ii-ii%10,1)
-        xticks_d=30*ib
-        # Finding appropriate amplitude as a multiple of 0.25:    
-        rmult = 0.2
-        rmax    = max( nmp.max(vs_m[:]) , nmp.max(vs_s[:])  )
-        r_ssh_p = cp.round_to_multiple_of(rmax, prec=1, base=rmult)
-        if rmax > r_ssh_p: r_ssh_p = r_ssh_p + rmult/2.
-    
-        rmin    = min( nmp.min(vs_m[:]) , nmp.min(vs_s[:])  )
-        r_ssh_m = cp.round_to_multiple_of(rmin, prec=1, base=rmult)
-        if rmin < r_ssh_m: r_ssh_m = r_ssh_m - rmult/2.
-    
-        fig = plt.figure(num = 1, figsize=(12,7.4), facecolor='w', edgecolor='k')
-        ax1 = plt.axes([0.07, 0.22, 0.88, 0.73])
-        ax1.set_xticks(vtime[::xticks_d])
-        ax1.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d %H:%M:%S'))
-        plt.xticks(rotation='60')
-        plt.plot(vtime, vtime*0., '-', color='k', linewidth=2, label=None)
-        plt.plot(vtime, vs_s[:], '-o', color=clr_sat, linewidth=2, label=cn_sat+' ("'+cv_sat+'")', zorder=10)
-        plt.plot(vtime, vs_m[:], '-o', color=clr_mod, linewidth=2,  label=cn_mod+' ("'+cv_mod+'")', zorder=15)
-        plt.yticks( nmp.arange(r_ssh_m, r_ssh_p+0.1, 0.1) )
-        ax1.set_ylim(r_ssh_m*1.05,r_ssh_p*1.05)
-        plt.ylabel('SSH [m]')
-        ax1.set_xlim(vtime[0],vtime[Nsp-1])
-        ax1.grid(color='k', linestyle='-', linewidth=0.3)
-        plt.legend(loc="best", ncol=1, shadow=True, fancybox=True)
+        # Figure that shows time-series of SSH for model and satellite:
+        cfigure = dir_figs+'/'+cn_box+'_'+cseas+'_'+cn_mod+'--'+cn_sat+'_seg'+vseg[jcpt]+'_track.'+fig_ext
         cstart = str(round(cp.degE_to_degWE(vlon[it1]),2))+"$^{\circ}$E, "+str(round(vlat[it1],2))+"$^{\circ}$N"
         cstop  = str(round(cp.degE_to_degWE(vlon[it2]),2))+"$^{\circ}$E, "+str(round(vlat[it2],2))+"$^{\circ}$N"
-        plt.title(r""+cn_box+": "+cstart+"  $\longrightarrow$ "+cstop)
-        plt.savefig(cfigure, dpi=120, transparent=False)
-        plt.close(1)
-        
+        #
+        ii = PlotSegmentTrack(VT[it1:it2+1], x_all_ssh_s[jcpt,:], x_all_ssh_m[jcpt,:], cfig=cfigure, \
+                              ctitle=r""+cn_box+": "+cstart+"  $\longrightarrow$ "+cstop, \
+                              clabS=clbl_sat, clabM=clbl_mod)
+
     if l_plot_spct:
         # Figure that shows all the spectrum for each segment:
-        cfigure = dir_figs+'/'+cn_box+'_'+cseas+'_'+cn_mod+'--'+cn_sat+'_seg'+cseg+'.'+fig_ext
+        cfigure = dir_figs+'/'+cn_box+'_'+cseas+'_'+cn_mod+'--'+cn_sat+'_seg'+vseg[jcpt]+'.'+fig_ext
         ii = cp.plot("pow_spectrum_ssh")(vk[idx], x_all_spectra_s[jcpt,:], cfig_name=cfigure, \
-                                         clab1=clabel_sat, cinfo=str(Nsp)+' points ('+str(nbp)+')', \
+                                         clab1=clbl_sat, cinfo=str(Nsp)+' points ('+str(it2-it1+1)+')', \
                                          L_min=13.5, L_max=1400., P_min_y=pow10_min_y, P_max_y=pow10_max_y, \
-                                         vk2=vk[idx], vps2=x_all_spectra_m[jcpt,:], clab2=clabel_mod)
+                                         vk2=vk[idx], vps2=x_all_spectra_m[jcpt,:], clab2=clbl_mod)
         
 
 
@@ -450,11 +409,11 @@ cfigure = cpout+'.'+fig_ext
 
 if ivrb>1: print(' *** cn_sat =', cn_sat)
 
-ii = cp.plot("pow_spectrum_ssh")(vk[idx], vps_mod, clab1=clabel_mod, clr1=clr_mod, lw1=5, \
+ii = cp.plot("pow_spectrum_ssh")(vk[idx], vps_mod, clab1=clbl_mod, clr1=clr_mod, lw1=5, \
                                  cfig_name=cfigure, cinfo=cinfrm, logo_on=False, \
                                  L_min=10., L_max=1200., P_min_y=pow10_min_y, P_max_y=pow10_max_y, \
                                  l_show_k4=False, l_show_k5=True, l_show_k11o3=False, l_show_k2=True, \
-                                 vk2=vk[idx], vps2=vps_sat, clab2=clabel_sat, clr2=clr_sat, lw2=4)
+                                 vk2=vk[idx], vps2=vps_sat, clab2=clbl_sat, clr2=clr_sat, lw2=4)
 
 
 nmp.savez( cpout+'_mod.npz', vk[idx], vps_mod )

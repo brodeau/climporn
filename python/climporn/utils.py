@@ -798,8 +798,16 @@ def round_bounds_above(x, base=5):
     from math import copysign, ceil
     return copysign( base * ceil(abs(x)/base) , x)
 
+def sym_round_bounds( x1, x2,  base=5, nbticks=10 ):
+    #lilo
+    rr  = max(abs(x1), abs(x2))
+    rmx = round_bounds_above(rr, base=base)
+    dr  = 2.*rmx/nbticks
+    return -rmx, rmx, dr
+
 
 def round_bounds( x1, x2,  base=5, prec=3 ):
+    from math import floor, ceil
     rmin =  base * round( floor(float(x1)/base), prec )
     rmax =  base * round(  ceil(float(x2)/base), prec )
     return rmin, rmax
