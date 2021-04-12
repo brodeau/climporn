@@ -1,0 +1,491 @@
+#!/usr/bin/env python3
+# -*- Mode: Python; coding: utf-8; indent-tabs-mode: nil; tab-width: 4 -*-
+
+#    L. Brodeau, 2018
+
+from sys import exit
+from os import path, getcwd, mkdir
+import argparse as ap
+import numpy as nmp
+#
+from netCDF4 import Dataset
+#
+import matplotlib as mpl
+mpl.use('Agg')
+import matplotlib.pyplot as plt
+import warnings
+warnings.filterwarnings("ignore")
+import time
+
+import matplotlib.dates as mdates
+
+import climporn as cp
+
+ivrb = 1
+
+l_tapper      = True ; # apply tappering !
+l_detrend_lin = True ; # apply a linear detrending on data segment before computing spectrum...
+l_rm_i_noise  = False
+
+l_plot_rawd = True ; # plot the whole SSH times series of model and satellite 
+# Plots for each segment (only to debug!):
+l_plot_trck = True ; # plots model and satellite tracks for each segment
+l_plot_spct = False ; # plot spectra for each segment
+
+dir_figs='./figs'
+fig_ext='svg'
+#fig_ext='png'
+
+
+# Because track files downloaded are usually full of inconsistencies / time and distance done
+# between 2 consecutive points, we need to spot these inconsitencies with the 2 following criteria:
+# ex: normally SARAL takes one measure every 1 s, => ds~=1 s, time during which it should move by
+#     roughly dx ~= 7 km on the ground...
+#     However, the netCDF files downloaded are full of points with dt=2s and the corresponding dx is
+#     still dx ~= 7 km, this is clearly a bug !!!
+
+rcut_by_time = 1.2 # specify in seconds the time gap between two obs to detect and discontinuity and therefore
+#                  # should be considered as a cut!
+
+rcut_by_dist = 7.8 # same as rcut_by_time, but in terms of distance (in km) between two consecutive points!
+#                  # time criterion "rcut_by_time" would have been sufficient if SARAL data was not bugged!!!
+#                  # => in SARAL data, spotted two consecutive points with the usual dt and a huge dL !!!
+#                  #   => like if the satellite undergone an extremely short huge acceleration !!!
+#                  #   => ex: 3rd of August 2016 around 07:53:43 !!!
+
+nlen_valid_seg_default = 120  # specify the minimum number of points a segment should contain to be considered and used!
+
+
+# Look and feel for the plot:
+clr_sat = '#AD0000'
+clr_mod = '#008ab8'
+
+#=============== en of configurable part ================================
+
+
+def FindUnbrokenSegments( VTe, VM, Vmsk, rcut_time=1.2, rcut_dist=7.8 ):
+    '''
+    # Bla bla
+    '''
+    # Will extract the N valid data segments:
+    nb_seg   = 0
+    idx_strt = [] ; # index of first valid point of the segment
+    idx_stop = [] ; # index of last  valid point of the segment    
+    jr=0
+    while jr < nbr:
+        # Ignoring masked values and zeros...
+        if (not Vmsk[jr]):
+            vm = VM[jr]
+            if (vm!=0.) and (vm<100.):
+                nb_seg = nb_seg + 1
+                if ivrb>1:
+                    print('\n --- found seg #'+str(nb_seg)+' !')
+                    print(' => starting at jt='+str(jr))
+                idx_strt.append(jr)            
+                while (not Vmsk[jr+1]) and (VM[jr+1]!=0.) and (VTe[jr+1]-VTe[jr] < rcut_time) and (vdist[jr+1]-vdist[jr] < rcut_dist) and (vm<100.) :
+                    jr = jr+1
+                    if jr==nbr-1: break
+                idx_stop.append(jr)
+                if ivrb>1: print(' => and stoping at jt='+str(jr))
+        jr = jr+1
+    if len(idx_strt) != nb_seg: cp.MsgExit('[FindUnbrokenSegments()] => len(idx_strt) != nb_seg')
+    return nmp.array(idx_strt, dtype=nmp.int64), nmp.array(idx_stop, dtype=nmp.int64)
+
+
+def SegmentSelection(IS_start, IS_stop):
+    '''
+    #  
+    #  1/ ID the continuous segments that have at least "nlen_valid_seg" points
+    #  2/ Decide of a constant length for segments to stick with! => "Nsl"
+    #  3/ ID the segments of length "Nsl"
+    #  4/ Segments with more than "Nsl" points are trimmed at both extremities to only preserve
+    #     the "Nsl" points at their center:
+
+    #
+    # Returns:
+    #   * NbSeg: number of selected segments
+    #   * Nsl:   trimmed length for all the  selected segments
+    #   * IDEDSeg: array containing the start and end index position of each selected segment
+    '''
+    #
+    NbP_seg = IS_stop[:] - IS_start[:] + 1 ; # number of points in each segment
+    if ivrb>0: print('\n *** Longest segments has '+str(max(NbP_seg))+' points!\n')
+    #
+    # 1/ ID the continuous segments that have at least "nlen_valid_seg" points
+    (idx_ok,) = nmp.where(NbP_seg >= nlen_valid_seg)
+    NbSeg = len(idx_ok) ; # number of selected segments we are going to work with
+    if NbSeg==0: cp.MsgExit('could not find any valid segment with nlen_valid_seg = '+str(nlen_valid_seg))
+    #
+    # 2/ Decide of a constant length for segments to stick with => Nsl!
+    rN = nmp.mean(NbP_seg[idx_ok])
+    if ivrb>0: print(' *** [SegmentSelection()]: Mean segment-length for the '+str(NbSeg)+' segments with at least '+str(nlen_valid_seg)+' points:', round(rN,1))
+    Nsl = int(rN/10.)*10 ; # We want a multiple of 10 just below this:
+    if ivrb>1: print('  ==> Nsl = '+str(Nsl))
+    #
+    # 3/ ID the segments of length "Nsl"
+    (idx_ok,) = nmp.where(NbP_seg >= Nsl)
+    NbSeg = len(idx_ok)
+    print(' *** [SegmentSelection()]: Will use '+str(NbSeg)+' segments with a fixed length of '+str(Nsl)+' points!')
+    print('     ==> '+str(NbSeg)+' selected segments out of the '+str(len(IS_start))+' available (requested minimum length is '+str(nlen_valid_seg)+' points)\n')
+    #
+    # 4/ Segments with more than "Nsl" points to be trimmed at both extremities to only preserve
+    #    the "Nsl" points at their center:
+    #
+    IDEDSeg = nmp.zeros( (NbSeg,2) , dtype=nmp.int64)
+    for jp in range(NbSeg):
+        js  = idx_ok[jp]        
+        it1 = IS_start[js]
+        it2 = IS_stop[js]
+        nbp = it2-it1+1    
+    
+        if ivrb>0:
+            print(' ###################################')
+            print('  *** Seg #'+'%2.2i'%(jp+1)+' of '+cn_box+':')
+            print('  ***   => originally '+str(nbp)+' points in this segment (from '+str(it1)+' to '+str(it2)+')')
+    
+        # nb of points in excess / Nsl:
+        nxcs = nbp - Nsl
+        jmp_strt = nxcs//2
+        jmp_stop = nxcs//2 + nxcs%2
+        it1 = it1+jmp_strt
+        it2 = it2-jmp_stop
+        if ivrb>0:
+            print('  ***   => we only retain '+str(it2-it1+1)+' points from '+str(it1)+' to '+str(it2)+'!')
+            print(' ###################################\n')
+        #
+        IDEDSeg[jp,:] = nmp.array([it1,it2])
+    #
+    del NbP_seg
+    #
+    return NbSeg, Nsl, IDEDSeg
+
+
+def Process4FFT( IDseg, Vd, VS, VM ):
+    '''
+    # Process time-series on segments so that they are ready to undergo the Fast Fourrier Transform
+    #
+    # Input:
+    #   * IDseg: array containing the start and end index position of each segment
+    #   * Vd: full series of cumulated distances in km
+    #   * VS: full series of SSH for satellite
+    #   * VM: full series of SSH for model
+    #
+    # Output:
+    #   * vs_s: processed satellite SSH for all segments [2D array of shape (<number of seg.>,<seg. length>)]
+    #   * vs_m: processed model     SSH           "                      "
+    #   * dx_sample: typical distance between to points in km
+    #
+    '''
+    from scipy.signal import detrend, tukey
+    #
+    #
+    NbS = IDseg.shape[0] ; # number of segments
+    if ivrb>1: print(' *** [Process4FFT()] NbS = ', NbS)
+
+    Nsl = IDseg[0,1]-IDseg[0,0]+1 ; # length of segments
+    if ivrb>1: print(' *** [Process4FFT()] Nsl = ', Nsl)
+    
+    vs_s = nmp.zeros((NbS,Nsl))
+    vs_m = nmp.zeros((NbS,Nsl))
+    
+    for js in range(NbS):
+            
+        it1 = IDseg[js,0]
+        it2 = IDseg[js,1]
+
+        if js==0:
+            # Checking the typical distance (in km) between two measures:
+            dmean = nmp.mean(Vd[it1+1:it2+1]-Vd[it1:it2])
+            if ivrb>0: print(' *** [Process4FFT()]: Mean distance between two consecutive points is '+str(dmean)+' km\n')
+            # Sample spacing in [km] (inverse of the sampling rate):
+            dx_sample = round(dmean,3)
+            if ivrb>0: print('     => will use a spatial sample spacing of '+str(dx_sample)+' km\n')
+                    
+        vs_s[js,:] = VS[it1:it2+1]
+        vs_m[js,:] = VM[it1:it2+1]
+        
+        # Linear detrending
+        if l_detrend_lin:
+            if js==0: print(' *** [Process4FFT()]: applying linear detrending...')
+            vs_s[js,:] = detrend(vs_s[js,:],type='linear')
+            vs_m[js,:] = detrend(vs_m[js,:],type='linear')
+        
+        # Centering about 0:
+        if js==0: print(' *** [Process4FFT()]: centering about 0...')
+        vs_s[js,:] = vs_s[js,:] - nmp.mean(vs_s[js,:])
+        vs_m[js,:] = vs_m[js,:] - nmp.mean(vs_m[js,:])
+        
+        # Tappering:
+        if l_tapper:
+            wdw =  tukey(Nsl,0.5)
+            if js==0: print(' *** [Process4FFT()]: applying "Tukey" tappering...')
+            vs_s[js,:] = vs_s[js,:]*wdw
+            vs_m[js,:] = vs_m[js,:]*wdw
+        if js==NbS-1: print('')
+    return vs_s, vs_m, dx_sample
+
+
+def ApplyFFT( IDseg, XS, XM, dx_sample ):
+    '''
+    # Process time-series on segments so that they are ready to undergo the Fast Fourrier Transform
+    #
+    # Input:
+    #   * IDseg: array containing the start and end index position of each segment
+    #   * XS: processed satellite SSH for all segments [2D array of shape (<number of seg.>,<seg. length>)]
+    #   * XM: processed model     SSH           "                      "
+    #   * dx_sample: typical distance between to points in km
+    #
+    # Output:
+    #   * VK:   wave numbers associated with spectra [1D array of length <seg. length>]
+    #   * PS_s: power spectrum of satellite SSH for all segments [2D array of shape (<number of seg.>,<seg. length>)]
+    #   * PS_m: power spectrum of model     SSH           "                      "
+    #
+    '''
+    (NbS,Nsl) = XS.shape
+    VK   = nmp.zeros(     Nsl )
+    PS_s = nmp.zeros((NbS,Nsl))
+    PS_m = nmp.zeros((NbS,Nsl))
+
+    for js in range(NbS):
+        if ivrb>0: print(' *** [ApplyFFT()]: applying FFT to segment #',js+1)
+        
+        it1 = IDseg[js,0]
+        it2 = IDseg[js,1]
+
+        # Wave numbers:
+        if js==0:
+            VK[:] = nmp.fft.fftfreq(Nsl, dx_sample)
+            idx   = nmp.argsort(VK)
+            VK[:] = VK[idx]
+        
+        # Power Spectrum:
+        vYf_s = 2.*(dx_sample/float(Nsl)) * nmp.abs(nmp.fft.fft(XS[js,:]))**2
+        vYf_m = 2.*(dx_sample/float(Nsl)) * nmp.abs(nmp.fft.fft(XM[js,:]))**2
+
+        PS_s[js,:] = vYf_s[idx]
+        PS_m[js,:] = vYf_m[idx]
+        if ivrb>0: print('')
+    return VK, PS_s, PS_m
+
+
+### Plot functions:
+
+def PlotInputSeries(vt, VS, VM, cfig, clabS='Satellite', clabM='Model' ):
+    ymin, ymax, dy = cp.sym_round_bounds(min(nmp.min(VM[:]),nmp.min(VS[:])), max(nmp.max(VM[:]), nmp.max(VS[:])), base=0.1 )
+    fig = plt.figure(num = 1, figsize=(12,7), facecolor='w', edgecolor='k')
+    ax  = plt.axes([0.07, 0.24, 0.9, 0.75])
+    #ax.set_xticks(vt[::xticks_d])
+    ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d %H:%M:%S'))
+    plt.xticks(rotation='60')
+    plt.plot(vt, VS, '.', color=clr_sat, markersize=4, label=clabS, zorder=10)
+    plt.plot(vt, VM, '.', color=clr_mod, markersize=4, label=clabM, zorder=15)
+    plt.yticks( nmp.arange(ymin, ymax+dy, dy) )
+    ax.set_ylim(ymin,ymax)
+    ax.set_xlim(vt[0],vt[nbr-1])
+    plt.ylabel('SSH [m]')
+    ax.grid(color='k', linestyle='-', linewidth=0.3)
+    plt.legend(bbox_to_anchor=(0.55, 0.98), ncol=1, shadow=True, fancybox=True)
+    plt.savefig(cfig, dpi=120, transparent=False)
+    plt.close(1)
+    return 0
+
+
+
+def PlotSegmentTrack( vt, VS, VM, cfig, ctitle='', clabS='Satellite', clabM='Model' ):
+    '''
+    '''
+    ii=len(vt)//300 ; xticks_d=5*max(ii-ii%10,1)
+    #
+    ymin, ymax, dy = cp.sym_round_bounds( min(nmp.min(VM[:]),nmp.min(VS[:])), max(nmp.max(VM[:]), nmp.max(VS[:])), base=0.1 )
+    #
+    fig = plt.figure(num = 1, figsize=(12,7.4), facecolor='w', edgecolor='k')
+    ax = plt.axes([0.07, 0.22, 0.88, 0.73])
+    ax.set_xticks(vt[::xticks_d])
+    ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d %H:%M:%S'))
+    plt.xticks(rotation='60')
+    plt.plot(vt, vt*0., '-', color='k', linewidth=2, label=None)
+    plt.plot(vt, VS[:], '-o', color=clr_sat, linewidth=2, label=clabS, zorder=10)
+    plt.plot(vt, VM[:], '-o', color=clr_mod, linewidth=2, label=clabM, zorder=15)
+    plt.yticks( nmp.arange(ymin, ymax+dy, dy) )
+    ax.set_ylim(ymin,ymax)
+    plt.ylabel('SSH [m]')
+    ax.set_xlim(vt[0],vt[-1])
+    ax.grid(color='k', linestyle='-', linewidth=0.3)
+    plt.legend(loc="best", ncol=1, shadow=True, fancybox=True)
+    plt.title(ctitle)
+    plt.savefig(cfig, dpi=120, transparent=False)
+    plt.close(1)
+    return 0
+
+#======================================================================================
+
+
+
+
+
+
+
+if not path.exists(dir_figs): mkdir(dir_figs)
+
+
+
+################## ARGUMENT PARSING / USAGE ################################################################################################
+
+# Defaults before reading command-line arguments:
+cn_mod = "NEMO"
+cn_sat = "Altimetry"
+cn_box = "Unknown box"
+pow10_min_y = -8
+pow10_max_y =  2
+
+parser = ap.ArgumentParser(description='Generate along-track spectral comparison of SSH, model versus satellite')
+#
+requiredNamed = parser.add_argument_group('required arguments')
+requiredNamed.add_argument('-i', '--fin' , required=True, help='specify output "result" file from interp_to_ground_track.x@SOSIE')
+requiredNamed.add_argument('-m', '--vmod', required=True, help='specify the name of the model variable for SSH' )
+requiredNamed.add_argument('-s', '--vsat', required=True, help='specify the name of the satellite variable for SSH')
+#
+parser.add_argument('-n', '--npseg', type=int, default=nlen_valid_seg_default, help='minimum number of points for a valid segment (default: '+str(nlen_valid_seg_default)+')')
+parser.add_argument('-B', '--name_box', default=cn_box,   help='name of the rectangular region (box) considered')
+parser.add_argument('-M', '--name_mod', default=cn_mod,   help='name of the model (ex: NEMO-eNATL60)')
+parser.add_argument('-S', '--name_sat', default=cn_sat,   help='name of the satellite (ex: SARAL-Altika)')
+#parser.add_argument('-z', '--zld' ,                           help='specify the topography netCDF file to use (field="z")')
+parser.add_argument('-a', '--pmin_y', type=int, default=pow10_min_y, help='minimum y-axis value to display in terms of 10^pmin_y')
+parser.add_argument('-b', '--pmax_y', type=int, default=pow10_max_y, help='maximum y-axis value to display in terms of 10^pmax_y')
+#
+args = parser.parse_args()
+
+cf_in  = args.fin
+cv_mod = args.vmod
+cv_sat = args.vsat
+nlen_valid_seg = args.npseg
+cn_box = args.name_box
+cn_mod = args.name_mod
+cn_sat = args.name_sat
+pow10_min_y = args.pmin_y
+pow10_max_y = args.pmax_y
+
+
+cfs  = path.basename(cf_in)
+
+cseas = ''
+if ('JFM' in cfs) and not('JAS' in cfs) : cseas = 'JFM'; vseas = ['01','02','03']
+if ('JAS' in cfs) and not('JFM' in cfs) : cseas = 'JAS'; vseas = ['07','08','09']
+if cseas != '': print('\n *** Season: '+cseas+'\n')
+
+
+
+cextra = ''
+
+print(' *** Opening file '+cf_in+'!')
+id_in    = Dataset(cf_in)
+vt_epoch = id_in.variables['time'][:]
+vmodel   = id_in.variables[cv_mod][:]
+vsatel   = id_in.variables[cv_sat][:]
+vlon     = id_in.variables['longitude'][:]
+vlat     = id_in.variables['latitude'][:]
+vdist    = id_in.variables['distance'][:]
+id_in.close()
+print("  => Everything read!\n")
+
+
+nbr = len(vt_epoch)
+
+# Once for all, convertion from Epoch Unix time to "day since 0001":
+VT = mdates.epoch2num(vt_epoch)
+
+
+cyear = time.strftime("%Y", time.localtime(vt_epoch[2]))
+
+print(' *** Year = '+cyear+'\n')
+
+
+# Plot time-series of SSH as found in input file:
+if l_plot_rawd:
+    cfigure = dir_figs+'/fig_raw_data_'+cn_mod+'--'+cn_sat+'.'+fig_ext
+    ii = PlotInputSeries(VT, vsatel, vmodel, cfigure, \
+                         clabS=cn_sat+' ("'+cv_sat+'")', clabM=cn_mod+' ("'+cv_mod+'")')
+
+
+vmask = vmodel.mask
+(idx_ok,) = nmp.where(vmask==False) # indexes with valid values!
+nbr_v = len(idx_ok)
+print(' *** Input data contains '+str(nbr_v)+' non masked data points among the '+str(nbr)+' points...\n')
+
+
+# Extract the Ns continuous data segments:
+ISeg_start, ISeg_stop = FindUnbrokenSegments( vt_epoch, vmodel, vmask, rcut_time=rcut_by_time, rcut_dist=rcut_by_dist )
+
+# Selecting proper segments:
+NbSeg, Nsl, IDEDSeg = SegmentSelection(ISeg_start, ISeg_stop)
+# validity check:
+#for js in range(NbSeg):
+#    print(' * Seg # ',js+1,' => it1, it2 =', IDEDSeg[js,:], ' ==> len = ', IDEDSeg[js,1]-IDEDSeg[js,0]+1)
+#print(' Nsl = ',Nsl)
+
+# Process data on segment so ready for FFT:
+XPs, XPm, rdist_sample = Process4FFT( IDEDSeg, vdist, vsatel, vmodel )
+
+# Apply FFT !
+Kwn, PwSpc_s, PwSpc_m = ApplyFFT( IDEDSeg, XPs, XPm, rdist_sample )
+
+# Everything is computed, time for control plots:
+clbl_sat = cn_sat+' ("'+cv_sat+'")'
+clbl_mod = cn_mod+' ("'+cv_mod+'")'
+#
+for js in range(NbSeg):
+    it1 = IDEDSeg[js,0]
+    it2 = IDEDSeg[js,1]
+    if l_plot_trck:
+        # Figure that shows processed time-series of SSH for model and satellite on each segment:
+        cfigure = dir_figs+'/'+cn_box+'_'+cseas+'_'+cn_mod+'--'+cn_sat+'_seg'+'%2.2i'%(js+1)+'_track.'+fig_ext
+        cstart = str(round(cp.degE_to_degWE(vlon[it1]),2))+"$^{\circ}$E, "+str(round(vlat[it1],2))+"$^{\circ}$N"
+        cstop  = str(round(cp.degE_to_degWE(vlon[it2]),2))+"$^{\circ}$E, "+str(round(vlat[it2],2))+"$^{\circ}$N"
+        #
+        ii = PlotSegmentTrack(VT[it1:it2+1], XPs[js,:], XPm[js,:], cfig=cfigure, \
+                              ctitle=r""+cn_box+": "+cstart+"  $\longrightarrow$ "+cstop, \
+                              clabS=clbl_sat, clabM=clbl_mod)
+    #
+    if l_plot_spct:
+        # Figure that shows all the spectrum for each segment:
+        cfigure = dir_figs+'/'+cn_box+'_'+cseas+'_'+cn_mod+'--'+cn_sat+'_seg'+'%2.2i'%(js+1)+'.'+fig_ext
+        ii = cp.plot("pow_spectrum_ssh")(Kwn, PwSpc_s[js,:], cfig_name=cfigure, \
+                                         clab1=clbl_sat, cinfo=str(Nsl)+' points ('+str(it2-it1+1)+')', \
+                                         L_min=13.5, L_max=1400., P_min_y=pow10_min_y, P_max_y=pow10_max_y, \
+                                         vk2=Kwn, vps2=PwSpc_m[js,:], clab2=clbl_mod)
+        
+#exit(0)
+        
+# Plotting mean spectrum:
+vps_mod = nmp.mean(PwSpc_m[:,:],axis=0)
+vps_sat = nmp.mean(PwSpc_s[:,:],axis=0) 
+#cinfrm = cn_box+', '+cseas+' '+cyear+'\n  '+str(NbSeg)+' tracks\n  '+str(Nsl)+' points\n  '+r'$\Delta$L: '+str(round(rdist_sample,1))+' km'
+
+ctime = ''
+if cseas != '': ctime=cseas+' '+cyear+'\n'
+cinfrm = ctime+str(NbSeg)+' segments\n'+str(Nsl)+' points/segment\n'+r'$\Delta$d sat.: '+str(round(rdist_sample,1))+' km'
+
+
+# remove white noise at fine scale for satellite (instrument) [advice from Clement Ubelmann]
+cxtr_noise=''
+if l_rm_i_noise:    
+    rwn = nmp.mean(vps_sat[Nsl-15:Nsl])
+    vps_sat = vps_sat - rwn
+    cxtr_noise='_denoised'
+
+# Sample spacing rdist_sample
+cpout   = dir_figs+'/'+cn_box+'_MEAN_'+cn_mod+'--'+cn_sat+'__'+cseas+cextra+'___pow-spectrum'+cxtr_noise
+cfigure = cpout+'.'+fig_ext
+
+
+if ivrb>1: print(' *** cn_sat =', cn_sat)
+
+ii = cp.plot("pow_spectrum_ssh")(Kwn, vps_mod, clab1=clbl_mod, clr1=clr_mod, lw1=5, \
+                                 cfig_name=cfigure, cinfo=cinfrm, logo_on=False, \
+                                 L_min=10., L_max=1200., P_min_y=pow10_min_y, P_max_y=pow10_max_y, \
+                                 l_show_k4=False, l_show_k5=True, l_show_k11o3=False, l_show_k2=True, \
+                                 vk2=Kwn, vps2=vps_sat, clab2=clbl_sat, clr2=clr_sat, lw2=4)
+
+
+nmp.savez( cpout+'_mod.npz', Kwn, vps_mod )
+nmp.savez( cpout+'_sat'+cxtr_noise+'.npz', Kwn, vps_sat )
