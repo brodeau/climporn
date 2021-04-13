@@ -1426,7 +1426,7 @@ class plot :
 
             #
     def __pow_spectrum_ssh(self, vk1, vps1, clab1=None, clr1=b_gre, lw1=6, \
-                           cfig_name='fig_spectrum_SSH.png', cinfo='', logo_on=True, \
+                           cfig_name='', cinfo='', logo_on=True, \
                            L_min=7., L_max=5000., P_min_y=-6, P_max_y=6,    \
                            l_show_k11o3=False, l_show_k5=False, l_show_k4=False, l_show_k2=False, \
                            vk2=[], vps2=[], clab2=None, clr2=b_org, lw2=3, \
@@ -1506,8 +1506,9 @@ class plot :
             fon = { 'fontname':'Arial', 'fontweight':'normal', 'fontsize':10 }
             ax2.annotate('© Ocean Next, 2018', xy=(0.84, -0.06), xycoords='axes fraction', color='0.5', zorder=100, **fon)
         #
-        plt.savefig(cfig_name, dpi=120, facecolor='w', edgecolor='w', orientation='portrait')
-        plt.close(1)
+        if not cfig_name=='':
+            plt.savefig(cfig_name, dpi=120, facecolor='w', edgecolor='w', orientation='portrait')
+            plt.close(1)
         return 0
     
 

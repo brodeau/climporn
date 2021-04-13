@@ -139,9 +139,9 @@ print(' *** Input data contains '+str(nbr_v)+' non masked data points among the 
 
 
 # Extract the Ns continuous data segments:
-ISeg_start, ISeg_stop = gzg.FindUnbrokenSegments( vt_epoch, vdist, vmodel, vmask, rcut_time=rcut_by_time, rcut_dist=rcut_by_dist )
+ISeg_start, ISeg_stop = gzg.FindUnbrokenSegments( vt_epoch, vdist, vmodel, rcut_time=rcut_by_time, rcut_dist=rcut_by_dist )
 
-# Selecting proper segments:
+# Select and retain only proper segments:
 NbSeg, Nsl, IDEDSeg = gzg.SegmentSelection(ISeg_start, ISeg_stop, np_valid_seg=nlen_valid_seg)
 # validity check:
 #for js in range(NbSeg):
