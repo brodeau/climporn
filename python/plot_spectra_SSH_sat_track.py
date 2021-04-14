@@ -11,6 +11,9 @@ from netCDF4 import Dataset
 import time
 import matplotlib.dates as mdates
 #
+import warnings
+warnings.filterwarnings("ignore")
+#
 import climporn as cp
 import gonzag   as gzg ; # Gonzag package => https://github.com/brodeau/gonzag
 
@@ -18,7 +21,7 @@ ivrb = 1
 
 l_rm_i_noise = False
 
-l_plot_rawd = True ; # plot the whole SSH times series of model and satellite 
+l_plot_rawd = True ; # plot the whole SSH times series of model and satellite
 # Plots for each segment (only to debug!):
 l_plot_trck = True ; # plots model and satellite tracks for each segment
 l_plot_spct = False ; # plot spectra for each segment
@@ -131,12 +134,16 @@ if l_plot_rawd:
     ii = cp.PlotInputSeries(VT, vsatel, vmodel, cfigure, \
                             clabS=cn_sat+' ("'+cv_sat+'")', clabM=cn_mod+' ("'+cv_mod+'")')
 
-
-vmask = vmodel.mask
-(idx_ok,) = nmp.where(vmask==False) # indexes with valid values!
-nbr_v = len(idx_ok)
-print(' *** Input data contains '+str(nbr_v)+' non masked data points among the '+str(nbr)+' points...\n')
-
+if nmp.ma.is_masked(vmodel):
+    print(' *** "vmodel" is masked...')
+    vmask = vmodel.mask
+    (idx_ok,) = nmp.where(vmask==False) ; # indexes with non-masked values!
+    nbr_v = len(idx_ok)
+    print('     ==> data contains '+str(nbr_v)+' non masked data points among the '+str(nbr)+' points...\n')
+#else:
+#    print(' *** "vmodel" is NOT masked...')
+#    #idx_ok = nmp.arange(nbr)
+#    nbr_v = nbr
 
 # Extract the Ns continuous data segments:
 ISeg_start, ISeg_stop = gzg.FindUnbrokenSegments( vt_epoch, vdist, vmodel, rcut_time=rcut_by_time, rcut_dist=rcut_by_dist )
@@ -178,11 +185,11 @@ for js in range(NbSeg):
                                          clab1=clbl_sat, cinfo=str(Nsl)+' points ('+str(it2-it1+1)+')', \
                                          L_min=13.5, L_max=1400., P_min_y=pow10_min_y, P_max_y=pow10_max_y, \
                                          vk2=Kwn, vps2=PwSpc_m[js,:], clab2=clbl_mod)
-        
+
 
 # Plotting mean spectrum:
 vps_mod = nmp.mean(PwSpc_m[:,:],axis=0)
-vps_sat = nmp.mean(PwSpc_s[:,:],axis=0) 
+vps_sat = nmp.mean(PwSpc_s[:,:],axis=0)
 
 ctime = ''
 if cseas != '': ctime=cseas+' '+cyear+'\n'
@@ -191,7 +198,7 @@ cinfrm = ctime+str(NbSeg)+' segments\n'+str(Nsl)+' points/segment\n'+r'$\Delta$d
 
 # remove white noise at fine scale for satellite (instrument) [advice from Clement Ubelmann]
 cxtr_noise=''
-if l_rm_i_noise:    
+if l_rm_i_noise:
     rwn = nmp.mean(vps_sat[Nsl-15:Nsl])
     vps_sat = vps_sat - rwn
     cxtr_noise='_denoised'
