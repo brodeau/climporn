@@ -7,12 +7,7 @@
 #
 ############################################################################
 
-#from sys import exit
-#from os import path, getcwd, mkdir
-#import argparse as ap
 import numpy as nmp
-#
-#from netCDF4 import Dataset
 #
 import matplotlib as mpl
 mpl.use('Agg')
@@ -20,15 +15,11 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 
 from .utils import sym_round_bounds
-#import climporn as cp
-
-#from .config import ivrb
 
 # Look and feel for the plot:
 clr_sat = '#AD0000'
 clr_mod = '#008ab8'
 
-#=============== en of configurable part ================================
 
 def PlotInputSeries(vt, VS, VM, cfig, clabS='Satellite', clabM='Model' ):
     ymin, ymax, dy = sym_round_bounds(min(nmp.min(VM[:]),nmp.min(VS[:])), max(nmp.max(VM[:]), nmp.max(VS[:])), base=0.1 )
