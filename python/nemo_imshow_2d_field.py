@@ -25,15 +25,21 @@ bathy_max = 5000. # m
 color_top = 'w'
 clr_yellow = '#ffed00'
 
-
-l_show_cb = True
-l_show_nm = True
+# Defaults:
+lknown = True
+rfact_zoom = 1.
+l_show_cb = False
+l_show_nm = False
 l_scientific_mode = False
 l_show_ttl = False
+vcb = [0.15, 0.96, 0.8, 0.02]
+font_rat = 1.
+
+
 
 l_show_msh = False
     
-pt_sz_track = 20
+pt_sz_track = 30
 
 l_read_lsm=False
 
@@ -204,13 +210,9 @@ elif CNEMO == 'CALEDO60':
     bathy_max = 6000. # m
     
 else:
-    print('\n PROBLEM: "'+CNEMO+'" is an unknown config!!!')
-    sys.exit(0)
-
-
-
-
-
+    print('\n WARNING [nemo_imshow_2d_field.py]: "'+CNEMO+'" is an unknown config!\n     ==> falling back on default setup')
+    lknown = False
+    i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0
 
 
 
@@ -271,7 +273,8 @@ elif cv_in == 'track':
     cpal_fld = 'nipy_spectral'
     cunit = r'SST ($^{\circ}$C)'
     cb_jump = 1
-    fig_type='svg'
+    #fig_type='svg'
+    fig_type='png'
 
 else:
     print('ERROR: variable '+cv_in+' is not known yet...'); sys.exit(0)
@@ -360,6 +363,8 @@ elif cv_in == 'track':
     id_fld = Dataset(cf_fld)
     xtmp = id_fld.variables[cv_in][:,:]
     (Nj,Ni) = xtmp.shape
+    if i2 == 0: i2 = Ni
+    if j2 == 0: j2 = Nj
     XMSK = nmp.zeros((Nj,Ni), dtype=nmp.int) ; XMSK[:,:] = 1
     XMSK[nmp.where(xtmp==-100.)] = 0
     del xtmp
@@ -398,11 +403,16 @@ print('  *** we are going to show: i1,i2,j1,j2 =>', i1,i2,j1,j2, '\n')
 nx_res = i2-i1
 ny_res = j2-j1
 yx_ratio = float(ny_res)/float(nx_res)
+
+if not lknown:
+    rfact_zoom = round(1000./float(ny_res),1)
+    print('LOLO: rfact_zoom =',rfact_zoom)
+
 nxr = int(rfact_zoom*nx_res) ; # widt image (in pixels)
 nyr = int(rfact_zoom*ny_res) ; # height image (in pixels)
 dpi = 100
 rh  = float(nxr)/float(dpi) ; # width of figure as for figure...
-
+#lilo
 
 print('\n *** width and height of image to create:', nxr, nyr, '\n')
 
@@ -621,17 +631,11 @@ if l_show_cb:
         
     del cf
     
-
-
-
 if l_show_nm:  ax.annotate(CNEMO, xy=(1, 4), xytext=(x_cnf, y_cnf), **cfont_cnfn)
 
 if l_show_ttl: ax.annotate(CNEMO, xy=(1, 4), xytext=(x_ttl, y_ttl), **cfont_ttl)
 
 
-
-
-    
 
 #plt.savefig(cfig, dpi=dpi, orientation='portrait', facecolor='b', transparent=True)
 plt.savefig(cfig, dpi=dpi, orientation='portrait', transparent=True)

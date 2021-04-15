@@ -65,8 +65,8 @@ if not path.exists(dir_figs): mkdir(dir_figs)
 cn_mod = "NEMO"
 cn_sat = "Altimetry"
 cn_box = "Unknown box"
-pow10_min_y = -8
-pow10_max_y =  2
+pow10_min_y = -8 ; pow10_max_y = 2  ; # min an max value to display in terms of 10^pow10_m??_y (=> y-axis range)
+Lmin = 10. ; Lmax = 1200. ; # smallest and largest scales to consider on the figure (=> x-axis range) [km]
 
 parser = ap.ArgumentParser(description='Generate along-track spectral comparison of SSH, model versus satellite')
 #
@@ -79,9 +79,10 @@ parser.add_argument('-n', '--npseg', type=int, default=nlen_valid_seg_default, h
 parser.add_argument('-B', '--name_box', default=cn_box,   help='name of the rectangular region (box) considered')
 parser.add_argument('-M', '--name_mod', default=cn_mod,   help='name of the model (ex: NEMO-eNATL60)')
 parser.add_argument('-S', '--name_sat', default=cn_sat,   help='name of the satellite (ex: SARAL-Altika)')
-#parser.add_argument('-z', '--zld' ,                           help='specify the topography netCDF file to use (field="z")')
 parser.add_argument('-a', '--pmin_y', type=int, default=pow10_min_y, help='minimum y-axis value to display in terms of 10^pmin_y')
 parser.add_argument('-b', '--pmax_y', type=int, default=pow10_max_y, help='maximum y-axis value to display in terms of 10^pmax_y')
+parser.add_argument('-l', '--l_min',  type=float, default=Lmin, help='smallest scales to consider on the figure (=> x-axis range) [km] (default: '+str(Lmin)+')')
+parser.add_argument('-L', '--l_max',  type=float, default=Lmax, help='largest scales to consider on the figure (=> x-axis range) [km] (default: '+str(Lmax)+')')
 #
 args = parser.parse_args()
 
@@ -94,6 +95,8 @@ cn_mod = args.name_mod
 cn_sat = args.name_sat
 pow10_min_y = args.pmin_y
 pow10_max_y = args.pmax_y
+Lmin = args.l_min
+Lmax = args.l_max
 
 
 cfs  = path.basename(cf_in)
@@ -183,18 +186,14 @@ for js in range(NbSeg):
         cfigure = dir_figs+'/'+cn_box+'_'+cseas+'_'+cn_mod+'--'+cn_sat+'_seg'+'%2.2i'%(js+1)+'.'+fig_ext
         ii = cp.plot("pow_spectrum_ssh")(Kwn, PwSpc_s[js,:], cfig_name=cfigure, \
                                          clab1=clbl_sat, cinfo=str(Nsl)+' points ('+str(it2-it1+1)+')', \
-                                         L_min=13.5, L_max=1400., P_min_y=pow10_min_y, P_max_y=pow10_max_y, \
+                                         L_min=Lmin, L_max=Lmax, P_min_y=pow10_min_y, P_max_y=pow10_max_y, \
                                          vk2=Kwn, vps2=PwSpc_m[js,:], clab2=clbl_mod)
 
 
-# Plotting mean spectrum:
+# Build mean spectra #
+######################
 vps_mod = nmp.mean(PwSpc_m[:,:],axis=0)
 vps_sat = nmp.mean(PwSpc_s[:,:],axis=0)
-
-ctime = ''
-if cseas != '': ctime=cseas+' '+cyear+'\n'
-cinfrm = ctime+str(NbSeg)+' segments\n'+str(Nsl)+' points/segment\n'+r'$\Delta$d sat.: '+str(round(rdist_sample,1))+' km'
-
 
 # remove white noise at fine scale for satellite (instrument) [advice from Clement Ubelmann]
 cxtr_noise=''
@@ -202,6 +201,14 @@ if l_rm_i_noise:
     rwn = nmp.mean(vps_sat[Nsl-15:Nsl])
     vps_sat = vps_sat - rwn
     cxtr_noise='_denoised'
+
+
+# Plot mean spectra #
+#####################
+
+ctime = ''
+if cseas != '': ctime=cseas+' '+cyear+'\n'
+cinfrm = ctime+str(NbSeg)+' segments\n'+str(Nsl)+' points/segment\n'+r'$\Delta$d sat.: '+str(round(rdist_sample,1))+' km'
 
 # Sample spacing rdist_sample
 cpout   = dir_figs+'/'+cn_box+'_MEAN_'+cn_mod+'--'+cn_sat+'__'+cseas+'___pow-spectrum'+cxtr_noise
@@ -211,7 +218,7 @@ if ivrb>1: print(' *** cn_sat =', cn_sat)
 
 ii = cp.plot("pow_spectrum_ssh")(Kwn, vps_mod, clab1=clbl_mod, clr1=clr_mod, lw1=5, \
                                  cfig_name=cfigure, cinfo=cinfrm, logo_on=False, \
-                                 L_min=10., L_max=1200., P_min_y=pow10_min_y, P_max_y=pow10_max_y, \
+                                 L_min=Lmin, L_max=Lmax, P_min_y=pow10_min_y, P_max_y=pow10_max_y, \
                                  l_show_k4=False, l_show_k5=True, l_show_k11o3=False, l_show_k2=True, \
                                  vk2=Kwn, vps2=vps_sat, clab2=clbl_sat, clr2=clr_sat, lw2=4)
 
