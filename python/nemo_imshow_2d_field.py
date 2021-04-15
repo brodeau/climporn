@@ -403,16 +403,12 @@ print('  *** we are going to show: i1,i2,j1,j2 =>', i1,i2,j1,j2, '\n')
 nx_res = i2-i1
 ny_res = j2-j1
 yx_ratio = float(ny_res)/float(nx_res)
-
 if not lknown:
     rfact_zoom = round(1000./float(ny_res),1)
-    print('LOLO: rfact_zoom =',rfact_zoom)
-
 nxr = int(rfact_zoom*nx_res) ; # widt image (in pixels)
 nyr = int(rfact_zoom*ny_res) ; # height image (in pixels)
 dpi = 100
 rh  = float(nxr)/float(dpi) ; # width of figure as for figure...
-#lilo
 
 print('\n *** width and height of image to create:', nxr, nyr, '\n')
 
