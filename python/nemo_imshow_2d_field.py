@@ -472,10 +472,9 @@ else:
 #fig = plt.figure(num = 1, figsize=(rh,rh*yx_ratio*rextra_height), dpi=None, facecolor='w', edgecolor='0.5')
 
 
-print('figsize =', (rh,rh*yx_ratio) )
-#sys.exit(0)
+fsize = ( rh, rh*yx_ratio )
 
-fig = plt.figure(num = 1, figsize=(rh,rh*yx_ratio), dpi=None, facecolor='k', edgecolor='k')
+fig = plt.figure(num = 1, figsize=fsize, dpi=None, facecolor='k', edgecolor='k')
 
 if l_scientific_mode:
     ax  = plt.axes([0.09, 0.09, 0.9, 0.9], facecolor = 'r')
@@ -532,10 +531,9 @@ if cfield == 'Bathymetry':
         print('  => done filling "pfilled" !\n')
 
     
-print('Ploting')
-
 if cv_in == 'track':
-    #lilo        
+
+    XFLD[nmp.where(nmp.isnan(XFLD))] = -1000
     indx = nmp.where( XFLD > 0 )
     (idy,idx) = indx
     
@@ -560,23 +558,14 @@ if l_show_msh:
 
 
 
-    
-#vj = nmp.arange(0,Nj-20,20)
-#for jj in vj:
-#    ccx = plt.plot(nmp.arange(len(Xlat[jj,:])), 5.*Xlat[jj,:], 'k', linewidth=0.5)
-
-#vi = nmp.arange(0,Ni-20,20)
-#for ii in vi:
-#    ccx = plt.plot(nmp.arange(len(Xlon[:,ii])), 5.*Xlon[:,ii], 'k', linewidth=0.5)
 
 
 del XFLD
-print('Done!')
 
 
 
 if l_add_topo_land:
-    print('Ploting topography over continents...')
+    #print('Ploting topography over continents...')
     #cp.dump_2d_field( 'xtopo.nc', xtopo ); #, xlon=[], xlat=[], name='field', unit='', long_name='', mask=[] )
     #cp.dump_2d_field( 'xmsk.nc', XMSK ); #, xlon=[], xlat=[], name='field', unit='', long_name='', mask=[] )
     xtopo = nmp.log10(xtopo+rof_log)
