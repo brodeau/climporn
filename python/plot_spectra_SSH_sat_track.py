@@ -134,8 +134,8 @@ print(' *** Year = '+cyear+'\n')
 # Plot time-series of SSH as found in input file:
 if l_plot_rawd:
     cfigure = dir_figs+'/fig_raw_data_'+cn_mod+'--'+cn_sat+'.'+fig_ext
-    ii = cp.PlotInputSeries(VT, vsatel, vmodel, cfigure, \
-                            clabS=cn_sat+' ("'+cv_sat+'")', clabM=cn_mod+' ("'+cv_mod+'")')
+    ii = cp.PlotSLASeries(VT, vsatel, vmodel, cfigure, \
+                          clabS=cn_sat+' ("'+cv_sat+'")', clabM=cn_mod+' ("'+cv_mod+'")')
 
 if nmp.ma.is_masked(vmodel):
     print(' *** "vmodel" is masked...')
