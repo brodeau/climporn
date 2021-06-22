@@ -1,9 +1,13 @@
 #!/usr/bin/env python3
-
-#       B a r a K u d a
 #
-#       L. Brodeau, 2017]
-
+#     CLIMPORN
+#
+# Converts a NetCDF 2D mask field into a black & white bitmap image
+#  ==> idea is to edit this image with a powerful image-editing software like Gimp
+#      and convert back the result to a new NetCDF field using `imageBW_to_NetCDF.py` !!!
+#
+#    L. Brodeau, 2021
+#
 import sys
 import numpy as nmp
 from PIL import Image
