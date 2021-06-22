@@ -8,6 +8,7 @@
 #
 #    L. Brodeau, 2021
 #
+
 import sys
 import numpy as nmp
 from PIL import Image
