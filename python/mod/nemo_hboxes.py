@@ -296,6 +296,11 @@ class nemo_hbox:
             x_clock = 50 ; y_clock = 40
             l_add_logo=False ; l_add_logo_ige=False ; l_add_logo_prc=False
 
+        #elif [ config, box ] == [ 'eNATL60', 'Florida']:
+        #    i1=0; j1=600; i2=1920; j2=j1+1080 ; rfact_zoom=1. ; vcb=[0.05, 0.94, 0.38, 0.018] ; font_rat = 2.
+        #    x_clock = 50 ; y_clock = 40
+        #    l_add_logo=False ; l_add_logo_ige=False ; l_add_logo_prc=False
+
 
         elif [ config, box ] == [ 'EORCA12.L75', 'SATL']:
             i1=2520 ; j1=700 ; i2=i1+1280 ; j2=j1+720 ; rfact_zoom=1 ; vcb=[0.2, 0.1, 0.6, 0.024]  ; font_rat=2.*rfact_zoom

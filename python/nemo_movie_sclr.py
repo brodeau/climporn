@@ -178,7 +178,6 @@ elif CWHAT == 'SST':
     cv_in = 'sosstsst' ; cv_out = CWHAT ; #in ['sosstsst','tos']:    
     tmin=-2 ;  tmax=32.   ;  df = 1. ; cpal_fld = 'ncview_nrl' ;     cb_jump = 2
     cunit = r'SST ($^{\circ}$C)'
-    if CBOX == 'ALL':      l_do_ice = True
     if CBOX == 'EUROPA':   tmin=0. ;  tmax=25.
     if CBOX == 'EUROPAs':  tmin=6. ;  tmax=18.
     if CBOX == 'Med':      tmin=10.;  tmax=30. ; cb_jump = 1
@@ -188,6 +187,7 @@ elif CWHAT == 'SST':
     if CBOX == 'GrlIcl':   tmax = 12.
     if CBOX in [ 'AzoresP','AzoresL','AzoresS']:  tmin = 15. ; tmax = 25. ; df=0.5
     if CBOX == 'Bretagne': tmin = 10. ; tmax = 22. ; df=1.
+    if CNEMO == "CALEDO60": l_do_ice = False ; tmin=18. ;  tmax=30. ; cb_jump=1 ; df=1 ; cv_in = 'tos'
     
 elif CWHAT == 'T_1000':
     cv_in = 'votemper' ; cv_out = CWHAT ;
@@ -334,7 +334,7 @@ l_3d_field = False
 # Ice:
 if l_do_ice:
     cv_ice  = 'ileadfrac'
-    cf_ice = replace(cf_in, 'gridT-2D', 'icemod')
+    cf_ice = str.replace(cf_in, 'gridT-2D', 'icemod')
     rmin_ice = 0.25
     #cpal_ice = 'ncview_bw'
     #cpal_ice = 'Blues_r'
@@ -440,7 +440,7 @@ XLSM = nmp.zeros((nj,ni)) ; # will define real continents not NEMO mask...
 if l_add_topo_land:
     bt.chck4f(cf_topo_land)
     id_top = Dataset(cf_topo_land)
-    print(' *** Reading 'z' into:\n'+cf_topo_land)
+    print(' *** Reading "z" into:\n'+cf_topo_land)
     xtopo = id_top.variables['z'][0,j1:j2,i1:i2]
     id_top.close()
     if nmp.shape(xtopo) != (nj,ni):
@@ -548,12 +548,12 @@ for jt in range(jt0,Nt):
 
         fig = plt.figure(num = 1, figsize=(rw_fig, rh_fig), dpi=None, facecolor='w', edgecolor='0.5')
     
-        ax  = plt.axes([0., 0., 1., 1.], facecolor = '0.85') # missing seas will be in 'facecolor' !
+        ax  = plt.axes([0., 0., 1., 1.], facecolor = '0.7') # missing seas will be in 'facecolor' !
     
         vc_fld = nmp.arange(tmin, tmax + df, df)
     
     
-        print('Reading record #'+str(jt)+' of '+cvx_in+' in '+cfx_in)
+        print('Reading record #'+str(jt)+' of '+cv_in+' in '+cf_in)
         if l3d: print('            => at level #'+str(jk)+' ('+cdepth+')!')
     
         if l_notime:
