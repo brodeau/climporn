@@ -1,5 +1,13 @@
+#!/usr/bin/env python3
+# -*- Mode: Python; coding: utf-8; indent-tabs-mode: nil; tab-width: 4 -*-
+#
+#   ///// https://github.com/brodeau/climporn \\\\\
+#
+#       L. Brodeau, 2021
+#
+############################################################################
 
-import sys
+from sys import exit
 import os
 import numpy as nmp
 
@@ -12,13 +20,19 @@ import numpy as nmp
 ris2 = 1./nmp.sqrt(2.)
 
 
+def MsgExit( cmsg ):
+    print('\n ERROR: '+cmsg+' !\n')
+    exit(0)
+
+
+
 def chck4f(cf, script_name=''):
 
-    cmesg = 'ERROR: File '+cf+' does not exist !!!'
-    if script_name != '': cmesg = 'ERROR in script '+script_name+': File '+cf+' does not exist !!!'
+    cmesg = 'File '+cf+' does not exist !!!'
+    if script_name != '': cmesg = 'in script '+script_name+': File '+cf+' does not exist !!!'
 
     if not os.path.exists(cf):
-        print(cmesg) ; sys.exit(0)
+        MsgExit(cmesg)
     else:
         print(' *** will open file '+cf)
 
@@ -40,7 +54,7 @@ def check_env_var(cnm, list):
         if cenv is None:
             print(" ERROR in "+cnm+":")
             print("  => the {} environement is not set".format(cv))
-            sys.exit(0)
+            exit(0)
         env_var_dic[cv] = cenv
         print(" *** "+cv+" => "+cenv)
 
@@ -48,7 +62,16 @@ def check_env_var(cnm, list):
     return env_var_dic
 
 
-
+def EpochT2Str( time ):
+    '''
+    # Input: UNIX epoch time (integer or float)
+    # Returns: a string of the date understandable by mamals...
+    '''
+    from datetime import datetime as dtm
+    #
+    itime = int(round(time,0))
+    #
+    return dtm.utcfromtimestamp(itime).strftime('%c')
 
 
 def round_to_multiple_of(x, prec=2, base=0.5):
@@ -60,24 +83,18 @@ def int_as_multiple_of(x, base=5):
     return int(base * round(float(x)/base))
 
 
-def lon_180_180(x):
-    rsign = 1.
-    if 180.-x < 0.: rsign=-1.
-    return rsign*min(x,abs(x-360.))
+def degE_to_degWE( X ):
+    '''
+    # From longitude in 0 -- 360 frame to -180 -- +180 frame...
+    '''
+    if nmp.shape( X ) == ():
+        # X is a scalar
+        from math import copysign
+        return     copysign(1., 180.-X)*        min(X,     abs(X-360.))
+    else:
+        # X is an array
+        return nmp.copysign(1., 180.-X)*nmp.minimum(X, nmp.abs(X-360.))
 
-def long_to_m180_p180(xx):
-    ## Forces longitude to be in the -180:180 frame...
-    ## xx: longitude
-    xx   = xx % 360.
-    rlon = copysign(1.,180.-xx)*min(xx, abs(xx-360.)) ;
-    return rlon
-#
-def long_to_m180_p180_vct(xx):
-    ## Forces longitude to be in the -180:180 frame...
-    ## xx: longitude
-    xx   = xx % 360.
-    xlon = nmp.copysign(1.,180.-xx)*nmp.minimum(xx, nmp.abs(xx-360.)) ;
-    return xlon
 
 
 def get_sections_from_file(cfile):
@@ -133,7 +150,7 @@ def monthly_2_annual(vtm, XDm):
     if nt < nbm:
         print('ERROR: vmonthly_2_vannual.clprn_tool.py => vt and data disagree in size!')
         print('      => size vt = '+str(nbm)+' / size data = '+str(nt))
-        sys.exit(0)
+        exit(0)
     if nt > nbm:
         print('WARNING: vmonthly_2_vannual.clprn_tool.py => vt and data disagree in size!')
         print('      => size vt = '+str(nbm)+' / size data = '+str(nt))
@@ -143,7 +160,7 @@ def monthly_2_annual(vtm, XDm):
         print('      => new shape of data =', nmp.shape(XDm),'\n')
 
 
-    if nbm%12 != 0: print('ERROR: vmonthly_2_vannual.clprn_tool.py => not a multiple of 12!'); sys.exit(0)
+    if nbm%12 != 0: print('ERROR: vmonthly_2_vannual.clprn_tool.py => not a multiple of 12!'); exit(0)
 
     nby = nbm/12
     vty = nmp.zeros(nby)
@@ -203,7 +220,7 @@ def find_ij_region_box(vbox4, VX, VY):
 
     if i_x_min == -1 or i_x_max == -1 or j_y_min == -1 or j_y_max == -1:
         print('ERROR: clprn_tool.find_ij_region_box, indiex not found')
-        sys.exit(0)
+        exit(0)
 
     if jy_inc == -1: jdum = j_y_min; j_y_min = j_y_max; j_y_max = jdum
 
@@ -242,7 +259,7 @@ def read_ascii_column(cfile, ivcol2read):
         ls = ll.split()
         if ls[0] != '#': jl = jl + 1
     nbl = jl
-    #print('number of lines = ', nbl ; sys.exit)
+    #print('number of lines = ', nbl ; exit)
     #
     Xout  = nmp.zeros((nbcol,nbl))
     #
@@ -334,7 +351,7 @@ def find_index_from_value( val, VX ):
     if val > nmp.max(VX) or val < nmp.min(VX):
         print('ERROR: find_index_from_value.clprn_tool => value "'+str(val)+'"outside range of Vector!')
         print(VX[:]) ; print(' => value =', val)
-        sys.exit(0)
+        exit(0)
     jval = -1; jj = 0 ; lfound = False
     while not lfound:
         if VX[jj] <= val and VX[jj + 1] > val:
@@ -374,7 +391,7 @@ def drown(X, mask, k_ew=-1, nb_max_inc=5, nb_smooth=5):
     nbdim = len(nmp.shape(X))
 
     if nbdim > 3 or nbdim <2:
-        print(cmesg+' size of data array is wrong!!!'); sys.exit(0)
+        print(cmesg+' size of data array is wrong!!!'); exit(0)
 
 
     nt = 1
@@ -383,11 +400,11 @@ def drown(X, mask, k_ew=-1, nb_max_inc=5, nb_smooth=5):
 
     if l_record:
         if nmp.shape(X[0,:,:]) != nmp.shape(mask):
-            print(cmesg+' size of data and mask do not match!!!'); sys.exit(0)
+            print(cmesg+' size of data and mask do not match!!!'); exit(0)
         (nt,nj,ni) = nmp.shape(X)
     else:
         if nmp.shape(X) != nmp.shape(mask):
-            print(cmesg+' size of data and mask do not match!!!'); sys.exit(0)
+            print(cmesg+' size of data and mask do not match!!!'); exit(0)
         (nj,ni) = nmp.shape(X)
 
     if nmp.sum(mask) == 0 :
@@ -474,7 +491,7 @@ def drown(X, mask, k_ew=-1, nb_max_inc=5, nb_smooth=5):
         nm1 =  n-1
         nk1 = -n+1
         nl1 = -n-1
-        
+
         if nb_smooth >= 1:
 
             dold[:,:] = Xtemp[:,:]
@@ -533,7 +550,7 @@ def extend_domain(ZZ, ext_east_deg, skp_west_deg=0):
     vdim = ZZ.shape
     ndim = len(vdim)
 
-    if ndim < 1 or ndim > 3: print('extend_conf.py: ERROR we only treat 1D or 2D arrays...'); sys.exit(0)
+    if ndim < 1 or ndim > 3: print('extend_conf.py: ERROR we only treat 1D or 2D arrays...'); exit(0)
     if ndim == 3: [ nz , ny , nx ] = vdim
     if ndim == 2:      [ ny , nx ] = vdim
     if ndim == 1:           [ nx ] = vdim
@@ -585,13 +602,13 @@ def mk_zonal(XF, XMSK=[0.], r_mask_from_val=-9999.):
         Nt = 1
     else:
         print(' ERROR (mk_zonal of clprn_tool.py): dimension of your field is weird!')
-        sys.exit(0)
+        exit(0)
     #
     if len(nmp.shape(XMSK)) == 2:
         (n2,n1) = XMSK.shape
         if n2 != ny or n1 != nx:
             print('ERROR: mk_zonal.clprn_tool.py => XF and XMSK do not agree in size!')
-            sys.exit(0)
+            exit(0)
     else:
         # Need to build the mask
         xtmp = nmp.zeros((ny,nx))
@@ -660,7 +677,7 @@ def read_coor(cf, ctype='int', lTS_bounds=False):
                 vj2.append(float(ls[4]))
             else:
                 print('ERROR: read_coor => ctype must be "int" or "float"')
-                sys.exit(0)
+                exit(0)
             #
             if lTS_bounds:
                 # Min and max values for temperature and salinity
@@ -677,7 +694,7 @@ def read_coor(cf, ctype='int', lTS_bounds=False):
                     vSl.append(float(37.)) ; # PSU
                 else:
                     print('ERROR: read_coor => something wrong in line "'+ls[0]+'" !')
-                    sys.exit(0)
+                    exit(0)
         #
         if ls[0] == 'EOF': leof = True
 
@@ -703,7 +720,7 @@ def test_nb_years(vt, cd):
         print('ERROR: '+csn+' for diag='+cd)
         print('       => the time vector seems to be neither monthly nor annual!')
         print('       => Nb. rec. = '+str(nb_rec))
-        sys.exit(0)
+        exit(0)
     ttick = iaxe_tick(nb_y)
     return (nb_y, nb_m, nb_rec, ttick)
 
@@ -741,7 +758,7 @@ def smoother(X, msk, nb_smooth=5):
     nbdim = len(nmp.shape(X))
 
     if nbdim != 2:
-        print(cmesg+' size of data array is wrong!!!'); sys.exit(0)
+        print(cmesg+' size of data array is wrong!!!'); exit(0)
 
     (nj,ni) = nmp.shape(X)
 
@@ -781,8 +798,16 @@ def round_bounds_above(x, base=5):
     from math import copysign, ceil
     return copysign( base * ceil(abs(x)/base) , x)
 
+def sym_round_bounds( x1, x2,  base=5, nbticks=10 ):
+    #lilo
+    rr  = max(abs(x1), abs(x2))
+    rmx = round_bounds_above(rr, base=base)
+    dr  = 2.*rmx/nbticks
+    return -rmx, rmx, dr
+
 
 def round_bounds( x1, x2,  base=5, prec=3 ):
+    from math import floor, ceil
     rmin =  base * round( floor(float(x1)/base), prec )
     rmax =  base * round(  ceil(float(x2)/base), prec )
     return rmin, rmax

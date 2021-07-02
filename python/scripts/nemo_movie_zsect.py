@@ -30,11 +30,7 @@ import datetime
 
 from re import split
 
-import clprn_colmap as bcm
-
-import clprn_plot as bp
-import clprn_tool as bt
-import clprn_ncio as bnc
+import climporn as cp
 
 
 l_use_dark_backgound = True
@@ -278,10 +274,10 @@ cdd0=csd0[6:8]
 l_3d_field = False
 
 
-bt.chck4f(cf_mm)
+cp.chck4f(cf_mm)
 
 l_notime=False
-bt.chck4f(cf_in)
+cp.chck4f(cf_in)
 id_fld = Dataset(cf_in)
 list_var = id_fld.variables.keys()
 if 'time_counter' in list_var:
@@ -300,7 +296,7 @@ if not l_notime: Nt = len(vtime)
 
 
 
-bt.chck4f(cf_mm)
+cp.chck4f(cf_mm)
 id_lsm = Dataset(cf_mm)
 #
 nb_dim = len(id_lsm.variables[cv_msk].dimensions)
@@ -390,12 +386,12 @@ cfont_titl =  { 'fontname':'', 'fontweight':'light', 'fontsize':int(30.*font_rat
 
 
 # Colormaps for fields:
-pal_fld = bcm.chose_colmap(cpal_fld)
+pal_fld = cp.chose_colmap(cpal_fld)
 norm_fld = colors.Normalize(vmin=tmin, vmax=tmax, clip=False)
 
 
 if l_show_lsm:
-    pal_lsm = bcm.chose_colmap('land_dark')
+    pal_lsm = cp.chose_colmap('land_dark')
     norm_lsm = colors.Normalize(vmin=0., vmax=1., clip=False)
 
 
@@ -488,19 +484,19 @@ for jt in range(jt0,Nt):
     #    print ' *** Computing gradient of "'+cv_in+'"!'
     #    lx = nmp.zeros((nj,ni))
     #    ly = nmp.zeros((nj,ni))
-    #     if l_smooth: bt.smoother(Xplot, XMSK, nb_smooth=nb_smooth)
+    #     if l_smooth: cp.smoother(Xplot, XMSK, nb_smooth=nb_smooth)
     #    # Zonal gradient on T-points:
     #    lx[:,1:ni-1] = (Xplot[:,2:ni] - Xplot[:,0:ni-2]) / (XE1U[:,1:ni-1] + XE1U[:,0:ni-2]) * UMSK[:,1:ni-1] * UMSK[:,0:ni-2]
     #    lx[:,:] = XMSK[:,:]*lx[:,:]
-    #    #bnc.dump_2d_field('dsst_dx_gridT.nc', lx, xlon=Xlon, xlat=Xlat, name='dsst_dx')
+    #    #cp.dump_2d_field('dsst_dx_gridT.nc', lx, xlon=Xlon, xlat=Xlat, name='dsst_dx')
     #    # Meridional gradient on T-points:
     #    ly[1:nj-1,:] = (Xplot[2:nj,:] - Xplot[0:nj-2,:]) / (XE2V[1:nj-1,:] + XE2V[0:nj-2,:]) * VMSK[1:nj-1,:] * VMSK[0:nj-2,:]
     #    ly[:,:] = XMSK[:,:]*ly[:,:]
-    #    #bnc.dump_2d_field('dsst_dy_gridT.nc', ly, xlon=Xlon, xlat=Xlat, name='dsst_dy')
+    #    #cp.dump_2d_field('dsst_dy_gridT.nc', ly, xlon=Xlon, xlat=Xlat, name='dsst_dy')
     #    Xplot[:,:] = 0.0
     #    # Modulus of vector gradient:        
     #    Xplot[:,:] = nmp.sqrt(  lx[:,:]*lx[:,:] + ly[:,:]*ly[:,:] )
-    #    #bnc.dump_2d_field('mod_grad_sst.nc', Xplot, xlon=Xlon, xlat=Xlat, name='dsst')
+    #    #cp.dump_2d_field('mod_grad_sst.nc', Xplot, xlon=Xlon, xlat=Xlat, name='dsst')
     #    del lx, ly
 
 
@@ -510,8 +506,8 @@ for jt in range(jt0,Nt):
     if l_save_nc:
         cf_out = 'nc/'+CWHAT+'_NEMO_'+CNEMO+'_'+CSEC+'_'+cday+'_'+chour+'.nc'
         print ' Saving in '+cf_out
-        bnc.dump_2d_field(cf_out, Xplot, xlon=Vx, xlat=Vdepth, name=CWHAT)
-        bnc.dump_2d_field(cf_out, Xplot, name=CWHAT)
+        cp.dump_2d_field(cf_out, Xplot, xlon=Vx, xlat=Vdepth, name=CWHAT)
+        cp.dump_2d_field(cf_out, Xplot, name=CWHAT)
         print ''
 
 
@@ -528,9 +524,9 @@ for jt in range(jt0,Nt):
 
     del Xplot
 
-    if l_merid: bp.__nice_latitude_axis__( ax, plt, x_min, x_max, dx, axt='x')
-    if l_zonal: bp.__nice_longitude_axis__(ax, plt, x_min, x_max, dx, axt='x')
-    bp.__nice_depth_axis__(ax, plt, 0., nmp.max(Vdepth), l_log=False, l_z_inc=False, cunit='Depth [m]', cfont=cfont_ylb)
+    if l_merid: cp.__nice_latitude_axis__( ax, plt, x_min, x_max, dx, axt='x')
+    if l_zonal: cp.__nice_longitude_axis__(ax, plt, x_min, x_max, dx, axt='x')
+    cp.__nice_depth_axis__(ax, plt, 0., nmp.max(Vdepth), l_log=False, l_z_inc=False, cunit='Depth [m]', cfont=cfont_ylb)
 
     if l_show_lsm:
         clsm = plt.pcolormesh(Vx[:], Vdepth[:], nmp.ma.masked_where(XMSK>0.0001, XMSK), cmap=pal_lsm, norm=norm_lsm) ###, interpolation='none')

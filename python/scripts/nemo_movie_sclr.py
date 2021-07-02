@@ -29,12 +29,7 @@ import datetime
 
 from re import split
 
-import clprn_colmap as bcm
-import clprn_tool as bt
-import clprn_ncio as bnc
-
-# ClimPorn:
-import nemo_hboxes as nhb
+import climporn as cp
 
 
 
@@ -58,6 +53,7 @@ jt0 = 0
 
 jk=0
 l_show_lsm = True
+l_do_ice  = False
 l_log_field = False
 l_pow_field = False
 
@@ -65,11 +61,15 @@ l_pow_field = False
 rof_log = 150.
 rof_dpt = 0.
 
-l_3d_field = False
+grav = 9.80665 # same as in NEMO 3.6
 
 l_save_nc = False ; # save the field we built in a netcdf file !!!
 
 romega = 7.292115083046062E-005 # same as in NEMO 3.6 / #romega = 2.*nmp.pi/86400.0
+
+l_apply_lap   = False
+l_apply_hgrad = False
+l_apply_geov  = False
 
 cb_extend = 'both' ;#colorbar extrema
 
@@ -82,10 +82,7 @@ print("\n --- logos found into : "+dir_logos+" !\n")
 parser = ap.ArgumentParser(description='Generate pixel maps of a given scalar.')
 
 requiredNamed = parser.add_argument_group('required arguments')
-requiredNamed.add_argument('-u', '--fiu' , required=True, help='specify the NEMO netCDF U file to read from...')
-requiredNamed.add_argument('-v', '--fiv' , required=True, help='specify the NEMO netCDF V file to read from...')
-requiredNamed.add_argument('-x', '--fldx', required=True, help='specify the name of the NEMO U field in U file')
-requiredNamed.add_argument('-y', '--fldy', required=True, help='specify the name of the NEMO V field in V file')
+requiredNamed.add_argument('-i', '--fin' , required=True,                help='specify the NEMO netCDF file to read from...')
 requiredNamed.add_argument('-w', '--what', required=True, help='specify the field/diagnostic to plot (ex: CSPEED,CURLOF,ect.)')
 
 parser.add_argument('-C', '--conf', default="none",           help='specify NEMO config (ex: eNATL60)')
@@ -101,10 +98,7 @@ args = parser.parse_args()
 CNEMO = args.conf
 CBOX  = args.box
 CWHAT = args.what
-cfx_in = args.fiu
-cfy_in = args.fiv
-cvx_in = args.fldx
-cvy_in = args.fldy
+cf_in = args.fin
 cf_mm = args.fmm
 csd0  = args.sd0
 jk    = args.lev
@@ -115,10 +109,7 @@ print('')
 print(' *** CNEMO = ', CNEMO)
 print(' *** CBOX  = ', CBOX)
 print(' *** CWHAT = ', CWHAT)
-print(' *** cfx_in = ', cfx_in)
-print(' *** cvx_in = ', cvx_in)
-print(' *** cfx_in = ', cfy_in)
-print(' *** cvx_in = ', cvy_in)
+print(' *** cf_in = ', cf_in)
 print(' *** cf_mm = ', cf_mm)
 print(' *** csd0 = ', csd0)
 print(' ***   jk  = ', jk)
@@ -150,7 +141,7 @@ if CNEMO == 'none':
 
 #---------------------------------------------------------------
 
-nemo_box = nhb.nemo_hbox(CNEMO,CBOX)
+nemo_box = cp.nemo_hbox(CNEMO,CBOX)
 
 (Ni0,Nj0) = nemo_box.size()
 print(' '+CNEMO+': Ni0,Nj0 => ', Ni0,Nj0)
@@ -170,102 +161,124 @@ if nemo_box.l_add_logo: (x_logo,y_logo) = nemo_box.logo
 
 
 
+cv_out = CWHAT ; # default
 
-l_do_crl=False
-l_do_cof=False
-l_do_cspd=False
-l_do_tke=False
-l_do_eke=False
+if   CWHAT == 'MLD':
+    cv_in = 'somxl010' ; cv_out = 'MLD'
+    tmin=0. ;  tmax=1800.  ;  df = 50. ; cpal_fld = 'ncview_hotres' ;     cb_jump = 4
+    cunit = r'MLD [m]'
+    if CBOX == 'Nordic': tmin=0. ; tmax=1000. ; cb_jump = 2 ; cpal_fld = 'magma_r' ; color_top_cb='k'
 
-if   CWHAT == 'CURL':
-    cpal_fld = 'on2' ; tmin=-1.2 ;  tmax=-tmin ;  df = 0.1 ; cb_jump = 2
-    l_do_crl = True  ; # do curl (relative-vorticity) !!!
+elif CWHAT == 'SST':
+    cv_in = 'sosstsst' ; cv_out = CWHAT ; #in ['sosstsst','tos']:    
+    tmin=-2 ;  tmax=32.   ;  df = 1. ; cpal_fld = 'ncview_nrl' ;     cb_jump = 2
+    cunit = r'SST ($^{\circ}$C)'
+    if CBOX == 'EUROPA':   tmin=0. ;  tmax=25.
+    if CBOX == 'EUROPAs':  tmin=6. ;  tmax=18.
+    if CBOX == 'Med':      tmin=10.;  tmax=30. ; cb_jump = 1
+    if CBOX == 'Med+BS':   tmin=7. ;  tmax=25.
+    if CBOX == 'LabSea':   tmin=-2.;  tmax=15.
+    if CBOX == 'Brittany': tmin=7. ;  tmax=13.
+    if CBOX == 'GrlIcl':   tmax = 12.
+    if CBOX in [ 'AzoresP','AzoresL','AzoresS']:  tmin = 15. ; tmax = 25. ; df=0.5
+    if CBOX == 'Bretagne': tmin = 10. ; tmax = 22. ; df=1.
+    if CNEMO == "CALEDO60": l_do_ice = False ; tmin=18. ;  tmax=30. ; cb_jump=1 ; df=1 ; cv_in = 'tos'
+    
+elif CWHAT == 'T_1000':
+    cv_in = 'votemper' ; cv_out = CWHAT ;
+    tmin=0. ;  tmax=14.   ;  df = 1. ; cpal_fld = 'ncview_nrl' ; cb_jump = 1
+    cunit = r'Potential temperature at 1000 m'
+
+elif CWHAT == 'T_60':
+    cv_in = 'votemper' ; cv_out = CWHAT ;
+    tmin=0. ;  tmax=14.   ;  df = 1. ; cpal_fld = 'ncview_nrl' ; cb_jump = 1
+    cunit = r'Potential temperature at 60 m'
+    if CBOX == 'BlackSea' : tmin=0. ; tmax=20. ;  df = 1.   ; cb_jump = 1 ; #cpal_fld = 'gist_stern_r'
+
+elif CWHAT == 'SSS':
+    cv_in = 'sosaline' ; cv_out = CWHAT ; #in ['sosstsst','tos']:    
+    tmin=20. ;  tmax=40.   ;  df = 2. ; cpal_fld = 'ncview_ssec' ; cb_jump = 2
+    cunit = r'Sea surface salinity'
+    if CBOX == 'Med' :    tmin=33. ; tmax=39.5 ;  df = 0.25 ; cpal_fld = 'magma'
+    if CBOX == 'LabSea' : tmin=28. ; tmax=35.5 ;  df = 1.   ; cb_jump = 1 ; cpal_fld = 'gist_stern_r'
+
+elif CWHAT == 'S_1000':
+    cv_in = 'vosaline' ; cv_out = CWHAT ;
+    tmin=33.5 ;  tmax=36.5   ;  df = 0.5 ; cpal_fld = 'ncview_helix2' ; cb_jump = 1
+    cunit = r'Salinity at 1000 m'
+    if CBOX == 'MeddiesW' : tmin=35. ;  tmax=36.6 ; df = 0.1
+
+elif CWHAT == 'GRAD_SST':
+    cv_in = 'sosstsst' ; cv_out = CWHAT ;
+    l_apply_hgrad = True
+    l_smooth = True ; nb_smooth  = 5
+    tmin=0. ;  tmax=0.001 ;  df = 0.0001 ; cpal_fld = 'ncview_hotres' ; cb_jump = 1
+    cunit = r'$\left|\vec{\nabla}SST\right|$ (K/m)'
+
+elif CWHAT == 'SSU':
+    cv_in = 'sozocrtx' ; cv_out = CWHAT ;
+    tmin=-0.8 ;  tmax=-tmin  ;  df = 0.1 ; cpal_fld = 'bone' ; cb_jump = 1
+    cunit = r'Zonal component of current speed [m/s]'
+    cv_msk = 'umask'
+
+elif CWHAT == 'SSV':
+    cv_in = 'somecrty' ; cv_out = CWHAT ;
+    tmin=-1. ;  tmax=-tmin  ;  df = 0.2 ; cpal_fld = 'bone' ; cb_jump = 1
+    cunit = r'Meridional component of current speed [m/s]'
+    cv_msk = 'vmask'
+
+elif CWHAT == 'SSH':
+    cv_in = 'sossheig' ; cv_out = CWHAT ;
+    cpal_fld = 'RdBu_r' ; tmin=-3. ;  tmax=-tmin   ;  df = 0.5 ;
+    cb_jump = 1
+    cunit = r'SSH [m]'
+    if CBOX == 'Med' or CBOX == 'Med+BS': tmin=-0.7; tmax=0.2   ; df = 0.1
+    if CRUN[:4] == 'BLB0':                tmin=-1.2; tmax=-tmin ; df = 0.2
+    if CBOX in [ 'Bretagne']:             tmin=-4.;  tmax=-tmin ; df = 0.5
 
 elif CWHAT == 'CURLOF':
-    l_do_cof = True  ; # do curl/f
-    cpal_fld = 'on2' ; tmin=-1.2 ;  tmax=-tmin ;  df = 0.1 ; cb_jump = 2
+    cv_in = 'socurloverf' ; cv_out = CWHAT ;
+    #tmin=-0.8 ;  tmax=-tmin  ;  df = 0.1  ; cb_jump = 2 ;
+    tmin=-0.7 ;  tmax=-tmin  ;  df = 0.1  ; cb_jump = 1
+    cpal_fld='RdBu_r' ; color_top_cb='k' ; # cpal_fld = 'on2' 
     cunit = r'$\zeta/f$'
-    if CBOX ==     'ALLC': tmin=-1. ;  tmax=-tmin ; df = 0.1 ; cb_jump = 2 ; cpal_fld='RdBu_r'; #; cpal_fld = 'bone'
-    #if CBOX ==     'ALLFR': tmin=-1. ;  tmax=-tmin ; df = 0.1 ; cb_jump = 2 ; cpal_fld='RdBu_r'; #; cpal_fld = 'bone'
-    #if CBOX ==      'Med': tmin=-1. ;  tmax=-tmin ; df = 0.1 ; cb_jump = 2 ; cpal_fld='RdBu_r'
-    if CBOX ==      'Med': tmin=-1. ;  tmax=-tmin ; df = 0.1 ; cb_jump = 2
-    if CBOX in ['AzoresP','MeddiesW','ALLFR']: tmin=-0.8 ;  tmax=-tmin ;  df = 0.1 ; cb_jump = 1
-    if CBOX == 'BlackSea': tmin=-0.6 ;  tmax=-tmin  ; df = 0.1 ; cb_jump = 1
-    if CBOX ==  'EATLcom': tmin=-1. ;  tmax=-tmin ; df = 0.1 ; cb_jump = 2
-    if CNEMO in ['TROPICO05_NST','CALEDO10']: tmin=-0.5 ;  tmax=-tmin ; df = 0.05 ; cb_jump = 2    
-    if CNEMO in ['CALEDO60']: tmin=-1. ;  tmax=-tmin ; df = 0.1 ; cb_jump = 2    
+    cv_msk = 'vmask'
 
-elif CWHAT == 'CURLOF_1000':
-    l_do_cof = True  ; # do curl/f
-    cpal_fld = 'on2' ; tmin=-0.6 ;  tmax=-tmin ;  df = 0.1 ; cb_jump = 1
-    cunit = r'$\zeta/f$ at 1000 m'
     
-elif CWHAT == 'CSPEED':
-    l_do_cspd = True  ; # do current speed
-    tmin=0. ; tmax=1.8 ; df = 0.2 ; cpal_fld = 'on3' ; # Poster full-res!!!
-    cunit = 'Surface current speed [m/s]' ; cb_jump = 1
-    cb_extend = 'max' ;#colorbar extrema
-    if CBOX ==    'Med'  : tmax=1.3 ; df = 0.1
-    if CBOX ==  'AzoresS': tmax=1.2 ; df = 0.2 ; cb_jump = 1
-    if CBOX == 'BlackSea': tmax=0.8 ; df = 0.1 ; cb_jump = 1
-    if CBOX in ['Manche','Bretagne']:  tmax=2.4 ; df = 0.1 ; cb_jump = 2
-    if CBOX in ['Brest']:  tmax=2.4 ; df = 0.1 ; cb_jump = 2
-    if CNEMO in ['CALEDO60']: tmax=0.8 ; df = 0.1 ; cb_jump = 1
+elif CWHAT == 'GEOSSV':
+    # Geostrophic velocity speed out of SSH
+    cv_in = 'sossheig' ; cv_out = CWHAT ;
+    l_apply_geov = True
+    cpal_fld = 'on3' ; tmin=0. ;  tmax=1.2   ;  df = 0.2 ; cb_extend = 'max'
+    cb_jump = 1
+    cunit = r'Surface geostrophic velocity speed [m/s]'
+    l_save_nc = True
 
-elif CWHAT == 'CSPEED_1000':
-    l_do_cspd = True  ; # do current speed
-    tmin=0. ; tmax=0.6 ; df = 0.1 ; cpal_fld = 'on3' ; # Poster full-res!!!
-    cunit = 'Current speed at 1000 m [m/s]' ; cb_jump = 1
-    cb_extend = 'max' ;#colorbar extrema
+elif CWHAT == 'LAP_SSH':
+    cv_in = 'sossheig' ; cv_out = CWHAT ;
+    l_apply_lap = True
+    cpal_fld = 'on2' ; tmin=-1.2 ;  tmax=1.2   ;  df = 0.05 ; 
 
-elif CWHAT == 'TKE':
-    l_do_tke = True ; l_log_field = False
-    tmin=0. ; tmax=3. ; df = 0.25 ; cpal_fld = 'ncview_hotres'
-    #tmin=0. ; tmax=3. ; df = 0.25 ; cpal_fld = 'ncview_helix2'
-    cunit = r'Turbulent Kinetic Energy [$m^2/s^2$]' ; cb_jump = 1
-    cb_extend = 'max' ;#colorbar extrema
+elif CWHAT == 'W_1000':
+    cv_in = 'vovecrtz'  ; cv_out = CWHAT ;
+    tmin=-0.01 ;  tmax=-tmin   ;  df = 0.005 ; cb_jump = 1
+    cpal_fld='RdBu_r' ;    #cpal_fld='PiYG_r' ; #cpal_fld='BrBG_r'
+    cunit = r'Vertical velocity at 1000 m [m/s]'
+    if CBOX in [ 'AzoresP','AzoresL','AzoresS']: color_top = 'k'
 
-elif CWHAT == 'EKE':
-    l_do_eke = True
-    tmin=0. ; tmax=1. ; df = 0.1 ; cpal_fld = 'ncview_hotres' ; # Poster full-res!!!
-    cunit = r'E Kinetic Energy [$m^2/s^2$]' ; cb_jump = 1
-    cb_extend = 'max' ;#colorbar extrema
+elif CWHAT == 'Amplitude':
+    cv_in = 'r'     ; cv_out = cv_in ;
+    cpal_fld = 'RdBu_r' ; tmin=-0.5 ;  tmax=-tmin   ;  df = 0.1 ; cb_jump = 1
+    cunit = r'Amplitude [m]'
+
+elif CWHAT == 'Phase':
+    cv_in = 'phi'     ; cv_out = cv_in ;
+    cpal_fld = 'RdBu_r' ; tmin=-30. ;  tmax=-tmin   ;  df = 5. ; cb_jump = 1
+    #
+    cunit = r'Phase (deg.)'
     
 else:
-    print(' ERROR: unknow diagnostic ''+CWHAT+'' !!!')
-    sys.exit(0)
-    
-cv_out = CWHAT
-
-
-    
-if cvx_in=='vozocrtx' and cvy_in=='vomecrty': l_3d_field = True
-
-
-elif cvx_in=='sozocrtx' and cvy_in=='somecrty' and l_do_cspd:
-    # Current speed !
-    if CBOX == 'Balear': tmin=0. ;  tmax=1.2 ;  df = 0.2 ; cpal_fld = 'ncview_hotres'
-    #if CBOX == 'Balear': tmin=0. ;  tmax=1. ;  df = 0.2
-    #if CBOX == 'Med+BS': tmin=0. ;  tmax=4. ;  df = 0.5 ; cpal_fld = 'ncview_hotres'
-    if CBOX == 'Med+BS': tmin=0. ;  tmax=1.5 ;  df = 0.25 ; cpal_fld = 'on3'
-        
-elif cvx_in=='vozocrtx' and cvy_in=='vomecrty' and l_do_crl:
-    l_3d_field = True
-    #cpal_fld = 'on2' ; tmin=-0.025 ;  tmax=0.025 ;  df = 0.05
-    #cpal_fld = 'ncview_bw' ; tmin=-0.025 ;  tmax=0.025 ;  df = 0.05
-    #cpal_fld = 'gray' ; tmin=-0.025 ;  tmax=0.025 ;  df = 0.05
-    cpal_fld = 'bone' ; tmin=-0.025 ;  tmax=0.025 ;  df = 0.05
-    cunit = '';  cb_jump = 1
-    l_show_clock = False
-    l_add_logo   = False
-
-#else:
-#    print('ERROR: we do not know cvx_in and cvy_in! (''+cvx_in+'', ''+cvy_in+'')'
-#    sys.exit(0)
-
-
-if l3d and not l_3d_field:
-    print('ERROR: you cannot extract a level is the field is not 3D!!!')
+    print('ERROR: we do not know variable ''+str(cv_in)+'' !')
     sys.exit(0)
 
 
@@ -313,16 +326,30 @@ l_3d_field = False
 
 
 
+# Ice:
+if l_do_ice:
+    cv_ice  = 'ileadfrac'
+    cf_ice = str.replace(cf_in, 'gridT-2D', 'icemod')
+    rmin_ice = 0.25
+    #cpal_ice = 'ncview_bw'
+    #cpal_ice = 'Blues_r'
+    cpal_ice = 'bone'
+    vcont_ice = nmp.arange(rmin_ice, 1.05, 0.05)
+    #
+    pal_ice = cp.chose_colmap(cpal_ice)
+    norm_ice = colors.Normalize(vmin = rmin_ice, vmax = 0.95, clip = False)
 
 
 
 
-bt.chck4f(cf_mm)
-bt.chck4f(cfx_in)
-bt.chck4f(cfy_in)
+
+if l_do_ice: cp.chck4f(cf_ice)
+
+cp.chck4f(cf_mm)
+cp.chck4f(cf_in)
 
 l_notime=False
-id_f = Dataset(cfx_in)
+id_f = Dataset(cf_in)
 list_var = id_f.variables.keys()
 if 'time_counter' in list_var:
     vtime = id_f.variables['time_counter'][:]
@@ -336,30 +363,43 @@ id_f.close()
 Nt = 1
 if not l_notime: Nt = len(vtime)
 
-if l_show_lsm or l_do_crl or l_do_cof or l_do_cspd or l_do_tke or l_do_eke:
+if l_show_lsm:
     cv_msk = 'tmask'
     print('\nReading record metrics in '+cf_mm)
     id_lsm = Dataset(cf_mm)
     nb_dim = len(id_lsm.variables[cv_msk].dimensions)
     print(' The mesh_mask has '+str(nb_dim)+' dimmensions!')
-    if l_show_lsm:
-        if l_do_crl or l_do_cof:  cv_msk = 'fmask'
-        print('\n Reading mask as ''+cv_msk+'' in:'); print(cv_msk,'\n')
-        if nb_dim==4: XMSK = id_lsm.variables[cv_msk][0,jk,j1:j2,i1:i2]
-        if nb_dim==3: XMSK = id_lsm.variables[cv_msk][0,j1:j2,i1:i2]
-        if nb_dim==2: XMSK = id_lsm.variables[cv_msk][j1:j2,i1:i2]
-        (nj,ni) = nmp.shape(XMSK)
-    if l_do_crl or l_do_cof:
-        # e2v, e1u, e1f, e2f
-        e2v = id_lsm.variables['e2v'][0,j1:j2,i1:i2]
+    print(' *** Reading '+cv_msk+' !')
+    if nb_dim==4: XMSK = id_lsm.variables[cv_msk][0,jk,j1:j2,i1:i2]
+    if nb_dim==3: XMSK = id_lsm.variables[cv_msk][jk,j1:j2,i1:i2]
+    if nb_dim==2: XMSK = id_lsm.variables[cv_msk][j1:j2,i1:i2]
+    (nj,ni) = nmp.shape(XMSK)
+    
+    if l_apply_lap:
+        print(' *** Reading e1t and e2t !')
+        XE1T2 = id_lsm.variables['e1t'][0,j1:j2,i1:i2]
+        XE2T2 = id_lsm.variables['e2t'][0,j1:j2,i1:i2]
+        XE1T2 = XE1T2*XE1T2
+        XE2T2 = XE2T2*XE2T2
+    if l_apply_hgrad or l_apply_geov:
+        print(' *** Reading e1u and e2v !')
         e1u = id_lsm.variables['e1u'][0,j1:j2,i1:i2]
-        e1f = id_lsm.variables['e1f'][0,j1:j2,i1:i2]
-        e2f = id_lsm.variables['e2f'][0,j1:j2,i1:i2] # 
-    if l_do_cof:
+        e2v = id_lsm.variables['e2v'][0,j1:j2,i1:i2]
+        print(' *** Reading umask and vmask !')
+        if nb_dim==4:
+            UMSK = id_lsm.variables['umask'][0,jk,j1:j2,i1:i2]
+            VMSK = id_lsm.variables['vmask'][0,jk,j1:j2,i1:i2]
+        if nb_dim==3:
+            UMSK = id_lsm.variables['umask'][jk,j1:j2,i1:i2]
+            VMSK = id_lsm.variables['vmask'][jk,j1:j2,i1:i2]
+        if nb_dim==2:
+            UMSK = id_lsm.variables['umask'][j1:j2,i1:i2]
+            VMSK = id_lsm.variables['vmask'][j1:j2,i1:i2]
+    
+    if l_apply_geov:        
         ## Coriolis Parameter:
         ff  = id_lsm.variables['gphif'][0,j1:j2,i1:i2]
         ff[:,:] = 2.*romega*nmp.sin(ff[:,:]*nmp.pi/180.0)
-        (nj,ni) = nmp.shape(XMSK)
 
     if l_save_nc:
         Xlon = id_lsm.variables['glamt'][0,j1:j2,i1:i2]
@@ -393,7 +433,7 @@ idx_land = nmp.where( XMSK <  0.5 )
 XLSM = nmp.zeros((nj,ni)) ; # will define real continents not NEMO mask...
 
 if l_add_topo_land:
-    bt.chck4f(cf_topo_land)
+    cp.chck4f(cf_topo_land)
     id_top = Dataset(cf_topo_land)
     print(' *** Reading "z" into:\n'+cf_topo_land)
     xtopo = id_top.variables['z'][0,j1:j2,i1:i2]
@@ -401,7 +441,7 @@ if l_add_topo_land:
     if nmp.shape(xtopo) != (nj,ni):
         print('ERROR: topo and mask do not agree in shape!'); sys.exit(0)
     xtopo = xtopo*(1. - XMSK)
-    #bnc.dump_2d_field('topo_'+CBOX+'.nc', xtopo, name='z')    
+    #cp.dump_2d_field('topo_'+CBOX+'.nc', xtopo, name='z')    
     if l3d: xtopo = xtopo + rof_dpt
     xtopo[nmp.where( XMSK > 0.01)] = nmp.nan
     if nemo_box.l_fill_holes_k and not l3d:
@@ -428,7 +468,7 @@ cfont_titl =  { 'fontname':'Open Sans', 'fontweight':'light', 'fontsize':int(30.
 
 
 # Colormaps for fields:
-pal_fld = bcm.chose_colmap(cpal_fld)
+pal_fld = cp.chose_colmap(cpal_fld)
 if   l_log_field:
     norm_fld = colors.LogNorm(                   vmin=tmin, vmax=tmax, clip=False)
 elif l_pow_field:
@@ -440,11 +480,11 @@ else:
 if l_show_lsm or l_add_topo_land:
     if l_add_topo_land:
         xtopo = nmp.log10(xtopo+rof_log)
-        pal_lsm = bcm.chose_colmap('gray_r')
+        pal_lsm = cp.chose_colmap('gray_r')
         #norm_lsm = colors.Normalize(vmin = nmp.log10(min(-100.+rof_dpt/3.,0.) + rof_log), vmax = nmp.log10(4000.+rof_dpt + rof_log), clip = False)
         norm_lsm = colors.Normalize(vmin = nmp.log10(-100. + rof_log), vmax = nmp.log10(4000.+rof_dpt + rof_log), clip = False)
     else:
-        pal_lsm = bcm.chose_colmap('land_dark')
+        pal_lsm = cp.chose_colmap('land_dark')
         norm_lsm = colors.Normalize(vmin = 0., vmax = 1., clip = False)
 
 cyr0=csd0[0:4]
@@ -464,74 +504,8 @@ if isleap(int(cyr0)): vm = vml
 jd = int(cdd0) - 1
 jm = int(cmn0)
 
-
-
-
-
-
-
-
-if l_do_eke:
-    Umean = nmp.zeros((nj,ni))
-    Vmean = nmp.zeros((nj,ni))
-    # Need to go for the mean first!!!
-    print('\n Goint for '+str(Nt)+' snaphots to compute the mean first!!!')
-    for jt in range(jt0,Nt):
-        print('Reading record #'+str(jt)+'...')
-
-        id_fx = Dataset(cfx_in)
-        if not l_3d_field:
-            XFLD  = id_fx.variables[cvx_in][jt,j1:j2,i1:i2] ; # t, y, x
-        else:
-            XFLD  = id_fx.variables[cvx_in][jt,jk,j1:j2,i1:i2] ; # t, y, x
-        id_fx.close()
-        
-        id_fy = Dataset(cfy_in)
-        if not l_3d_field:
-            YFLD  = id_fy.variables[cvy_in][jt,j1:j2,i1:i2] ; # t, y, x
-        else:
-            YFLD  = id_fy.variables[cvy_in][jt,jk,j1:j2,i1:i2] ; # t, y, x
-        id_fy.close()
-        
-        print('Done!')
-        # On T-points:
-        Umean[:,2:ni] = Umean[:,2:ni] + 0.5*( XFLD[:,1:ni-1] + XFLD[:,2:ni] )/float(Nt)
-        Vmean[2:nj,:] = Vmean[2:nj,:] + 0.5*( YFLD[1:nj-1,:] + YFLD[2:nj,:] )/float(Nt)
-    print(' time averaging done...\n\n')
-
-
-
-    
-
-vm = vmn
-if isleap(int(cyr0)): vm = vml
-#print(' year is ', vm, nmp.sum(vm)
-
-jd = int(cdd0) - 1
-jm = int(cmn0)
-
-
-
-
-
-
-
-
-Xplot = nmp.zeros((nj,ni))
-if nemo_box.l_add_quiver:
-    #VX = nmp.arange(0,ni,10)
-    #VY = nmp.arange(0,nj,10)
-    VX = nmp.arange(ni)
-    VY = nmp.arange(nj)
-    XU = nmp.zeros((nj,ni))
-    XV = nmp.zeros((nj,ni))
-
-
-
 # Opening netCDF files:
-id_fx = Dataset(cfx_in)
-id_fy = Dataset(cfy_in)
-
+id_f = Dataset(cf_in)
 
 for jt in range(jt0,Nt):
 
@@ -569,68 +543,92 @@ for jt in range(jt0,Nt):
 
         fig = plt.figure(num = 1, figsize=(rw_fig, rh_fig), dpi=None, facecolor='w', edgecolor='0.5')
     
-        ax  = plt.axes([0., 0., 1., 1.], facecolor = '0.85') # missing seas will be in 'facecolor' !
+        ax  = plt.axes([0., 0., 1., 1.], facecolor = '0.7') # missing seas will be in 'facecolor' !
     
         vc_fld = nmp.arange(tmin, tmax + df, df)
     
     
-        print('Reading record #'+str(jt)+' of '+cvx_in+' in '+cfx_in)
+        print('Reading record #'+str(jt)+' of '+cv_in+' in '+cf_in)
         if l3d: print('            => at level #'+str(jk)+' ('+cdepth+')!')
-
-        if not l_3d_field:
-            XFLD  = id_fx.variables[cvx_in][jt,j1:j2,i1:i2] ; # t, y, x
+    
+        if l_notime:
+            if l3d:
+                Xplot  = id_f.variables[cv_in][jk,j1:j2,i1:i2]
+            else:
+                Xplot  = id_f.variables[cv_in][j1:j2,i1:i2]
         else:
-            print('j1:j2 =', j1,j2)
-            print('i1:i2 =', i1,i2)
-            XFLD  = id_fx.variables[cvx_in][jt,jk,j1:j2,i1:i2] ; # t, y, x
-        print('Done!')
+            if l3d:
+                Xplot  = id_f.variables[cv_in][jt,jk,j1:j2,i1:i2] ; # t, y, x        
+            else:
+                Xplot  = id_f.variables[cv_in][jt,j1:j2,i1:i2] ; # t, y, x        
     
-        print('Reading record #'+str(jt)+' of '+cvy_in+' in '+cfy_in)
-        if l3d: print('            => at level #'+str(jk)+' ('+cdepth+')!')
-        if not l_3d_field:
-            YFLD  = id_fy.variables[cvy_in][jt,j1:j2,i1:i2] ; # t, y, x
-        else:
-            YFLD  = id_fy.variables[cvy_in][jt,jk,j1:j2,i1:i2] ; # t, y, x
-        print('Done!')
+        print('Done!\n')
     
     
-        lx = nmp.zeros((nj,ni))
-        ly = nmp.zeros((nj,ni))
-    
-        if l_do_crl or l_do_cof:
-            print('\nComputing curl...')
-            lx[:,1:ni-1] =   e2v[:,2:ni]*YFLD[:,2:ni] - e2v[:,1:ni-1]*YFLD[:,1:ni-1]
-            ly[1:nj-1,:] = - e1u[2:nj,:]*XFLD[2:nj,:] + e1u[1:nj-1,:]*XFLD[1:nj-1,:]
-            if l_do_cof: Xplot[:,:] = ( lx[:,:] + ly[:,:] )*XMSK[:,:] / ( e1f[:,:]*e2f[:,:]*ff[:,:] ) # Relative Vorticity...
-            if l_do_crl: Xplot[:,:] = ( lx[:,:] + ly[:,:] )*XMSK[:,:] / ( e1f[:,:]*e2f[:,:] ) * 1000. # Curl...
-    
-        if l_do_cspd:
-            print('\nComputing current speed at T-points ...')
-            lx[:,2:ni] = 0.5*( XFLD[:,1:ni-1] + XFLD[:,2:ni] )
-            ly[2:nj,:] = 0.5*( YFLD[1:nj-1,:] + YFLD[2:nj,:] )
-            Xplot[:,:] = nmp.sqrt( lx[:,:]*lx[:,:] + ly[:,:]*ly[:,:] ) * XMSK[:,:]
-            if nemo_box.l_add_quiver:
-                XU[:,:] = XFLD[:,:]
-                XV[:,:] = YFLD[:,:]
-    
-        if l_do_tke:
-            print('\nComputing TKE at T-points ...')
-            lx[:,2:ni] = 0.5*( XFLD[:,1:ni-1] + XFLD[:,2:ni] )
-            ly[2:nj,:] = 0.5*( YFLD[1:nj-1,:] + YFLD[2:nj,:] )
-            Xplot[:,:] = ( lx[:,:]*lx[:,:] + ly[:,:]*ly[:,:] ) * XMSK[:,:]
+        # Ice
+        if l_do_ice:
+            print('Reading record #'+str(jt)+' of '+cv_ice+' in '+cf_ice)
+            id_ice = Dataset(cf_ice)
+            XICE  = id_ice.variables[cv_ice][jt,j1:j2,i1:i2] ; # t, y, x
+            id_ice.close()
+            print('Done!\n')
     
     
-        if l_do_eke:
-            print('\nComputing TKE at T-points ...')
-            lx[:,2:ni] = 0.5*( XFLD[:,1:ni-1] + XFLD[:,2:ni] ) - Umean[:,2:ni]
-            ly[2:nj,:] = 0.5*( YFLD[1:nj-1,:] + YFLD[2:nj,:] ) - Vmean[2:nj,:]
-            Xplot[:,:] = ( lx[:,:]*lx[:,:] + ly[:,:]*ly[:,:] ) * XMSK[:,:]
     
-        del lx, ly
-        print('... '+cv_out+' computed!\n')
+    
+    
+        if l_apply_lap:
+            print(' *** Computing Laplacian of "'+cv_in+'"!')
+            lx = nmp.zeros((nj,ni))
+            ly = nmp.zeros((nj,ni))
+            lx[:,1:ni-1] = 1.E9*(Xplot[:,2:ni] -2.*Xplot[:,1:ni-1] + Xplot[:,0:ni-2])/XE1T2[:,1:ni-1]
+            ly[1:nj-1,:] = 1.E9*(Xplot[2:nj,:] -2.*Xplot[1:nj-1,:] + Xplot[0:nj-2,:])/XE2T2[1:nj-1,:]
+            Xplot[:,:] = lx[:,:] + ly[:,:]
+            del lx, ly
+    
+        if l_apply_hgrad:
+            print(' *** Computing gradient of "'+cv_in+'"!')
+            lx = nmp.zeros((nj,ni))
+            ly = nmp.zeros((nj,ni))
+    
+            if l_smooth: cp.smoother(Xplot, XMSK, nb_smooth=nb_smooth)
             
-        del XFLD,YFLD
+            # Zonal gradient on T-points:
+            lx[:,1:ni-1] = (Xplot[:,2:ni] - Xplot[:,0:ni-2]) / (e1u[:,1:ni-1] + e1u[:,0:ni-2]) * UMSK[:,1:ni-1] * UMSK[:,0:ni-2]
+            lx[:,:] = XMSK[:,:]*lx[:,:]
+            #cp.dump_2d_field('dsst_dx_gridT.nc', lx, xlon=Xlon, xlat=Xlat, name='dsst_dx')
+            # Meridional gradient on T-points:
+            ly[1:nj-1,:] = (Xplot[2:nj,:] - Xplot[0:nj-2,:]) / (e2v[1:nj-1,:] + e2v[0:nj-2,:]) * VMSK[1:nj-1,:] * VMSK[0:nj-2,:]
+            ly[:,:] = XMSK[:,:]*ly[:,:]
+            #cp.dump_2d_field('dsst_dy_gridT.nc', ly, xlon=Xlon, xlat=Xlat, name='dsst_dy')
+            Xplot[:,:] = 0.0
+            # Modulus of vector gradient:        
+            Xplot[:,:] = nmp.sqrt(  lx[:,:]*lx[:,:] + ly[:,:]*ly[:,:] )
+            #cp.dump_2d_field('mod_grad_sst.nc', Xplot, xlon=Xlon, xlat=Xlat, name='dsst')
+            del lx, ly
     
+    
+        if l_apply_geov:
+            print(' *** Computing gradient of "'+cv_in+'"!')
+            lx = nmp.zeros((nj,ni))
+            ly = nmp.zeros((nj,ni))
+    
+            # Zonal gradient on T-points:
+            lx[:,1:ni-1] = (Xplot[:,2:ni] - Xplot[:,0:ni-2]) / (e1u[:,1:ni-1] + e1u[:,0:ni-2]) * UMSK[:,1:ni-1] * UMSK[:,0:ni-2]
+            lx[:,:] = XMSK[:,:]*lx[:,:]
+            #cp.dump_2d_field('dsst_dx_gridT.nc', lx, xlon=Xlon, xlat=Xlat, name='dsst_dx')
+            # Meridional gradient on T-points:
+            ly[1:nj-1,:] = (Xplot[2:nj,:] - Xplot[0:nj-2,:]) / (e2v[1:nj-1,:] + e2v[0:nj-2,:]) * VMSK[1:nj-1,:] * VMSK[0:nj-2,:]
+            ly[:,:] = XMSK[:,:]*ly[:,:]
+            #cp.dump_2d_field('dsst_dy_gridT.nc', ly, xlon=Xlon, xlat=Xlat, name='dsst_dy')
+            Xplot[:,:] = 0.0
+            # Modulus of vector gradient:        
+            Xplot[:,:] = grav/ff * nmp.sqrt( lx[:,:]*lx[:,:] + ly[:,:]*ly[:,:] )
+            #cp.dump_2d_field('mod_grad_sst.nc', Xplot, xlon=Xlon, xlat=Xlat, name='dsst')
+            del lx, ly
+    
+    
+            
         print('')
         if not l_show_lsm and jt == jt0: ( nj , ni ) = nmp.shape(Xplot)
         print('  *** dimension of array => ', ni, nj, nmp.shape(Xplot))
@@ -643,7 +641,7 @@ for jt in range(jt0,Nt):
         if nemo_box.c_imshow_interp == 'none':
             Xplot[idx_land] = nmp.nan
         else:
-            bt.drown(Xplot, XMSK, k_ew=-1, nb_max_inc=10, nb_smooth=10)
+            cp.drown(Xplot, XMSK, k_ew=-1, nb_max_inc=10, nb_smooth=10)
     
         if l_save_nc:
             if l3d:
@@ -651,20 +649,20 @@ for jt in range(jt0,Nt):
             else:
                 cf_out = 'nc/'+CWHAT+'_NEMO_'+CNEMO+'-'+CRUN+'_'+CBOX+'_'+cdate+'_'+cpal_fld+'.nc'
             print(' Saving in '+cf_out)
-            bnc.dump_2d_field(cf_out, Xplot, xlon=Xlon, xlat=Xlat, name=CWHAT)
+            cp.dump_2d_field(cf_out, Xplot, xlon=Xlon, xlat=Xlat, name=CWHAT)
             print('')
     
     
         cf = plt.imshow( Xplot[:,:], cmap=pal_fld, norm=norm_fld, interpolation=nemo_box.c_imshow_interp )
     
-        if nemo_box.l_add_quiver:
-            idx_high = nmp.where(Xplot[:,:]>tmax)
-            XU[idx_high] = nmp.nan ; XV[idx_high] = nmp.nan
-            idx_miss = nmp.where(XLSM[:,:]<0.5)
-            XU[idx_miss] = nmp.nan ; XV[idx_miss] = nmp.nan
-            #XU = XU*XLSM ; XV = XV*XLSM 
-            nss=nemo_box.n_subsamp_qvr
-            cq = plt.quiver( VX[:ni:nss], VY[:nj:nss], XU[:nj:nss,:ni:nss], XV[:nj:nss,:ni:nss], scale=50, color='w', width=0.001, linewidth=0.1 )
+        # Ice
+        if l_do_ice:
+            #XM[:,:] = XMSK[:,:]
+            #cp.drown(XICE, XM, k_ew=2, nb_max_inc=10, nb_smooth=10)
+            #ci = plt.contourf(XICE[:,:], vcont_ice, cmap = pal_ice, norm = norm_ice) #
+            pice = nmp.ma.masked_where(XICE < rmin_ice, XICE)
+            ci = plt.imshow(pice, cmap = pal_ice, norm = norm_ice, interpolation='none') ; del pice, ci
+            del XICE
     
         #LOLO: rm ???
         if l_show_lsm or l_add_topo_land:
@@ -748,7 +746,5 @@ for jt in range(jt0,Nt):
     else:
         print('\n Figure '+cfig+' already there!\n')
 
-
-id_fx.close()
-id_fy.close()
+id_f.close()
 

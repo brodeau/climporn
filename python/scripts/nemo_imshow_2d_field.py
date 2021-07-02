@@ -18,30 +18,28 @@ mpl.use('Agg')
 import matplotlib.pyplot as plt
 import matplotlib.colors as colors
 
-import warnings
-warnings.filterwarnings("ignore")
-
-import clprn_colmap as bcm
-
-import clprn_tool as bt
-import clprn_ncio as cn
-
-
+import climporn as cp
 
 bathy_max = 5000. # m
 
 color_top = 'w'
 clr_yellow = '#ffed00'
 
-
-l_show_cb = True
-l_show_nm = True
+# Defaults:
+lknown = True
+rfact_zoom = 1.
+l_show_cb = False
+l_show_nm = False
 l_scientific_mode = False
 l_show_ttl = False
+vcb = [0.15, 0.96, 0.8, 0.02]
+font_rat = 1.
+
+
 
 l_show_msh = False
     
-pt_sz_track = 20
+pt_sz_track = 30
 
 l_read_lsm=False
 
@@ -65,9 +63,9 @@ if narg ==6 :
 l_bathy_var = [ 'Bathymetry', 'elevation' ]
     
 
-if not l_read_lsm and ( not cv_in in l_bathy_var):
-    print("It's only for bathymetric fields that you can skip providing the mesh_mask file!")
-    sys.exit(0)
+#if not l_read_lsm and ( not cv_in in l_bathy_var):
+#    print("It's only for bathymetric fields that you can skip providing the mesh_mask file!")
+#    sys.exit(0)
 
 
 
@@ -126,11 +124,6 @@ elif CNEMO == 'eNATL60':
     x_cnf = 160. ; y_cnf = 4000. ; # where to put label of conf on Figure...
     l_show_cb = False ; l_show_nm = False
 
-elif CNEMO == 'KANAK60':
-    i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 1. ; vcb = [0.5, 0.1, 0.45, 0.025] ; font_rat = 1.*rfact_zoom
-    x_cnf = 160. ; y_cnf = 4000. ; # where to put label of conf on Figure...
-    l_show_cb = True ; l_show_nm = False
-
 elif CNEMO == 'eNATL1':
     i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 6.
     vcb = [0.62, 0.11, 0.35, 0.025] ; font_rat = 0.12*rfact_zoom
@@ -184,6 +177,26 @@ elif CNEMO == 'GulfS':
     l_show_cb = False ; l_show_nm = False
     pt_sz_track = 3
 
+elif CNEMO == 'Faroe':
+    i1 = 0 ; j1 = 0 ; i2 = 421 ; j2 = 351 ; rfact_zoom = 1. ; vcb = [0.15, 0.96, 0.8, 0.02] ; font_rat = 0.1
+    l_show_cb = False ; l_show_nm = False
+    pt_sz_track = 3
+
+elif CNEMO == 'WestMed':
+    i1 = 0 ; j1 = 0 ; i2 = 868 ; j2 = 796 ; rfact_zoom = 1. ; vcb = [0.15, 0.96, 0.8, 0.02] ; font_rat = 0.1
+    l_show_cb = False ; l_show_nm = False
+    pt_sz_track = 3
+
+elif CNEMO == 'SouthWestPac_G12':
+    i1 = 0 ; j1 = 0 ; i2 = 601 ; j2 = 301 ; rfact_zoom = 1. ; vcb = [0.15, 0.96, 0.8, 0.02] ; font_rat = 0.1
+    l_show_cb = False ; l_show_nm = False
+    pt_sz_track = 3
+
+elif CNEMO == 'ORCA1':
+    i1 = 0 ; j1 = 0 ; i2 = 362 ; j2 = 292 ; rfact_zoom = 2. ; vcb = [0.15, 0.96, 0.8, 0.02] ; font_rat = 0.1
+    l_show_cb = False ; l_show_nm = False
+    pt_sz_track = 3
+
 elif CNEMO == 'CALEDO10':
     i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 1. ; vcb = [0.2, 0.06, 0.6, 0.03] ; font_rat = 1.5/rfact_zoom
     x_cnf = 900. ; y_cnf = 1350. ; # where to put label of conf on Figure...
@@ -197,13 +210,9 @@ elif CNEMO == 'CALEDO60':
     bathy_max = 6000. # m
     
 else:
-    print('\n PROBLEM: "'+CNEMO+'" is an unknown config!!!')
-    sys.exit(0)
-
-
-
-
-
+    print('\n WARNING [nemo_imshow_2d_field.py]: "'+CNEMO+'" is an unknown config!\n     ==> falling back on default setup')
+    lknown = False
+    i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0
 
 
 
@@ -212,6 +221,7 @@ l_log_field = False
 l_pow_field = False
 cextend='both'
 l_hide_cb_ticks = False
+tmin=0. ; tmax=1. ; df=0.01
 
 print(' cv_in = '+cv_in)
 
@@ -260,12 +270,11 @@ elif cv_in == 'somxl010':
 
 elif cv_in == 'track':
     cfield = 'TRACK'
-    tmin=140. ;  tmax=24800.   ;  df = 1.
-    cpal_fld = 'viridis'    
+    cpal_fld = 'nipy_spectral'
     cunit = r'SST ($^{\circ}$C)'
     cb_jump = 1
     fig_type='svg'
-
+    # 
 else:
     print('ERROR: variable '+cv_in+' is not known yet...'); sys.exit(0)
 
@@ -273,7 +282,7 @@ else:
 
 
 # Time record stuff...
-bt.chck4f(cf_fld)
+cp.chck4f(cf_fld)
 id_fld = Dataset(cf_fld)
 list_var = id_fld.variables.keys()
 if 'time_counter' in list_var:    
@@ -291,7 +300,7 @@ id_fld.close()
 ibath=1
 
 if l_read_lsm:
-    bt.chck4f(cf_lsm)
+    cp.chck4f(cf_lsm)
     print('\n *** Reading "tmask" in meshmask file...')
     id_lsm = Dataset(cf_lsm)
     nb_dim = len(id_lsm.variables['tmask'].dimensions)
@@ -309,7 +318,7 @@ if l_read_lsm:
     print('      done.')
 
 elif cv_in in l_bathy_var:
-    bt.chck4f(cf_fld)
+    cp.chck4f(cf_fld)
     print('\n *** Will build mask from "Bathymetry"...')
     id_fld = Dataset(cf_fld)
     list_dim = list(id_fld.dimensions.keys()) ; #lolopy3
@@ -348,10 +357,19 @@ elif cv_in in l_bathy_var:
     del XBATH
     print('      done.')
 
+elif cv_in == 'track':
+    cp.chck4f(cf_fld)
+    id_fld = Dataset(cf_fld)
+    xtmp = id_fld.variables[cv_in][:,:]
+    (Nj,Ni) = xtmp.shape
+    if i2 == 0: i2 = Ni
+    if j2 == 0: j2 = Nj
+    XMSK = nmp.zeros((Nj,Ni), dtype=nmp.int) ; XMSK[:,:] = 1
+    XMSK[nmp.where(xtmp==-100.)] = 0
+    del xtmp
     
 else:
     print('PROBLEM #2'); sys.exit(0)
-
 
 print('\n According to "tmask" the shape of the domain is Ni, Nj =', Ni, Nj)
 
@@ -362,7 +380,7 @@ if l_add_topo_land:
     cf_topo_land = dir_conf+'/'+ftopo
     print('\n We are going to show topography:\n'+'  ==> '+cf_topo_land)
 
-    bt.chck4f(cf_topo_land)
+    cp.chck4f(cf_topo_land)
     id_top = Dataset(cf_topo_land)
     print(' *** Reading "z" into:\n'+cf_topo_land)
     xtopo = id_top.variables['z'][0,j1:j2,i1:i2]
@@ -384,11 +402,12 @@ print('  *** we are going to show: i1,i2,j1,j2 =>', i1,i2,j1,j2, '\n')
 nx_res = i2-i1
 ny_res = j2-j1
 yx_ratio = float(ny_res)/float(nx_res)
+if not lknown:
+    rfact_zoom = round(1000./float(ny_res),1)
 nxr = int(rfact_zoom*nx_res) ; # widt image (in pixels)
 nyr = int(rfact_zoom*ny_res) ; # height image (in pixels)
 dpi = 100
 rh  = float(nxr)/float(dpi) ; # width of figure as for figure...
-
 
 print('\n *** width and height of image to create:', nxr, nyr, '\n')
 
@@ -422,7 +441,7 @@ cfont_ttl = { 'fontname':'Open Sans', 'fontweight':'medium', 'fontsize':int(25.*
 
 
 # Colormaps for fields:
-pal_fld = bcm.chose_colmap(cpal_fld)
+pal_fld = cp.chose_colmap(cpal_fld)
 if l_log_field:
     norm_fld = colors.LogNorm(  vmin = tmin, vmax = tmax, clip = False)
 if l_pow_field:
@@ -430,10 +449,10 @@ if l_pow_field:
 else:
     norm_fld = colors.Normalize(vmin = tmin, vmax = tmax, clip = False)
 
-pal_lsm = bcm.chose_colmap('land_dark')
+pal_lsm = cp.chose_colmap('land_dark')
 norm_lsm = colors.Normalize(vmin = 0., vmax = 1., clip = False)
 
-pal_filled = bcm.chose_colmap('gray_r')
+pal_filled = cp.chose_colmap('gray_r')
 norm_filled = colors.Normalize(vmin = 0., vmax = 0.1, clip = False)
 
 
@@ -447,7 +466,10 @@ else:
 #if l_scientific_mode: rextra_height = 1.12
 #fig = plt.figure(num = 1, figsize=(rh,rh*yx_ratio*rextra_height), dpi=None, facecolor='w', edgecolor='0.5')
 
-fig = plt.figure(num = 1, figsize=(rh,rh*yx_ratio), dpi=None, facecolor='k', edgecolor='k')
+
+fsize = ( rh, rh*yx_ratio )
+
+fig = plt.figure(num = 1, figsize=fsize, dpi=None, facecolor='k', edgecolor='k')
 
 if l_scientific_mode:
     ax  = plt.axes([0.09, 0.09, 0.9, 0.9], facecolor = 'r')
@@ -481,12 +503,12 @@ print('  *** Shape of field and mask => ', nmp.shape(XFLD))
 
 if cv_in in l_bathy_var and ibath==-1: XFLD = ibath*XFLD
 
+l_add_true_filled = False
 
 if cfield == 'Bathymetry':
     (idy_nan,idx_nan) = nmp.where( nmp.isnan(XFLD) )
     #
     # LSM with different masking for true lsm and filled lsm...
-    l_add_true_filled = False
     cf_mask_lbc = dir_conf+'/lsm_LBC_'+CNEMO+'.nc'
     if path.exists(cf_mask_lbc):
         print('\n *** '+cf_mask_lbc+' found !!!')
@@ -504,13 +526,18 @@ if cfield == 'Bathymetry':
         print('  => done filling "pfilled" !\n')
 
     
-print('Ploting')
-
 if cv_in == 'track':
+
+    XFLD[nmp.where(nmp.isnan(XFLD))] = -1000
     indx = nmp.where( XFLD > 0 )
     (idy,idx) = indx
+    
+    tmin=nmp.amin(XFLD[indx]) ;  tmax=nmp.amax(XFLD[indx])
+    norm_fld = colors.Normalize(vmin = tmin, vmax = tmax, clip = False)
+
     cf = plt.scatter(idx, idy, c=XFLD[indx], cmap = pal_fld, norm = norm_fld, alpha=0.5, marker='.', s=pt_sz_track )
-    #
+
+
 else:
     cf = plt.imshow(XFLD[:,:], cmap = pal_fld, norm = norm_fld, interpolation='nearest' ) #, interpolation='none')
     if cfield == 'Bathymetry':
@@ -526,27 +553,18 @@ if l_show_msh:
 
 
 
-    
-#vj = nmp.arange(0,Nj-20,20)
-#for jj in vj:
-#    ccx = plt.plot(nmp.arange(len(Xlat[jj,:])), 5.*Xlat[jj,:], 'k', linewidth=0.5)
-
-#vi = nmp.arange(0,Ni-20,20)
-#for ii in vi:
-#    ccx = plt.plot(nmp.arange(len(Xlon[:,ii])), 5.*Xlon[:,ii], 'k', linewidth=0.5)
 
 
 del XFLD
-print('Done!')
 
 
 
 if l_add_topo_land:
-    print('Ploting topography over continents...')
-    #cn.dump_2d_field( 'xtopo.nc', xtopo ); #, xlon=[], xlat=[], name='field', unit='', long_name='', mask=[] )
-    #cn.dump_2d_field( 'xmsk.nc', XMSK ); #, xlon=[], xlat=[], name='field', unit='', long_name='', mask=[] )
+    #print('Ploting topography over continents...')
+    #cp.dump_2d_field( 'xtopo.nc', xtopo ); #, xlon=[], xlat=[], name='field', unit='', long_name='', mask=[] )
+    #cp.dump_2d_field( 'xmsk.nc', XMSK ); #, xlon=[], xlat=[], name='field', unit='', long_name='', mask=[] )
     xtopo = nmp.log10(xtopo+rof_log)
-    pal_topo = bcm.chose_colmap('gray_r')
+    pal_topo = cp.chose_colmap('gray_r')
     norm_topo = colors.Normalize(vmin = nmp.log10(-100. + rof_log), vmax = nmp.log10(6000. + rof_log), clip = False)
     cm = plt.imshow(xtopo, cmap=pal_topo, norm=norm_topo, interpolation='none')
     plt.contour(XMSK, [0.9], colors='k', linewidths=0.5)
@@ -597,17 +615,11 @@ if l_show_cb:
         
     del cf
     
-
-
-
 if l_show_nm:  ax.annotate(CNEMO, xy=(1, 4), xytext=(x_cnf, y_cnf), **cfont_cnfn)
 
 if l_show_ttl: ax.annotate(CNEMO, xy=(1, 4), xytext=(x_ttl, y_ttl), **cfont_ttl)
 
 
-
-
-    
 
 #plt.savefig(cfig, dpi=dpi, orientation='portrait', facecolor='b', transparent=True)
 plt.savefig(cfig, dpi=dpi, orientation='portrait', transparent=True)

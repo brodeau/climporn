@@ -6,9 +6,11 @@ More seriously, *climporn* is a collection of scripts to generate "climate-porn"
 
 Example: https://vimeo.com/300943265
 
-In order for *climporn* to work, add the ``climporn/python/mod`` directory to your PYTHONPATH environment variable.
+<!--
+In order for *climporn* to work, add the ``climporn/python/python`` directory to your PYTHONPATH environment variable.
 In the civilized Unix world, this is done by adding the following line in your ``${HOME}/.bashrc`` or ``${HOME}/.profile``
 
-    export PYTHONPATH=<YOUR_INSTALLATION_PATH>/climporn/python/mod:${PYTHONPATH}
+    export PYTHONPATH=<YOUR_INSTALLATION_PATH>/climporn/python/python:${PYTHONPATH}
+-->
 
 Peace!
