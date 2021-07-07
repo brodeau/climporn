@@ -161,6 +161,8 @@ if nemo_box.l_show_exp: (x_exp,y_exp) = nemo_box.exp
 
 if nemo_box.l_add_logo: (x_logo,y_logo) = nemo_box.logo
 
+if nemo_box.l_show_sign: (x_sign,y_sign) = nemo_box.sign
+
 #---------------------------------------------------------------
 
 
@@ -420,6 +422,7 @@ cfont_clock = { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(
 cfont_exp= { 'fontname':'Open Sans'  , 'fontweight':'light', 'fontsize':int(9.*fontr), 'color':color_top }
 cfont_mail =  { 'fontname':'Times New Roman', 'fontweight':'normal', 'fontstyle':'italic', 'fontsize':int(14.*fontr), 'color':'0.8'}
 cfont_titl =  { 'fontname':'Open Sans', 'fontweight':'light', 'fontsize':int(30.*fontr), 'color':color_top }
+cfont_sign = { 'fontname':'Open Sans', 'fontweight':'normal', 'fontstyle':'italic','fontsize':int(5.*fontr), 'color':color_top }
 
 
 # Colormaps for fields:
@@ -704,6 +707,11 @@ for jt in range(jt0,Nt):
             xl = float(x_exp)/rfz
             yl = float(y_exp)/rfz
             ax.annotate('Experiment: '+CNEMO+'-'+CRUN, xy=(1, 4), xytext=(xl,yl), **cfont_exp)
+
+        if nemo_box.l_show_sign:
+            xl = float(x_sign)/rfz # 
+            yl = float(y_sign)/rfz
+            ax.annotate('Laurent Brodeau, 2021 / vimeo.com/oceannumerique', xy=(1, 4), xytext=(xl,yl), **cfont_sign)
     
     
         #ax.annotate('laurent.brodeau@ocean-next.fr', xy=(1, 4), xytext=(xl+150, 20), **cfont_mail)

@@ -55,6 +55,7 @@ class nemo_hbox:
         l_fill_holes_k=False
         l_annotate_name=False
         l_show_clock = True
+        l_show_sign = False
         l_add_logo=True
         l_add_logo_ige=False
         l_add_logo_prc=False
@@ -69,6 +70,7 @@ class nemo_hbox:
         cf_logo_prc = 'PRACE_blanc.png'
 
         x_clock = 1600 ; y_clock = 200
+        x_sign = 1600 ; y_sign = 200
         x_logo = 2200  ; y_logo  = 50
         x_exp = 40     ; y_exp = 980
 
@@ -79,6 +81,14 @@ class nemo_hbox:
             i1=0   ; j1=0    ; i2=Ni0 ; j2=Nj0  ; rfact_zoom=1440./float(Nj0) ; vcb=[0.61, 0.1, 0.36, 0.018]  ; font_rat=8.*rfact_zoom
             x_clock = 1600 ; y_clock = 200 ; x_logo=2200 ; y_logo=1200
             l_show_exp = True ; x_exp = 1750 ; y_exp = 300
+            l_fill_holes_k=True
+
+        if   [ config, box ] == [ 'eNATL60', 'ALL4K']:
+            l_add_logo=False
+            i1=0   ; j1=0    ; i2=Ni0 ; j2=Nj0  ; rfact_zoom=2400./float(Nj0) ; vcb=[0.61, 0.1, 0.36, 0.018]  ; font_rat=8.*rfact_zoom
+            x_clock = 2666 ; y_clock = 333
+            l_show_exp = False ; x_exp = 2916 ; y_exp = 500
+            l_show_sign = True ; x_sign = 3450 ; y_sign = 80
             l_fill_holes_k=True
 
         elif [ config, box ] == [ 'ORCA36', 'ALL']:
@@ -330,6 +340,8 @@ class nemo_hbox:
         self.l_annotate_name = l_annotate_name
         self.l_show_clock    = l_show_clock
         self.clock           = (x_clock,y_clock)
+        self.l_show_sign    = l_show_sign
+        self.sign           = (x_sign,y_sign)
         self.l_add_logo      = l_add_logo
         self.logo            = (x_logo,y_logo)
         self.l_add_logo_ige  = l_add_logo_ige
@@ -344,7 +356,7 @@ class nemo_hbox:
 
         self.c_imshow_interp = c_imshow_interp
 
-        self.cf_logo_on  = cf_logo_on 
+        self.cf_logo_on  = cf_logo_on # 
         self.cf_logo_ige = cf_logo_ige
         self.cf_logo_prc = cf_logo_prc
 
