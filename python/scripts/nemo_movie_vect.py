@@ -84,6 +84,7 @@ requiredNamed.add_argument('-y', '--fldy', required=True, help='specify the name
 requiredNamed.add_argument('-w', '--what', required=True, help='specify the field/diagnostic to plot (ex: CSPEED,CURLOF,ect.)')
 
 parser.add_argument('-C', '--conf', default="none",           help='specify NEMO config (ex: eNATL60)')
+parser.add_argument('-E', '--exp',  default="none",           help='specify name of experiment')
 parser.add_argument('-b', '--box' , default="ALL",            help='specify extraction box name (ex: ALL)')
 parser.add_argument('-m', '--fmm' , default="mesh_mask.nc",   help='specify the NEMO mesh_mask file (ex: mesh_mask.nc)')
 parser.add_argument('-s', '--sd0' , default="20090101",       help='specify initial date as <YYYYMMDD>')
@@ -94,6 +95,7 @@ parser.add_argument('-t', '--tstep', type=int, default=1, help='specify the time
 args = parser.parse_args()
 
 CNEMO = args.conf
+CEXP = args.exp
 CBOX  = args.box
 CWHAT = args.what
 cfx_in = args.fiu
@@ -142,6 +144,8 @@ if CNEMO == 'none':
         print('ERROR: your file name is not consistent with '+CNEMO+' !!! ('+vv[0]+')'); sys.exit(0)
     CRUN = vv[1]
     print('\n Run is called: ''+CRUN+'' !\n')
+
+if CEXP != 'none': CRUN=CEXP
 
 #---------------------------------------------------------------
 
