@@ -51,16 +51,28 @@ print(' *** Will create image '+cf_im)
 f_nc = Dataset(cf_nc)
 Ndim = len(f_nc.variables[cv_nc].dimensions)
 if   Ndim == 4:
-    xfield = imult*f_nc.variables[cv_nc][0,0,:,:]
+    xfield = f_nc.variables[cv_nc][0,0,:,:]
 elif Ndim == 3:
-    xfield = imult*f_nc.variables[cv_nc][0,:,:]
+    xfield = f_nc.variables[cv_nc][0,:,:]
 elif Ndim == 2:
-    xfield = imult*f_nc.variables[cv_nc][:,:]
+    xfield = f_nc.variables[cv_nc][:,:]
 else:
     print(' ERROR (mk_zonal_average.py) => weird shape for your mask array!')
     sys.exit(0)
-#xfield  = imult*f_nc.variables[cv_nc][:,:]
+
 f_nc.close()
+
+
+if cv_nc == 'Bathymetry':
+    # Converts bathymetry to mask:
+    idx_oce = nmp.where(xfield>0.)
+    xfield[idx_oce] = 1.
+    
+
+
+xfield = imult*xfield
+
+
 
 
 
