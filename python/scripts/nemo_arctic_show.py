@@ -171,7 +171,7 @@ elif CNEMO in ['NANUK1']:
     jk=0
     j1=0 ; j2=129
     i1=0 ; i2=118
-    rfig_fact = 1
+    rfig_fact = 0.75
 else:
     print('ERRO: unknow conf '+CNEMO)
     ###############################
@@ -290,7 +290,7 @@ id_lsm.close()
 print('Done!\n')
 
 
-fontr=1.2
+fontr=1.2*rfig_fact
 params = { 'font.family':'Helvetica Neue',
            'font.weight':    'normal',
            'font.size':       int(9.*fontr),
@@ -299,8 +299,9 @@ params = { 'font.family':'Helvetica Neue',
            'ytick.labelsize': int(9.*fontr),
            'axes.labelsize':  int(9.*fontr) }
 mpl.rcParams.update(params)
-cfont_clb  =  { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(8.5*fontr), 'color':color_top_cb}
-cfont_clock = { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(9.*fontr) , 'color':color_top }
+#cfont_clb  =  { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(10*fontr), 'color':color_top_cb}
+cfont_clb  =  { 'fontname':'Open Sans', 'fontweight':'normal', 'fontsize':int(10*fontr), 'color':color_top_cb}
+cfont_clock = { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(10*fontr) , 'color':color_top }
 #cfont_exp= { 'fontname':'Open Sans'  , 'fontweight':'light', 'fontsize':int(9.*fontr), 'color':color_top }
 #cfont_mail  =  { 'fontname':'Times New Roman', 'fontweight':'normal', 'fontstyle':'italic', 'fontsize':int(14.*fontr), 'color':'0.8'}
 cfont_titl1 = { 'fontname':'Open Sans', 'fontweight':'light', 'fontsize':int(18.*fontr), 'color':color_top }
@@ -505,7 +506,7 @@ for jt in range(jt0,Nt):
 
     
     #ax.annotate('Date: '+cday+' '+chour+':00', xy=(0.785, 0.015), xycoords='figure fraction', **cfont_clock)
-    ax.annotate('Date: '+cday+' '+chour+':00', xy=(0.76, 0.88), xycoords='figure fraction', **cfont_clock)
+    ax.annotate('Date: '+cday+' '+chour+':00', xy=(0.3, 0.01), xycoords='figure fraction', **cfont_clock)
     
     ry0 = 0.78
     #ry0 = 0.9
