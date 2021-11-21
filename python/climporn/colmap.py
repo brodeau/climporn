@@ -122,7 +122,7 @@ def ncview_ncmap_to_array( cname, l_rev=False ):
     import re
 
     dir_scrpt = path.dirname(path.realpath(__file__))
-    dir_ncview_cmap = str.replace( dir_scrpt ,  'python/mod', 'misc/ncview_colormaps')
+    dir_ncview_cmap = str.replace( dir_scrpt ,  'python/climporn', 'misc/ncview_colormaps')
 
     if cname[:7] != 'ncview_' : print(' ERROR: a ncview colormap should begin with "ncview_" !'); sys.exit(0)
     ncview_name = cname[7:]

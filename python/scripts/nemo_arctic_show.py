@@ -38,7 +38,7 @@ l_add_topo_land = False
 
 l_show_ice_colbar = True
 
-l_show_logos = True
+l_show_logos = False
 f_logo_on    = 'ocean-next_trans_white_120x82.png'
 f_logo_ifrmr = 'IFREMER_blanc_small.png'
 f_logo_nersc = 'NERSC_white_120p.png'
@@ -64,7 +64,6 @@ jt0 = 0
 
 
 
-cdt = '6h'
 l_get_name_of_run = True
 
 # Ice:
@@ -107,6 +106,8 @@ parser.add_argument('-m', '--fmm' , default="mesh_mask.nc", help='specify the NE
 parser.add_argument('-s', '--sd0' , default="19950101",     help='specify initial date as <YYYYMMDD>')
 parser.add_argument('-l', '--lev' , type=int, default=0,    help='specify the level to use if 3D field (default: 0 => 2D)')
 parser.add_argument('-I', '--ice' , action='store_true',    help='draw sea-ice concentration layer onto the field')
+parser.add_argument('-T', '--title', default="",            help='specify experiment title')
+parser.add_argument('-f', '--freq',  default="6h",          help='specify experiment title')
 
 args = parser.parse_args()
 
@@ -119,6 +120,8 @@ cf_mm = args.fmm
 csd0  = args.sd0
 jk    = args.lev
 lshow_ice = args.ice
+ctitle = args.title
+cfreq  = args.freq
 #cf_topo_land = args.zld
 
 print('')
@@ -157,16 +160,25 @@ if l_get_name_of_run:
 
 #---------------------------------------------------------------
 
-if CNEMO in ['NANUK025', 'CREG025', 'CREG025.L75']:
+rfig_fact = 1
+
+if   CNEMO in ['NANUK025', 'CREG025', 'CREG025.L75']:
     jk=0
     j1=0 ; j2=603
     i1=0 ; i2=528
+
+elif CNEMO in ['NANUK1']:
+    jk=0
+    j1=0 ; j2=129
+    i1=0 ; i2=118
+    rfig_fact = 1
 else:
     print('ERRO: unknow conf '+CNEMO)
     ###############################
 
 if CNEMO == 'NANUK025': cxtra_info1 = "OPA - neXtSIM" ; #cxtra_info2 = "   (CREG025)"
 if CNEMO[:7] == 'CREG025':  cxtra_info1 = "OPA - LIM3"    ; #cxtra_info2 = "(CREG025)"
+if CNEMO == 'NANUK1': cxtra_info1 = "OPA - neXtSIM" ; #cxtra_info2 = "   (CREG025)"
 
 #cv_bg = ''
 l_only_over_ice = False ; # only plot fields in regions with sea-ice
@@ -292,7 +304,7 @@ cfont_clock = { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(
 #cfont_exp= { 'fontname':'Open Sans'  , 'fontweight':'light', 'fontsize':int(9.*fontr), 'color':color_top }
 #cfont_mail  =  { 'fontname':'Times New Roman', 'fontweight':'normal', 'fontstyle':'italic', 'fontsize':int(14.*fontr), 'color':'0.8'}
 cfont_titl1 = { 'fontname':'Open Sans', 'fontweight':'light', 'fontsize':int(18.*fontr), 'color':color_top }
-cfont_titl2 = { 'fontname':'Open Sans', 'fontweight':'light', 'fontsize':int(14.*fontr), 'color':color_top }
+cfont_titl2 = { 'fontname':'Open Sans', 'fontweight':'normal','fontsize':int(12.*fontr), 'color':color_top }
 
 
 # for colorbar:
@@ -310,7 +322,7 @@ if l_show_ice_colbar: vc_ice = nmp.arange(rmin_ice, rmax_ice+0.2, 0.2)
 #vsporg = [0.03, 0.1, 1., 0.8]
 
 # For movie
-vfig_size = [ 7.54, 7.2 ]
+vfig_size = [ 7.54*rfig_fact, 7.2*rfig_fact ]
 #vsporg = [0.001, 0.0011, 0.997, 0.999]
 #vsporg = [0., 0.0001, 1., 1.001]
 vsporg = [0., 0., 1., 1.]
@@ -322,14 +334,14 @@ cyr0=csd0[0:4]
 cmn0=csd0[4:6]
 cdd0=csd0[6:8]
 
-if cdt == '6h':
+if cfreq == '6h':
     dt = 6
-elif cdt == '3h':
+elif cfreq == '3h':
     dt = 3
-elif cdt == '1h':
+elif cfreq == '1h':
     dt = 1
 else:
-    print('ERROR: unknown dt!')
+    print('ERROR: unknown frequency!'); sys.exit(0)
 
 
 if rexp_ctrl > 0.:
@@ -496,8 +508,10 @@ for jt in range(jt0,Nt):
     ry0 = 0.78
     #ry0 = 0.9
     ax.annotate(cxtra_info1, xy=(0.02, ry0+0.05), xycoords='figure fraction', **cfont_titl1)
-    #ax.annotate(cxtra_info2, xy=(0.05, ry0 ),     xycoords='figure fraction', **cfont_titl2)
 
+    if ctitle != "":
+        ax.annotate(ctitle, xy=(0.03, ry0-0.01), xycoords='figure fraction', **cfont_titl2)
+    
     #
     if l_show_logos:
 
