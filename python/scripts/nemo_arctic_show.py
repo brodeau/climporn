@@ -188,7 +188,7 @@ rexp_ctrl = 0.
 if  CWHAT == 'sst':
     # SST
     cv_in = 'sst'
-    cv_if = 'siconc'
+    cv_if = 'ice_cover'
     cv_out = CWHAT
     tmin=-2. ;    tmax=20. ; df = 1. ; cb_jump = 2    
     cpal_fld = 'on3'  #cpal_fld = 'ncview_nrl'
