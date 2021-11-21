@@ -440,8 +440,10 @@ for jt in range(jt0,Nt):
         carte.drawlsmask(ocean_color='0.5',land_color=(255,255,255,1), alpha=1)
         #carte.drawlsmask(land_color=(255,255,255,1))
 
+    #ft = carte.pcolormesh(x0, y0, XFLD, cmap = pal_fld, norm = nrm_fld, shading="gouraud" )
     ft = carte.pcolormesh(x0, y0, XFLD, cmap = pal_fld, norm = nrm_fld )
     #ft = carte.pcolor(x0, y0, XFLD, cmap = pal_fld, norm = nrm_fld )
+
     if lshow_ice:
         fi = carte.pcolormesh(x0, y0, XIFR, cmap = pal_ice, norm = nrm_ice )
         #fc = carte.contour(   x0, y0, XIFR_bkp, [r_oi_thr], colors='k', linewidths=1. )
