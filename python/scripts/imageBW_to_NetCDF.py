@@ -73,6 +73,21 @@ print(" *** shape of pic: ", (ny,nx))
 xpic = nmp.array(pic)
 
 
+#print(" xpic = ")
+#for jj in range(ny):
+#    for ji in range(nx):
+#        print(xpic[jj,ji])
+
+ithresh = 255//2
+#ithresh = 250
+idx_sea = nmp.where( xpic >= ithresh )
+idx_lnd = nmp.where( xpic  < ithresh )
+
+xpic[idx_sea] = 255
+xpic[idx_lnd] =  0
+
+
+
 if l_fake_coor:
     # Prepare coordinates if needed:
     vlon = nmp.zeros(nx) ; dx = 360./float(nx)
