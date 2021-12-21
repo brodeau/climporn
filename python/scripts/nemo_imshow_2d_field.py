@@ -47,18 +47,25 @@ l_read_lsm=False
 fig_type='png'
 
 narg = len(sys.argv)
-if not narg in [5,6]:
-    print('Usage: '+sys.argv[0]+' <CONF> <file> <variable> <snapshot> (<LSM_file>)')
+if not narg in [5,6,7]:
+    print('Usage: '+sys.argv[0]+' <CONF> <file> <variable> <snapshot> (<LSM_file> <point>)')
     sys.exit(0)
 CNEMO  = sys.argv[1]
 cf_fld = sys.argv[2]
 cv_in  = sys.argv[3]
 jt=int(sys.argv[4])
 
-if narg ==6 :
+if narg >= 6 :
     l_read_lsm=True
     cf_lsm = sys.argv[5]
 
+cpnt = 't'
+if narg == 7 :
+    cpnt = sys.argv[6]
+
+if not cpnt in ['t','f','u','v']:
+    print('ERROR: what to do with C-grid "'+cpnt+'" point!?')
+    sys.exit(0)
 
 l_bathy_var = [ 'Bathymetry', 'elevation' ]
     
@@ -88,7 +95,7 @@ if CNEMO == 'NATL60':
 elif CNEMO == 'NANUK1':
     i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 4. ; vcb = [0.5, 0.875, 0.49, 0.02] ; font_rat = 0.16*rfact_zoom
 elif CNEMO == 'NANUK1h': # half proc [i/2]
-    i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 4. ; vcb = [0.5, 0.875, 0.49, 0.02] ; font_rat = 0.16*rfact_zoom
+    i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 8. ; vcb = [0.15, 0.96, 0.8, 0.02] ; font_rat = 0.16*rfact_zoom
 
 elif CNEMO == 'NANUK025':
     i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 1. ; vcb = [0.5, 0.875, 0.49, 0.02] ; font_rat = 0.5*rfact_zoom
@@ -333,16 +340,17 @@ ibath=1
 
 if l_read_lsm:
     cp.chck4f(cf_lsm)
-    print('\n *** Reading "tmask" in meshmask file...')
+    cnmsk = cpnt+'mask'
+    print('\n *** Reading "'+cnmsk+'" in meshmask file...')
     id_lsm = Dataset(cf_lsm)
-    nb_dim = len(id_lsm.variables['tmask'].dimensions)
+    nb_dim = len(id_lsm.variables[cnmsk].dimensions)
     Ni = id_lsm.dimensions['x'].size
     Nj = id_lsm.dimensions['y'].size
     if i2 == 0: i2 = Ni
     if j2 == 0: j2 = Nj
-    if nb_dim == 4: XMSK  = id_lsm.variables['tmask'][0,0,j1:j2,i1:i2] ; # t, y, x
-    if nb_dim == 3: XMSK  = id_lsm.variables['tmask'][0,  j1:j2,i1:i2] ; # t, y, x
-    if nb_dim == 2: XMSK  = id_lsm.variables['tmask'][    j1:j2,i1:i2] ; # t, y, x
+    if nb_dim == 4: XMSK  = id_lsm.variables[cnmsk][0,0,j1:j2,i1:i2] ; # t, y, x
+    if nb_dim == 3: XMSK  = id_lsm.variables[cnmsk][0,  j1:j2,i1:i2] ; # t, y, x
+    if nb_dim == 2: XMSK  = id_lsm.variables[cnmsk][    j1:j2,i1:i2] ; # t, y, x
     if l_show_msh:
         Xlon = id_lsm.variables['glamu'][0,j1:j2,i1:i2]
         Xlat = id_lsm.variables['gphiv'][0,j1:j2,i1:i2]
@@ -403,7 +411,7 @@ elif cv_in == 'track':
 else:
     print('PROBLEM #2'); sys.exit(0)
 
-print('\n According to "tmask" the shape of the domain is Ni, Nj =', Ni, Nj)
+print('\n According to "'+cnmsk+'" the shape of the domain is Ni, Nj =', Ni, Nj)
 
 
 
