@@ -35,7 +35,7 @@ if narg == 4:
     
 cfname, cncext = path.splitext(cf_nc)
 
-cf_msk = 'mask.nc'
+cf_msk = 'mask_'+cv_nc+'.nc'
 
 print(' *** Will create mask '+cf_msk)
 

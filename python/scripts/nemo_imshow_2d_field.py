@@ -293,6 +293,18 @@ elif cv_in == 's12':
     cpal_fld = 'ncview_rainbow2_cmyk'
     cunit = r'$\sigma_{12}$ (N)'
     cb_jump = 1
+elif cv_in == 'e12':
+    cfield = 'eps12'
+    tmin=-1.e-5 ;  tmax=-tmin   ;  df = 1.E-8
+    cpal_fld = 'ncview_rainbow2_cmyk'
+    cunit = r'$\epsilon_{12}$ (m/s^2)'
+    cb_jump = 1
+elif cv_in in ['elasticity-t','elasticity-f']:
+    cfield = 'E'
+    tmin=2.E8 ;  tmax=6.E8   ;  df = 1000.
+    cpal_fld = 'viridis'
+    cunit = r'Elasticity'
+    cb_jump = 1
 
     
 else:
