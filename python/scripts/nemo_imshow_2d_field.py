@@ -87,6 +87,8 @@ if CNEMO == 'NATL60':
     
 elif CNEMO == 'NANUK1':
     i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 4. ; vcb = [0.5, 0.875, 0.49, 0.02] ; font_rat = 0.16*rfact_zoom
+elif CNEMO == 'NANUK1h': # half proc [i/2]
+    i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 4. ; vcb = [0.5, 0.875, 0.49, 0.02] ; font_rat = 0.16*rfact_zoom
 
 elif CNEMO == 'NANUK025':
     i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 1. ; vcb = [0.5, 0.875, 0.49, 0.02] ; font_rat = 0.5*rfact_zoom
@@ -253,8 +255,6 @@ elif cv_in in l_bathy_var:   #
         #cpal_fld = 'ncview_hotres' ; l_pow_field = False
         cpal_fld = 'ncview_nrl' ; l_pow_field = True
         #cpal_fld = 'ocean' ; l_pow_field = False
-        
-
     
 elif cv_in == 'sossheig':
     cfield = 'SSH'
@@ -274,7 +274,27 @@ elif cv_in == 'track':
     cunit = r'SST ($^{\circ}$C)'
     cb_jump = 1
     fig_type='svg'
-    # 
+
+elif cv_in == 's11':
+    cfield = 'sig11'
+    tmin=-50000. ;  tmax=50000.   ;  df = 1000.
+    cpal_fld = 'ncview_rainbow2_cmyk'
+    cunit = r'$\sigma_{11}$ (N)'
+    cb_jump = 1
+elif cv_in == 's22':
+    cfield = 'sig22'
+    tmin=-30000. ;  tmax=30000.   ;  df = 1000.
+    cpal_fld = 'ncview_rainbow2_cmyk'
+    cunit = r'$\sigma_{22}$ (N)'
+    cb_jump = 1
+elif cv_in == 's12':
+    cfield = 'sig12'
+    tmin=-30000. ;  tmax=30000.   ;  df = 1000.
+    cpal_fld = 'ncview_rainbow2_cmyk'
+    cunit = r'$\sigma_{12}$ (N)'
+    cb_jump = 1
+
+    
 else:
     print('ERROR: variable '+cv_in+' is not known yet...'); sys.exit(0)
 
