@@ -300,8 +300,8 @@ elif cv_in == 's12':
     cpal_fld = 'ncview_rainbow2_cmyk'
     cunit = r'$\sigma_{12}$ (N)'
     cb_jump = 1
-elif cv_in == 'e12':
-    cfield = 'eps12'
+elif cv_in in ['e11','e22','e12']:
+    cfield = 'eps'
     tmin=-1.e-5 ;  tmax=-tmin   ;  df = 1.E-8
     cpal_fld = 'ncview_rainbow2_cmyk'
     cunit = r'$\epsilon_{12}$ (m/s^2)'
