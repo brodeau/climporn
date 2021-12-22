@@ -292,37 +292,49 @@ elif cv_in == 'damage':
 elif cv_in == 's11':
     cfield = 'sig11'
     tmin=-50000. ;  tmax=50000.   ;  df = 25000.
-    cpal_fld = 'ncview_rainbow2_cmyk'
+    cpal_fld = 'RdBu'
     cunit = r'$\sigma_{11}$ (N)'
 
 elif cv_in == 's22':
     cfield = 'sig22'
     tmin=-30000. ;  tmax=30000.   ;  df = 15000.
-    cpal_fld = 'ncview_rainbow2_cmyk'
+    cpal_fld = 'RdBu'
     cunit = r'$\sigma_{22}$ (N)'
 
 elif cv_in == 's12':
     cfield = 'sig'
     tmin=-30000. ;  tmax=30000.   ;  df = 15000.
-    cpal_fld = 'ncview_rainbow2_cmyk'
+    cpal_fld = 'RdBu'
     cunit = r'$\sigma_{12}$ (N)'
+
+elif cv_in == 'Uice':
+    cfield = 'Uice'
+    tmin=-1. ;  tmax=1.   ;  df = 0.1
+    cpal_fld = 'RdBu'
+    cunit = r'$u_{ice}$ (m/s)'
+
+elif cv_in == 'Vice':
+    cfield = 'Vice'
+    tmin=-1. ;  tmax=1.   ;  df = 0.1
+    cpal_fld = 'RdBu'
+    cunit = r'$v_{ice}$ (m/s)'
 
 elif cv_in == 'zsN':
     cfield = 'sigN'
     tmin=-30000. ;  tmax=30000.   ;  df = 15000.
-    cpal_fld = 'ncview_rainbow2_cmyk'
+    cpal_fld = 'RdBu'
     cunit = r'$\sigma_N$ (N)'
 
 elif cv_in == 'zsS':
     cfield = 'sigS'
     tmin=-30000. ;  tmax=30000.   ;  df = 15000.
-    cpal_fld = 'ncview_rainbow2_cmyk'
+    cpal_fld = 'RdBu'
     cunit = r'$\sigma_S$ (N)'
 
 elif cv_in in ['e11','e22','e12']:
     cfield = 'eps'
     tmin=-1.e-5 ;  tmax=-tmin   ;  df = 5.E-6
-    cpal_fld = 'ncview_rainbow2_cmyk'
+    cpal_fld = 'RdBu'
     cunit = r'$\epsilon$ (m/s^2)'
 
 elif cv_in in ['elasticity','elasticity-t','elasticity-f']:
@@ -360,6 +372,18 @@ elif cv_in in ['dcrit-t','dcrit-f']:
     tmin=-5 ;  tmax=5.   ;  df = 1.
     cpal_fld = 'ncview_tofino'
     cunit = r'$d_{crit}$'
+
+elif cv_in in ['Tdc-t','Tdc-f']:
+    cfield = 'Tdc'
+    tmin=0. ;  tmax=300.   ;  df = 50.
+    cpal_fld = 'ncview_tofino'
+    cunit = r'$Td_{c}$'
+
+elif cv_in in ['mult-dmg-t','mult-dmg-f']:
+    cfield = 'mult-dmg'
+    tmin=0. ;  tmax=0.2   ;  df = 0.05
+    cpal_fld = 'ncview_tofino'
+    cunit = r'$MultDmg$'
 
 
     
