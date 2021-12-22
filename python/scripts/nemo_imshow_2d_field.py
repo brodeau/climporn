@@ -232,6 +232,8 @@ l_pow_field = False
 cextend='both'
 l_hide_cb_ticks = False
 tmin=0. ; tmax=1. ; df=0.01
+cb_jump = 1
+
 
 print(' cv_in = '+cv_in)
 
@@ -240,7 +242,7 @@ if cv_in in ['sosstsst','tos']:
     tmin=0. ;  tmax=28.   ;  df = 1.
     cpal_fld = 'ncview_nrl'    
     cunit = r'SST ($^{\circ}$C)'
-    cb_jump = 1
+
 
 elif cv_in in l_bathy_var:   # 
     cfield = 'Bathymetry'       # 
@@ -253,7 +255,6 @@ elif cv_in in l_bathy_var:   #
     #cpal_fld = 'ncview_hotres'
     #cpal_fld = 'ncview_helix'
     cunit = r'Bathymetry (m)'
-    cb_jump = 10
     l_pow_field = True
     pow_field = 1.5
     #l_log_field = False
@@ -269,7 +270,7 @@ elif cv_in == 'sossheig':
     tmin=-0.3 ;  tmax=0.3   ;  df = 0.1
     cpal_fld = 'ncview_jaisnc'    
     cunit = r'SSH (m)'
-    cb_jump = 1
+
 
 elif cv_in == 'somxl010':
     cfield == 'MLD'
@@ -280,7 +281,6 @@ elif cv_in == 'track':
     cfield = 'TRACK'
     cpal_fld = 'nipy_spectral'
     cunit = r'SST ($^{\circ}$C)'
-    cb_jump = 1
     fig_type='svg'
 
 elif cv_in == 'damage':
@@ -288,61 +288,79 @@ elif cv_in == 'damage':
     tmin=0. ;  tmax=1.   ;  df = 0.1
     cpal_fld = 'ncview_tofino'
     cunit = r'damage'
-    cb_jump = 1    
+    
 elif cv_in == 's11':
     cfield = 'sig11'
     tmin=-50000. ;  tmax=50000.   ;  df = 25000.
     cpal_fld = 'ncview_rainbow2_cmyk'
     cunit = r'$\sigma_{11}$ (N)'
-    cb_jump = 1
+
 elif cv_in == 's22':
     cfield = 'sig22'
     tmin=-30000. ;  tmax=30000.   ;  df = 15000.
     cpal_fld = 'ncview_rainbow2_cmyk'
     cunit = r'$\sigma_{22}$ (N)'
-    cb_jump = 1
-elif cv_in in ['s12','zsN']:
+
+elif cv_in == 's12':
     cfield = 'sig'
     tmin=-30000. ;  tmax=30000.   ;  df = 15000.
     cpal_fld = 'ncview_rainbow2_cmyk'
-    cunit = r'$\sigma$ (N)'
-    cb_jump = 1
+    cunit = r'$\sigma_{12}$ (N)'
+
+elif cv_in == 'zsN':
+    cfield = 'sigN'
+    tmin=-30000. ;  tmax=30000.   ;  df = 15000.
+    cpal_fld = 'ncview_rainbow2_cmyk'
+    cunit = r'$\sigma_N$ (N)'
+
+elif cv_in == 'zsS':
+    cfield = 'sigS'
+    tmin=-30000. ;  tmax=30000.   ;  df = 15000.
+    cpal_fld = 'ncview_rainbow2_cmyk'
+    cunit = r'$\sigma_S$ (N)'
+
 elif cv_in in ['e11','e22','e12']:
     cfield = 'eps'
     tmin=-1.e-5 ;  tmax=-tmin   ;  df = 5.E-6
     cpal_fld = 'ncview_rainbow2_cmyk'
     cunit = r'$\epsilon$ (m/s^2)'
-    cb_jump = 1
+
 elif cv_in in ['elasticity','elasticity-t','elasticity-f']:
     cfield = 'E'
     tmin=1.E8 ;  tmax=6.E8   ;  df = 1.E8
     cpal_fld = 'viridis'
     cunit = r'Elasticity'
-    cb_jump = 1
+
 elif cv_in in ['lambda-t','lambda-f']:
     cfield = 'lambda'
     tmin=1.E6 ;  tmax=1.E7   ;  df = 2.E6
     cpal_fld = 'viridis'
     cunit = r'$\lambda$'
-    cb_jump = 1
+
 elif cv_in in ['Pmax-t','Pmax-f']:
     cfield = 'Pmax'
     tmin=0. ;  tmax=1.E5   ;  df = 2.E4
     cpal_fld = 'ncview_tofino'
     cunit = r'$P_{max}$'
-    cb_jump = 1
+
 elif cv_in in ['Ptilde-t','Ptilde-f']:
     cfield = 'Ptilde'
     tmin=0. ;  tmax=1.   ;  df = 0.1
     cpal_fld = 'ncview_tofino'
     cunit = r'$\tilde{P}$'
-    cb_jump = 1
+
 elif cv_in in ['mult-t','mult-f']:
     cfield = 'mult'
     tmin=0. ;  tmax=1.   ;  df = 0.1
     cpal_fld = 'ncview_tofino'
     cunit = r'multiplicator'
-    cb_jump = 1
+
+elif cv_in in ['dcrit-t','dcrit-f']:
+    cfield = 'dcrit'
+    tmin=-5 ;  tmax=5.   ;  df = 1.
+    cpal_fld = 'ncview_tofino'
+    cunit = r'$d_{crit}$'
+
 
     
 else:
