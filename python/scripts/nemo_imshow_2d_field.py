@@ -95,7 +95,8 @@ if CNEMO == 'NATL60':
 elif CNEMO == 'NANUK1':
     i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 4. ; vcb = [0.5, 0.875, 0.49, 0.02] ; font_rat = 0.16*rfact_zoom
 elif CNEMO == 'NANUK1h': # half proc [i/2]
-    i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 8. ; vcb = [0.15, 0.96, 0.8, 0.02] ; font_rat = 0.16*rfact_zoom
+    i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 8. ; vcb = [0.04, 0.06, 0.92, 0.015] ; font_rat = 0.1*rfact_zoom
+    l_show_cb = True ; color_top = 'k'
 
 elif CNEMO == 'NANUK025':
     i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 1. ; vcb = [0.5, 0.875, 0.49, 0.02] ; font_rat = 0.5*rfact_zoom
@@ -282,6 +283,12 @@ elif cv_in == 'track':
     cb_jump = 1
     fig_type='svg'
 
+elif cv_in == 'damage':
+    cfield = 'damage'
+    tmin=0. ;  tmax=1.   ;  df = 0.1
+    cpal_fld = 'ncview_tofino'
+    cunit = r'damage'
+    cb_jump = 1    
 elif cv_in == 's11':
     cfield = 'sig11'
     tmin=-50000. ;  tmax=50000.   ;  df = 1000.
@@ -294,21 +301,21 @@ elif cv_in == 's22':
     cpal_fld = 'ncview_rainbow2_cmyk'
     cunit = r'$\sigma_{22}$ (N)'
     cb_jump = 1
-elif cv_in == 's12':
-    cfield = 'sig12'
-    tmin=-30000. ;  tmax=30000.   ;  df = 1000.
+elif cv_in in ['s12','zsN']:
+    cfield = 'sig'
+    tmin=-30000. ;  tmax=30000.   ;  df = 10000.
     cpal_fld = 'ncview_rainbow2_cmyk'
-    cunit = r'$\sigma_{12}$ (N)'
+    cunit = r'$\sigma$ (N)'
     cb_jump = 1
 elif cv_in in ['e11','e22','e12']:
     cfield = 'eps'
-    tmin=-1.e-5 ;  tmax=-tmin   ;  df = 1.E-8
+    tmin=-1.e-5 ;  tmax=-tmin   ;  df = 5.E-6
     cpal_fld = 'ncview_rainbow2_cmyk'
-    cunit = r'$\epsilon_{12}$ (m/s^2)'
+    cunit = r'$\epsilon$ (m/s^2)'
     cb_jump = 1
-elif cv_in in ['elasticity-t','elasticity-f']:
+elif cv_in in ['elasticity','elasticity-t','elasticity-f']:
     cfield = 'E'
-    tmin=2.E8 ;  tmax=6.E8   ;  df = 1000.
+    tmin=1.E8 ;  tmax=6.E8   ;  df = 1.E8
     cpal_fld = 'viridis'
     cunit = r'Elasticity'
     cb_jump = 1
