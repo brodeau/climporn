@@ -291,19 +291,19 @@ elif cv_in == 'damage':
     cb_jump = 1    
 elif cv_in == 's11':
     cfield = 'sig11'
-    tmin=-50000. ;  tmax=50000.   ;  df = 1000.
+    tmin=-50000. ;  tmax=50000.   ;  df = 25000.
     cpal_fld = 'ncview_rainbow2_cmyk'
     cunit = r'$\sigma_{11}$ (N)'
     cb_jump = 1
 elif cv_in == 's22':
     cfield = 'sig22'
-    tmin=-30000. ;  tmax=30000.   ;  df = 1000.
+    tmin=-30000. ;  tmax=30000.   ;  df = 15000.
     cpal_fld = 'ncview_rainbow2_cmyk'
     cunit = r'$\sigma_{22}$ (N)'
     cb_jump = 1
 elif cv_in in ['s12','zsN']:
     cfield = 'sig'
-    tmin=-30000. ;  tmax=30000.   ;  df = 10000.
+    tmin=-30000. ;  tmax=30000.   ;  df = 15000.
     cpal_fld = 'ncview_rainbow2_cmyk'
     cunit = r'$\sigma$ (N)'
     cb_jump = 1
@@ -318,6 +318,30 @@ elif cv_in in ['elasticity','elasticity-t','elasticity-f']:
     tmin=1.E8 ;  tmax=6.E8   ;  df = 1.E8
     cpal_fld = 'viridis'
     cunit = r'Elasticity'
+    cb_jump = 1
+elif cv_in in ['lambda-t','lambda-f']:
+    cfield = 'lambda'
+    tmin=1.E6 ;  tmax=1.E7   ;  df = 2.E6
+    cpal_fld = 'viridis'
+    cunit = r'$\lambda$'
+    cb_jump = 1
+elif cv_in in ['Pmax-t','Pmax-f']:
+    cfield = 'Pmax'
+    tmin=0. ;  tmax=1.E5   ;  df = 2.E4
+    cpal_fld = 'ncview_tofino'
+    cunit = r'$P_{max}$'
+    cb_jump = 1
+elif cv_in in ['Ptilde-t','Ptilde-f']:
+    cfield = 'Ptilde'
+    tmin=0. ;  tmax=1.   ;  df = 0.1
+    cpal_fld = 'ncview_tofino'
+    cunit = r'$\tilde{P}$'
+    cb_jump = 1
+elif cv_in in ['mult-t','mult-f']:
+    cfield = 'mult'
+    tmin=0. ;  tmax=1.   ;  df = 0.1
+    cpal_fld = 'ncview_tofino'
+    cunit = r'multiplicator'
     cb_jump = 1
 
     
