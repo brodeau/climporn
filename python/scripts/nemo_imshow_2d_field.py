@@ -47,21 +47,22 @@ l_read_lsm=False
 fig_type='png'
 
 narg = len(sys.argv)
-if not narg in [5,6,7]:
-    print('Usage: '+sys.argv[0]+' <CONF> <file> <variable> <snapshot> (<LSM_file> <point>)')
+if not narg in [6,7,8]:
+    print('Usage: '+sys.argv[0]+' <CONF> <file> <variable> <snapshot> <name_fig> (<LSM_file> <point>)')
     sys.exit(0)
 CNEMO  = sys.argv[1]
 cf_fld = sys.argv[2]
 cv_in  = sys.argv[3]
-jt=int(sys.argv[4])
+jt = int(sys.argv[4])
+cnfig  = sys.argv[5]
 
-if narg >= 6 :
+if narg >= 7 :
     l_read_lsm=True
-    cf_lsm = sys.argv[5]
+    cf_lsm = sys.argv[6]
 
 cpnt = 't'
-if narg == 7 :
-    cpnt = sys.argv[6]
+if narg == 8 :
+    cpnt = sys.argv[7]
 
 if not cpnt in ['t','f','u','v']:
     print('ERROR: what to do with C-grid "'+cpnt+'" point!?')
@@ -292,49 +293,54 @@ elif cv_in == 'damage':
 elif cv_in == 's11':
     cfield = 'sig11'
     tmin=-50000. ;  tmax=50000.   ;  df = 25000.
-    cpal_fld = 'RdBu'
+    cpal_fld = 'RdBu_r'
     cunit = r'$\sigma_{11}$ (N)'
 
 elif cv_in == 's22':
     cfield = 'sig22'
     tmin=-30000. ;  tmax=30000.   ;  df = 15000.
-    cpal_fld = 'RdBu'
+    cpal_fld = 'RdBu_r'
     cunit = r'$\sigma_{22}$ (N)'
 
 elif cv_in == 's12':
     cfield = 'sig'
     tmin=-30000. ;  tmax=30000.   ;  df = 15000.
-    cpal_fld = 'RdBu'
+    cpal_fld = 'RdBu_r'
     cunit = r'$\sigma_{12}$ (N)'
 
 elif cv_in == 'Uice':
     cfield = 'Uice'
-    tmin=-1. ;  tmax=1.   ;  df = 0.1
-    cpal_fld = 'RdBu'
+    tmin=-1. ;  tmax=1.   ;  df = 0.2
+    cpal_fld = 'RdBu_r'
     cunit = r'$u_{ice}$ (m/s)'
 
 elif cv_in == 'Vice':
     cfield = 'Vice'
-    tmin=-1. ;  tmax=1.   ;  df = 0.1
-    cpal_fld = 'RdBu'
+    tmin=-1. ;  tmax=1.   ;  df = 0.2
+    cpal_fld = 'RdBu_r'
     cunit = r'$v_{ice}$ (m/s)'
 
 elif cv_in == 'zsN':
     cfield = 'sigN'
     tmin=-30000. ;  tmax=30000.   ;  df = 15000.
-    cpal_fld = 'RdBu'
+    cpal_fld = 'RdBu_r'
     cunit = r'$\sigma_N$ (N)'
 
 elif cv_in == 'zsS':
     cfield = 'sigS'
     tmin=-30000. ;  tmax=30000.   ;  df = 15000.
-    cpal_fld = 'RdBu'
+    cpal_fld = 'RdBu_r'
+    cunit = r'$\sigma_S$ (N)'
+elif cv_in == 'zsS2':
+    cfield = 'sigS'
+    tmin=-0.5E9 ;  tmax=-tmin   ;  df = 1.E8
+    cpal_fld = 'RdBu_r'
     cunit = r'$\sigma_S$ (N)'
 
 elif cv_in in ['e11','e22','e12']:
     cfield = 'eps'
     tmin=-1.e-5 ;  tmax=-tmin   ;  df = 5.E-6
-    cpal_fld = 'RdBu'
+    cpal_fld = 'RdBu_r'
     cunit = r'$\epsilon$ (m/s^2)'
 
 elif cv_in in ['elasticity','elasticity-t','elasticity-f']:
@@ -568,12 +574,12 @@ norm_lsm = colors.Normalize(vmin = 0., vmax = 1., clip = False)
 pal_filled = cp.chose_colmap('gray_r')
 norm_filled = colors.Normalize(vmin = 0., vmax = 0.1, clip = False)
 
+cfig = cnfig+'.'+fig_type
 
-if Nt == 0:
-    cfig = cv_in+'_'+CNEMO+'_'+cpal_fld+'.'+fig_type    
-else:
-    cfig = 'snapshot_'+str(jt)+'_'+cv_in+'_'+CNEMO+'_'+cpal_fld+'.'+fig_type    
-
+#if Nt == 0:
+#    cfig = cv_in+'_'+CNEMO+'_'+cpal_fld+'.'+fig_type    
+#else:
+#    cfig = 'snapshot_'+str(jt)+'_'+cv_in+'_'+CNEMO+'_'+cpal_fld+'.'+fig_type    
 
 #rextra_height = 1.
 #if l_scientific_mode: rextra_height = 1.12
