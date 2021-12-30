@@ -343,6 +343,12 @@ elif cv_in in ['e11','e22','e12']:
     cpal_fld = 'RdBu_r'
     cunit = r'$\epsilon$ (m/s^2)'
 
+elif cv_in in ['shear2']:
+    cfield = 'shear2'
+    tmin=-1.e-10 ;  tmax=-tmin   ;  df = 5.E-9
+    cpal_fld = 'RdBu_r'
+    cunit = r'$\tau$^2'
+
 elif cv_in in ['elasticity','elasticity-t','elasticity-f']:
     cfield = 'E'
     tmin=1.E8 ;  tmax=6.E8   ;  df = 1.E8
