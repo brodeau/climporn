@@ -379,10 +379,17 @@ elif cv_in in ['mult-t','mult-f']:
     cpal_fld = 'ncview_tofino'
     cunit = r'multiplicator'
 
+elif cv_in in ['dmg-inc-t','dmg-inc-f']:
+    cfield = 'd_inc'
+    tmin=-1.e-3 ;  tmax=-tmin   ;  df = 2.e-4
+    cpal_fld = 'ncview_tofino'
+    cunit = r'multiplicator'
+
 elif cv_in in ['dcrit-t','dcrit-f']:
     cfield = 'dcrit'
     tmin=-5 ;  tmax=5.   ;  df = 1.
-    cpal_fld = 'ncview_tofino'
+    #cpal_fld = 'ncview_tofino'
+    cpal_fld = 'RdBu_r'
     cunit = r'$d_{crit}$'
 
 elif cv_in in ['Tdc-t','Tdc-f']:
