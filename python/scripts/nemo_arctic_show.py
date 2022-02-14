@@ -192,7 +192,18 @@ l_only_over_ice = False ; # only plot fields in regions with sea-ice
 r_oi_thr = 0.01
 rexp_ctrl = 0.
 
-if  CWHAT == 'sst':
+
+
+if   CWHAT == 'siconc':
+    # SST
+    cv_in = 'siconc'
+    cv_if = ''
+    cv_out = CWHAT
+    tmin=0. ; tmax=1. ; df = 0.1 ; cb_jump = 2
+    cpal_fld = cpal_ice
+    cunit = r'ice fraction'
+
+elif CWHAT == 'sst':
     # SST
     cv_in = 'sst'
     cv_if = 'ice_cover'
@@ -255,6 +266,9 @@ else:
     
 
 cp.chck4f(cf_mm)
+
+
+if cv_if == '': lshow_ice = False
 
 
 if not path.exists("figs"): mkdir("figs")
