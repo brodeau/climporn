@@ -185,7 +185,7 @@ if CNEMO == 'NANUK025': cxtra_info1 = "OPA - neXtSIM" ; #cxtra_info2 = "   (CREG
 if CNEMO[:7] == 'CREG025':  cxtra_info1 = "OPA - LIM3"    ; #cxtra_info2 = "(CREG025)"
 if CNEMO == 'NANUK1': cxtra_info1 = "OPA - neXtSIM" ; #cxtra_info2 = "   (CREG025)"
 
-if CNEMO == 'NANUK4': cxtra_info1 = "OPA - SI3-bbm 4.0.6" ; #cxtra_info2 = "   (CREG025)"
+if CNEMO == 'NANUK4': cxtra_info1 = "OPA - SI3-bbm" ; #cxtra_info2 = "   (CREG025)"
 
 #cv_bg = ''
 l_only_over_ice = False ; # only plot fields in regions with sea-ice
