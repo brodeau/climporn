@@ -167,6 +167,11 @@ if   CNEMO in ['NANUK025', 'CREG025', 'CREG025.L75']:
     j1=0 ; j2=603
     i1=0 ; i2=528
 
+if   CNEMO in ['NANUK4']:
+    jk=0
+    j1=0 ; j2=566
+    i1=0 ; i2=492
+
 elif CNEMO in ['NANUK1']:
     jk=0
     j1=0 ; j2=129
@@ -179,6 +184,8 @@ else:
 if CNEMO == 'NANUK025': cxtra_info1 = "OPA - neXtSIM" ; #cxtra_info2 = "   (CREG025)"
 if CNEMO[:7] == 'CREG025':  cxtra_info1 = "OPA - LIM3"    ; #cxtra_info2 = "(CREG025)"
 if CNEMO == 'NANUK1': cxtra_info1 = "OPA - neXtSIM" ; #cxtra_info2 = "   (CREG025)"
+
+if CNEMO == 'NANUK4': cxtra_info1 = "OPA - SI3-bbm 4.0.6" ; #cxtra_info2 = "   (CREG025)"
 
 #cv_bg = ''
 l_only_over_ice = False ; # only plot fields in regions with sea-ice
@@ -210,10 +217,10 @@ elif CWHAT in [ 'sit', 'sivolu' ] :
     cunit = 'Sea-Ice thickness [m]'
     l_only_over_ice=True
 
-elif CWHAT == 'damage':
+elif CWHAT in [ 'damage','damage-f','damage-t' ] :
     # Sea Ice Thickness
-    cv_in = 'damage'
-    cv_if = 'sic'
+    cv_in = CWHAT
+    cv_if = 'siconc'
     #cv_bg = 'sst'
     cv_out = CWHAT
     #tmin=0.9 ; tmax=1.; df = 0.05 ; cb_jump = 1 ; rexp_ctrl = 2. ; #rexp_ctrl = 3.5
