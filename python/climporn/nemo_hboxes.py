@@ -35,6 +35,9 @@ class nemo_hbox:
         elif config == 'CALEDO60':
             Ni0 = 788
             Nj0 = 853
+        elif config == 'NANUK4':
+            Ni0 = 492
+            Nj0 = 566
         else:
             print('ERROR: we do not know NEMO config "'+str(config)+'" !')
             exit(0)
@@ -125,14 +128,25 @@ class nemo_hbox:
             l_show_exp=False ; x_exp = 50 ; y_exp = 800
             l_fill_holes_k=True
 
-            
-        elif [ config, box ] == [ 'ORCA36', 'ALLFR']:
-            # FR = FullRes !
-            i1=0   ; j1=0    ; i2=Ni0 ; j2=Nj0  ; rfact_zoom=1. ; vcb=[0.02, 0.97, 0.23, 0.018]  ; font_rat=12.*rfact_zoom
-            l_show_clock=False; x_clock = 1600 ; y_clock = 200
-            l_add_logo=False ; x_logo=2200 ; y_logo=1200
-            l_show_exp = False ; x_exp = 1750 ; y_exp = 300
+        elif [ config, box ] == [ 'CALEDO60', 'ALL']:
+            i1=4 ; j1=18  ;  i2=Ni0-4 ; j2=Nj0-15  ; rfact_zoom=1 ; font_rat=1.5*rfact_zoom
+            l_show_cb  = True ; vcb=[0.15, 0.07, 0.7, 0.018]
+            l_show_clock=True ; x_clock = 50 ; y_clock = 800
+            l_add_logo=False
+            #l_annotate_name=True
+            l_show_exp=False ; x_exp = 50 ; y_exp = 800
+            l_fill_holes_k=True
+
+        elif [ config, box ] == [ 'NANUK4', 'ALL']:
+            i1=0 ; j1=0  ;  i2=Ni0 ; j2=Nj0  ; rfact_zoom=1 ; font_rat=1.5*rfact_zoom
+            l_show_cb  = True ; vcb=[0.15, 0.09, 0.7, 0.018]
+            l_show_clock=True ; x_clock = 50 ; y_clock = 800
+            l_add_logo=False
+            #l_annotate_name=True
+            l_show_exp=True ; x_exp = 50 ; y_exp = 800
             l_fill_holes_k=False
+
+            
             
         elif [ config, box ] == [ 'ORCA36', 'ALLFRX']:
             # FR = FullRes !
