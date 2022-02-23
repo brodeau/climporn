@@ -42,11 +42,10 @@ vml = [ 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ]
 
 fig_type='png'
 rDPI = 110
-#color_top = 'white'
-color_top = 'k'
-#color_top_cb = 'white'
-color_top_cb = 'k'
+color_top = 'white'
 #color_top = 'k'
+color_top_cb = 'white'
+#color_top_cb = 'k'
 
 cv_out = 'unknown'
 
@@ -56,6 +55,7 @@ jt0 = 0
 jk=0
 l_show_lsm = True
 l_do_ice  = False
+l_mask_no_ice = False
 l_log_field = False
 l_pow_field = False
 
@@ -282,23 +282,22 @@ elif CWHAT == 'Phase':
     cunit = r'Phase (deg.)'
 
 elif CWHAT == 'siconc':
-    cv_in = 'siconc'  ; cv_out = cv_in ;
-    cpal_fld = 'bone' ; tmin=0. ;  tmax=1. ;  df = 0.1 ; cb_jump = 1
+    cv_in = 'siconc'  ; cv_out = cv_in 
+    cpal_fld = 'ice4_on' ; tmin=0. ;  tmax=1. ;  df = 0.1 ; cb_jump = 1
     #cpal_fld = 'bone_r' ; tmin=0.5 ;  tmax=1. ; l_pow_field=True  ;  pow_field=0.5 ; df = 0.1 ; cb_jump = 1
     #cpal_fld = 'bone_r' ; tmin=0.5 ;  tmax=1. ; l_log_field=True ;  df = 0.1 ; cb_jump = 1
     cunit = 'Sea-ice concentration'
-
     
-elif CWHAT == 'damage':
-    cv_in = 'damage-t'  ; cv_out = cv_in ;
-    cpal_fld = 'bone_r' ; tmin=0.8 ;  tmax=1. ;  df = 0.1 ; cb_jump = 1
+elif CWHAT in [ 'damage', 'damage-t', 'damage-f' ]:
+    cv_in = CWHAT  ; cv_out = cv_in ; color_top_cb='k'
+    cpal_fld = 'bone_r' ; tmin=0.75 ;  tmax=1. ;  df = 0.025 ; cb_jump = 1
     #cpal_fld = 'bone_r' ; tmin=0.5 ;  tmax=1. ; l_pow_field=True  ;  pow_field=0.5 ; df = 0.1 ; cb_jump = 1
     #cpal_fld = 'bone_r' ; tmin=0.5 ;  tmax=1. ; l_log_field=True ;  df = 0.1 ; cb_jump = 1
     cunit = 'Damage@T'
 
 
 else:
-    print('ERROR: we do not know variable ''+str(cv_in)+'' !')
+    print('ERROR: we do not know variable '+str(cv_in)+' !')
     sys.exit(0)
 
 
@@ -661,6 +660,7 @@ for jt in range(jt0,Nt):
         if nemo_box.c_imshow_interp == 'none':
             Xplot[idx_land] = nmp.nan
         else:
+            print(" *** drowning array `Xplot`....\n")
             cp.drown(Xplot, XMSK, k_ew=-1, nb_max_inc=10, nb_smooth=10)
     
         if l_save_nc:

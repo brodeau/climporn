@@ -138,8 +138,8 @@ class nemo_hbox:
             l_fill_holes_k=True
 
         elif [ config, box ] == [ 'NANUK4', 'ALL']:
-            i1=0 ; j1=0  ;  i2=Ni0 ; j2=Nj0  ; rfact_zoom=1 ; font_rat=1.5*rfact_zoom
-            l_show_cb  = True ; vcb=[0.15, 0.09, 0.7, 0.018]
+            i1=0 ; j1=0  ;  i2=Ni0 ; j2=Nj0  ; rfact_zoom=1 ; font_rat=1.*rfact_zoom
+            l_show_cb  = True ; vcb=[0.15, 0.08, 0.7, 0.018]
             l_show_clock=True ; x_clock = 50 ; y_clock = 800
             l_add_logo=False
             #l_annotate_name=True

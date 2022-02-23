@@ -99,6 +99,11 @@ elif CNEMO == 'NANUK1h': # half proc [i/2]
     i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 8. ; vcb = [0.04, 0.06, 0.92, 0.015] ; font_rat = 0.1*rfact_zoom
     l_show_cb = True ; color_top = 'k'
 
+
+elif CNEMO == 'NANUK4':
+    i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 1. ; vcb = [0.5, 0.875, 0.49, 0.02] ; font_rat = 0.16*rfact_zoom
+
+    
 elif CNEMO == 'NANUK025':
     i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 1. ; vcb = [0.5, 0.875, 0.49, 0.02] ; font_rat = 0.5*rfact_zoom
     x_cnf = 30. ; y_cnf = 540. ; # where to put label of conf on Figure...
@@ -284,7 +289,7 @@ elif cv_in == 'track':
     cunit = r'SST ($^{\circ}$C)'
     fig_type='svg'
 
-elif cv_in == 'damage':
+elif cv_in in [ 'damage', 'damage-t', 'damage-f' ]:
     cfield = 'damage'
     tmin=0. ;  tmax=1.   ;  df = 0.1
     cpal_fld = 'ncview_tofino'
@@ -671,9 +676,9 @@ if cv_in == 'track':
 
 
 else:
-    cf = plt.imshow(XFLD[:,:], cmap = pal_fld, norm = norm_fld, interpolation='nearest' ) #, interpolation='none')
+    cf = plt.imshow(XFLD[:,:], cmap = pal_fld, norm = norm_fld, interpolation='none')
     if cfield == 'Bathymetry':
-        #lulu
+        #lulu aspect='auto'111 , interpolation='nearest'
         if len(idy_nan) > 0:
             idd = nmp.where(idy_nan==1); idy_nan[idd] = int(10./rfact_zoom)/2  # just so the boundary line is not too thin on plot...
             plt.scatter(idx_nan, idy_nan, color=clr_yellow, marker='s', s=int(10./rfact_zoom))
