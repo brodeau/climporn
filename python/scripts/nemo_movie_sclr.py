@@ -284,9 +284,12 @@ elif CWHAT == 'Phase':
 elif CWHAT == 'siconc':
     cv_in = 'siconc'  ; cv_out = cv_in 
     cpal_fld = 'ice4_on' ; tmin=0. ;  tmax=1. ;  df = 0.1 ; cb_jump = 1
-    #cpal_fld = 'bone_r' ; tmin=0.5 ;  tmax=1. ; l_pow_field=True  ;  pow_field=0.5 ; df = 0.1 ; cb_jump = 1
-    #cpal_fld = 'bone_r' ; tmin=0.5 ;  tmax=1. ; l_log_field=True ;  df = 0.1 ; cb_jump = 1
     cunit = 'Sea-ice concentration'
+    
+elif CWHAT == 'sivolu':
+    cv_in = 'sivolu'  ; cv_out = cv_in 
+    cpal_fld = 'magma' ; tmin=1. ;  tmax=8. ;  df = 1 ; cb_jump = 1
+    cunit = 'Sea-ice volume [m]'
     
 elif CWHAT in [ 'damage', 'damage-t', 'damage-f' ]:
     cv_in = CWHAT  ; cv_out = cv_in ; color_top_cb='k'
@@ -483,7 +486,7 @@ cfont_clb  =  { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(
 cfont_clock = { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(9.*fontr), 'color':color_top }
 cfont_exp= { 'fontname':'Open Sans'  , 'fontweight':'light', 'fontsize':int(9.*fontr), 'color':color_top }
 cfont_mail =  { 'fontname':'Times New Roman', 'fontweight':'normal', 'fontstyle':'italic', 'fontsize':int(14.*fontr), 'color':'0.8'}
-cfont_titl =  { 'fontname':'Open Sans', 'fontweight':'light', 'fontsize':int(30.*fontr), 'color':color_top }
+cfont_titl =  { 'fontname':'Open Sans', 'fontweight':'light', 'fontsize':int(24.*fontr), 'color':color_top }
 
 
 # Colormaps for fields:
@@ -552,9 +555,9 @@ for jt in range(jt0,Nt):
     #-----------------------------------------------------------------------------------
 
     if l3d:
-        cfig = cdir_figs+'/'+cv_out+'_'+CNEMO+'-'+CRUN+'_lev'+str(jk)+'_'+CBOX+'_'+cdate+'_'+cpal_fld+'.'+fig_type
+        cfig = cdir_figs+'/'+cv_out+'_'+CNEMO+'-'+CRUN+'_lev'+str(jk)+'_'+CBOX+'_'+cdate+'.'+fig_type
     else:
-        cfig = cdir_figs+'/'+cv_out+'_'+CNEMO+'-'+CRUN+'_'+CBOX+'_'+cdate+'_'+cpal_fld+'.'+fig_type
+        cfig = cdir_figs+'/'+cv_out+'_'+CNEMO+'-'+CRUN+'_'+CBOX+'_'+cdate+'.'+fig_type
 
 
     if not path.exists(cfig):
@@ -665,9 +668,9 @@ for jt in range(jt0,Nt):
     
         if l_save_nc:
             if l3d:
-                cf_out = 'nc/'+CWHAT+'_NEMO_'+CNEMO+'-'+CRUN+'_lev'+str(jk)+'_'+CBOX+'_'+cdate+'_'+cpal_fld+'.nc'
+                cf_out = 'nc/'+CWHAT+'_NEMO_'+CNEMO+'-'+CRUN+'_lev'+str(jk)+'_'+CBOX+'_'+cdate+'.nc'
             else:
-                cf_out = 'nc/'+CWHAT+'_NEMO_'+CNEMO+'-'+CRUN+'_'+CBOX+'_'+cdate+'_'+cpal_fld+'.nc'
+                cf_out = 'nc/'+CWHAT+'_NEMO_'+CNEMO+'-'+CRUN+'_'+CBOX+'_'+cdate+'.nc'
             print(' Saving in '+cf_out)
             cp.dump_2d_field(cf_out, Xplot, xlon=Xlon, xlat=Xlat, name=CWHAT)
             print('')
@@ -733,7 +736,7 @@ for jt in range(jt0,Nt):
     
         if nemo_box.l_annotate_name:
             xl = rnxr/20./rfz
-            yl = rnyr/1.33/rfz
+            yl = rnyr/1.14/rfz
             ax.annotate(CNEMO, xy=(1, 4), xytext=(xl, yl), **cfont_titl)
     
         if nemo_box.l_add_logo:
