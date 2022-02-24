@@ -95,7 +95,8 @@ parser.add_argument('-m', '--fmm' , default="mesh_mask.nc",   help='specify the 
 parser.add_argument('-s', '--sd0' , default="20090101",       help='specify initial date as <YYYYMMDD>')
 parser.add_argument('-l', '--lev' , type=int, default=0,      help='specify the level to use if 3D field (default: 0 => 2D)')
 parser.add_argument('-z', '--zld' ,                           help='specify the topography netCDF file to use (field="z")')
-parser.add_argument('-t', '--tstep', type=int, default=1, help='specify the time step (hours) in input file')
+parser.add_argument('-t', '--tstep', type=int, default=1,     help='specify the time step (hours) in input file')
+parser.add_argument('-N', '--oname', default="",              help='specify a name that overides `CONF` on the plot...')
 
 args = parser.parse_args()
 
@@ -108,6 +109,7 @@ csd0  = args.sd0
 jk    = args.lev
 cf_topo_land = args.zld
 dt    = args.tstep  ; # time step in hours
+CONAME = args.oname
 
 print('')
 print(' *** CNEMO = ', CNEMO)
@@ -117,6 +119,7 @@ print(' *** cf_in = ', cf_in)
 print(' *** cf_mm = ', cf_mm)
 print(' *** csd0 = ', csd0)
 print(' ***   jk  = ', jk)
+if CONAME != "": print(' *** CONAME = ', CONAME)
 l_add_topo_land = False
 if args.zld != None:
     print(' *** cf_topo_land = ', cf_topo_land)
@@ -486,7 +489,7 @@ cfont_clb  =  { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(
 cfont_clock = { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(9.*fontr), 'color':color_top }
 cfont_exp= { 'fontname':'Open Sans'  , 'fontweight':'light', 'fontsize':int(9.*fontr), 'color':color_top }
 cfont_mail =  { 'fontname':'Times New Roman', 'fontweight':'normal', 'fontstyle':'italic', 'fontsize':int(14.*fontr), 'color':'0.8'}
-cfont_titl =  { 'fontname':'Open Sans', 'fontweight':'light', 'fontsize':int(24.*fontr), 'color':color_top }
+cfont_titl =  { 'fontname':'Open Sans', 'fontweight':'light', 'fontsize':int(14.*fontr), 'color':color_top }
 
 
 # Colormaps for fields:
@@ -735,9 +738,11 @@ for jt in range(jt0,Nt):
         #ax.annotate('laurent.brodeau@ocean-next.fr', xy=(1, 4), xytext=(xl+150, 20), **cfont_mail)
     
         if nemo_box.l_annotate_name:
-            xl = rnxr/20./rfz
+            cbla = CNEMO
+            if CONAME != "": cbla = CONAME
+            xl = rnxr/30./rfz
             yl = rnyr/1.14/rfz
-            ax.annotate(CNEMO, xy=(1, 4), xytext=(xl, yl), **cfont_titl)
+            ax.annotate(cbla, xy=(1, 4), xytext=(xl, yl), **cfont_titl)
     
         if nemo_box.l_add_logo:
             datafile = cbook.get_sample_data(dir_logos+'/'+nemo_box.cf_logo_on, asfileobj=False)
