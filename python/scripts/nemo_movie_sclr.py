@@ -291,7 +291,7 @@ elif CWHAT == 'siconc':
     
 elif CWHAT == 'sivolu':
     cv_in = 'sivolu'  ; cv_out = cv_in 
-    cpal_fld = 'magma' ; tmin=1. ;  tmax=8. ;  df = 1 ; cb_jump = 1
+    cpal_fld = 'magma' ; tmin=0. ;  tmax=5. ;  df = 1 ; cb_jump = 1
     cunit = 'Sea-ice volume [m]'
     
 elif CWHAT in [ 'damage', 'damage-t', 'damage-f' ]:
