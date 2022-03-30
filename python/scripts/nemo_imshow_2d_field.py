@@ -43,6 +43,8 @@ pt_sz_track = 30
 
 l_read_lsm=False
 
+l_use_xmsk=True
+
 
 fig_type='png'
 
@@ -99,6 +101,9 @@ elif CNEMO == 'NANUK1h': # half proc [i/2]
     i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 8. ; vcb = [0.04, 0.06, 0.92, 0.015] ; font_rat = 0.1*rfact_zoom
     l_show_cb = True ; color_top = 'k'
 
+elif CNEMO == 'eHUDSON4h': # half proc [i/2]
+    i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 12. ; vcb = [0.04, 0.06, 0.92, 0.015] ; font_rat = 0.1*rfact_zoom
+    l_show_cb = False ; color_top = 'k'
 
 elif CNEMO == 'NANUK4':
     i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 1. ; vcb = [0.5, 0.875, 0.49, 0.02] ; font_rat = 0.16*rfact_zoom
@@ -289,39 +294,67 @@ elif cv_in == 'track':
     cunit = r'SST ($^{\circ}$C)'
     fig_type='svg'
 
-elif cv_in in [ 'damage', 'damage-t', 'damage-f' ]:
+elif cv_in in [ 'damage', 'damage-t', 'damage-f', 'dmg' ]:
     cfield = 'damage'
     tmin=0. ;  tmax=1.   ;  df = 0.1
     cpal_fld = 'ncview_tofino'
     cunit = r'damage'
+
+elif cv_in in [ 'zfU', 'zfV' ]:
+    cfield = 'divS'
+    tmin=-5. ;  tmax=5.   ;  df = 1
+    cpal_fld = 'RdBu_r'
+    cunit = r'[Pa]'
+
+elif cv_in in [ 'u_oceT' ]:
+    cfield = 'u_oce'
+    tmin=-0.25 ;  tmax=0.25   ;  df = 0.05
+    cpal_fld = 'RdBu_r'
+    cunit = r'[m/s]'
+elif cv_in in [ 'v_oceT' ]:
+    cfield = 'v_oce'
+    tmin=-0.25 ;  tmax=0.25   ;  df = 0.05
+    cpal_fld = 'RdBu_r'
+    cunit = r'[m/s]'
+
+elif cv_in in [ 'ztaux_ai' ]:
+    cfield = 'taux_ice'
+    tmin=-0.5 ;  tmax=0.5   ;  df = 0.025
+    cpal_fld = 'RdBu_r'
+    cunit = r'[Pa]'
+elif cv_in in [ 'ztauy_ai' ]:
+    cfield = 'tauy_ice'
+    tmin=-0.5 ;  tmax=0.5   ;  df = 0.025
+    cpal_fld = 'RdBu_r'
+    cunit = r'[Pa]'
     
-elif cv_in == 's11':
+elif cv_in in [ 's11', 'sig1' ]:
     cfield = 'sig11'
     tmin=-50000. ;  tmax=50000.   ;  df = 25000.
     cpal_fld = 'RdBu_r'
     cunit = r'$\sigma_{11}$ (N)'
 
-elif cv_in == 's22':
+elif cv_in in [ 's22', 'sig2' ]:
     cfield = 'sig22'
     tmin=-30000. ;  tmax=30000.   ;  df = 15000.
     cpal_fld = 'RdBu_r'
     cunit = r'$\sigma_{22}$ (N)'
 
-elif cv_in == 's12':
-    cfield = 'sig'
+elif cv_in in [ 's12', 'sig12', 'sig12f' ]:
+    cfield = 'sig12'
     tmin=-30000. ;  tmax=30000.   ;  df = 15000.
     cpal_fld = 'RdBu_r'
     cunit = r'$\sigma_{12}$ (N)'
 
-elif cv_in == 'Uice':
+elif cv_in in [ 'Uice', 'Ut', 'u_ice' ]:
     cfield = 'Uice'
-    tmin=-1. ;  tmax=1.   ;  df = 0.2
+    tmin=-0.3 ;  tmax=0.3   ;  df = 0.2
     cpal_fld = 'RdBu_r'
     cunit = r'$u_{ice}$ (m/s)'
 
-elif cv_in == 'Vice':
+elif cv_in in [ 'Vice', 'Vt', 'v_ice' ]:
     cfield = 'Vice'
-    tmin=-1. ;  tmax=1.   ;  df = 0.2
+    tmin=-0.3 ;  tmax=0.3   ;  df = 0.2
     cpal_fld = 'RdBu_r'
     cunit = r'$v_{ice}$ (m/s)'
 
@@ -342,7 +375,7 @@ elif cv_in == 'zsS2':
     cpal_fld = 'RdBu_r'
     cunit = r'$\sigma_S$ (N)'
 
-elif cv_in in ['e11','e22','e12']:
+elif cv_in in ['e11','e22','e12','div','ten','shr']:
     cfield = 'eps'
     tmin=-1.e-5 ;  tmax=-tmin   ;  df = 5.E-6
     cpal_fld = 'RdBu_r'
@@ -506,14 +539,22 @@ elif cv_in == 'track':
     del xtmp
     
 else:
-    print('PROBLEM #2'); sys.exit(0)
+    #print('PROBLEM #2'); sys.exit(0)
+    print('WARNING: no mask provided!!!')
+    l_use_xmsk = False
+    cp.chck4f(cf_fld)
+    id_fld = Dataset(cf_fld)
+    xtmp = id_fld.variables[cv_in][:,:]
+    (Nj,Ni) = xtmp.shape
+    if i2 == 0: i2 = Ni
+    if j2 == 0: j2 = Nj
 
-print('\n According to "'+cnmsk+'" the shape of the domain is Ni, Nj =', Ni, Nj)
 
-
+print('\n The shape of the domain is Ni, Nj =', Ni, Nj)
+#sys.exit(0)
 
 # Show topo ?
-if l_add_topo_land:
+if l_add_topo_land and l_use_xmsk:
     cf_topo_land = dir_conf+'/'+ftopo
     print('\n We are going to show topography:\n'+'  ==> '+cf_topo_land)
 
@@ -543,7 +584,7 @@ if not lknown:
     rfact_zoom = round(1000./float(ny_res),1)
 nxr = int(rfact_zoom*nx_res) ; # widt image (in pixels)
 nyr = int(rfact_zoom*ny_res) ; # height image (in pixels)
-dpi = 100
+dpi = 500
 rh  = float(nxr)/float(dpi) ; # width of figure as for figure...
 
 print('\n *** width and height of image to create:', nxr, nyr, '\n')
@@ -551,13 +592,9 @@ print('\n *** width and height of image to create:', nxr, nyr, '\n')
 
 
 
-pmsk = nmp.ma.masked_where(XMSK[:,:] > 0.2, XMSK[:,:]*0.+40.)
-
-
-
-
-
-idx_oce = nmp.where(XMSK[:,:] > 0.5)
+if l_use_xmsk:
+    pmsk = nmp.ma.masked_where(XMSK[:,:] > 0.2, XMSK[:,:]*0.+40.)
+    idx_oce = nmp.where(XMSK[:,:] > 0.5)
 
 #font_rat
 #params = { 'font.family':'Ubuntu',
@@ -606,12 +643,12 @@ cfig = cnfig+'.'+fig_type
 
 fsize = ( rh, rh*yx_ratio )
 
-fig = plt.figure(num = 1, figsize=fsize, dpi=None, facecolor='k', edgecolor='k')
+fig = plt.figure(num = 1, figsize=fsize, dpi=dpi, facecolor='k', edgecolor='k')
 
 if l_scientific_mode:
     ax  = plt.axes([0.09, 0.09, 0.9, 0.9], facecolor = 'r')
 else:
-    ax  = plt.axes([0., 0., 1., 1.],     facecolor = 'k')
+    ax  = plt.axes([0., 0., 1., 1.],     facecolor = '0.4')
 
 vc_fld = nmp.arange(tmin, tmax + df, df)
 
@@ -628,13 +665,12 @@ else:
 id_fld.close()
 print('          Done!\n')
 
-
-if XMSK.shape != XFLD.shape:
-    print('\n PROBLEM: field and mask do not agree in shape!')
-    print(XMSK.shape , XFLD.shape)
-    sys.exit(0)
-
-print('  *** Shape of field and mask => ', nmp.shape(XFLD))
+if l_use_xmsk:
+    if XMSK.shape != XFLD.shape:
+        print('\n PROBLEM: field and mask do not agree in shape!')
+        print(XMSK.shape , XFLD.shape)
+        sys.exit(0)
+    print('  *** Shape of field and mask => ', nmp.shape(XFLD))
 
 
 
@@ -654,7 +690,7 @@ if cfield == 'Bathymetry':
         xtmp = id_filled.variables['lsm'][j1:j2,i1:i2]
         id_filled.close()
         pfilled = nmp.ma.masked_where(xtmp[:,:] != -1., xtmp[:,:]*0.+40.)
-        if l_add_topo_land:
+        if l_add_topo_land and l_use_xmsk:
             xtopo[nmp.where(xtmp[:,:] < -0.9)] = nmp.nan
             XMSK[:,:] = 1
             XMSK[nmp.where(xtmp[:,:]==0)] = 0 ; # updated mask
@@ -676,7 +712,8 @@ if cv_in == 'track':
 
 
 else:
-    cf = plt.imshow(XFLD[:,:], cmap = pal_fld, norm = norm_fld, interpolation='none')
+    #cf = plt.imshow(XFLD[:,:], cmap = pal_fld, norm = norm_fld, interpolation='none')
+    cf = plt.pcolormesh(XFLD[:,:], cmap = pal_fld, norm = norm_fld )
     if cfield == 'Bathymetry':
         #lulu aspect='auto'111 , interpolation='nearest'
         if len(idy_nan) > 0:
@@ -695,22 +732,21 @@ if l_show_msh:
 del XFLD
 
 
-
-if l_add_topo_land:
-    #print('Ploting topography over continents...')
-    #cp.dump_2d_field( 'xtopo.nc', xtopo ); #, xlon=[], xlat=[], name='field', unit='', long_name='', mask=[] )
-    #cp.dump_2d_field( 'xmsk.nc', XMSK ); #, xlon=[], xlat=[], name='field', unit='', long_name='', mask=[] )
-    xtopo = nmp.log10(xtopo+rof_log)
-    pal_topo = cp.chose_colmap('gray_r')
-    norm_topo = colors.Normalize(vmin = nmp.log10(-100. + rof_log), vmax = nmp.log10(6000. + rof_log), clip = False)
-    cm = plt.imshow(xtopo, cmap=pal_topo, norm=norm_topo, interpolation='none')
-    plt.contour(XMSK, [0.9], colors='k', linewidths=0.5)
-    #
-else:
-    cm = plt.imshow(pmsk, cmap = pal_lsm, norm = norm_lsm, interpolation='none')
-
-
-del XMSK
+if l_use_xmsk:
+    if l_add_topo_land:
+        #print('Ploting topography over continents...')
+        #cp.dump_2d_field( 'xtopo.nc', xtopo ); #, xlon=[], xlat=[], name='field', unit='', long_name='', mask=[] )
+        #cp.dump_2d_field( 'xmsk.nc', XMSK ); #, xlon=[], xlat=[], name='field', unit='', long_name='', mask=[] )
+        xtopo = nmp.log10(xtopo+rof_log)
+        pal_topo = cp.chose_colmap('gray_r')
+        norm_topo = colors.Normalize(vmin = nmp.log10(-100. + rof_log), vmax = nmp.log10(6000. + rof_log), clip = False)
+        cm = plt.imshow(xtopo, cmap=pal_topo, norm=norm_topo, interpolation='none')
+        plt.contour(XMSK, [0.9], colors='k', linewidths=0.5)
+        #
+    else:
+        #cm = plt.imshow(pmsk, cmap = pal_lsm, norm = norm_lsm, interpolation='none')
+        cm = plt.pcolormesh(pmsk, cmap = pal_lsm, norm = norm_lsm)
+        del XMSK
 
 
 
@@ -719,7 +755,7 @@ if cfield == 'Bathymetry' and l_add_true_filled:
     cfl = plt.imshow(pfilled, cmap=pal_filled, norm=norm_filled, interpolation='none' ) #, interpolation='none')
 
 
-del pmsk
+if l_use_xmsk: del pmsk
 if l_add_true_filled: del pfilled
 
 
@@ -759,11 +795,14 @@ if l_show_ttl: ax.annotate(CNEMO, xy=(1, 4), xytext=(x_ttl, y_ttl), **cfont_ttl)
 
 
 #plt.savefig(cfig, dpi=dpi, orientation='portrait', facecolor='b', transparent=True)
-plt.savefig(cfig, dpi=dpi, orientation='portrait', transparent=True)
+plt.savefig(cfig, dpi=dpi, orientation='portrait') #, transparent=True)
 print(cfig+' created!\n')
 plt.close(1)
 
 
-del cm, fig, ax
+
+if l_use_xmsk: del cm
+
+del fig, ax
 
 
