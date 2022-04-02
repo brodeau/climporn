@@ -302,7 +302,7 @@ elif cv_in in [ 'damage', 'damage-t', 'damage-f', 'dmg' ]:
 
 elif cv_in in [ 'zfU', 'zfV' ]:
     cfield = 'divS'
-    tmin=-5. ;  tmax=5.   ;  df = 1
+    tmin=-1. ;  tmax=1.   ;  df = 0.1
     cpal_fld = 'RdBu_r'
     cunit = r'[Pa]'
 
@@ -328,13 +328,13 @@ elif cv_in in [ 'ztauy_ai' ]:
     cpal_fld = 'RdBu_r'
     cunit = r'[Pa]'
     
-elif cv_in in [ 's11', 'sig1' ]:
+elif cv_in in [ 's11', 'sig1', 'sig11' ]:
     cfield = 'sig11'
     tmin=-50000. ;  tmax=50000.   ;  df = 25000.
     cpal_fld = 'RdBu_r'
     cunit = r'$\sigma_{11}$ (N)'
 
-elif cv_in in [ 's22', 'sig2' ]:
+elif cv_in in [ 's22', 'sig2', 'sig22' ]:
     cfield = 'sig22'
     tmin=-30000. ;  tmax=30000.   ;  df = 15000.
     cpal_fld = 'RdBu_r'
