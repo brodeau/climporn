@@ -300,7 +300,7 @@ elif cv_in in [ 'damage', 'damage-t', 'damage-f', 'dmg' ]:
     cpal_fld = 'ncview_tofino'
     cunit = r'damage'
 
-elif cv_in in [ 'zfU', 'zfV' ]:
+elif cv_in in [ 'zfU', 'zfV', 'ds11dx', 'ds22dy', 'ds12dx', 'ds12dy' ]:
     cfield = 'divS'
     tmin=-1. ;  tmax=1.   ;  df = 0.1
     cpal_fld = 'RdBu_r'
@@ -340,7 +340,7 @@ elif cv_in in [ 's22', 'sig2', 'sig22' ]:
     cpal_fld = 'RdBu_r'
     cunit = r'$\sigma_{22}$ (N)'
 
-elif cv_in in [ 's12', 'sig12', 'sig12f' ]:
+elif cv_in in [ 's12', 'sig12', 'sig12f' ] or cv_in[0:5]=='sig12' :
     cfield = 'sig12'
     tmin=-30000. ;  tmax=30000.   ;  df = 15000.
     cpal_fld = 'RdBu_r'
@@ -358,8 +358,8 @@ elif cv_in in [ 'Vice', 'Vt', 'v_ice' ]:
     cpal_fld = 'RdBu_r'
     cunit = r'$v_{ice}$ (m/s)'
 
-elif cv_in == 'zsN':
-    cfield = 'sigN'
+elif cv_in in [ 'zsN', 'MC', 'sigI', 'sigII' ]:
+    cfield = 'sigma'
     tmin=-30000. ;  tmax=30000.   ;  df = 15000.
     cpal_fld = 'RdBu_r'
     cunit = r'$\sigma_N$ (N)'
