@@ -317,12 +317,12 @@ elif cv_in in [ 'v_oceT' ]:
     cpal_fld = 'RdBu_r'
     cunit = r'[m/s]'
 
-elif cv_in in [ 'ztaux_ai' ]:
+elif cv_in in [ 'taux_ai' ]:
     cfield = 'taux_ice'
     tmin=-0.5 ;  tmax=0.5   ;  df = 0.025
     cpal_fld = 'RdBu_r'
     cunit = r'[Pa]'
-elif cv_in in [ 'ztauy_ai' ]:
+elif cv_in in [ 'tauy_ai' ]:
     cfield = 'tauy_ice'
     tmin=-0.5 ;  tmax=0.5   ;  df = 0.025
     cpal_fld = 'RdBu_r'
