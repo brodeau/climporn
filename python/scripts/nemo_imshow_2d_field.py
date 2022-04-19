@@ -105,9 +105,12 @@ elif CNEMO == 'eHUDSON4h': # half proc [i/2]
     i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 12. ; vcb = [0.04, 0.06, 0.92, 0.015] ; font_rat = 0.1*rfact_zoom
     l_show_cb = False ; color_top = 'k'
 
+elif CNEMO == 'HUDSON12': # half proc [i/2]
+    i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 4. ; vcb = [0.04, 0.06, 0.92, 0.015] ; font_rat = 0.1*rfact_zoom
+    l_show_cb = False ; color_top = 'k'
+
 elif CNEMO == 'NANUK4':
     i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 1. ; vcb = [0.5, 0.875, 0.49, 0.02] ; font_rat = 0.16*rfact_zoom
-
     
 elif CNEMO == 'NANUK025':
     i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 1. ; vcb = [0.5, 0.875, 0.49, 0.02] ; font_rat = 0.5*rfact_zoom
@@ -294,13 +297,13 @@ elif cv_in == 'track':
     cunit = r'SST ($^{\circ}$C)'
     fig_type='svg'
 
-elif cv_in in [ 'damage', 'damage-t', 'damage-f', 'dmg' ]:
+elif cv_in in [ 'damage', 'damage-t', 'damage-f', 'dmg', 'dmgf', 'dmgt' ]:
     cfield = 'damage'
     tmin=0. ;  tmax=1.   ;  df = 0.1
     cpal_fld = 'ncview_tofino'
     cunit = r'damage'
 
-elif cv_in in [ 'zfU', 'zfV', 'ds11dx', 'ds22dy', 'ds12dx', 'ds12dy' ]:
+elif cv_in in [ 'zfU', 'zfV', 'ds11dx', 'ds22dy', 'ds12dx', 'ds12dy', 'zfUv', 'zfVu' ]:
     cfield = 'divS'
     tmin=-1. ;  tmax=1.   ;  df = 0.1
     cpal_fld = 'RdBu_r'
@@ -328,31 +331,31 @@ elif cv_in in [ 'tauy_ai' ]:
     cpal_fld = 'RdBu_r'
     cunit = r'[Pa]'
     
-elif cv_in in [ 's11', 'sig1', 'sig11' ]:
+elif cv_in in [ 's11', 'sig1', 'sig11', 'sig1F' ]:
     cfield = 'sig11'
     tmin=-50000. ;  tmax=50000.   ;  df = 25000.
     cpal_fld = 'RdBu_r'
     cunit = r'$\sigma_{11}$ (N)'
 
-elif cv_in in [ 's22', 'sig2', 'sig22' ]:
+elif cv_in in [ 's22', 'sig2', 'sig22', 'sig2F' ]:
     cfield = 'sig22'
     tmin=-30000. ;  tmax=30000.   ;  df = 15000.
     cpal_fld = 'RdBu_r'
     cunit = r'$\sigma_{22}$ (N)'
 
-elif cv_in in [ 's12', 'sig12', 'sig12f' ] or cv_in[0:5]=='sig12' :
+elif cv_in in [ 's12', 'sig12', 'sig12f', 'sig12T' ] or cv_in[0:5]=='sig12' :
     cfield = 'sig12'
     tmin=-30000. ;  tmax=30000.   ;  df = 15000.
     cpal_fld = 'RdBu_r'
     cunit = r'$\sigma_{12}$ (N)'
 
-elif cv_in in [ 'Uice', 'Ut', 'u_ice' ]:
+elif cv_in in [ 'Uice', 'Ut', 'u_ice', 'uVice' ]:
     cfield = 'Uice'
     tmin=-0.3 ;  tmax=0.3   ;  df = 0.2
     cpal_fld = 'RdBu_r'
     cunit = r'$u_{ice}$ (m/s)'
 
-elif cv_in in [ 'Vice', 'Vt', 'v_ice' ]:
+elif cv_in in [ 'Vice', 'Vt', 'v_ice', 'vUice' ]:
     cfield = 'Vice'
     tmin=-0.3 ;  tmax=0.3   ;  df = 0.2
     cpal_fld = 'RdBu_r'
@@ -584,8 +587,8 @@ if not lknown:
     rfact_zoom = round(1000./float(ny_res),1)
 nxr = int(rfact_zoom*nx_res) ; # widt image (in pixels)
 nyr = int(rfact_zoom*ny_res) ; # height image (in pixels)
-dpi = 500
-rh  = float(nxr)/float(dpi) ; # width of figure as for figure...
+ndpi = 400
+rh  = float(nxr)/float(ndpi) ; # width of figure as for figure...
 
 print('\n *** width and height of image to create:', nxr, nyr, '\n')
 
@@ -643,7 +646,7 @@ cfig = cnfig+'.'+fig_type
 
 fsize = ( rh, rh*yx_ratio )
 
-fig = plt.figure(num = 1, figsize=fsize, dpi=dpi, facecolor='k', edgecolor='k')
+fig = plt.figure(num = 1, figsize=fsize, dpi=ndpi, facecolor='k', edgecolor='k')
 
 if l_scientific_mode:
     ax  = plt.axes([0.09, 0.09, 0.9, 0.9], facecolor = 'r')
@@ -794,8 +797,8 @@ if l_show_ttl: ax.annotate(CNEMO, xy=(1, 4), xytext=(x_ttl, y_ttl), **cfont_ttl)
 
 
 
-#plt.savefig(cfig, dpi=dpi, orientation='portrait', facecolor='b', transparent=True)
-plt.savefig(cfig, dpi=dpi, orientation='portrait') #, transparent=True)
+#plt.savefig(cfig, dpi=ndpi, orientation='portrait', facecolor='b', transparent=True)
+plt.savefig(cfig, dpi=ndpi, orientation='portrait') #, transparent=True)
 print(cfig+' created!\n')
 plt.close(1)
 
