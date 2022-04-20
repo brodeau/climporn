@@ -310,7 +310,8 @@ elif cv_in in [ 'damage', 'damage-t', 'damage-f', 'dmg', 'dmgf', 'dmgt' ]:
 elif cv_in in [ 'siconc' ]:
     cfield = 'ice_frac'
     tmin=0. ;  tmax=1.   ;  df = 0.1
-    cpal_fld = 'viridis'
+    #cpal_fld = 'viridis'
+    cpal_fld = 'bone'
     cunit = r'sea-ice fraction'
     l_pow_field = True
     pow_field = 2.5
