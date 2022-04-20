@@ -106,7 +106,7 @@ elif CNEMO == 'eHUDSON4h': # half proc [i/2]
     l_show_cb = False ; color_top = 'k'
 
 elif CNEMO == 'HUDSON12': # half proc [i/2]
-    i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 4. ; vcb = [0.04, 0.06, 0.92, 0.015] ; font_rat = 0.1*rfact_zoom
+    i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 2. ; vcb = [0.04, 0.06, 0.92, 0.015] ; font_rat = 0.1*rfact_zoom
     l_show_cb = False ; color_top = 'k'
 
 elif CNEMO == 'NANUK4':
