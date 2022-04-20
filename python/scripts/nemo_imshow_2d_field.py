@@ -307,6 +307,14 @@ elif cv_in in [ 'damage', 'damage-t', 'damage-f', 'dmg', 'dmgf', 'dmgt' ]:
     l_pow_field = True
     pow_field = 3.5
 
+elif cv_in in [ 'siconc' ]:
+    cfield = 'ice_frac'
+    tmin=0. ;  tmax=1.   ;  df = 0.1
+    cpal_fld = 'viridis'
+    cunit = r'sea-ice concentrarion'
+    l_pow_field = True
+    pow_field = 2.5
+    
 elif cv_in in [ 'zfU', 'zfV', 'ds11dx', 'ds22dy', 'ds12dx', 'ds12dy', 'zfUv', 'zfVu' ]:
     cfield = 'divS'
     tmin=-1. ;  tmax=1.   ;  df = 0.1
