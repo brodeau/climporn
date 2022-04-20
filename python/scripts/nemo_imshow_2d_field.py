@@ -311,7 +311,7 @@ elif cv_in in [ 'siconc' ]:
     cfield = 'ice_frac'
     tmin=0. ;  tmax=1.   ;  df = 0.1
     cpal_fld = 'viridis'
-    cunit = r'sea-ice concentrarion'
+    cunit = r'sea-ice fraction'
     l_pow_field = True
     pow_field = 2.5
     
