@@ -110,7 +110,8 @@ elif CNEMO == 'HUDSON12': # half proc [i/2]
     l_show_cb = False ; color_top = 'k'
 
 elif CNEMO == 'NANUK4':
-    i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 1. ; vcb = [0.5, 0.875, 0.49, 0.02] ; font_rat = 0.16*rfact_zoom
+    i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 2. ; vcb = [0.2, 0.085, 0.6, 0.02] ; font_rat = 0.1*rfact_zoom
+    l_show_cb=True
     
 elif CNEMO == 'NANUK025':
     i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 1. ; vcb = [0.5, 0.875, 0.49, 0.02] ; font_rat = 0.5*rfact_zoom
@@ -300,8 +301,11 @@ elif cv_in == 'track':
 elif cv_in in [ 'damage', 'damage-t', 'damage-f', 'dmg', 'dmgf', 'dmgt' ]:
     cfield = 'damage'
     tmin=0. ;  tmax=1.   ;  df = 0.1
-    cpal_fld = 'ncview_tofino'
+    cpal_fld = 'inferno'
+    #cpal_fld = 'cividis'
     cunit = r'damage'
+    l_pow_field = True
+    pow_field = 3.5
 
 elif cv_in in [ 'zfU', 'zfV', 'ds11dx', 'ds22dy', 'ds12dx', 'ds12dy', 'zfUv', 'zfVu' ]:
     cfield = 'divS'
@@ -771,8 +775,12 @@ if l_scientific_mode:
 if l_show_cb:
 
     ax2 = plt.axes(vcb)
-    
-    clb = mpl.colorbar.ColorbarBase(ax2, ticks=vc_fld, cmap=pal_fld, norm=norm_fld, orientation='horizontal', extend=cextend)
+
+    if l_pow_field or l_log_field:
+        clb = mpl.colorbar.ColorbarBase(ax=ax2,               cmap=pal_fld, norm=norm_fld, orientation='horizontal', extend='neither')
+    else:
+        clb = mpl.colorbar.ColorbarBase(ax=ax2, ticks=vc_fld, cmap=pal_fld, norm=norm_fld, orientation='horizontal', extend=cextend)
+
     if cb_jump > 1:
         cb_labs = [] ; cpt = 0
         for rr in vc_fld:
