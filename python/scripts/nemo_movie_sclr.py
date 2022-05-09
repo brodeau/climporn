@@ -535,9 +535,10 @@ id_f = Dataset(cf_in)
 for jt in range(jt0,Nt):
 
     #---------------------- Calendar stuff --------------------------------------------    
-    #jh  = (jt*dt)%24
+    jh  = (jt*dt)%24
     #jh  = int( (float(jt)+0.5)*float(dt) ) % 24 ; # average is centered
-    jh  = ((jt+1)*dt)%24
+    #jh  = ((jt+1)*dt)%24
+    #jh  = ((float(jt)+0.5)*dt)%24
     if jt%ntpd == 0: jd = jd + 1
     if jd == vm[jm-1]+1 and (jt)%ntpd == 0 :
         jd = 1
