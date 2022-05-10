@@ -41,7 +41,7 @@ vmn = [ 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ]
 vml = [ 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ]
 
 fig_type='png'
-rDPI = 110
+rDPI = 240
 color_top = 'white'
 #color_top = 'k'
 color_top_cb = 'white'
@@ -64,6 +64,7 @@ rof_log = 150.
 rof_dpt = 0.
 
 pow_field=0.5
+vc_fld_powlog = [ 0., 0.5, 1. ]
 
 grav = 9.80665 # same as in NEMO 3.6
 
@@ -294,11 +295,11 @@ elif CWHAT == 'sivolu':
     cpal_fld = 'magma' ; tmin=0. ;  tmax=5. ;  df = 1 ; cb_jump = 1
     cunit = 'Sea-ice volume [m]'
     
-elif CWHAT in [ 'damage', 'damage-t', 'damage-f' ]:
+elif CWHAT in [ 'damage', 'damage-t', 'damage-f' ]:    
     cv_in = CWHAT  ; cv_out = cv_in ; color_top_cb='k'
-    cpal_fld = 'bone_r' ; tmin=0.75 ;  tmax=1. ;  df = 0.025 ; cb_jump = 1
-    #cpal_fld = 'bone_r' ; tmin=0.5 ;  tmax=1. ; l_pow_field=True  ;  pow_field=0.5 ; df = 0.1 ; cb_jump = 1
-    #cpal_fld = 'bone_r' ; tmin=0.5 ;  tmax=1. ; l_log_field=True ;  df = 0.1 ; cb_jump = 1
+    cpal_fld = 'bone_r'
+    tmin=0. ;  tmax=1. ;  df = 0.5 ; cb_jump = 1 ; l_pow_field=True ; pow_field=7.
+    vc_fld_powlog = [ 0., 0.7, 0.8, 0.9, 0.95, 1. ]
     cunit = 'Damage@T'
 
 
@@ -509,9 +510,10 @@ if l_show_lsm or l_add_topo_land:
         #norm_lsm = colors.Normalize(vmin = nmp.log10(min(-100.+rof_dpt/3.,0.) + rof_log), vmax = nmp.log10(4000.+rof_dpt + rof_log), clip = False)
         norm_lsm = colors.Normalize(vmin = nmp.log10(-100. + rof_log), vmax = nmp.log10(4000.+rof_dpt + rof_log), clip = False)
     else:
-        pal_lsm = cp.chose_colmap('land_dark')
+        #pal_lsm = cp.chose_colmap('land_dark')
+        pal_lsm = cp.chose_colmap('land')
         norm_lsm = colors.Normalize(vmin = 0., vmax = 1., clip = False)
-
+        
 cyr0=csd0[0:4]
 cmn0=csd0[4:6]
 cdd0=csd0[6:8]
@@ -568,7 +570,7 @@ for jt in range(jt0,Nt):
     if not path.exists(cfig):
     ###### FIGURE ##############
 
-        fig = plt.figure(num = 1, figsize=(rw_fig, rh_fig), dpi=None, facecolor='w', edgecolor='0.5')
+        fig = plt.figure(num = 1, figsize=(rw_fig, rh_fig), dpi=rDPI, facecolor='w', edgecolor='0.5')
     
         ax  = plt.axes([0., 0., 1., 1.], facecolor = '0.7') # missing seas will be in 'facecolor' !
     
@@ -680,8 +682,9 @@ for jt in range(jt0,Nt):
             cp.dump_2d_field(cf_out, Xplot, xlon=Xlon, xlat=Xlat, name=CWHAT)
             print('')
     
-    
+            
         cf = plt.imshow( Xplot[:,:], cmap=pal_fld, norm=norm_fld, interpolation=nemo_box.c_imshow_interp )
+        #cf = plt.pcolormesh( Xplot[:,:], cmap=pal_fld, norm=norm_fld )
     
         # Ice
         if l_do_ice:
@@ -692,33 +695,34 @@ for jt in range(jt0,Nt):
             ci = plt.imshow(pice, cmap = pal_ice, norm = norm_ice, interpolation='none') ; del pice, ci
             del XICE
     
-        #LOLO: rm ???
         if l_show_lsm or l_add_topo_land:
             if l_add_topo_land:
-                clsm = plt.imshow(nmp.ma.masked_where(XLSM>0.0001, xtopo), cmap = pal_lsm, norm = norm_lsm, interpolation='none')
+                clsm = plt.imshow( nmp.ma.masked_where(XLSM>0.0001, xtopo), cmap=pal_lsm, norm=norm_lsm, interpolation='none' )
                 if nemo_box.c_imshow_interp == 'none':
                     plt.contour(XLSM, [0.9], colors='k', linewidths=0.5)
             else:
-                clsm = plt.imshow(nmp.ma.masked_where(XLSM>0.0001, XLSM), cmap = pal_lsm, norm = norm_lsm, interpolation='none')
+                pmsk = nmp.ma.masked_where(XLSM[:,:] > 0.2, XLSM[:,:]*0.+40.)
+                clsm = plt.imshow( pmsk, cmap=pal_lsm, norm=norm_lsm, interpolation='none' )                
+                del pmsk
     
         ##### COLORBAR ######
         if nemo_box.l_show_cb:
             ax2 = plt.axes(nemo_box.vcb)
-            clb = mpl.colorbar.ColorbarBase(ax2, ticks=vc_fld, cmap=pal_fld, norm=norm_fld, orientation='horizontal', extend=cb_extend)
-            cb_labs = []
-            #if cb_jump > 1:
-            cpt = 0
-            for rr in vc_fld:
-                if cpt % cb_jump == 0:
-                    if df >= 1.: cb_labs.append(str(int(rr)))
-                    if df <  1.: cb_labs.append(str(round(rr,int(nmp.ceil(nmp.log10(1./df)))+1) ))
-                else:
-                    cb_labs.append(' ')
-                cpt = cpt + 1
-            #else:
-            #    for rr in vc_fld: cb_labs.append(str(round(rr,int(nmp.ceil(nmp.log10(1./df)))+1) ))
-    
-            clb.ax.set_xticklabels(cb_labs, **cfont_clb_tcks)
+            if l_pow_field or l_log_field:
+                clb = mpl.colorbar.ColorbarBase(ax=ax2, ticks=vc_fld_powlog, cmap=pal_fld, norm=norm_fld, orientation='horizontal', extend='neither')
+            else:
+                clb = mpl.colorbar.ColorbarBase(ax=ax2, ticks=vc_fld, cmap=pal_fld, norm=norm_fld, orientation='horizontal', extend=cb_extend)
+                cb_labs = []
+                cpt = 0
+                for rr in vc_fld:
+                    if cpt % cb_jump == 0:
+                        if df >= 1.: cb_labs.append(str(int(rr)))
+                        if df <  1.: cb_labs.append(str(round(rr,int(nmp.ceil(nmp.log10(1./df)))+1) ))
+                    else:
+                        cb_labs.append(' ')
+                    cpt = cpt + 1
+                clb.ax.set_xticklabels(cb_labs, **cfont_clb_tcks)
+                
             clb.set_label(cunit, **cfont_clb)
             clb.ax.yaxis.set_tick_params(color=color_top_cb) ; # set colorbar tick color
             clb.outline.set_edgecolor(color_top_cb) ; # set colorbar edgecolor

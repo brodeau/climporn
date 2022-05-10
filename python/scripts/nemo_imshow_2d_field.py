@@ -600,8 +600,8 @@ if not lknown:
     rfact_zoom = round(1000./float(ny_res),1)
 nxr = int(rfact_zoom*nx_res) ; # widt image (in pixels)
 nyr = int(rfact_zoom*ny_res) ; # height image (in pixels)
-ndpi = 400
-rh  = float(nxr)/float(ndpi) ; # width of figure as for figure...
+rDPI = 400
+rh  = float(nxr)/float(rDPI) ; # width of figure as for figure...
 
 print('\n *** width and height of image to create:', nxr, nyr, '\n')
 
@@ -659,7 +659,7 @@ cfig = cnfig+'.'+fig_type
 
 fsize = ( rh, rh*yx_ratio )
 
-fig = plt.figure(num = 1, figsize=fsize, dpi=ndpi, facecolor='k', edgecolor='k')
+fig = plt.figure(num = 1, figsize=fsize, dpi=rDPI, facecolor='k', edgecolor='k')
 
 if l_scientific_mode:
     ax  = plt.axes([0.09, 0.09, 0.9, 0.9], facecolor = 'r')
@@ -724,12 +724,12 @@ if cv_in == 'track':
     tmin=nmp.amin(XFLD[indx]) ;  tmax=nmp.amax(XFLD[indx])
     norm_fld = colors.Normalize(vmin = tmin, vmax = tmax, clip = False)
 
-    cf = plt.scatter(idx, idy, c=XFLD[indx], cmap = pal_fld, norm = norm_fld, alpha=0.5, marker='.', s=pt_sz_track )
+    cf = plt.scatter(idx, idy, c=XFLD[indx], cmap=pal_fld, norm=norm_fld, alpha=0.5, marker='.', s=pt_sz_track )
 
 
 else:
-    #cf = plt.imshow(XFLD[:,:], cmap = pal_fld, norm = norm_fld, interpolation='none')
-    cf = plt.pcolormesh(XFLD[:,:], cmap = pal_fld, norm = norm_fld )
+    #cf = plt.imshow(XFLD[:,:], cmap=pal_fld, norm=norm_fld, interpolation='none')
+    cf = plt.pcolormesh(XFLD[:,:], cmap=pal_fld, norm=norm_fld )
     if cfield == 'Bathymetry':
         #lulu aspect='auto'111 , interpolation='nearest'
         if len(idy_nan) > 0:
@@ -760,8 +760,8 @@ if l_use_xmsk:
         plt.contour(XMSK, [0.9], colors='k', linewidths=0.5)
         #
     else:
-        #cm = plt.imshow(pmsk, cmap = pal_lsm, norm = norm_lsm, interpolation='none')
-        cm = plt.pcolormesh(pmsk, cmap = pal_lsm, norm = norm_lsm)
+        #cm = plt.imshow(pmsk, cmap=pal_lsm, norm=norm_lsm, interpolation='none')
+        cm = plt.pcolormesh( pmsk, cmap=pal_lsm, norm=norm_lsm )
         del XMSK
 
 
@@ -814,8 +814,8 @@ if l_show_ttl: ax.annotate(CNEMO, xy=(1, 4), xytext=(x_ttl, y_ttl), **cfont_ttl)
 
 
 
-#plt.savefig(cfig, dpi=ndpi, orientation='portrait', facecolor='b', transparent=True)
-plt.savefig(cfig, dpi=ndpi, orientation='portrait') #, transparent=True)
+#plt.savefig(cfig, dpi=rDPI, orientation='portrait', facecolor='b', transparent=True)
+plt.savefig(cfig, dpi=rDPI, orientation='portrait') #, transparent=True)
 print(cfig+' created!\n')
 plt.close(1)
 
