@@ -9,7 +9,7 @@ import numpy as nmp
 
 # List of Climporn home-made colormaps:
 list_climporn = [ 'blk', 'land', 'landm', 'land_dark', 'terre', 'cb1', 'eke', 'bathy', 'mld', 'tap1', 'tap2', 'jetblanc', 'amoc',
-                  'sst1', 'sst2', 'sst3', 'ice', 'ice_on', 'ice2_on', 'ice3_on', 'ice4_on', 'blanc', 'rms',
+                  'sst1', 'sst2', 'sst3', 'ice', 'ice_on', 'ice2_on', 'ice3_on', 'ice4_on', 'ice5_on', 'blanc', 'rms',
                   'sigtr', 'bbr', 'bbr2', 'bbr0', 'bbr_cold', 'bbr_warm',
                   'cold0', 'warm0', 'graylb', 'graylb2', 'sigma', 'sigma0', 'mask', 'on0', 'on1', 'on2', 'on3' ]
 
@@ -445,6 +445,17 @@ class brkd_cmap:
                 [ 51./255. , 85./255. , 85./255. ],
                 [ 40./255. , 75./255. , 75./255. ], # ? 
                 [ 30./255. , 60./255. , 60./255. ], # ?
+                [ 1.0 , 1.0 , 1.0 ]  # white
+            ] )
+            #
+        elif cname == 'ice5_on':
+            M = nmp.array( [
+                [  0./255., 0./255., 0./255. ],        # Dark gray
+                [ 70./255.,70./255.,70./255. ],        # Dark gray                
+                [ 160./255.,160./255.,160./255. ],        # Light gray
+                [ 127./255.,144./255.,144./255. ],  # ?              
+                [  95./255.,156./255.,156./255. ],
+                [ 72./255. ,118./255.,118./255. ],  # ?
                 [ 1.0 , 1.0 , 1.0 ]  # white
             ] )
             #

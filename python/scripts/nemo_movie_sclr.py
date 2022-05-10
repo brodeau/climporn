@@ -289,7 +289,7 @@ elif CWHAT == 'Phase':
 
 elif CWHAT == 'siconc':
     cv_in = 'siconc'  ; cv_out = cv_in 
-    cpal_fld = 'ice4_on' ; tmin=0. ;  tmax=1. ;  df = 0.1 ; cb_jump = 1
+    cpal_fld = 'ice5_on' ; tmin=0. ;  tmax=1. ;  df = 0.1 ; cb_jump = 1
     cunit = 'Sea-ice concentration'
     
 elif CWHAT == 'sivolu':
