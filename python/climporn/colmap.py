@@ -8,7 +8,7 @@ import sys
 import numpy as nmp
 
 # List of Climporn home-made colormaps:
-list_climporn = [ 'blk', 'land', 'land_dark', 'terre', 'cb1', 'eke', 'bathy', 'mld', 'tap1', 'tap2', 'jetblanc', 'amoc',
+list_climporn = [ 'blk', 'land', 'landm', 'land_dark', 'terre', 'cb1', 'eke', 'bathy', 'mld', 'tap1', 'tap2', 'jetblanc', 'amoc',
                   'sst1', 'sst2', 'sst3', 'ice', 'ice_on', 'ice2_on', 'ice3_on', 'ice4_on', 'blanc', 'rms',
                   'sigtr', 'bbr', 'bbr2', 'bbr0', 'bbr_cold', 'bbr_warm',
                   'cold0', 'warm0', 'graylb', 'graylb2', 'sigma', 'sigma0', 'mask', 'on0', 'on1', 'on2', 'on3' ]
@@ -227,6 +227,12 @@ class brkd_cmap:
             M = nmp.array( [
                 [ 0.75 , 0.75, 0.75 ],
                 [ 0.75 , 0.75, 0.75 ]
+            ] )
+
+        elif cname == 'landm':
+            M = nmp.array( [
+                [ 0.5 , 0.5, 0.5 ],
+                [ 0.5 , 0.5, 0.5 ]
             ] )
 
         elif cname == 'land_dark':

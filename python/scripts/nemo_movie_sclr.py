@@ -64,7 +64,7 @@ rof_log = 150.
 rof_dpt = 0.
 
 pow_field=0.5
-vc_fld_powlog = [ 0., 0.5, 1. ]
+vc_fld_powlog = [ ]
 
 grav = 9.80665 # same as in NEMO 3.6
 
@@ -167,9 +167,11 @@ if nemo_box.l_add_logo: (x_logo,y_logo) = nemo_box.logo
 
 #---------------------------------------------------------------
 
+# Some defaults:
+df = 1.
+cb_jump = 1
+cv_out = CWHAT
 
-
-cv_out = CWHAT ; # default
 
 if   CWHAT == 'MLD':
     cv_in = 'somxl010' ; cv_out = 'MLD'
@@ -298,7 +300,7 @@ elif CWHAT == 'sivolu':
 elif CWHAT in [ 'damage', 'damage-t', 'damage-f' ]:    
     cv_in = CWHAT  ; cv_out = cv_in ; color_top_cb='k'
     cpal_fld = 'bone_r'
-    tmin=0. ;  tmax=1. ;  df = 0.5 ; cb_jump = 1 ; l_pow_field=True ; pow_field=7.
+    tmin=0. ;  tmax=1. ; l_pow_field=True ; pow_field=7.
     vc_fld_powlog = [ 0., 0.7, 0.8, 0.9, 0.95, 1. ]
     cunit = 'Damage@T'
 
@@ -511,8 +513,8 @@ if l_show_lsm or l_add_topo_land:
         norm_lsm = colors.Normalize(vmin = nmp.log10(-100. + rof_log), vmax = nmp.log10(4000.+rof_dpt + rof_log), clip = False)
     else:
         #pal_lsm = cp.chose_colmap('land_dark')
-        pal_lsm = cp.chose_colmap('land')
-        norm_lsm = colors.Normalize(vmin = 0., vmax = 1., clip = False)
+        pal_lsm = cp.chose_colmap('landm')
+        norm_lsm = colors.Normalize(vmin=0., vmax=1., clip=False)
         
 cyr0=csd0[0:4]
 cmn0=csd0[4:6]
@@ -537,19 +539,24 @@ id_f = Dataset(cf_in)
 for jt in range(jt0,Nt):
 
     #---------------------- Calendar stuff --------------------------------------------    
-    jh  = (jt*dt)%24
-    #jh  = int( (float(jt)+0.5)*float(dt) ) % 24 ; # average is centered
-    #jh  = ((jt+1)*dt)%24
-    #jh  = ((float(jt)+0.5)*dt)%24
+    jh   = (jt*dt)%24
+    rjh  = ((float(jt)+0.5)*dt)%24
     if jt%ntpd == 0: jd = jd + 1
     if jd == vm[jm-1]+1 and (jt)%ntpd == 0 :
         jd = 1
         jm = jm + 1
-    ch = '%2.2i'%(jh)
-    cd = '%3.3i'%(jd)
-    cm = '%2.2i'%(jm)
-    ct = str(datetime.datetime.strptime(cyr0+'-'+cm+'-'+cd+' '+ch, '%Y-%m-%j %H'))    
-    ct=ct[:5]+cm+ct[7:] #lolo bug !!! need to do that to get the month and not '01    
+    ch  = '%2.2i'%(jh)
+    crh = '%2.2i'%(rjh)
+    cd  = '%3.3i'%(jd)
+    cm  = '%2.2i'%(jm)
+    #
+    jhou = int(rjh)
+    jmin = int((rjh-jhou)*60)
+    chou = '%2.2i'%(jhou)
+    cmin = '%2.2i'%(jmin)
+    #
+    ct  = str(datetime.datetime.strptime(cyr0+'-'+cm+'-'+cd+' '+ch, '%Y-%m-%j %H'))    
+    ct  = ct[:5]+cm+ct[7:] #lolo bug !!! need to do that to get the month and not '01    
     cday  = ct[:10]   ; #print(' *** cday  :', cday        
     if dt >= 24:
         cdate = cday
@@ -557,8 +564,11 @@ for jt in range(jt0,Nt):
     else:
         chour = ct[11:13] ; #print(' *** chour :', chour
         cdate = cday+'_'+chour
-        cdats = cday+' '+chour+':00'
-    print('\n Current date = ', cdate+' !\n')
+        if jmin==0:
+            cdats = cday+' '+chour+':00'
+        else:
+            cdats = cday+' '+chou+':'+cmin
+    print('\n Current date = ', cdats+' !\n')
     #-----------------------------------------------------------------------------------
 
     if l3d:
@@ -701,7 +711,7 @@ for jt in range(jt0,Nt):
                 if nemo_box.c_imshow_interp == 'none':
                     plt.contour(XLSM, [0.9], colors='k', linewidths=0.5)
             else:
-                pmsk = nmp.ma.masked_where(XLSM[:,:] > 0.2, XLSM[:,:]*0.+40.)
+                pmsk = nmp.ma.masked_where(XLSM[:,:] > 0.2, XLSM[:,:])
                 clsm = plt.imshow( pmsk, cmap=pal_lsm, norm=norm_lsm, interpolation='none' )                
                 del pmsk
     
