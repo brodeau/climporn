@@ -295,7 +295,7 @@ elif CWHAT == 'siconc':
     
 elif CWHAT == 'sivolu':
     cv_in = 'sivolu'  ; cv_out = cv_in 
-    cpal_fld = 'magma' ; tmin=0. ;  tmax=5. ;  df = 1 ; cb_jump = 1
+    cpal_fld = 'magma' ; tmin=0. ;  tmax=4. ;  df=1 ; cb_jump = 1
     cunit = 'Sea-ice volume [m]'
     
 elif CWHAT in [ 'damage', 'damage-t', 'damage-f' ]:    
@@ -304,6 +304,18 @@ elif CWHAT in [ 'damage', 'damage-t', 'damage-f' ]:
     tmin=0. ;  tmax=1. ; l_pow_field=True ; pow_field=7.
     vc_fld_powlog = [ 0., 0.7, 0.8, 0.9, 0.95, 1. ]
     cunit = 'Damage@T'
+
+elif CWHAT in [ 'sidive', 'sidive-t', 'sidive-f' ]:
+    cv_in = CWHAT  ; cv_out = cv_in ; color_top_cb='k'
+    cpal_fld = 'RdBu_r' ; tmin=-1.e-5 ;  tmax=-tmin ;  df = 2.5e-6 ; cb_jump = 1
+    cunit = 'Divergence of sea-ice velocity [1/s]'
+
+elif CWHAT in [ 'sishea', 'sishea-t', 'sishea-f' ]:
+    #l_log_field = True ;    
+    cv_in = CWHAT  ; cv_out = cv_in ; color_top_cb='w'
+    cpal_fld = 'inferno' ; tmin=0. ;  tmax=0.8e-4
+    l_pow_field=True ; pow_field=0.25 ;  vc_fld_powlog=[ tmin, 0.1e-4, 0.5e-4, tmax ]
+    cunit = 'Shear of sea-ice velocity [$10^{-4}$ s$^{-1}$]'
 
 
 else:
@@ -721,6 +733,7 @@ for jt in range(jt0,Nt):
             ax2 = plt.axes(nemo_box.vcb)
             if l_pow_field or l_log_field:
                 clb = mpl.colorbar.ColorbarBase(ax=ax2, ticks=vc_fld_powlog, cmap=pal_fld, norm=norm_fld, orientation='horizontal', extend='neither')
+                cb_labs = clb.ax.get_xticklabels()
             else:
                 clb = mpl.colorbar.ColorbarBase(ax=ax2, ticks=vc_fld, cmap=pal_fld, norm=norm_fld, orientation='horizontal', extend=cb_extend)
                 cb_labs = []
@@ -732,8 +745,8 @@ for jt in range(jt0,Nt):
                     else:
                         cb_labs.append(' ')
                     cpt = cpt + 1
-                clb.ax.set_xticklabels(cb_labs, **cfont_clb_tcks)
-                
+            #
+            clb.ax.set_xticklabels(cb_labs, **cfont_clb_tcks)                
             clb.set_label(cunit, **cfont_clb)
             clb.ax.yaxis.set_tick_params(color=color_top_cb) ; # set colorbar tick color
             clb.outline.set_edgecolor(color_top_cb) ; # set colorbar edgecolor
