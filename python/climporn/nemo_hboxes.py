@@ -38,6 +38,9 @@ class nemo_hbox:
         elif config == 'NANUK4':
             Ni0 = 492
             Nj0 = 566
+        elif config == 'HUDSON4':
+            Ni0 = 78
+            Nj0 = 141
         else:
             print('ERROR: we do not know NEMO config "'+str(config)+'" !')
             exit(0)
@@ -147,6 +150,15 @@ class nemo_hbox:
             l_fill_holes_k=False
 
             
+        elif [ config, box ] == [ 'HUDSON4', 'ALL']:
+            i1=0 ; j1=0  ;  i2=Ni0 ; j2=Nj0  ; rfact_zoom=4. ; font_rat=0.4*rfact_zoom
+            l_show_cb  = True ; vcb=[0.15, 0.08, 0.7, 0.018]
+            l_show_clock=True ; x_clock = 320*rfact_zoom ; y_clock = 540*rfact_zoom
+            l_add_logo=False
+            l_annotate_name=True
+            l_show_exp=False ; x_exp = 50*rfact_zoom ; y_exp = 80*rfact_zoom
+            l_fill_holes_k=False
+
             
         elif [ config, box ] == [ 'ORCA36', 'ALLFRX']:
             # FR = FullRes !
