@@ -17,6 +17,7 @@ FVID="mp4"
 NTHRD="1"
 DROPFRAMES=0
 DIR_OUT="."
+PIXELIZED=0
 
 usage()
 {
@@ -34,6 +35,7 @@ usage()
     echo "      -d: frequency for dropping frames (ex: -d 2 would speed up video by 2 by dropping every other frame)"
     echo "      -D: directory (path) in which to create the video if elsewhere than current directory"
     echo "      -n: number of threads (default='${NTHRD}')"
+    echo "      -P: pixelized! when scaling, apply nearest point interpolation!"
     echo
     exit
 }
@@ -45,7 +47,7 @@ if [ "`ffmpeg -codecs 2>/dev/null | grep libx264`" = "" ]; then
 fi
 
 
-while getopts i:t:h:c:f:C:p:v:d:D:n:h option; do
+while getopts i:t:h:c:f:C:p:v:d:D:n:Ph option; do
     case $option in
         i) FPREF=${OPTARG};;
         t) FIMG=${OPTARG};;
@@ -58,6 +60,7 @@ while getopts i:t:h:c:f:C:p:v:d:D:n:h option; do
         d) DROPFRAMES=${OPTARG};;
         D) DIR_OUT=${OPTARG};;
         n) NTHRD=${OPTARG};;
+        P) PIXELIZED=1;;
         h)  usage ;;
         \?) usage ;;
     esac
@@ -70,6 +73,7 @@ if [ "${FPREF}" = "" ]; then usage; fi
 
 # Video filter stuff:
 VFLTR="-vf scale='-2:${HEIGHT}'"
+if [ ${PIXELIZED} -eq 1 ]; then VFLTR="-vf scale='-2:${HEIGHT}:flags=neighbor'"; fi
 
 if [ ${DROPFRAMES} -gt 1 ]; then
     if [ "${FRAMERATE_IN}" != "${FRAMERATE_OUT}" ]; then
