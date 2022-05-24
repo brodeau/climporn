@@ -169,6 +169,11 @@ class field_aspect:
             cpal_fld='magma' ; tmin=0. ;  tmax=4. ;  df=1 ; cb_jump = 1; cb_extend = 'max'
             cunit = 'Sea-ice volume [m]'
 
+        elif CWHAT == 'sithic':
+            cv_in = 'sithic'  ; cv_out = cv_in
+            cpal_fld='magma' ; tmin=0. ;  tmax=4. ;  df=1 ; cb_jump = 1; cb_extend = 'max'
+            cunit = 'Sea-ice thickness [m]'
+
         elif CWHAT in [ 'damage', 'damage-t', 'damage-f' ]:
             cv_in = CWHAT  ; cv_out = cv_in
             cpal_fld='magma' ; color_top_cb='w'
@@ -191,7 +196,7 @@ class field_aspect:
 
         else:
             print('ERROR: we do not know field '+str(CWHAT)+' !')
-            sys.exit(0)
+            exit(0)
 
             
         self.color_top     = color_top
