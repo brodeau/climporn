@@ -733,8 +733,7 @@ for jt in range(jt0,Nt):
             clb.outline.set_edgecolor(color_top_cb) ; # set colorbar edgecolor
             clb.ax.tick_params(which = 'minor', length = 2, color = color_top_cb )
             clb.ax.tick_params(which = 'major', length = 4, color = color_top_cb )
-    
-    
+        
         if nemo_box.l_show_clock:
             xl = float(x_clock)/rfz
             yl = float(y_clock)/rfz
