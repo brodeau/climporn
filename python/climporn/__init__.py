@@ -14,4 +14,5 @@ from .stat import *
 from .plot import *
 from .utils import *
 from .nemo_hboxes import *
+from .field_aspect import *
 from .saplot import *

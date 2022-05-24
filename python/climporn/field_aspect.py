@@ -9,7 +9,7 @@ class field_aspect:
         self.cfield = cfield
         self.cbox   = cbox
 
-    def colbar( self ):
+        #def colbar( self ):
 
         CWHAT = self.cfield
         CBOX  = self.cbox
@@ -30,14 +30,14 @@ class field_aspect:
         pow_field=0.5
         vc_fld_powlog = [ ]
 
-        df = 1.
-        cb_jump = 1
-        cb_extend = 'both'
 
+        rmult = 1.
         tmin = 0.
         tmax = 1.
         df   = 0.1
         cpal_fld = 'viridis'
+        cb_jump = 1
+        cb_extend = 'both'        
         cunit = ''
 
         l_apply_geov  = False
@@ -165,33 +165,35 @@ class field_aspect:
         elif CWHAT == 'siconc':
             cv_in = 'siconc'  ; cv_out = cv_in
             #cpal_fld='ice5_on' ; tmin=0. ;  tmax=1. ;  df = 0.1 ; cb_jump = 1
-            cpal_fld='ncview_ice' ; tmin=0. ;  tmax=1. ;  df = 0.1 ; cb_jump = 1
+            cpal_fld='ncview_ice' ; tmin=0. ;  tmax=1. ;  df = 0.1 ; cb_jump = 1 ; cb_extend = 'neither'
             cunit = 'Sea-ice concentration'
 
         elif CWHAT == 'sivolu':
             cv_in = 'sivolu'  ; cv_out = cv_in
-            cpal_fld='magma' ; tmin=0. ;  tmax=4. ;  df=1 ; cb_jump = 1
+            cpal_fld='magma' ; tmin=0. ;  tmax=4. ;  df=1 ; cb_jump = 1; cb_extend = 'max'
             cunit = 'Sea-ice volume [m]'
 
         elif CWHAT in [ 'damage', 'damage-t', 'damage-f' ]:
             cv_in = CWHAT  ; cv_out = cv_in
             #cpal_fld='bone_r' ; color_top_cb='k'
             cpal_fld='magma' ; color_top_cb='w'
-            tmin=0. ;  tmax=1. ; l_pow_field=True ; pow_field=7.
+            tmin=0. ;  tmax=1. ; l_pow_field=True ; pow_field=7. ; cb_extend = 'neither'
             vc_fld_powlog = [ 0., 0.7, 0.8, 0.9, 0.95, 1. ]
             cunit = 'Damage@T'
 
         elif CWHAT in [ 'sidive', 'sidive-t', 'sidive-f' ]:
             cv_in = CWHAT  ; cv_out = cv_in ; color_top_cb='k'
-            cpal_fld='RdBu_r' ; tmin=-1.e-5 ;  tmax=-tmin ;  df = 2.5e-6 ; cb_jump = 1
-            cunit = 'Divergence of sea-ice velocity [1/s]'
+            rmult = 3600.*24.
+            cpal_fld='RdBu_r' ; tmin=-0.8 ;  tmax=-tmin ;  df=0.2
+            cunit = 'Divergence of sea-ice velocity [day$^{-1}$]'
 
         elif CWHAT in [ 'sishea', 'sishea-t', 'sishea-f' ]:
             #l_log_field = True ;
             cv_in = CWHAT  ; cv_out = cv_in ; color_top_cb='w'
-            cpal_fld='inferno' ; tmin=0. ;  tmax=0.8e-4
-            l_pow_field=True ; pow_field=0.25 ;  vc_fld_powlog=[ tmin, 0.1e-4, 0.5e-4, tmax ]
-            cunit = 'Shear of sea-ice velocity [$10^{-4}$ s$^{-1}$]'
+            rmult = 3600.*24.
+            cpal_fld='inferno' ; tmin=0. ;  tmax=5.
+            l_pow_field=True ; pow_field=0.25 ;  vc_fld_powlog= [tmin, 0.1, 0.5, 1., 3., tmax ]
+            cunit = 'Shear of sea-ice velocity [day$^{-1}$]'
 
         else:
             print('ERROR: we do not know field '+str(CWHAT)+' !')
@@ -203,7 +205,7 @@ class field_aspect:
         self.cv_in         = cv_in
         self.cv_out        = cv_out
         self.cv_msk        = cv_msk
-        self.              =
+
         self.l_show_lsm    = l_show_lsm
         self.l_show_ice    = l_show_ice
 
@@ -212,12 +214,12 @@ class field_aspect:
         self.pow_field     = pow_field
         self.vc_fld_powlog = vc_fld_powlog
 
-        self.df            = df
-        self.cb_jump       = cb_jump
-
+        self.rmult         = rmult
         self.tmin          = tmin
         self.tmax          = tmax
         self.df            = df
+        self.cb_jump       = cb_jump
+        self.cb_extend     = cb_extend
         self.cpal_fld      = cpal_fld
         self.cunit         = cunit
 
@@ -227,4 +229,3 @@ class field_aspect:
         self.l_smooth      = l_smooth
         self.nb_smooth     = nb_smooth
 
-        return 0
