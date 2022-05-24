@@ -2,14 +2,13 @@ from sys import exit
 
 class field_aspect:
 
-    ''' Bla bla bla
+    ''' This is where you can define field specific plotting features such as colormap, bounds, etc...
+        For now, only used by `nemo_movie_sclr.py`
     '''
 
     def __init__( self, cfield, cbox="" ):
         self.cfield = cfield
         self.cbox   = cbox
-
-        #def colbar( self ):
 
         CWHAT = self.cfield
         CBOX  = self.cbox
@@ -31,7 +30,7 @@ class field_aspect:
         vc_fld_powlog = [ ]
 
 
-        rmult = 1.
+        rmult = 1.  ; # multiplicator to apply to field read into netCDF file
         tmin = 0.
         tmax = 1.
         df   = 0.1
@@ -45,7 +44,6 @@ class field_aspect:
         l_apply_hgrad = False
         l_smooth  = False
         nb_smooth = 0
-
 
 
         if   CWHAT == 'MLD':
@@ -129,7 +127,6 @@ class field_aspect:
             cunit = r'$\zeta/f$'
             cv_msk = 'vmask'
 
-
         elif CWHAT == 'GEOSSV':
             # Geostrophic velocity speed out of SSH
             cv_in = 'sossheig' ; cv_out = CWHAT ;
@@ -164,7 +161,6 @@ class field_aspect:
 
         elif CWHAT == 'siconc':
             cv_in = 'siconc'  ; cv_out = cv_in
-            #cpal_fld='ice5_on' ; tmin=0. ;  tmax=1. ;  df = 0.1 ; cb_jump = 1
             cpal_fld='ncview_ice' ; tmin=0. ;  tmax=1. ;  df = 0.1 ; cb_jump = 1 ; cb_extend = 'neither'
             cunit = 'Sea-ice concentration'
 
@@ -175,7 +171,6 @@ class field_aspect:
 
         elif CWHAT in [ 'damage', 'damage-t', 'damage-f' ]:
             cv_in = CWHAT  ; cv_out = cv_in
-            #cpal_fld='bone_r' ; color_top_cb='k'
             cpal_fld='magma' ; color_top_cb='w'
             tmin=0. ;  tmax=1. ; l_pow_field=True ; pow_field=7. ; cb_extend = 'neither'
             vc_fld_powlog = [ 0., 0.7, 0.8, 0.9, 0.95, 1. ]
@@ -188,7 +183,6 @@ class field_aspect:
             cunit = 'Divergence of sea-ice velocity [day$^{-1}$]'
 
         elif CWHAT in [ 'sishea', 'sishea-t', 'sishea-f' ]:
-            #l_log_field = True ;
             cv_in = CWHAT  ; cv_out = cv_in ; color_top_cb='w'
             rmult = 3600.*24.
             cpal_fld='inferno' ; tmin=0. ;  tmax=5.
@@ -199,6 +193,7 @@ class field_aspect:
             print('ERROR: we do not know field '+str(CWHAT)+' !')
             sys.exit(0)
 
+            
         self.color_top     = color_top
         self.color_top_cb  = color_top_cb
 
