@@ -68,14 +68,16 @@ requiredNamed = parser.add_argument_group('required arguments')
 requiredNamed.add_argument('-i', '--fin' , required=True,                help='specify the NEMO netCDF file to read from...')
 requiredNamed.add_argument('-w', '--what', required=True, help='specify the field/diagnostic to plot (ex: CSPEED,CURLOF,ect.)')
 
-parser.add_argument('-C', '--conf', default="none",           help='specify NEMO config (ex: eNATL60)')
-parser.add_argument('-b', '--box' , default="ALL",            help='specify extraction box name (ex: ALL)')
-parser.add_argument('-m', '--fmm' , default="mesh_mask.nc",   help='specify the NEMO mesh_mask file (ex: mesh_mask.nc)')
-parser.add_argument('-s', '--sd0' , default="20090101",       help='specify initial date as <YYYYMMDD>')
-parser.add_argument('-l', '--lev' , type=int, default=0,      help='specify the level to use if 3D field (default: 0 => 2D)')
-parser.add_argument('-z', '--zld' ,                           help='specify the topography netCDF file to use (field="z")')
-parser.add_argument('-t', '--tstep', type=int, default=1,     help='specify the time step (hours) in input file')
-parser.add_argument('-N', '--oname', default="",              help='specify a name that overides `CONF` on the plot...')
+parser.add_argument('-C', '--conf', default="none",         help='specify NEMO config (ex: eNATL60)')
+parser.add_argument('-b', '--box' , default="ALL",          help='specify extraction box name (ex: ALL)')
+parser.add_argument('-m', '--fmm' , default="mesh_mask.nc", help='specify the NEMO mesh_mask file (ex: mesh_mask.nc)')
+parser.add_argument('-s', '--sd0' , default="20090101",     help='specify initial date as <YYYYMMDD>')
+parser.add_argument('-l', '--lev' , type=int, default=0,    help='specify the level to use if 3D field (default: 0 => 2D)')
+parser.add_argument('-z', '--zld' ,                         help='specify the topography netCDF file to use (field="z")')
+#parser.add_argument('-t', '--tstep', type=int, default=1,  help='specify the time step (hours) in input file')
+parser.add_argument('-t', '--tstep',  default="1h",         help='specify the time step ("1h","2h",..,up to "1d") in input file')
+parser.add_argument('-N', '--oname',  default="",           help='specify a name that overides `CONF` on the plot...')
+parser.add_argument('-o', '--outdir', default="./figs",     help='specify the path to directory where to save figures')
 
 args = parser.parse_args()
 
@@ -87,8 +89,9 @@ cf_mm = args.fmm
 csd0  = args.sd0
 jk    = args.lev
 cf_topo_land = args.zld
-dt    = args.tstep  ; # time step in hours
+cdt    = args.tstep  ; # time step, in the form "1h", "2h", ..., "12h", ..., "1m", ..., "6m", ... "1y", ..., etc
 CONAME = args.oname
+cd_out = args.outdir
 
 print('')
 print(' *** CNEMO = ', CNEMO)
@@ -110,8 +113,8 @@ else:
     jk=0
 ###############################################################################################################################################
 
-if not path.exists('figs'): mkdir('figs')
-cdir_figs = './figs/'+CWHAT
+if not path.exists(cd_out): mkdir(cd_out)
+cdir_figs = cd_out+'/'+CWHAT
 if not path.exists(cdir_figs): mkdir(cdir_figs)
 
 if l_save_nc and not path.exists('nc'): mkdir('nc')
@@ -363,10 +366,14 @@ cmn0=csd0[4:6]
 cdd0=csd0[6:8]
 
 # Time step as a string
-if not dt in [ 24, 6, 3, 1 ]:
-    print('ERROR: unknown dt! '+str(dt))
-    sys.exit(0)
-ntpd = 24/dt
+if not len(cdt)==2:
+    print('ERROR: something is wrong with the format of your time step => '+cdt+' !'); sys.exit(0)
+if cdt=='1d':
+    dt = 24 ; ntpd = 1
+elif cdt[1]=='h':
+    dt = int(cdt[0]) ; ntpd = 24 / dt
+else:
+    print('ERROR: something is wrong with the format of your time step => '+cdt+' !'); sys.exit(0)
 
 vm = vmn
 if isleap(int(cyr0)): vm = vml
