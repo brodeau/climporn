@@ -10,6 +10,12 @@
 import sys
 import numpy as nmp
 
+#TRG_NAME_CONF = 'HEMI'
+
+#DPIsvg=200
+#DPIpng=200
+
+
 
 def get_basin_info( cf_bm ):    
     from netCDF4 import Dataset
@@ -332,3 +338,80 @@ def shrink_domain(LSM):
     if (i1,i2) == (0,lx): i2 = i2-2 ; # Mind east-west periodicity overlap of 2 points...
     #
     return (i1,j1,i2,j2)
+
+
+
+
+##################
+
+
+#def init_fig( font_rat=1, color_top='k' ):
+#    rr = font_rat
+#    params = { 'font.family':'Open Sans', 'font.weight':    'normal',
+#               'font.size':       int(12.*rr),
+#               'legend.fontsize': int(22.*rr),
+##               'xtick.labelsize': int(13.*rr), 'ytick.labelsize': int(12.*rr),
+#               'axes.labelsize':  int(14.*rr), # label of colorbar
+#               'text.color': color_top, 'axes.labelcolor': color_top, 'xtick.color':color_top, 'xtick.color':color_top }
+#    mpl.rcParams.update(params)
+#    return 0
+
+
+def PlotGridGlobe( Xglamf, Xgphif, chemi='N', lon0=-35., cfig_name='mesh_globe_ortho.svg', nsubsamp=5, rdpi=200, nxcld_n=0, ldark=False ):
+    """
+            Shows the actual grid meshes on an orthographic projection of the globe
+            * chemi     => which hemisphere to look at (N/S)
+            * lon0      => facing longitude [deg.E]
+            * cfig_name => name of figure to create, extension is important as it will tell what format to use!
+            * nsubsamp  => subsampling level, useful for high resolution grids
+            * nxcld_n   => number of raws to exclude at the north fold
+            * ldark     => hell yeah, make it dark babe!
+    """
+    #
+    import matplotlib as mpl
+    mpl.use('Agg')
+    import matplotlib.pyplot as plt
+    import matplotlib.colors as colors
+    from mpl_toolkits.basemap import Basemap
+    from mpl_toolkits.basemap import shiftgrid
+    #
+    ishape   = nmp.shape(Xglamf)
+    (ny,nx,) = ishape
+    if len(ishape) != 2:
+        print('ERROR: `PlotGridGlobe()` => coordinate arrays should have 2 dimensions!'); sys.exit(0)
+    if nmp.shape(Xgphif) != ishape:
+        print('ERROR: `PlotGridGlobe()` => coordinate arrays should have the same shape!'); sys.exit(0)
+
+    vsporg = [0., 0., 1., 1.]
+    col_bg = 'w' ; col_fg = 'k' ; col_gr = 'b' ; col_cl = 'k' ; col_fc = '0.85'
+    if ldark:
+        col_bg = 'k' ; col_fg = 'w' ; col_gr = 'w' ; col_cl = '0.5' ; col_fc = '0.15'
+
+    fig = plt.figure(num = 1, figsize=(7.,7.), dpi=rdpi, facecolor=col_fg, edgecolor=col_fg)
+    ax  = plt.axes(vsporg, facecolor=col_bg)
+
+    if   chemi== 'N':
+        carte = Basemap(projection='ortho', lon_0=lon0, lat_0= 45, resolution='l')
+    elif chemi== 'S':
+        carte = Basemap(projection='ortho', lon_0=lon0, lat_0=-45, resolution='l')
+    else:
+        print('ERROR: `PlotGridGlobe()` => only "N" and "S" hemispheres are known!'); sys.exit(0)
+
+    # Vertical lines connecting F-points:
+    for ji in range(0,nx,nsubsamp):
+        x0,y0 = carte(Xglamf[::nsubsamp,ji], Xgphif[::nsubsamp,ji])
+        ftv = carte.plot( x0, y0, color=col_gr, linestyle='-', linewidth=0.2, marker=None )
+
+    # Horizontal lines connecting F-points:
+    for jj in range(0,ny-nxcld_n,nsubsamp):
+        x0,y0 = carte(Xglamf[jj,::nsubsamp], Xgphif[jj,::nsubsamp])
+        fth = carte.plot( x0, y0, color=col_gr, linestyle='-', linewidth=0.2, marker=None )
+
+    carte.drawcoastlines(linewidth=1.,  color=col_cl)
+    carte.fillcontinents( color=col_fc )
+
+
+    plt.savefig(cfig_name, dpi=rdpi, orientation='portrait', transparent=True)
+    print(cfig_name+' created!\n')
+    plt.close(1)
+    return 0
