@@ -357,7 +357,7 @@ def shrink_domain(LSM):
 #    return 0
 
 
-def PlotGridGlobe( Xglamf, Xgphif, chemi='N', lon0=-35., cfig_name='mesh_globe_ortho.svg', nsubsamp=5, rdpi=200, nxcld_n=0, ldark=False ):
+def PlotGridGlobe( Xglamf, Xgphif, chemi='N', lon0=-35., cfig_name='mesh_globe_ortho.svg', nsubsamp=5, rdpi=200, nxcld_n=0, ldark=False, nzoom=1 ):
     """
             Shows the actual grid meshes on an orthographic projection of the globe
             * chemi     => which hemisphere to look at (N/S)
@@ -387,7 +387,7 @@ def PlotGridGlobe( Xglamf, Xgphif, chemi='N', lon0=-35., cfig_name='mesh_globe_o
     if ldark:
         col_bg = 'k' ; col_fg = 'w' ; col_gr = 'w' ; col_cl = '0.5' ; col_fc = '0.15'
 
-    fig = plt.figure(num = 1, figsize=(7.,7.), dpi=rdpi, facecolor=col_fg, edgecolor=col_fg)
+    fig = plt.figure(num = 1, figsize=(nzoom*7.,nzoom*7.), dpi=rdpi, facecolor=col_fg, edgecolor=col_fg)
     ax  = plt.axes(vsporg, facecolor=col_bg)
 
     if   chemi== 'N':
