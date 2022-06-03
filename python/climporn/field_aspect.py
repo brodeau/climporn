@@ -184,7 +184,7 @@ class field_aspect:
         elif CWHAT in [ 'sidive', 'sidive-t', 'sidive-f' ]:
             cv_in = CWHAT  ; cv_out = cv_in ; color_top_cb='k'
             rmult = 3600.*24.
-            cpal_fld='RdBu_r' ; tmin=-0.8 ;  tmax=-tmin ;  df=0.2
+            cpal_fld='RdBu_r' ; tmin=-0.5 ;  tmax=-tmin ;  df=0.1
             cunit = 'Divergence of sea-ice velocity [day$^{-1}$]'
 
         elif CWHAT in [ 'sishea', 'sishea-t', 'sishea-f' ]:
