@@ -65,7 +65,7 @@ if __name__ == '__main__':
     print('\n *** Horizontal domain => '+str(Ni)+' x '+str(Nj))
 
     list_var = id_mm.variables.keys()
-    print('\n *** Variables in '+cf_mm+':\n', list_var)
+    print('\n *** Variables in '+cf_mm+':\n', list(list_var), '\n')
     list_treat = []
     list_ndims = []
     list_point = []
