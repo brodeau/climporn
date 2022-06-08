@@ -357,8 +357,9 @@ def shrink_domain(LSM):
 #    return 0
 
 
-def PlotGridGlobe( Xglamf, Xgphif, chemi='N', lon0=-35., cfig_name='mesh_globe_ortho.svg',
-                   nsubsamp=5, rdpi=200, nxcld_n=0, ldark=False, nzoom=1, linew=0.2 ):
+def PlotGridGlobe( Xglamf, Xgphif, chemi='N', lon0=-35., lat0=45., cfig_name='mesh_globe_ortho.svg',
+                   nsubsamp=5, rdpi=200, nxcld_n=0, hres=0.25, ldark=False, nzoom=1, linew=0.2,
+                   lNPzoom=False, l_show_lat_bg=False ):
     """
             Shows the actual grid meshes on an orthographic projection of the globe
             * chemi     => which hemisphere to look at (N/S)
@@ -392,12 +393,24 @@ def PlotGridGlobe( Xglamf, Xgphif, chemi='N', lon0=-35., cfig_name='mesh_globe_o
     ax  = plt.axes(vsporg, facecolor=col_bg)
 
     if   chemi== 'N':
-        carte = Basemap(projection='ortho', lon_0=lon0, lat_0= 45, resolution='l')
+        if lNPzoom:
+            rr = hres/0.027
+            carte = Basemap(projection='ortho', lon_0=lon0, lat_0=89.9999, llcrnrx=-rr*20000, llcrnry=-rr*20000, urcrnrx=rr*20000, urcrnry=rr*20000, resolution='c')
+        else:
+            carte = Basemap(projection='ortho', lon_0=lon0, lat_0= lat0, resolution='c')
     elif chemi== 'S':
-        carte = Basemap(projection='ortho', lon_0=lon0, lat_0=-45, resolution='l')
+        carte = Basemap(projection='ortho', lon_0=lon0, lat_0=-lat0, resolution='c')
     else:
         print('ERROR: `PlotGridGlobe()` => only "N" and "S" hemispheres are known!'); sys.exit(0)
 
+
+    if l_show_lat_bg:
+        rl0 = 90. - 5.*hres
+        # Add field of latitude:
+        x0,y0 = carte(Xglamf[:,:], Xgphif[:,:])
+        XP = nmp.ma.masked_where( Xgphif[:,:]<rl0, Xgphif[:,:] )
+        carte.pcolor( x0, y0, Xgphif[:,:], cmap=plt.get_cmap('pink_r'), norm=colors.Normalize(vmin=rl0,vmax=90.,clip=False), zorder=1 )
+        
     # Vertical lines connecting F-points:
     for ji in range(0,nx,nsubsamp):
         x0,y0 = carte(Xglamf[::nsubsamp,ji], Xgphif[::nsubsamp,ji])
@@ -407,7 +420,7 @@ def PlotGridGlobe( Xglamf, Xgphif, chemi='N', lon0=-35., cfig_name='mesh_globe_o
     for jj in range(0,ny-nxcld_n,nsubsamp):
         x0,y0 = carte(Xglamf[jj,::nsubsamp], Xgphif[jj,::nsubsamp])
         fth = carte.plot( x0, y0, color=col_gr, linestyle='-', linewidth=linew, marker=None )
-
+        
     carte.drawcoastlines(linewidth=1.,  color=col_cl)
     carte.fillcontinents( color=col_fc )
 
