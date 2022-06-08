@@ -357,9 +357,9 @@ def shrink_domain(LSM):
 #    return 0
 
 
-def PlotGridGlobe( Xglamf, Xgphif, chemi='N', lon0=-35., lat0=45., cfig_name='mesh_globe_ortho.svg',
+def PlotGridGlobe( Xglamf, Xgphif, Xglamt=[], Xgphit=[], chemi='N', lon0=-35., lat0=45., cfig_name='mesh_globe_ortho.svg',
                    nsubsamp=5, rdpi=200, nxcld_n=0, hres=0.25, ldark=False, nzoom=1, linew=0.2,
-                   lNPzoom=False, l_show_lat_bg=False ):
+                   lNPzoom=False ):
     """
             Shows the actual grid meshes on an orthographic projection of the globe
             * chemi     => which hemisphere to look at (N/S)
@@ -384,6 +384,13 @@ def PlotGridGlobe( Xglamf, Xgphif, chemi='N', lon0=-35., lat0=45., cfig_name='me
     if nmp.shape(Xgphif) != ishape:
         print('ERROR: `PlotGridGlobe()` => coordinate arrays should have the same shape!'); sys.exit(0)
 
+
+    # Providing glamt and gphit means we want to plot one of them in the background:
+    l_show_lat_bg = (nmp.shape(Xglamt)==nmp.shape(Xglamf)) and (nmp.shape(Xgphit)==nmp.shape(Xgphif))
+
+
+
+        
     vsporg = [0., 0., 1., 1.]
     col_bg = 'w' ; col_fg = 'k' ; col_gr = 'b' ; col_cl = 'k' ; col_fc = '0.85'
     if ldark:
@@ -408,8 +415,8 @@ def PlotGridGlobe( Xglamf, Xgphif, chemi='N', lon0=-35., lat0=45., cfig_name='me
         rl0 = 90. - 2*hres
         # Add field of latitude:
         x0,y0 = carte(Xglamf[:,:], Xgphif[:,:])
-        XP = nmp.ma.masked_where( Xgphif[:,:]<rl0, Xgphif[:,:] )
-        carte.pcolor( x0, y0, Xgphif[:,:], cmap=plt.get_cmap('cubehelix_r'), norm=colors.Normalize(vmin=rl0,vmax=90.,clip=False), zorder=1 )
+        XP = nmp.ma.masked_where( Xgphit[:,:]<rl0, Xgphit[:,:] )
+        carte.pcolor( x0, y0, XP, cmap=plt.get_cmap('cubehelix_r'), norm=colors.Normalize(vmin=rl0,vmax=90.,clip=False), zorder=1 )
         
     # Vertical lines connecting F-points:
     for ji in range(0,nx,nsubsamp):
@@ -425,7 +432,7 @@ def PlotGridGlobe( Xglamf, Xgphif, chemi='N', lon0=-35., lat0=45., cfig_name='me
     carte.fillcontinents( color=col_fc )
 
 
-    plt.savefig(cfig_name, dpi=rdpi, orientation='portrait', transparent=True)
+    plt.savefig(cfig_name, dpi=rdpi, orientation='portrait', transparent=(not l_show_lat_bg))
     print(cfig_name+' created!\n')
     plt.close(1)
     return 0

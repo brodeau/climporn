@@ -91,13 +91,13 @@ if __name__ == '__main__':
     jv  = 0
     for cv in xcv_n:
 
-        if cv in [ 'glamf', 'gphif', 'gphit' ]:
+        if cv in [ 'glamf', 'gphif', 'glamt', 'gphit' ]:
         
             print('\n  ==> reading variable # '+str(jv+1)+' :'+cv+' ('+str(xcv_d[jv])+'D), grid point = '+xcv_p[jv])
     
             if cv == 'glamf': id_glamf=jv
             if cv == 'gphif': id_gphif=jv
-            #if cv == 'glamt': id_glamt=jv
+            if cv == 'glamt': id_glamt=jv
             if cv == 'gphit': id_gphit=jv
             #if cv == 'e1t'  : id_e1t=jv
             #if cv == 'e2t'  : id_e2t=jv
@@ -135,8 +135,9 @@ if __name__ == '__main__':
     
 
     # Small box including the North Pole to spot possible inconsistencies in the grid:
-    ii = cp.PlotGridGlobe( XVF[id_glamf,j1:j2,i1:i2], XVF[id_gphif,j1:j2,i1:i2], chemi='N', lon0=0., cfig_name='zoom_'+cfig+'_NH_35W_f_OUT_ortho_WHITE.png',
-                           nsubsamp=1, rdpi=DPIsvg, hres=1./float(ires), ldark=False, nzoom=1, linew=1., lNPzoom=True, l_show_lat_bg=True )
+    ii = cp.PlotGridGlobe( XVF[id_glamf,j1:j2,i1:i2], XVF[id_gphif,j1:j2,i1:i2], Xglamt=XVF[id_glamt,j1:j2,i1:i2], Xgphit=XVF[id_gphit,j1:j2,i1:i2],
+                           chemi='N', lon0=0., cfig_name='zoom_'+cfig+'_NH_35W_f_OUT_ortho_WHITE.png',
+                           nsubsamp=1, rdpi=DPIsvg, hres=1./float(ires), ldark=False, nzoom=1, linew=1., lNPzoom=True )
 
     # White:
     ii = cp.PlotGridGlobe( XVF[id_glamf,:,:], XVF[id_gphif,:,:], chemi='N', lon0=-35., lat0=68., cfig_name=cfig+'_NH_35W_f_OUT_ortho_WHITE.svg',  nsubsamp=isubsamp, rdpi=DPIsvg, ldark=False )
