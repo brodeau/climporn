@@ -119,9 +119,7 @@ if __name__ == '__main__':
 
     
     # Location of north pole:
-    NNN = nmp.argmax( XVF[id_gphit,:,:] )
-    NjNP = NNN // Ni
-    NiNP = NNN % Ni    
+    (NjNP,NiNP) = nmp.unravel_index(XVF[id_gphit,:,:].argmax(), XVF[id_gphit,:,:].shape)
     print( "\n *** North Pole found at : Ni, Nj = ", NiNP, NjNP, ' => ', XVF[id_gphit,NjNP,NiNP]  )    
     #cp.dump_2d_field( 'LAT.nc',  XVF[id_gphit,:,:] ) ; #debug
 
