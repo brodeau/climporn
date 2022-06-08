@@ -58,8 +58,7 @@ if __name__ == '__main__':
     nbdim = 2
     if l_td: nbdim = nbdim + 1
     if l_zd: nbdim = nbdim + 1
-    
-    print(list_dim, l_td, ltz)
+    #print(list_dim, l_td, l_zd)
     
     Ni = id_mm.dimensions['x'].size
     Nj = id_mm.dimensions['y'].size
@@ -101,7 +100,9 @@ if __name__ == '__main__':
 
         # There is always time_counter as a dimmension
         if   xcv_d[jv] == nbdim:
-            if l_td:
+            if   nbdim==4:
+                XVF[jv,:,:] = id_mm.variables[cv][0,0,:,:]
+            elif nbdim==3:
                 XVF[jv,:,:] = id_mm.variables[cv][0,:,:]
             else:
                 XVF[jv,:,:] = id_mm.variables[cv][:,:]
