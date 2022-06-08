@@ -5,10 +5,9 @@
 # L. Brodeau, 2022
 
 import sys
-import os
+#import os
 import numpy as nmp
 from netCDF4 import Dataset
-#import string
 
 # Extra
 import matplotlib as mpl
@@ -89,39 +88,34 @@ if __name__ == '__main__':
     jv  = 0
     for cv in xcv_n:
 
-        print('\n  ==> reading variable # '+str(jv+1)+' :'+cv+' ('+str(xcv_d[jv])+'D), grid point = '+xcv_p[jv])
-
-        if cv == 'glamf': id_glamf=jv
-        if cv == 'gphif': id_gphif=jv
-        if cv == 'glamt': id_glamt=jv
-        if cv == 'gphit': id_gphit=jv
-        if cv == 'e1t'  : id_e1t=jv
-        if cv == 'e2t'  : id_e2t=jv
-
-        # There is always time_counter as a dimmension
-        if   xcv_d[jv] == nbdim:
-            if   nbdim==4:
-                XVF[jv,:,:] = id_mm.variables[cv][0,0,:,:]
-            elif nbdim==3:
-                XVF[jv,:,:] = id_mm.variables[cv][0,:,:]
+        if cv in [ 'glamf', 'gphif', 'gphit' ]:
+        
+            print('\n  ==> reading variable # '+str(jv+1)+' :'+cv+' ('+str(xcv_d[jv])+'D), grid point = '+xcv_p[jv])
+    
+            if cv == 'glamf': id_glamf=jv
+            if cv == 'gphif': id_gphif=jv
+            #if cv == 'glamt': id_glamt=jv
+            if cv == 'gphit': id_gphit=jv
+            #if cv == 'e1t'  : id_e1t=jv
+            #if cv == 'e2t'  : id_e2t=jv
+    
+            # There is always time_counter as a dimmension
+            if   xcv_d[jv] == nbdim:
+                if   nbdim==4:
+                    XVF[jv,:,:] = id_mm.variables[cv][0,0,:,:]
+                elif nbdim==3:
+                    XVF[jv,:,:] = id_mm.variables[cv][0,:,:]
+                else:
+                    XVF[jv,:,:] = id_mm.variables[cv][:,:]
             else:
-                XVF[jv,:,:] = id_mm.variables[cv][:,:]
-        else:
-            print(' PROBLEM: variable '+cv+' has '+str(xcv_d[jv])+' dimensions!!!'); sys.exit(0)
-           
-        jv=jv+1
+                print(' PROBLEM: variable '+cv+' has '+str(xcv_d[jv])+' dimensions!!!'); sys.exit(0)
+               
+            jv=jv+1
 
     id_mm.close()
+
     
-    
-
-    cf_out = 'grid_nextsimDG_2x'+conf+'.nc'
-        
-
-
     # Location of north pole:
-    
-
     NNN = nmp.argmax( XVF[id_gphit,:,:] )
     NjNP = NNN // Ni
     NiNP = NNN % Ni    
@@ -139,7 +133,7 @@ if __name__ == '__main__':
 
     # Small box including the North Pole to spot possible inconsistencies in the grid:
     ii = cp.PlotGridGlobe( XVF[id_glamf,j1:j2,i1:i2], XVF[id_gphif,j1:j2,i1:i2], chemi='N', lon0=-35., cfig_name='zoom_NH_35W_f_OUT_ortho_WHITE.svg',
-                           nsubsamp=1, rdpi=DPIsvg, ldark=False, nzoom=5 )
+                           nsubsamp=1, rdpi=DPIsvg, ldark=False, nzoom=5, linew=0.05 )
 
     # White:
     ii = cp.PlotGridGlobe( XVF[id_glamf,:,:], XVF[id_gphif,:,:], chemi='N', lon0=-35., cfig_name='NH_35W_f_OUT_ortho_WHITE.svg',  nsubsamp=isubsamp, rdpi=DPIsvg, ldark=False )

@@ -357,7 +357,8 @@ def shrink_domain(LSM):
 #    return 0
 
 
-def PlotGridGlobe( Xglamf, Xgphif, chemi='N', lon0=-35., cfig_name='mesh_globe_ortho.svg', nsubsamp=5, rdpi=200, nxcld_n=0, ldark=False, nzoom=1 ):
+def PlotGridGlobe( Xglamf, Xgphif, chemi='N', lon0=-35., cfig_name='mesh_globe_ortho.svg',
+                   nsubsamp=5, rdpi=200, nxcld_n=0, ldark=False, nzoom=1, linew=0.2 ):
     """
             Shows the actual grid meshes on an orthographic projection of the globe
             * chemi     => which hemisphere to look at (N/S)
@@ -400,12 +401,12 @@ def PlotGridGlobe( Xglamf, Xgphif, chemi='N', lon0=-35., cfig_name='mesh_globe_o
     # Vertical lines connecting F-points:
     for ji in range(0,nx,nsubsamp):
         x0,y0 = carte(Xglamf[::nsubsamp,ji], Xgphif[::nsubsamp,ji])
-        ftv = carte.plot( x0, y0, color=col_gr, linestyle='-', linewidth=0.2, marker=None )
+        ftv = carte.plot( x0, y0, color=col_gr, linestyle='-', linewidth=linew, marker=None )
 
     # Horizontal lines connecting F-points:
     for jj in range(0,ny-nxcld_n,nsubsamp):
         x0,y0 = carte(Xglamf[jj,::nsubsamp], Xgphif[jj,::nsubsamp])
-        fth = carte.plot( x0, y0, color=col_gr, linestyle='-', linewidth=0.2, marker=None )
+        fth = carte.plot( x0, y0, color=col_gr, linestyle='-', linewidth=linew, marker=None )
 
     carte.drawcoastlines(linewidth=1.,  color=col_cl)
     carte.fillcontinents( color=col_fc )
