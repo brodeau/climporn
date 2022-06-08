@@ -52,12 +52,14 @@ if __name__ == '__main__':
     id_mm = Dataset(cf_mm)
 
     list_dim = id_mm.dimensions.keys()
-    l_td = 'time_counter' in list_dim
+    l_td = 'time_counter' in list_dim or 'time' in list_dim
+    l_zd = 'z' in list_dim
 
     nbdim = 2
-    if l_td: nbdim = 3
+    if l_td: nbdim = nbdim + 1
+    if l_zd: nbdim = nbdim + 1
     
-    #print(list_dim, l_td)
+    print(list_dim, l_td, ltz)
     
     Ni = id_mm.dimensions['x'].size
     Nj = id_mm.dimensions['y'].size
