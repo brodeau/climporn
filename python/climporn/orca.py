@@ -405,11 +405,11 @@ def PlotGridGlobe( Xglamf, Xgphif, chemi='N', lon0=-35., lat0=45., cfig_name='me
 
 
     if l_show_lat_bg:
-        rl0 = 90. - 5.*hres
+        rl0 = 90. - 2*hres
         # Add field of latitude:
         x0,y0 = carte(Xglamf[:,:], Xgphif[:,:])
         XP = nmp.ma.masked_where( Xgphif[:,:]<rl0, Xgphif[:,:] )
-        carte.pcolor( x0, y0, Xgphif[:,:], cmap=plt.get_cmap('pink_r'), norm=colors.Normalize(vmin=rl0,vmax=90.,clip=False), zorder=1 )
+        carte.pcolor( x0, y0, Xgphif[:,:], cmap=plt.get_cmap('cubehelix_r'), norm=colors.Normalize(vmin=rl0,vmax=90.,clip=False), zorder=1 )
         
     # Vertical lines connecting F-points:
     for ji in range(0,nx,nsubsamp):
