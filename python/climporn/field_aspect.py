@@ -187,6 +187,12 @@ class field_aspect:
             cpal_fld='RdBu_r' ; tmin=-0.5 ;  tmax=-tmin ;  df=0.1
             cunit = 'Divergence of sea-ice velocity [day$^{-1}$]'
 
+        elif CWHAT in [ 'zfUu'  ]:
+            cv_in = CWHAT  ; cv_out = cv_in ; color_top_cb='k'
+            #rmult = 3600.*24.
+            cpal_fld='RdBu_r' ; tmin=-0.2 ;  tmax=-tmin ;  df=0.05
+            cunit = r'$\partial ( h_t ~ \sigma_{11} ) / \partial x + \partial ( h_f ~ \sigma_{12} ) / \partial y$ [Pa]'
+
         elif CWHAT in [ 'sishea', 'sishea-t', 'sishea-f' ]:
             cv_in = CWHAT  ; cv_out = cv_in ; color_top_cb='w'
             rmult = 3600.*24.
