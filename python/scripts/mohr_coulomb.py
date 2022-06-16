@@ -53,8 +53,8 @@ xmin = -60000. ; xmax = 10000
 ymin = 0.      ; ymax = 40000
 
 
-cv_in1 = 'ice_sigI'
-cv_in2 = 'ice_sigII'
+cv_in1 = 'ice_sigI-t'
+cv_in2 = 'ice_sigII-t'
 
 jt0 = 0
 
