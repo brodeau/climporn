@@ -49,8 +49,8 @@ tmin = 0.      # Pa
 tmax = 40000.  # Pa
 df=1000. # Pa
 
-xmin = -60000. ; xmax = 10000
-ymin = 0.      ; ymax = 40000
+xmin = -30000. ; xmax = 10000
+ymin = 0.      ; ymax = 30000
 
 
 cv_in1 = 'ice_sigI-t'
