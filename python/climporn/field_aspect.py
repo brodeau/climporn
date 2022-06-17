@@ -193,6 +193,11 @@ class field_aspect:
             cpal_fld='RdBu_r' ; tmin=-0.2 ;  tmax=-tmin ;  df=0.05
             cunit = r'$\partial ( h_t ~ \sigma_{11} ) / \partial x + \partial ( h_f ~ \sigma_{12} ) / \partial y$ [Pa]'
 
+        elif CWHAT in [ 'sigI', 'sig_I', 'ice_sigI', 'ice_sig_I', 'ice_sigI-t', 'ice_sigI-f'  ]:
+            cv_in = CWHAT  ; cv_out = 'sig_I' ; color_top_cb='k'
+            cpal_fld='turbo_r' ; tmin=-50000. ;  tmax=10000. ;  df=10000.
+            cunit = r'$\sigma_{I}$ [Pa]'
+
         elif CWHAT in [ 'sishea', 'sishea-t', 'sishea-f' ]:
             cv_in = CWHAT  ; cv_out = cv_in ; color_top_cb='w'
             rmult = 3600.*24.
