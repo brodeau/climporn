@@ -209,7 +209,7 @@ fa = cp.field_aspect( CWHAT, cbox=CBOX )
 
 # SST under sea-ice field:
 if l_add_SST_to_ice_field:
-    pal_sst = cp.chose_colmap('cividis_r')
+    cpal_sst = 'YlGnBu_r'
     rmin_sst = -2. ; rmax_sst = 22. ; dsst = 2.
     pal_sst = cp.chose_colmap(cpal_sst)
     norm_sst = colors.Normalize(vmin=rmin_sst, vmax=rmax_sst , clip = False)
@@ -567,7 +567,7 @@ for jt in range(jt0,Nt):
 
         # Add SST onto a sea-ice field:
         if l_add_SST_to_ice_field:
-            psst = nmp.ma.masked_where(Xpsic > 0.1, Xpsst)
+            psst = nmp.ma.masked_where(Xpsic > 0.05, Xpsst)
             ct   = plt.imshow(psst, cmap=pal_sst, norm=norm_sst, interpolation='none')
             del psst, ct
             
