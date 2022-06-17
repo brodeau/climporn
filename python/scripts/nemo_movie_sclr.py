@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 #
+##################################################################
 #     CLIMPORN
 #
 #  Prepare 2D maps (monthly) that will later become a movie!
 #  NEMO output and observations needed
 #
 #    L. Brodeau, November 2019
+##################################################################
 
 import sys
 from os import path, getcwd, mkdir
@@ -20,9 +22,6 @@ import matplotlib.pyplot as plt
 import matplotlib.colors as colors
 import matplotlib.image as image
 import matplotlib.cbook as cbook
-
-import warnings
-warnings.filterwarnings("ignore")
 
 from calendar import isleap
 import datetime
@@ -49,11 +48,11 @@ l_mask_no_ice = False
 rof_log = 150.
 rof_dpt = 0.
 
-grav = 9.80665 # same as in NEMO 3.6
+grav = 9.80665    # acceleration of gravity, [m/s^2] (same as in NEMO 3.6)
 
 l_save_nc = False ; # save the field we built in a netcdf file !!!
 
-romega = 7.292115083046062E-005 # same as in NEMO 3.6 / #romega = 2.*nmp.pi/86400.0
+romega = 7.292115083046062E-005 # Coriolis [1/s] (same as in NEMO 3.6 / #romega = 2.*nmp.pi/86400.0)
 
 
 # Normally logos should be found there:
@@ -65,19 +64,19 @@ print("\n --- logos found into : "+dir_logos+" !\n")
 parser = ap.ArgumentParser(description='Generate pixel maps of a given scalar.')
 
 requiredNamed = parser.add_argument_group('required arguments')
-requiredNamed.add_argument('-i', '--fin' , required=True,                help='specify the NEMO netCDF file to read from...')
-requiredNamed.add_argument('-w', '--what', required=True, help='specify the field/diagnostic to plot (ex: CSPEED,CURLOF,ect.)')
-
-parser.add_argument('-C', '--conf', default="none",         help='specify NEMO config (ex: eNATL60)')
-parser.add_argument('-b', '--box' , default="ALL",          help='specify extraction box name (ex: ALL)')
-parser.add_argument('-m', '--fmm' , default="mesh_mask.nc", help='specify the NEMO mesh_mask file (ex: mesh_mask.nc)')
-parser.add_argument('-s', '--sd0' , default="20090101",     help='specify initial date as <YYYYMMDD>')
-parser.add_argument('-l', '--lev' , type=int, default=0,    help='specify the level to use if 3D field (default: 0 => 2D)')
-parser.add_argument('-z', '--zld' ,                         help='specify the topography netCDF file to use (field="z")')
-#parser.add_argument('-t', '--tstep', type=int, default=1,  help='specify the time step (hours) in input file')
-parser.add_argument('-t', '--tstep',  default="1h",         help='specify the time step ("1h","2h",..,up to "1d") in input file')
-parser.add_argument('-N', '--oname',  default="",           help='specify a name that overides `CONF` on the plot...')
-parser.add_argument('-o', '--outdir', default="./figs",     help='specify the path to directory where to save figures')
+requiredNamed.add_argument('-i', '--fin' , required=True,                help='NEMO netCDF file to read from...')
+requiredNamed.add_argument('-w', '--what', required=True, help='field/diagnostic to plot (ex: CSPEED,CURLOF,ect.)')
+#
+parser.add_argument('-C', '--conf', default="none",         help='name of NEMO config (ex: eNATL60) (defined into `nemo_hboxes.py`)')
+parser.add_argument('-b', '--box' , default="ALL",          help='extraction box name (ex: ALL) (defined into `nemo_hboxes.py`)')
+parser.add_argument('-m', '--fmm' , default="mesh_mask.nc", help='NEMO mesh_mask file (ex: mesh_mask.nc)')
+parser.add_argument('-s', '--sd0' , default="20090101",     help='initial date as <YYYYMMDD>')
+parser.add_argument('-l', '--lev' , type=int, default=0,    help='level to use if 3D field (default: 0 => 2D)')
+parser.add_argument('-z', '--zld' ,                         help='topography netCDF file to use (field="z")')
+parser.add_argument('-t', '--tstep',  default="1h",         help='time step ("1h","2h",..,up to "1d") in input file')
+parser.add_argument('-N', '--oname',  default="",           help='a name that overides `CONF` on the plot...')
+parser.add_argument('-o', '--outdir', default="./figs",     help='path to directory where to save figures')
+parser.add_argument('-T', '--addSST', default="",      help='add this SST field if showing a sea-ice field')
 
 args = parser.parse_args()
 
@@ -92,6 +91,7 @@ cf_topo_land = args.zld
 cdt    = args.tstep  ; # time step, in the form "1h", "2h", ..., "12h", ..., "1m", ..., "6m", ... "1y", ..., etc
 CONAME = args.oname
 cd_out = args.outdir
+caSST  = args.addSST
 
 print('')
 print(' *** CNEMO = ', CNEMO)
@@ -111,7 +111,14 @@ if jk > 0:
     l3d=True
 else:
     jk=0
-###############################################################################################################################################
+
+l_add_SST_to_ice_field = False
+if caSST != "":
+    l_add_SST_to_ice_field = True
+    print(' *** We shall add following SST field below ice: ', caSST)
+
+    
+##########################################################################################
 
 if not path.exists(cd_out): mkdir(cd_out)
 cdir_figs = cd_out+'/'+CWHAT
@@ -200,7 +207,14 @@ fa = cp.field_aspect( CWHAT, cbox=CBOX )
 
 
 
-# Ice:
+# SST under sea-ice field:
+if l_add_SST_to_ice_field:
+    pal_sst = cp.chose_colmap('cividis_r')
+    rmin_sst = -2. ; rmax_sst = 22. ; dsst = 2.
+    pal_sst = cp.chose_colmap(cpal_sst)
+    norm_sst = colors.Normalize(vmin=rmin_sst, vmax=rmax_sst , clip = False)
+
+# Ice over ocean field:
 if fa.l_show_ice:
     cv_ice  = 'ileadfrac'
     cf_ice = str.replace(cf_in, 'gridT-2D', 'icemod')
@@ -449,7 +463,11 @@ for jt in range(jt0,Nt):
                 Xplot  = id_f.variables[fa.cv_in][jt,jk,j1:j2,i1:i2] ; # t, y, x        
             else:
                 Xplot  = id_f.variables[fa.cv_in][jt,j1:j2,i1:i2] ; # t, y, x        
-    
+
+        if l_add_SST_to_ice_field:
+            Xpsic = id_f.variables['siconc'][jt,j1:j2,i1:i2] ; # t, y, x  => we need it to separate open ocean from sea-ice !
+            Xpsst = id_f.variables[caSST][jt,j1:j2,i1:i2] ; # t, y, x        
+                
         print('Done!\n')
 
         if fa.rmult != 1.: Xplot[:,:] = fa.rmult * Xplot[:,:]
@@ -546,15 +564,17 @@ for jt in range(jt0,Nt):
             
         cf = plt.imshow( Xplot[:,:], cmap=pal_fld, norm=norm_fld, interpolation=nemo_box.c_imshow_interp )
         #cf = plt.pcolormesh( Xplot[:,:], cmap=pal_fld, norm=norm_fld )
-    
-        # Ice
+
+        # Add SST onto a sea-ice field:
+        if l_add_SST_to_ice_field:
+            psst = nmp.ma.masked_where(Xpsic > 0.1, Xpsst)
+            ct   = plt.imshow(psst, cmap=pal_sst, norm=norm_sst, interpolation='none')
+            del psst, ct
+            
+        # Add Sea-Ice onto a open ocean field:
         if fa.l_show_ice:
-            #XM[:,:] = XMSK[:,:]
-            #cp.drown(XICE, XM, k_ew=2, nb_max_inc=10, nb_smooth=10)
-            #ci = plt.contourf(XICE[:,:], vcont_ice, cmap = pal_ice, norm = norm_ice) #
             pice = nmp.ma.masked_where(XICE < rmin_ice, XICE)
-            ci = plt.imshow(pice, cmap = pal_ice, norm = norm_ice, interpolation='none') ; del pice, ci
-            del XICE
+            ci = plt.imshow(pice, cmap=pal_ice, norm=norm_ice, interpolation='none') ; del pice, ci
     
         if fa.l_show_lsm or l_add_topo_land:
             if l_add_topo_land:
