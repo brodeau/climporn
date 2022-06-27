@@ -3,14 +3,14 @@
 # Laurent Brodeau, 2017-2019
 
 # Output framerate for the video to generate in "fps":
-#FRAMERATE_OUT="30000/1001" ; #NTSC (~29.97 fps)
-FRAMERATE_OUT="25" ; # Normal ?
+#FPS_O="30000/1001" ; #NTSC (~29.97 fps)
+FPS_O=25
 
 # Defaults:
 FIMG="png"
 HEIGHT="1080"
 CODEC="x264"
-FRAMERATE_IN=25
+FPS_I=25 ; # INPUT framerate !!!
 CRF=20
 PRESET="medium"
 FVID="mp4"
@@ -28,7 +28,7 @@ usage()
     echo "      -t: format of images (default='${FIMG}')"
     echo "      -h: height (pixels) of video to create (default='${HEIGHT}')"
     echo "      -c: codec for video (default='${CODEC})' [x264, x265, ...]"
-    echo "      -f: input framerate == images per second (default='${FRAMERATE_IN}')"
+    echo "      -f: input framerate == images per second (default='${FPS_I}')"
     echo "      -C: CRF value, 0 is lossless and 51 worse possible (default='${CRF}') [ffmpeg default=23]"
     echo "      -p: preset for encoding (default='${PRESET}') [fast, medium, slow, veryslow]"
     echo "      -v: video format (default='${FVID}') [mp4,webm,...]"
@@ -53,7 +53,7 @@ while getopts i:t:h:c:f:C:p:v:d:D:n:Ph option; do
         t) FIMG=${OPTARG};;
         h) HEIGHT=${OPTARG};;
         c) CODEC=${OPTARG};;
-        f) FRAMERATE_IN=${OPTARG};;
+        f) FPS_I=${OPTARG};;
         C) CRF=${OPTARG};;
         p) PRESET=${OPTARG};;
         v) FVID=${OPTARG};;
@@ -76,11 +76,12 @@ VFLTR="-vf scale='-2:${HEIGHT}'"
 if [ ${PIXELIZED} -eq 1 ]; then VFLTR="-vf scale='-2:${HEIGHT}:flags=neighbor'"; fi
 
 if [ ${DROPFRAMES} -gt 1 ]; then
-    if [ "${FRAMERATE_IN}" != "${FRAMERATE_OUT}" ]; then
-        echo "PROBLEM: chose either option!"
-        echo "   => if you drop frames with '-d n' then ensure that FRAMERATE_IN == FRAMERATE_OUT !"
-        exit
-    fi    
+    #if [ "${FPS_I}" != "${FPS_O}" ]; then
+    #    FPS_I=${FPS_O}
+    #    #echo "PROBLEM: chose either option!"
+    #    #echo "   => if you drop frames with '-d n' then ensure that FPS_I == FPS_O !"
+    #    #exit
+    #fi    
     if [ ${DROPFRAMES} -eq 2 ]; then
         VFLTR="${VFLTR},setpts='0.5*PTS'" ; # drop every other frame => speed of video x 2
     elif [ ${DROPFRAMES} -eq 3 ]; then
@@ -113,7 +114,7 @@ else
 fi
 
 
-fo="${DIR_OUT}/movie_${fprf}_${info}_${FRAMERATE_IN}fps_crf${CRF}.${FVID}"
+fo="${DIR_OUT}/movie_${fprf}_${info}_${FPS_I}fps_crf${CRF}.${FVID}"
 
 rm -f ${fo}
 
@@ -123,15 +124,15 @@ echo " fo = ${fo} !!!"
 
 echo
 echo "ffmpeg -f image2 -threads ${NTHRD} \
--pattern_type glob -r ${FRAMERATE_IN} -i ${FPREF}*.${FIMG} \
+-pattern_type glob -r ${FPS_I} -i ${FPREF}*.${FIMG} \
 ${VC} -preset ${PRESET} \
 -crf ${CRF} -refs 16 ${VFLTR} \
 -pix_fmt yuv420p \
--r ${FRAMERATE_OUT} ${fo}"
+-r ${FPS_O} ${fo}"
 echo
 
 
-#ffmpeg -f image2 -threads ${NTHRD} -framerate ${FRAMERATE_IN} -r ${FRAMERATE_OUT} \
+#ffmpeg -f image2 -threads ${NTHRD} -framerate ${FPS_I} -r ${FPS_O} \
 #       -pattern_type glob -i "${FPREF}*.${FIMG}" \
 #       ${VC} -preset ${PRESET} \
 #       -crf ${CRF} -refs 16 ${VFLTR} \
@@ -139,11 +140,11 @@ echo
 #       ${fo}
 
 ffmpeg -f image2 -threads ${NTHRD} \
-       -pattern_type glob -r ${FRAMERATE_IN} -i "${FPREF}*.${FIMG}" \
+       -pattern_type glob -r ${FPS_I} -i "${FPREF}*.${FIMG}" \
        ${VC} -preset ${PRESET} \
        -crf ${CRF} -refs 16 ${VFLTR} \
        -pix_fmt yuv420p \
-       -r ${FRAMERATE_OUT} ${fo}
+       -r ${FPS_O} ${fo}
 
 echo
 echo
