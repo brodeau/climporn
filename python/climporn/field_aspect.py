@@ -160,23 +160,23 @@ class field_aspect:
             cunit = r'Phase (deg.)'
 
         elif CWHAT == 'siconc':
-            cv_in = 'siconc'  ; cv_out = cv_in
+            cv_in = 'siconc'  ; cv_out = cv_in ; color_top_cb='k'
             cpal_fld='ncview_ice' ; tmin=0. ;  tmax=1. ;  df = 0.1 ; cb_jump = 1 ; cb_extend = 'neither'
             cunit = 'Sea-ice concentration'
 
         elif CWHAT == 'sivolu':
-            cv_in = 'sivolu'  ; cv_out = cv_in
+            cv_in = 'sivolu'  ; cv_out = cv_in ; color_top_cb='k'
             cpal_fld='magma' ; tmin=0. ;  tmax=4. ;  df=1 ; cb_jump = 1; cb_extend = 'max'
             cunit = 'Sea-ice volume [m]'
 
         elif CWHAT == 'sithic':
-            cv_in = 'sithic'  ; cv_out = cv_in
+            cv_in = 'sithic'  ; cv_out = cv_in ; color_top_cb='k'
             cpal_fld='magma' ; tmin=0. ;  tmax=4. ;  df=1 ; cb_jump = 1; cb_extend = 'max'
             cunit = 'Sea-ice thickness [m]'
 
         elif CWHAT in [ 'damage', 'damage-t', 'damage-f' ]:
             cv_in = CWHAT  ; cv_out = cv_in
-            cpal_fld='magma' ; color_top_cb='w'
+            cpal_fld='magma' ; color_top_cb='k'
             tmin=0. ;  tmax=1. ; l_pow_field=True ; pow_field=7. ; cb_extend = 'neither'
             vc_fld_powlog = [ 0., 0.7, 0.8, 0.9, 0.95, 1. ]
             cunit = 'Damage@T'
@@ -200,7 +200,7 @@ class field_aspect:
 
         elif CWHAT in [ 'sishea', 'sishea-t', 'sishea-f' ]:
             cv_in = CWHAT  ; cv_out = cv_in ; color_top_cb='w'
-            rmult = 3600.*24.
+            rmult = 3600.*24. ; color_top_cb='k'
             cpal_fld='inferno' ; tmin=0. ;  tmax=5.
             l_pow_field=True ; pow_field=0.25 ;  vc_fld_powlog= [tmin, 0.1, 0.5, 1., 3., tmax ]
             cunit = 'Shear of sea-ice velocity [day$^{-1}$]'

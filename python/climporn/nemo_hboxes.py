@@ -163,7 +163,7 @@ class nemo_hbox:
             l_show_cb  = True ; vcb=[0.15, 0.08, 0.7, 0.018]
             l_show_clock=True ; x_clock = 170*rfact_zoom ; y_clock = 250*rfact_zoom
             l_add_logo=False
-            l_show_name=True ; x_name = 130*rfact_zoom ; y_name = 270*rfact_zoom
+            l_show_name=True ; x_name = 118*rfact_zoom ; y_name = 265*rfact_zoom
             l_show_exp=False ; x_exp = 50*rfact_zoom ; y_exp = 80*rfact_zoom
             l_fill_holes_k=False
 
