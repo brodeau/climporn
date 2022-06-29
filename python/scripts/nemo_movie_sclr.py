@@ -609,13 +609,13 @@ for jt in range(jt0,Nt):
             clb.ax.tick_params(which = 'major', length = 4, color = fa.color_top_cb )
         
         if nemo_box.l_show_clock:
-            xl = float(x_clock)/rfz
-            yl = float(y_clock)/rfz
+            xl = float(x_clock)
+            yl = float(y_clock)
             ax.annotate('Date: '+cdats, xy=(1, 4), xytext=(xl,yl), **cfont_clock)
     
         if nemo_box.l_show_exp:
-            xl = float(x_exp)/rfz
-            yl = float(y_exp)/rfz
+            xl = float(x_exp)
+            yl = float(y_exp)
             ax.annotate('Experiment: '+CNEMO+'-'+CRUN, xy=(1, 4), xytext=(xl,yl), **cfont_exp)
     
     
@@ -624,8 +624,8 @@ for jt in range(jt0,Nt):
         if nemo_box.l_show_name:
             cbla = CNEMO
             if CONAME != "": cbla = CONAME
-            xl = float(x_name)/rfz
-            yl = float(y_name)/rfz
+            xl = float(x_name)
+            yl = float(y_name)
             ax.annotate(cbla, xy=(1, 4), xytext=(xl, yl), **cfont_titl)
     
         if nemo_box.l_add_logo:
