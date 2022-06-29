@@ -720,7 +720,7 @@ for jt in range(jt0,Nt):
     
         #ax.annotate('laurent.brodeau@ocean-next.fr', xy=(1, 4), xytext=(xl+150, 20), **cfont_mail)
     
-        if nemo_box.l_annotate_name:
+        if nemo_box.l_show_name:
             xl = rnxr/20./rfz
             yl = rnyr/1.33/rfz
             ax.annotate(CNEMO, xy=(1, 4), xytext=(xl, yl), **cfont_titl)

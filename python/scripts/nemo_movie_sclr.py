@@ -145,13 +145,10 @@ print(' '+CNEMO+': Ni0,Nj0 => ', Ni0,Nj0)
 (i1,j1, i2,j2) = nemo_box.idx()
 print(' i1,j1, i2,j2 => ', i1,j1, i2,j2,'\n')
 
+if nemo_box.l_show_name:  (x_name,y_name)   = nemo_box.name
 if nemo_box.l_show_clock: (x_clock,y_clock) = nemo_box.clock
-#print(' x_clock,y_clock =', x_clock,y_clock
-
-if nemo_box.l_show_exp: (x_exp,y_exp) = nemo_box.exp
-#print(' x_exp,y_exp =', x_exp,y_exp
-
-if nemo_box.l_add_logo: (x_logo,y_logo) = nemo_box.logo
+if nemo_box.l_show_exp:   (x_exp,y_exp)     = nemo_box.exp
+if nemo_box.l_add_logo:   (x_logo,y_logo)   = nemo_box.logo
 
 #---------------------------------------------------------------
 
@@ -624,11 +621,11 @@ for jt in range(jt0,Nt):
     
         #ax.annotate('laurent.brodeau@ocean-next.fr', xy=(1, 4), xytext=(xl+150, 20), **cfont_mail)
     
-        if nemo_box.l_annotate_name:
+        if nemo_box.l_show_name:
             cbla = CNEMO
             if CONAME != "": cbla = CONAME
-            xl = rnxr/30./rfz
-            yl = rnyr/1.14/rfz
+            xl = float(x_name)/rfz
+            yl = float(y_name)/rfz
             ax.annotate(cbla, xy=(1, 4), xytext=(xl, yl), **cfont_titl)
     
         if nemo_box.l_add_logo:

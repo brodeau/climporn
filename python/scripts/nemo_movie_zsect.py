@@ -57,7 +57,7 @@ j2=0
 l_get_name_of_run = False
 l_show_lsm = True
 l_show_cb = False
-l_annotate_name = False
+l_show_name = False
 l_show_clock = True
 l_show_exp = True
 
@@ -569,7 +569,7 @@ for jt in range(jt0,Nt):
     if l_show_exp:
         ax.annotate('Experiment: '+CNEMO+'-'+CRUN, xy=(x_exp,y_exp),xycoords='axes fraction', xytext=(x_exp,y_exp),textcoords='axes fraction', **cfont_exp)
 
-    if l_annotate_name:
+    if l_show_name:
         xl = rnxr/20./rfact_zoom
         yl = rnyr/1.33/rfact_zoom
         ax.annotate(CNEMO, xy=(1, 4), xytext=(xl, yl), **cfont_titl)

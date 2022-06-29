@@ -38,6 +38,9 @@ class nemo_hbox:
         elif config == 'NANUK4':
             Ni0 = 492
             Nj0 = 566
+        elif config == 'NANUK2':
+            Ni0 = 247
+            Nj0 = 286
         elif config == 'HUDSON4':
             Ni0 = 78
             Nj0 = 141
@@ -58,11 +61,11 @@ class nemo_hbox:
         box       = self.box
 
         rfact_zoom=1.
-        
+
+        l_show_name=False
         l_show_exp = False
         l_show_cb  = True
         l_fill_holes_k=False
-        l_annotate_name=False
         l_show_clock = True
         l_show_sign = False
         l_add_logo=True
@@ -79,9 +82,10 @@ class nemo_hbox:
         cf_logo_prc = 'PRACE_blanc.png'
 
         x_clock = 1600 ; y_clock = 200
-        x_sign = 1600 ; y_sign = 200
+        x_sign = 1600  ; y_sign = 200
         x_logo = 2200  ; y_logo  = 50
         x_exp = 40     ; y_exp = 980
+        x_name = 100   ; y_name = 100
 
 
         
@@ -130,7 +134,7 @@ class nemo_hbox:
             l_show_cb  = True ; vcb=[0.15, 0.07, 0.7, 0.018]
             l_show_clock=True ; x_clock = 50 ; y_clock = 800
             l_add_logo=False
-            #l_annotate_name=True
+            #l_show_name=True
             l_show_exp=False ; x_exp = 50 ; y_exp = 800
             l_fill_holes_k=True
 
@@ -139,17 +143,27 @@ class nemo_hbox:
             l_show_cb  = True ; vcb=[0.15, 0.07, 0.7, 0.018]
             l_show_clock=True ; x_clock = 50 ; y_clock = 800
             l_add_logo=False
-            #l_annotate_name=True
+            #l_show_name=True
             l_show_exp=False ; x_exp = 50 ; y_exp = 800
             l_fill_holes_k=True
 
+        #lolo
         elif [ config, box ] == [ 'NANUK4', 'ALL']:
-            i1=0 ; j1=0  ;  i2=Ni0 ; j2=Nj0  ; rfact_zoom=2. ; font_rat=0.4*rfact_zoom
+            i1=0 ; j1=0  ;  i2=Ni0 ; j2=Nj0  ; rfact_zoom=2. ; font_rat=0.3*rfact_zoom
             #i1=0 ; j1=0  ;  i2=Ni0 ; j2=Nj0  ; rfact_zoom=1. ; font_rat=0.4*rfact_zoom
             l_show_cb  = True ; vcb=[0.15, 0.08, 0.7, 0.018]
             l_show_clock=True ; x_clock = 320*rfact_zoom ; y_clock = 540*rfact_zoom
             l_add_logo=False
-            l_annotate_name=True
+            l_show_name=True
+            l_show_exp=False ; x_exp = 50*rfact_zoom ; y_exp = 80*rfact_zoom
+            l_fill_holes_k=False
+
+        elif [ config, box ] == [ 'NANUK2', 'ALL']:
+            i1=0 ; j1=0  ;  i2=Ni0 ; j2=Nj0  ; rfact_zoom=4. ; font_rat=0.2*rfact_zoom
+            l_show_cb  = True ; vcb=[0.15, 0.08, 0.7, 0.018]
+            l_show_clock=True ; x_clock = 170*rfact_zoom ; y_clock = 250*rfact_zoom
+            l_add_logo=False
+            l_show_name=True ; x_name = 130*rfact_zoom ; y_name = 270*rfact_zoom
             l_show_exp=False ; x_exp = 50*rfact_zoom ; y_exp = 80*rfact_zoom
             l_fill_holes_k=False
 
@@ -159,7 +173,7 @@ class nemo_hbox:
             l_show_cb  = True ; vcb=[0.15, 0.08, 0.7, 0.018]
             l_show_clock=True ; x_clock = 320*rfact_zoom ; y_clock = 540*rfact_zoom
             l_add_logo=False
-            l_annotate_name=True
+            l_show_name=True
             l_show_exp=False ; x_exp = 50*rfact_zoom ; y_exp = 80*rfact_zoom
             l_fill_holes_k=False
 
@@ -168,7 +182,7 @@ class nemo_hbox:
             l_show_cb  = True ; vcb=[0.15, 0.08, 0.7, 0.018]
             l_show_clock=True ; x_clock = 320*rfact_zoom ; y_clock = 540*rfact_zoom
             l_add_logo=False
-            l_annotate_name=True
+            l_show_name=True
             l_show_exp=False ; x_exp = 50*rfact_zoom ; y_exp = 80*rfact_zoom
             l_fill_holes_k=False
             
@@ -375,11 +389,12 @@ class nemo_hbox:
         self.rfact_zoom      = rfact_zoom
         self.vcb             = vcb
         self.font_rat        = font_rat
-        self.l_annotate_name = l_annotate_name
+        self.l_show_name     = l_show_name
+        self.name             = (x_name,y_name)
         self.l_show_clock    = l_show_clock
         self.clock           = (x_clock,y_clock)
-        self.l_show_sign    = l_show_sign
-        self.sign           = (x_sign,y_sign)
+        self.l_show_sign     = l_show_sign
+        self.sign            = (x_sign,y_sign)
         self.l_add_logo      = l_add_logo
         self.logo            = (x_logo,y_logo)
         self.l_add_logo_ige  = l_add_logo_ige
