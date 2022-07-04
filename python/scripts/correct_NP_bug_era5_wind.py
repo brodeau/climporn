@@ -25,10 +25,10 @@ from climporn import utils as cpu
 #cv_coefr  = 'socoefr'
 #cv_runoff = 'sorunoff'
 
-#cv_lon = 'longitude'
-#cv_lat = 'latitude'
-cv_lon = 'lon'
-cv_lat = 'lat'
+cv_lon = 'longitude'
+cv_lat = 'latitude'
+#cv_lon = 'lon'
+#cv_lat = 'lat'
 cv_tim = 'time'
 
 narg = len(sys.argv)

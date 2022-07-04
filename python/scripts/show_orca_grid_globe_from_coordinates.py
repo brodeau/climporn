@@ -5,7 +5,7 @@
 # L. Brodeau, 2022
 
 import sys
-#import os
+from os import path
 import numpy as nmp
 from netCDF4 import Dataset
 
@@ -46,7 +46,7 @@ if __name__ == '__main__':
     ires     = int(sys.argv[3])
 
     
-    cfig = str.replace(cf_coor,".nc","")
+    cfig = path.basename( str.replace(cf_coor,".nc","") )
     cfig = str.replace(cfig,"coordinates_","")
     
     cp.chck4f(cf_coor)
