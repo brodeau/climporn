@@ -86,8 +86,13 @@ cf_lsm = sys.argv[5]
     
 print('\n Field to show in background: "'+cv_run+'" of file "'+cf_run+'" !\n')
 
+dir_conf = path.dirname(cf_csv)
+if dir_conf == '':  dir_conf = '.'
+print('\n *** dir_conf =',dir_conf,'\n')
 
-# Testing CSV file:
+#######################################################################################
+# Testing, then reading CSV file
+#######################################################################################
 ft = open( cf_csv, newline='' )
 truc = csv.reader(ft, delimiter=',')
 
@@ -142,11 +147,11 @@ if idebug > 0:
         for jtraj in range(NbTraj):
             print(' Traj. #',jtraj+1,' ==> ID =', ITRID[jtraj,jt], ' | x =', COORX[jtraj,jt], ' | y =', COORY[jtraj,jt] )
         
-sys.exit(0)
+#######################################################################################
+#######################################################################################
 
-dir_conf = path.dirname(cf_csv)
-if dir_conf == '':  dir_conf = '.'
-print('\n *** dir_conf =',dir_conf,'\n')
+            
+
 
 i2=0
 j2=0
@@ -155,144 +160,11 @@ if CCONF == 'NATL60':
     i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 0.25 ; vcb = [0.6, 0.1, 0.39, 0.025] ; font_rat = 5.*rfact_zoom
     x_cnf = 160. ; y_cnf = 2300. ; # where to put label of conf on Figure...
     l_show_cb = False ; l_show_nm = False
-    
-elif CCONF == 'NANUK1':
-    i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 4. ; vcb = [0.5, 0.875, 0.49, 0.02] ; font_rat = 0.16*rfact_zoom
-elif CCONF == 'NANUK1h': # half proc [i/2]
-    i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 8. ; vcb = [0.04, 0.06, 0.92, 0.015] ; font_rat = 0.1*rfact_zoom
-    l_show_cb = True ; color_top = 'k'
-
-elif CCONF == 'eHUDSON4h': # half proc [i/2]
-    i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 12. ; vcb = [0.04, 0.06, 0.92, 0.015] ; font_rat = 0.1*rfact_zoom
-    l_show_cb = False ; color_top = 'k'
-
-elif CCONF == 'HUDSON12': # half proc [i/2]
-    i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 2. ; vcb = [0.04, 0.06, 0.92, 0.015] ; font_rat = 0.1*rfact_zoom
-    l_show_cb = False ; color_top = 'k'
-
-elif CCONF == 'NANUK4':
-    i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 2. ; vcb = [0.2, 0.085, 0.6, 0.02] ; font_rat = 0.1*rfact_zoom
-    l_show_cb=True
-    
-elif CCONF == 'NANUK025':
-    i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 1. ; vcb = [0.5, 0.875, 0.49, 0.02] ; font_rat = 0.5*rfact_zoom
-    x_cnf = 30. ; y_cnf = 540. ; # where to put label of conf on Figure...
-
-elif CCONF == 'ROALD12':
-    i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 2. ; vcb = [0.63, 0.95, 0.36, 0.02] ; font_rat = 1.*rfact_zoom
-    x_cnf = 50. ; y_cnf = 1250. ; # where to put label of conf on Figure...
-    
-elif CCONF in [ 'CREG025' ] :
-    i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 2.
-    vcb = [0.6, 0.975, 0.38, 0.02] ; font_rat = 0.5*rfact_zoom
-    x_cnf = 20. ; y_cnf = 560. ; # where to put label of conf on Figure...
-
-elif CCONF in [ 'CREG4' ] :
-    i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 2.
-    vcb = [0.14, 0.05, 0.8, 0.02] ; font_rat = 0.5*rfact_zoom
-    x_ttl = 210. ; y_ttl = 620. ; # where to put label of conf on Figure...
-    l_show_nm = False ; l_show_msh = True
-    l_scientific_mode = True ; l_show_ttl = True
-    color_top = 'k'
-
-elif CCONF == 'eNATL4':
-    i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 0.25 ; vcb = [0.6, 0.11, 0.39, 0.025] ; font_rat = 0.5*rfact_zoom
-    x_cnf = 20. ; y_cnf = 560. ; # where to put label of conf on Figure...
-    l_show_cb = False ; l_show_nm = False
-
-elif CCONF == 'eNATL36':
-    i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 0.3 ; vcb = [0.6, 0.1, 0.39, 0.025] ; font_rat = 2.5*rfact_zoom
-    x_cnf = 160. ; y_cnf = 4000. ; # where to put label of conf on Figure...
-    l_show_cb = True ; l_show_nm = False
-
-elif CCONF == 'eNATL60':
-    i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 0.25 ; vcb = [0.6, 0.1, 0.39, 0.025] ; font_rat = 5.*rfact_zoom
-    x_cnf = 160. ; y_cnf = 4000. ; # where to put label of conf on Figure...
-    l_show_cb = False ; l_show_nm = False
-
-elif CCONF == 'eNATL1':
-    i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 6.
-    vcb = [0.62, 0.11, 0.35, 0.025] ; font_rat = 0.12*rfact_zoom
-    x_cnf = 4. ; y_cnf = 120. ; # where to put label of conf on Figure...
-
-elif CCONF == 'SouthPac':
-    i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 1. ; vcb = [0.5, 0.875, 0.49, 0.02] ; font_rat = 0.16*rfact_zoom
-    x_cnf = 160. ; y_cnf = 4000. ; # where to put label of conf on Figure...
-    l_show_cb = False ; l_show_nm = False
-    bathy_max = 8000. # m
-    
-elif CCONF == 'SWEPAC2':
-    i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 12. ; vcb = [0.15, 0.96, 0.8, 0.02] ; font_rat = 1./rfact_zoom*10.
-    x_cnf = 160. ; y_cnf = 4000. ; # where to put label of conf on Figure...
-    l_show_cb = True ; l_show_nm = False
-    bathy_max = 6000. # m
-    
-elif CCONF == 'TROPICO2':
-    i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 10. ; vcb = [0.35, 0.94, 0.6, 0.04] ; font_rat = 8./rfact_zoom
-    x_cnf = 20. ; y_cnf = 3. ; # where to put label of conf on Figure...
-    l_show_cb = True ; l_show_nm = True ; l_scientific_mode=False
-    bathy_max = 6000. # m
-    
-elif CCONF == 'TROPICO05':
-    i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 5. ; vcb = [0.35, 0.09, 0.4, 0.03] ; font_rat = 4./rfact_zoom
-    x_cnf = 280. ; y_cnf = 135. ; # where to put label of conf on Figure...
-    l_show_cb = True ; l_show_nm = False ; l_scientific_mode=False
-    bathy_max = 6000. # m
-    
-elif CCONF == 'TROPICO12':
-    i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 1. ; vcb = [0.35, 0.08, 0.4, 0.03] ; font_rat = 1.1/rfact_zoom
-    x_cnf = 1400. ; y_cnf = 820. ; # where to put label of conf on Figure...
-    l_show_cb = True ; l_show_nm = False ; l_scientific_mode=False
-    bathy_max = 6000. # m
-
-elif CCONF == 'GEBCO':
-    i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 1. ; vcb = [0.2, 0.06, 0.6, 0.03] ; font_rat = 1.5/rfact_zoom
-    x_cnf = 900. ; y_cnf = 1350. ; # where to put label of conf on Figure...
-    l_show_cb = True ; l_show_nm = True ; l_scientific_mode=False
-    bathy_max = 5000. # m
-    
-elif CCONF == 'Azores':
-    i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 2. ; vcb = [0.15, 0.96, 0.8, 0.02] ; font_rat = 1./rfact_zoom*10.
-    x_cnf = 0. ; y_cnf = 0. ; # where to put label of conf on Figure...
-    l_show_cb = False ; l_show_nm = False
-    bathy_max = 6000. # m
-
-elif CCONF == 'GulfS':
-    i1 = 0 ; j1 = 420 ; i2 = 900 ; j2 = 980 ; rfact_zoom = 1. ; vcb = [0.15, 0.96, 0.8, 0.02] ; font_rat = 0.1
-    l_show_cb = False ; l_show_nm = False
-    pt_sz_track = 3
-
-elif CCONF == 'Faroe':
-    i1 = 0 ; j1 = 0 ; i2 = 421 ; j2 = 351 ; rfact_zoom = 1. ; vcb = [0.15, 0.96, 0.8, 0.02] ; font_rat = 0.1
-    l_show_cb = False ; l_show_nm = False
-    pt_sz_track = 3
-
-elif CCONF == 'WestMed':
-    i1 = 0 ; j1 = 0 ; i2 = 868 ; j2 = 796 ; rfact_zoom = 1. ; vcb = [0.15, 0.96, 0.8, 0.02] ; font_rat = 0.1
-    l_show_cb = False ; l_show_nm = False
-    pt_sz_track = 3
-
-elif CCONF == 'SouthWestPac_G12':
-    i1 = 0 ; j1 = 0 ; i2 = 601 ; j2 = 301 ; rfact_zoom = 1. ; vcb = [0.15, 0.96, 0.8, 0.02] ; font_rat = 0.1
-    l_show_cb = False ; l_show_nm = False
-    pt_sz_track = 3
 
 elif CCONF == 'ORCA1':
     i1 = 0 ; j1 = 0 ; i2 = 362 ; j2 = 292 ; rfact_zoom = 2. ; vcb = [0.15, 0.96, 0.8, 0.02] ; font_rat = 0.1
     l_show_cb = False ; l_show_nm = False
     pt_sz_track = 3
-
-elif CCONF == 'CALEDO10':
-    i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 1. ; vcb = [0.2, 0.06, 0.6, 0.03] ; font_rat = 1.5/rfact_zoom
-    x_cnf = 900. ; y_cnf = 1350. ; # where to put label of conf on Figure...
-    l_show_cb = False ; l_show_nm = False ; l_scientific_mode=False
-    bathy_max = 6000. # m
-    
-elif CCONF == 'CALEDO60':
-    i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 1. ; vcb = [0.2, 0.06, 0.6, 0.03] ; font_rat = 1.5/rfact_zoom
-    x_cnf = 900. ; y_cnf = 1350. ; # where to put label of conf on Figure...
-    l_show_cb = False ; l_show_nm = False ; l_scientific_mode=False
-    bathy_max = 6000. # m
     
 else:
     print('\n WARNING [nemo_imshow_2d_field.py]: "'+CCONF+'" is an unknown config!\n     ==> falling back on default setup')
@@ -318,186 +190,6 @@ if cv_run in ['sosstsst','tos','votemper']:
     cpal_fld = 'ncview_nrl'    
     cunit = r'SST ($^{\circ}$C)'
     
-elif cv_run == 'sossheig':
-    cfield = 'SSH'
-    tmin=-0.3 ;  tmax=0.3   ;  df = 0.1
-    cpal_fld = 'ncview_jaisnc'    
-    cunit = r'SSH (m)'
-
-
-elif cv_run == 'somxl010':
-    cfield == 'MLD'
-    tmin=50. ;  tmax=1500. ;  df = 50.
-    cpal_fld = 'viridis_r'
-
-elif cv_run == 'track':
-    cfield = 'TRACK'
-    cpal_fld = 'nipy_spectral'
-    cunit = r'SST ($^{\circ}$C)'
-    fig_type='svg'
-
-elif cv_run in [ 'damage', 'damage-t', 'damage-f', 'dmg', 'dmgf', 'dmgt' ]:
-    cfield = 'damage'
-    tmin=0. ;  tmax=1.   ;  df = 0.1
-    cpal_fld = 'inferno'
-    #cpal_fld = 'cividis'
-    cunit = r'damage'
-    l_pow_field = True
-    pow_field = 3.5
-
-elif cv_run in [ 'siconc' ]:
-    cfield = 'ice_frac'
-    tmin=0. ;  tmax=1.   ;  df = 0.1
-    #cpal_fld = 'viridis'
-    cpal_fld = 'bone'
-    cunit = r'sea-ice fraction'
-    l_pow_field = True
-    pow_field = 2.5
-    
-elif cv_run in [ 'zfU', 'zfV', 'ds11dx', 'ds22dy', 'ds12dx', 'ds12dy', 'zfUv', 'zfVu' ]:
-    cfield = 'divS'
-    tmin=-1. ;  tmax=1.   ;  df = 0.1
-    cpal_fld = 'RdBu_r'
-    cunit = r'[Pa]'
-
-elif cv_run in [ 'u_oceT' ]:
-    cfield = 'u_oce'
-    tmin=-0.25 ;  tmax=0.25   ;  df = 0.05
-    cpal_fld = 'RdBu_r'
-    cunit = r'[m/s]'
-elif cv_run in [ 'v_oceT' ]:
-    cfield = 'v_oce'
-    tmin=-0.25 ;  tmax=0.25   ;  df = 0.05
-    cpal_fld = 'RdBu_r'
-    cunit = r'[m/s]'
-
-elif cv_run in [ 'taux_ai' ]:
-    cfield = 'taux_ice'
-    tmin=-0.5 ;  tmax=0.5   ;  df = 0.025
-    cpal_fld = 'RdBu_r'
-    cunit = r'[Pa]'
-elif cv_run in [ 'tauy_ai' ]:
-    cfield = 'tauy_ice'
-    tmin=-0.5 ;  tmax=0.5   ;  df = 0.025
-    cpal_fld = 'RdBu_r'
-    cunit = r'[Pa]'
-    
-elif cv_run in [ 's11', 'sig1', 'sig11', 'sig1F' ]:
-    cfield = 'sig11'
-    tmin=-50000. ;  tmax=50000.   ;  df = 25000.
-    cpal_fld = 'RdBu_r'
-    cunit = r'$\sigma_{11}$ (N)'
-
-elif cv_run in [ 's22', 'sig2', 'sig22', 'sig2F' ]:
-    cfield = 'sig22'
-    tmin=-30000. ;  tmax=30000.   ;  df = 15000.
-    cpal_fld = 'RdBu_r'
-    cunit = r'$\sigma_{22}$ (N)'
-
-elif cv_run in [ 's12', 'sig12', 'sig12f', 'sig12T' ] or cv_run[0:5]=='sig12' :
-    cfield = 'sig12'
-    tmin=-30000. ;  tmax=30000.   ;  df = 15000.
-    cpal_fld = 'RdBu_r'
-    cunit = r'$\sigma_{12}$ (N)'
-
-elif cv_run in [ 'Uice', 'Ut', 'u_ice', 'uVice' ]:
-    cfield = 'Uice'
-    tmin=-0.3 ;  tmax=0.3   ;  df = 0.2
-    cpal_fld = 'RdBu_r'
-    cunit = r'$u_{ice}$ (m/s)'
-
-elif cv_run in [ 'Vice', 'Vt', 'v_ice', 'vUice' ]:
-    cfield = 'Vice'
-    tmin=-0.3 ;  tmax=0.3   ;  df = 0.2
-    cpal_fld = 'RdBu_r'
-    cunit = r'$v_{ice}$ (m/s)'
-
-elif cv_run in [ 'zsN', 'MC', 'sigI', 'sigII' ]:
-    cfield = 'sigma'
-    tmin=-30000. ;  tmax=30000.   ;  df = 15000.
-    cpal_fld = 'RdBu_r'
-    cunit = r'$\sigma_N$ (N)'
-
-elif cv_run == 'zsS':
-    cfield = 'sigS'
-    tmin=-30000. ;  tmax=30000.   ;  df = 15000.
-    cpal_fld = 'RdBu_r'
-    cunit = r'$\sigma_S$ (N)'
-elif cv_run == 'zsS2':
-    cfield = 'sigS'
-    tmin=-0.5E9 ;  tmax=-tmin   ;  df = 1.E8
-    cpal_fld = 'RdBu_r'
-    cunit = r'$\sigma_S$ (N)'
-
-elif cv_run in ['e11','e22','e12','div','ten','shr']:
-    cfield = 'eps'
-    tmin=-1.e-5 ;  tmax=-tmin   ;  df = 5.E-6
-    cpal_fld = 'RdBu_r'
-    cunit = r'$\epsilon$ (m/s^2)'
-
-elif cv_run in ['shear2']:
-    cfield = 'shear2'
-    tmin=-1.e-10 ;  tmax=-tmin   ;  df = 5.E-9
-    cpal_fld = 'RdBu_r'
-    cunit = r'$\tau$^2'
-
-elif cv_run in ['elasticity','elasticity-t','elasticity-f']:
-    cfield = 'E'
-    tmin=1.E8 ;  tmax=6.E8   ;  df = 1.E8
-    cpal_fld = 'viridis'
-    cunit = r'Elasticity'
-
-elif cv_run in ['lambda-t','lambda-f']:
-    cfield = 'lambda'
-    tmin=1.E6 ;  tmax=1.E7   ;  df = 2.E6
-    cpal_fld = 'viridis'
-    cunit = r'$\lambda$'
-
-elif cv_run in ['Pmax-t','Pmax-f']:
-    cfield = 'Pmax'
-    tmin=0. ;  tmax=1.E5   ;  df = 2.E4
-    cpal_fld = 'ncview_tofino'
-    cunit = r'$P_{max}$'
-
-elif cv_run in ['Ptilde-t','Ptilde-f']:
-    cfield = 'Ptilde'
-    tmin=0. ;  tmax=1.   ;  df = 0.1
-    cpal_fld = 'ncview_tofino'
-    cunit = r'$\tilde{P}$'
-
-elif cv_run in ['mult-t','mult-f']:
-    cfield = 'mult'
-    tmin=0. ;  tmax=1.   ;  df = 0.1
-    cpal_fld = 'ncview_tofino'
-    cunit = r'multiplicator'
-
-elif cv_run in ['dmg-inc-t','dmg-inc-f']:
-    cfield = 'd_inc'
-    tmin=-1.e-3 ;  tmax=-tmin   ;  df = 2.e-4
-    cpal_fld = 'ncview_tofino'
-    cunit = r'multiplicator'
-
-elif cv_run in ['dcrit-t','dcrit-f']:
-    cfield = 'dcrit'
-    tmin=-5 ;  tmax=5.   ;  df = 1.
-    #cpal_fld = 'ncview_tofino'
-    cpal_fld = 'RdBu_r'
-    cunit = r'$d_{crit}$'
-
-elif cv_run in ['Tdc-t','Tdc-f']:
-    cfield = 'Tdc'
-    tmin=0. ;  tmax=300.   ;  df = 50.
-    cpal_fld = 'ncview_tofino'
-    cunit = r'$Td_{c}$'
-
-elif cv_run in ['mult-dmg-t','mult-dmg-f']:
-    cfield = 'mult-dmg'
-    tmin=0. ;  tmax=0.2   ;  df = 0.05
-    cpal_fld = 'ncview_tofino'
-    cunit = r'$MultDmg$'
-
-
-    
 else:
     print('ERROR: variable '+cv_run+' is not known yet...'); sys.exit(0)
 
@@ -519,6 +211,13 @@ else:
     Nt = 0
 id_fld.close()
 
+
+print('\n\n *** So, we have '+str(Nrec_traj)+' records for trajectories in CSV file')
+print('   => and '+str(Nt)+' records of field '+cv_run+' in NEMO file '+cf_run+' !')
+#lilo
+
+
+sys.exit(0)
 
 ibath=1
 
