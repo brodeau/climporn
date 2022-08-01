@@ -1,7 +1,14 @@
 #!/usr/bin/env python3
 # -*- Mode: Python; coding: utf-8; indent-tabs-mode: nil; tab-width: 4 -*-
-
+#
+##################################################################
+#     CLIMPORN
+#
+#  bla bla bla
+#
 #    L. Brodeau, 2018
+##################################################################
+
 
 from sys import exit
 from os import path, mkdir

@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
-
-#       B a r a K u d a
+# -*- Mode: Python; coding: utf-8; indent-tabs-mode: nil; tab-width: 4 -*-
 #
-#  Prepare 2D maps (monthly) that will later become a GIF animation!
-#  NEMO output and observations needed
+##################################################################
+#     CLIMPORN
+#
+#  Plot a NEMO field directly on the NEMO grid (no projection)
+#  => 1 image pixel per grid point 
 #
 #    L. Brodeau, May 2018
+##################################################################
 
 import sys
 from os import path
