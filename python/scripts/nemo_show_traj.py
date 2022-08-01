@@ -27,6 +27,14 @@ import matplotlib.colors as colors
 
 import climporn as cp
 
+idebug = 1
+followIDs = [ 1, 2, 3 ] ;# fixme # Trajectories to follow:
+
+
+
+
+
+
 bathy_max = 5000. # m
 
 color_top = 'w'
@@ -84,46 +92,56 @@ ft = open( cf_csv, newline='' )
 truc = csv.reader(ft, delimiter=',')
 
 jl=0
-jrec=0
-for row in truc:
+jt=0
+for line in truc:
     jl = jl + 1
-    itraj = int(row[0])      ; # ID of trajectory as an integer
-    ctraj = '%4.4i'%(itraj)  ; #       "      as a 4-char long string
-    if itraj == 1:
-        jrec = jrec + 1
-        print('\n record #',jrec,':')
+    iID = int(line[0])      ; # ID of trajectory as an integer
+    ctraj = '%4.4i'%(iID)  ; #       "      as a 4-char long string
+    if iID == 1:
+        jt = jt + 1
+        if idebug > 1: print('\n record #',jt,':')
         # This is a new time record as we are dealing with first trajectory (again)
     
-    print( 'Line:', jl, ' => traj #',itraj, ' ROW => ', row )
-    #print( row[0] , '\n')
-Nrec_traj = jrec
-
-# Trajectories to follow:
-follow = [ 1, 2, 3 ] ;# fixme
-NbTraj = len(follow)
-
-ITRID = nmp.zeros( NbTraj, Nrec_traj, dtype=int ) ; #trajectory ID (integer)
-COORX = nmp.zeros( NbTraj, Nrec_traj )
-COORY = nmp.zeros( NbTraj, Nrec_traj )
+    if idebug > 1: print( 'Line:', jl, ' => traj #',iID, ' LINE => ', line )
+    #print( line[0] , '\n')
+Nrec_traj = jt
+ft.close()
 
 
-jl=0
-jrec=0
-for row in truc:
-    jl = jl + 1
-    itraj = int(row[0])      ; # ID of trajectory as an integer
-    if itraj == 1:
-        jrec = jrec + 1
+NbTraj = len(followIDs)
+
+print('\n Number of trajectories to follow:', NbTraj)
+print('   => with IDs:', followIDs )
+print('   => along ',Nrec_traj,' integration time steps!')
+
+ITRID = nmp.zeros( (NbTraj, Nrec_traj), dtype=int ) ; #trajectory ID (integer)
+COORX = nmp.zeros( (NbTraj, Nrec_traj) )
+COORY = nmp.zeros( (NbTraj, Nrec_traj) )
+
+ft = open( cf_csv, newline='' )
+truc = csv.reader(ft, delimiter=',')
+print('\n')
+jt=0
+for line in truc:    
+    iID = int(line[0])      ; # ID of trajectory as an integer
+    if iID == 1:
         # This is a new time record as we are dealing with first trajectory (again)
-        jtraj=0
-        
-    if itraj in follow:
-        ITRID[jtraj,jrec-1] = itraj
-        COORX[jtraj,jrec-1] = float(row[1])
-        COORY[jtraj,jrec-1] = float(row[2])
-
+        jt = jt + 1
+        jtraj=0        
+    if iID in followIDs:
+        ITRID[jtraj,jt-1] = iID
+        COORX[jtraj,jt-1] = float(line[1])
+        COORY[jtraj,jt-1] = float(line[2])
         jtraj = jtraj+1   # itteration of 1 trajectory for this particular record
-
+ft.close()
+        
+# Debug, checking trajectories:
+if idebug > 0:
+    for jt in range(Nrec_traj):
+        print('\n *** Record #',jt,':')
+        for jtraj in range(NbTraj):
+            print(' Traj. #',jtraj+1,' ==> ID =', ITRID[jtraj,jt], ' | x =', COORX[jtraj,jt], ' | y =', COORY[jtraj,jt] )
+        
 sys.exit(0)
 
 dir_conf = path.dirname(cf_csv)
