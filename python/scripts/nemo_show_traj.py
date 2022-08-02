@@ -177,8 +177,8 @@ print('   => with IDs:', followIDs )
 print('   => along ',Nrec_traj,' integration time steps!')
 
 ITRID = nmp.zeros( (NbTraj, Nrec_traj), dtype=int ) ; #trajectory ID (integer)
-COORX = nmp.zeros( (NbTraj, Nrec_traj) )
-COORY = nmp.zeros( (NbTraj, Nrec_traj) )
+COORX = nmp.zeros( (NbTraj, Nrec_traj) )            ; # coordinates in terms of `ji` as float
+COORY = nmp.zeros( (NbTraj, Nrec_traj) )            ; # coordinates in terms of `jj` as float
 FLDO1 = nmp.zeros( (NbTraj, Nrec_traj) ) ; # first field at position column #8 (7 in C)
 
 ft = open( cf_trj, newline='' )
@@ -193,8 +193,8 @@ for line in truc:
         jtraj=0        
     if iID in followIDs:
         ITRID[jtraj,jt-1] = iID
-        COORX[jtraj,jt-1] = float(line[1])
-        COORY[jtraj,jt-1] = float(line[2])
+        COORX[jtraj,jt-1] = float(line[1]) #- 1. ; # Fortran to C !!! ???
+        COORY[jtraj,jt-1] = float(line[2]) #- 1. ; # Fortran to C !!! ???
         FLDO1[jtraj,jt-1] = float(line[7])
         jtraj = jtraj+1   # itteration of 1 trajectory for this particular record
 ft.close()
@@ -429,7 +429,7 @@ for jtt in range(Nt_traj-1):
     #ct = plt.scatter([Ni/2,Ni/3], [Nj/2,Nj/3], cmap=pal_fld, norm=norm_fld, alpha=0.5, marker='.', s=pt_sz_track )
 
     ##ct = plt.scatter(COORX[:,jtt], COORY[:,jtt], color='r', marker='.', s=pt_sz_track )
-    ct = plt.scatter(COORX[:,jtt], COORY[:,jtt], c=FLDO1[:,jtt], cmap=pal_fld, norm=norm_fld, marker='.', s=pt_sz_track )
+    ct = plt.scatter(COORX[:,jtt], COORY[:,jtt], c=FLDO1[:,jtt], cmap=pal_fld, norm=norm_fld, alpha=0.5, marker='.', s=pt_sz_track )
     #ct = plt.scatter(COORX[:,jtt], COORY[:,jtt], c=FLDO1[:,jtt], cmap=pal_fld, norm=norm_fld, marker=',', s=pt_sz_track )  ; # 1 pixel!!!
 
 
