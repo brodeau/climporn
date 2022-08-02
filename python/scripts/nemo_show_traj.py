@@ -130,6 +130,13 @@ elif cv_mod in ['sosaline','sos']:
     tmin=32. ;  tmax=36.   ;  df = 1.
     cpal_fld = 'viridis'    
     cunit = r'SSS (PSU)'
+
+elif cv_mod in ['siconc']:
+    cfield = 'siconc'
+    tmin=0. ;  tmax=1.   ;  df = 1. ; # Arctic!
+    cpal_fld = 'viridis'    
+    cunit = 'Ice concentration'
+
     
 else:
     print('ERROR: variable '+cv_mod+' is not known yet...'); sys.exit(0)
