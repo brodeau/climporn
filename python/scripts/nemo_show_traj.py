@@ -29,14 +29,10 @@ import climporn as cp
 
 idebug = 1
 #followIDs = [ 1, 2, 3 ] ;# fixme # Trajectories to follow:
-followIDs = [ 1, 2, 3, 4, 5, 6, 7 ] ;# fixme # Trajectories to follow:
+#followIDs = [ 1, 2, 3, 4, 5, 6, 7 ] ;# fixme # Trajectories to follow:
+#
 
 l_show_mod_field = False
-
-
-
-
-bathy_max = 5000. # m
 
 color_top = 'w'
 clr_yellow = '#ffed00'
@@ -60,20 +56,21 @@ pt_sz_track = 30
 fig_type='png'
 
 narg = len(sys.argv)
-if not narg in [6]:
-    print('Usage: '+sys.argv[0]+' <CONF> <file_run_csv> <file_run,var> <name_fig> <LSM_file>')
+if not narg in [7]:
+    print('Usage: '+sys.argv[0]+' <CONF> <file_trj.csv> <file_mod,var> <name_fig> <LSM_file> <N>')
     sys.exit(0)
-#
-# `file_run` => just to plot a field
     
 CCONF  = sys.argv[1]
-cf_csv = sys.argv[2]
+cf_trj = sys.argv[2]
 vv = split(',',sys.argv[3])
-cf_run = vv[0]
-cv_run = vv[1]
+cf_mod = vv[0]
+cv_mod = vv[1]
 cnfig  = sys.argv[4]
 #
 cf_lsm = sys.argv[5]
+#
+N2follow = int(sys.argv[6]) ; # we will follow the `N2follow` first trajectories
+followIDs = nmp.arange(1,N2follow) ; #
 
 #cpnt = 't'
 #if narg == 8 :
@@ -83,18 +80,70 @@ cf_lsm = sys.argv[5]
 #    print('ERROR: what to do with C-grid "'+cpnt+'" point!?')
 #    sys.exit(0)
 
-
-    
-print('\n Field to show in background: "'+cv_run+'" of file "'+cf_run+'" !\n')
-
-dir_conf = path.dirname(cf_csv)
+dir_conf = path.dirname(cf_trj)
 if dir_conf == '':  dir_conf = '.'
 print('\n *** dir_conf =',dir_conf,'\n')
+
+if l_show_mod_field: print('\n Field to show in background: "'+cv_mod+'" of file "'+cf_mod+'" !\n')
+
+
+i2=0
+j2=0
+
+if   CCONF == 'ORCA1':
+    i1 = 0 ; j1 = 0 ; i2 = 362 ; j2 = 292 ; rfact_zoom = 3. ; vcb = [0.15, 0.96, 0.8, 0.02] ; font_rat = 0.1
+    l_show_cb = False ; l_show_nm = False
+    pt_sz_track = 1
+    
+if   CCONF == 'NANUK2':
+    i1 = 0 ; j1 = 0 ; i2 = 247 ; j2 = 286 ; rfact_zoom = 3. ; vcb = [0.5, 0.875, 0.49, 0.02] ; font_rat = 0.1
+    l_show_cb = False ; l_show_nm = False
+    pt_sz_track = 3
+    
+else:
+    print('\n WARNING [nemo_imshow_2d_field.py]: "'+CCONF+'" is an unknown config!\n     ==> falling back on default setup')
+    lknown = False
+    i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0
+
+
+
+laplacian = False
+l_log_field = False
+l_pow_field = False
+cextend='both'
+l_hide_cb_ticks = False
+tmin=0. ; tmax=1. ; df=0.01
+cb_jump = 1
+
+
+print(' cv_mod = '+cv_mod)
+
+if   cv_mod in ['sosstsst','tos']:
+    cfield = 'SST'
+    tmin=-2. ;  tmax=10.   ;  df = 1. ; # Arctic!
+    #tmin=14. ;  tmax=26.   ;  df = 1.    
+    cpal_fld = 'inferno'    
+    cunit = r'SST ($^{\circ}$C)'
+
+elif cv_mod in ['sosaline','sos']:
+    cfield = 'SSS'
+    tmin=32. ;  tmax=36.   ;  df = 1.
+    cpal_fld = 'viridis'    
+    cunit = r'SSS (PSU)'
+    
+else:
+    print('ERROR: variable '+cv_mod+' is not known yet...'); sys.exit(0)
+
+
+
+
+
 
 #######################################################################################
 # Testing, then reading CSV file
 #######################################################################################
-ft = open( cf_csv, newline='' )
+
+ft = open( cf_trj, newline='' )
 truc = csv.reader(ft, delimiter=',')
 
 jl=0
@@ -125,7 +174,7 @@ COORX = nmp.zeros( (NbTraj, Nrec_traj) )
 COORY = nmp.zeros( (NbTraj, Nrec_traj) )
 FLDO1 = nmp.zeros( (NbTraj, Nrec_traj) ) ; # first field at position column #8 (7 in C)
 
-ft = open( cf_csv, newline='' )
+ft = open( cf_trj, newline='' )
 truc = csv.reader(ft, delimiter=',')
 print('\n')
 jt=0
@@ -156,69 +205,32 @@ if idebug > 0:
 Nt_traj = Nrec_traj + 1 ; #lilo            
 
 
-i2=0
-j2=0
 
-if CCONF == 'ORCA1':
-    i1 = 0 ; j1 = 0 ; i2 = 362 ; j2 = 292 ; rfact_zoom = 3. ; vcb = [0.15, 0.96, 0.8, 0.02] ; font_rat = 0.1
-    l_show_cb = False ; l_show_nm = False
-    pt_sz_track = 1
+
     
-else:
-    print('\n WARNING [nemo_imshow_2d_field.py]: "'+CCONF+'" is an unknown config!\n     ==> falling back on default setup')
-    lknown = False
-    i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0
 
 
-
-laplacian = False
-l_log_field = False
-l_pow_field = False
-cextend='both'
-l_hide_cb_ticks = False
-tmin=0. ; tmax=1. ; df=0.01
-cb_jump = 1
-
-
-print(' cv_run = '+cv_run)
-
-if   cv_run in ['sosstsst','tos']:
-    cfield = 'SST'
-    #tmin=-2. ;  tmax=32.   ;  df = 1.
-    tmin=14. ;  tmax=26.   ;  df = 1.
-    cpal_fld = 'ncview_nrl'    
-    cunit = r'SST ($^{\circ}$C)'
-
-elif cv_run in ['sosaline','sos']:
-    cfield = 'SSS'
-    tmin=32. ;  tmax=36.   ;  df = 1.
-    cpal_fld = 'viridis'    
-    cunit = r'SSS (PSU)'
     
-else:
-    print('ERROR: variable '+cv_run+' is not known yet...'); sys.exit(0)
-
-
 
 
 # Time record stuff...
-cp.chck4f(cf_run)
-id_fld = Dataset(cf_run)
+cp.chck4f(cf_mod)
+id_fld = Dataset(cf_mod)
 list_var = id_fld.variables.keys()
 if 'time_counter' in list_var:    
     vtime = id_fld.variables['time_counter'][:]
     Nt_mod = len(vtime)
-    print('\n There is a "time_counter" in file '+cf_run+' !')
+    print('\n There is a "time_counter" in file '+cf_mod+' !')
     print('   => '+str(Nt_mod)+' snapshots!')
 else:
-    print('\nWARNING: there is NO "time_counter" in file '+cf_run+' !')
+    print('\nWARNING: there is NO "time_counter" in file '+cf_mod+' !')
     print('   ==> setting Nt_mod = 0 !\n')
     Nt_mod = 0
 id_fld.close()
 
 
 print('\n\n *** So, we have '+str(Nt_traj)+' records for trajectories in CSV file')
-print('   => and '+str(Nt_mod)+' records of field '+cv_run+' in NEMO file '+cf_run+' !')
+print('   => and '+str(Nt_mod)+' records of field '+cv_mod+' in NEMO file '+cf_mod+' !')
 #lilo
 
 if not Nt_traj%Nt_mod == 0:
@@ -259,7 +271,7 @@ if not lknown:
     rfact_zoom = round(1000./float(ny_res),1)
 nxr = int(rfact_zoom*nx_res) ; # widt image (in pixels)
 nyr = int(rfact_zoom*ny_res) ; # height image (in pixels)
-rDPI = 400
+rDPI = 200
 rh  = float(nxr)/float(rDPI) ; # width of figure as for figure...
 
 print('\n *** width and height of image to create:', nxr, nyr, '\n')
@@ -307,23 +319,21 @@ vc_fld = nmp.arange(tmin, tmax + df, df)
 
 
 
-print('\n *** Opening file '+cf_run)
-id_fld = Dataset(cf_run)
+print('\n *** Opening file '+cf_mod)
+id_fld = Dataset(cf_mod)
 
 
 # Loop over time records:
 
-jtm = 0 ; # time record to use for model
+jtm = -1 ; # time record to use for model
 l_read_mod = True
-for jtt in range(Nt_traj):
-
+for jtt in range(Nt_traj-1):
     
     if jtt%nsubC == 0:
         jtm = jtm+1
         l_read_mod = True
     else:
         l_read_mod = False
-        
 
     print( ' ### jtt, jtm = ',jtt, jtm )
         
@@ -339,8 +349,8 @@ for jtt in range(Nt_traj):
 
 
     if l_show_mod_field and l_read_mod:
-        print('    => Reading record #'+str(jtm)+' of '+cv_run+' in '+cf_run)
-        XFLD  = id_fld.variables[cv_run][jtm-1,j1:j2,i1:i2] ; # t, y, x
+        print('    => Reading record #'+str(jtm)+' of '+cv_mod+' in '+cf_mod)
+        XFLD  = id_fld.variables[cv_mod][jtm-1,j1:j2,i1:i2] ; # t, y, x
         print('          Done!\n')
 
         if jtm == 0:
@@ -371,7 +381,7 @@ for jtt in range(Nt_traj):
     #        print('  => done filling "pfilled" !\n')
     
         
-    #if cv_run == 'track':
+    #if cv_mod == 'track':
     #    
     #    XFLD[nmp.where(nmp.isnan(XFLD))] = -1000
     #    indx = nmp.where( XFLD > 0 )
@@ -405,8 +415,9 @@ for jtt in range(Nt_traj):
     ##ct = plt.scatter([Ni/2,Ni/3], [Nj/2,Nj/3], c=XFLD[indx], cmap=pal_fld, norm=norm_fld, alpha=0.5, marker='.', s=pt_sz_track )
     #ct = plt.scatter([Ni/2,Ni/3], [Nj/2,Nj/3], cmap=pal_fld, norm=norm_fld, alpha=0.5, marker='.', s=pt_sz_track )
 
-    #ct = plt.scatter(COORX[:,jtt], COORY[:,jtt], color='r', marker='.', s=pt_sz_track )
+    ##ct = plt.scatter(COORX[:,jtt], COORY[:,jtt], color='r', marker='.', s=pt_sz_track )
     ct = plt.scatter(COORX[:,jtt], COORY[:,jtt], c=FLDO1[:,jtt], cmap=pal_fld, norm=norm_fld, marker='.', s=pt_sz_track )
+    #ct = plt.scatter(COORX[:,jtt], COORY[:,jtt], c=FLDO1[:,jtt], cmap=pal_fld, norm=norm_fld, marker=',', s=pt_sz_track )  ; # 1 pixel!!!
 
 
 
