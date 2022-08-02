@@ -28,9 +28,10 @@ import matplotlib.colors as colors
 import climporn as cp
 
 idebug = 1
-followIDs = [ 1, 2, 3 ] ;# fixme # Trajectories to follow:
+#followIDs = [ 1, 2, 3 ] ;# fixme # Trajectories to follow:
+followIDs = [ 1, 2, 3, 4, 5, 6, 7 ] ;# fixme # Trajectories to follow:
 
-
+l_show_mod_field = False
 
 
 
@@ -122,6 +123,7 @@ print('   => along ',Nrec_traj,' integration time steps!')
 ITRID = nmp.zeros( (NbTraj, Nrec_traj), dtype=int ) ; #trajectory ID (integer)
 COORX = nmp.zeros( (NbTraj, Nrec_traj) )
 COORY = nmp.zeros( (NbTraj, Nrec_traj) )
+FLDO1 = nmp.zeros( (NbTraj, Nrec_traj) ) ; # first field at position column #8 (7 in C)
 
 ft = open( cf_csv, newline='' )
 truc = csv.reader(ft, delimiter=',')
@@ -137,6 +139,7 @@ for line in truc:
         ITRID[jtraj,jt-1] = iID
         COORX[jtraj,jt-1] = float(line[1])
         COORY[jtraj,jt-1] = float(line[2])
+        FLDO1[jtraj,jt-1] = float(line[7])
         jtraj = jtraj+1   # itteration of 1 trajectory for this particular record
 ft.close()
         
@@ -150,21 +153,16 @@ if idebug > 0:
 #######################################################################################
 #######################################################################################
 
-            
+Nt_traj = Nrec_traj + 1 ; #lilo            
 
 
 i2=0
 j2=0
 
-if CCONF == 'NATL60':
-    i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 0.25 ; vcb = [0.6, 0.1, 0.39, 0.025] ; font_rat = 5.*rfact_zoom
-    x_cnf = 160. ; y_cnf = 2300. ; # where to put label of conf on Figure...
+if CCONF == 'ORCA1':
+    i1 = 0 ; j1 = 0 ; i2 = 362 ; j2 = 292 ; rfact_zoom = 3. ; vcb = [0.15, 0.96, 0.8, 0.02] ; font_rat = 0.1
     l_show_cb = False ; l_show_nm = False
-
-elif CCONF == 'ORCA1':
-    i1 = 0 ; j1 = 0 ; i2 = 362 ; j2 = 292 ; rfact_zoom = 2. ; vcb = [0.15, 0.96, 0.8, 0.02] ; font_rat = 0.1
-    l_show_cb = False ; l_show_nm = False
-    pt_sz_track = 3
+    pt_sz_track = 1
     
 else:
     print('\n WARNING [nemo_imshow_2d_field.py]: "'+CCONF+'" is an unknown config!\n     ==> falling back on default setup')
@@ -184,11 +182,18 @@ cb_jump = 1
 
 print(' cv_run = '+cv_run)
 
-if cv_run in ['sosstsst','tos','votemper']:
+if   cv_run in ['sosstsst','tos']:
     cfield = 'SST'
-    tmin=-2. ;  tmax=32.   ;  df = 1.
+    #tmin=-2. ;  tmax=32.   ;  df = 1.
+    tmin=14. ;  tmax=26.   ;  df = 1.
     cpal_fld = 'ncview_nrl'    
     cunit = r'SST ($^{\circ}$C)'
+
+elif cv_run in ['sosaline','sos']:
+    cfield = 'SSS'
+    tmin=32. ;  tmax=36.   ;  df = 1.
+    cpal_fld = 'viridis'    
+    cunit = r'SSS (PSU)'
     
 else:
     print('ERROR: variable '+cv_run+' is not known yet...'); sys.exit(0)
@@ -202,22 +207,25 @@ id_fld = Dataset(cf_run)
 list_var = id_fld.variables.keys()
 if 'time_counter' in list_var:    
     vtime = id_fld.variables['time_counter'][:]
-    Nt = len(vtime)
+    Nt_mod = len(vtime)
     print('\n There is a "time_counter" in file '+cf_run+' !')
-    print('   => '+str(Nt)+' snapshots!')
+    print('   => '+str(Nt_mod)+' snapshots!')
 else:
     print('\nWARNING: there is NO "time_counter" in file '+cf_run+' !')
-    print('   ==> setting Nt = 0 !\n')
-    Nt = 0
+    print('   ==> setting Nt_mod = 0 !\n')
+    Nt_mod = 0
 id_fld.close()
 
 
-print('\n\n *** So, we have '+str(Nrec_traj)+' records for trajectories in CSV file')
-print('   => and '+str(Nt)+' records of field '+cv_run+' in NEMO file '+cf_run+' !')
+print('\n\n *** So, we have '+str(Nt_traj)+' records for trajectories in CSV file')
+print('   => and '+str(Nt_mod)+' records of field '+cv_run+' in NEMO file '+cf_run+' !')
 #lilo
 
+if not Nt_traj%Nt_mod == 0:
+    print('==> ERROR: they are not a multiple of each other!'); sys.exit(0)
+nsubC = Nt_traj//Nt_mod
 
-sys.exit(0)
+print('    ==> number of subcycles for trajectories =', nsubC)
 
 ibath=1
 
@@ -305,9 +313,21 @@ id_fld = Dataset(cf_run)
 
 # Loop over time records:
 
-for jt in range(Nt):
+jtm = 0 ; # time record to use for model
+l_read_mod = True
+for jtt in range(Nt_traj):
 
-    ct   = '%4.4i'%(jt+1)
+    
+    if jtt%nsubC == 0:
+        jtm = jtm+1
+        l_read_mod = True
+    else:
+        l_read_mod = False
+        
+
+    print( ' ### jtt, jtm = ',jtt, jtm )
+        
+    ct   = '%4.4i'%(jtt+1)
     cfig = cnfig+'_'+ct+'.'+fig_type
 
     fig = plt.figure(num = 1, figsize=fsize, dpi=rDPI, facecolor='k', edgecolor='k')
@@ -315,83 +335,81 @@ for jt in range(Nt):
     if l_scientific_mode:
         ax  = plt.axes([0.09, 0.09, 0.9, 0.9], facecolor = 'r')
     else:
-        ax  = plt.axes([0., 0., 1., 1.],     facecolor = '0.4')
+        ax  = plt.axes([0., 0., 1., 1.],     facecolor = '0.9')
 
 
+    if l_show_mod_field and l_read_mod:
+        print('    => Reading record #'+str(jtm)+' of '+cv_run+' in '+cf_run)
+        XFLD  = id_fld.variables[cv_run][jtm-1,j1:j2,i1:i2] ; # t, y, x
+        print('          Done!\n')
 
-    print('    => Reading record #'+str(jt)+' of '+cv_run+' in '+cf_run)
-    XFLD  = id_fld.variables[cv_run][jt-1,j1:j2,i1:i2] ; # t, y, x
-    print('          Done!\n')
-
-
-    if XMSK[:,:].shape != XFLD.shape:
-        print('\n PROBLEM: field and mask do not agree in shape!')
-        print(XMSK.shape , XFLD.shape)
-        sys.exit(0)
-    print('  *** Shape of field and mask => ', nmp.shape(XFLD))
+        if jtm == 0:
+            if XMSK[:,:].shape != XFLD.shape:
+                print('\n PROBLEM: field and mask do not agree in shape!')
+                print(XMSK.shape , XFLD.shape)
+                sys.exit(0)
+            print('  *** Shape of field and mask => ', nmp.shape(XFLD))
     
     
     
     l_add_true_filled = False
     
-    if cfield == 'Bathymetry':
-        (idy_nan,idx_nan) = nmp.where( nmp.isnan(XFLD) )
-        #
-        # LSM with different masking for true lsm and filled lsm...
-        cf_mask_lbc = dir_conf+'/lsm_LBC_'+CCONF+'.nc'
-        if path.exists(cf_mask_lbc):
-            print('\n *** '+cf_mask_lbc+' found !!!')
-            l_add_true_filled = True 
-            id_filled = Dataset(cf_mask_lbc)
-            xtmp = id_filled.variables['lsm'][j1:j2,i1:i2]
-            id_filled.close()
-            pfilled = nmp.ma.masked_where(xtmp[:,:] != -1., xtmp[:,:]*0.+40.)
-            del xtmp
-    
-            print('  => done filling "pfilled" !\n')
+    #if cfield == 'Bathymetry':
+    #    (idy_nan,idx_nan) = nmp.where( nmp.isnan(XFLD) )
+    #    #
+    #    # LSM with different masking for true lsm and filled lsm...
+    #    cf_mask_lbc = dir_conf+'/lsm_LBC_'+CCONF+'.nc'
+    #    if path.exists(cf_mask_lbc):
+    #        print('\n *** '+cf_mask_lbc+' found !!!')
+    #        l_add_true_filled = True 
+    #        id_filled = Dataset(cf_mask_lbc)
+    #        xtmp = id_filled.variables['lsm'][j1:j2,i1:i2]
+    #        id_filled.close()
+    #        pfilled = nmp.ma.masked_where(xtmp[:,:] != -1., xtmp[:,:]*0.+40.)
+    #        del xtmp
+    #
+    #        print('  => done filling "pfilled" !\n')
     
         
-    if cv_run == 'track':
-        
-        XFLD[nmp.where(nmp.isnan(XFLD))] = -1000
-        indx = nmp.where( XFLD > 0 )
-        (idy,idx) = indx
-        
-        tmin=nmp.amin(XFLD[indx]) ;  tmax=nmp.amax(XFLD[indx])
-        norm_fld = colors.Normalize(vmin = tmin, vmax = tmax, clip = False)
+    #if cv_run == 'track':
+    #    
+    #    XFLD[nmp.where(nmp.isnan(XFLD))] = -1000
+    #    indx = nmp.where( XFLD > 0 )
+    #    (idy,idx) = indx
+    #    
+    #    tmin=nmp.amin(XFLD[indx]) ;  tmax=nmp.amax(XFLD[indx])
+    #    norm_fld = colors.Normalize(vmin = tmin, vmax = tmax, clip = False)
+    # 
+    #    cf = plt.scatter(idx, idy, c=XFLD[indx], cmap=pal_fld, norm=norm_fld, alpha=0.5, marker='.', s=pt_sz_track )
+    #
+    #else:
     
-        cf = plt.scatter(idx, idy, c=XFLD[indx], cmap=pal_fld, norm=norm_fld, alpha=0.5, marker='.', s=pt_sz_track )
-    
-    
-    else:
-        #cf = plt.imshow(XFLD[:,:], cmap=pal_fld, norm=norm_fld, interpolation='none')
+    #cf = plt.imshow(XFLD[:,:], cmap=pal_fld, norm=norm_fld, interpolation='none')
+    if l_show_mod_field:
         cf = plt.pcolormesh(XFLD[:,:], cmap=pal_fld, norm=norm_fld )
-        if cfield == 'Bathymetry':
-            #lulu aspect='auto'111 , interpolation='nearest'
-            if len(idy_nan) > 0:
-                idd = nmp.where(idy_nan==1); idy_nan[idd] = int(10./rfact_zoom)/2  # just so the boundary line is not too thin on plot...
-                plt.scatter(idx_nan, idy_nan, color=clr_yellow, marker='s', s=int(10./rfact_zoom))
-    
-                
+            
     if l_show_msh:
         ccx = plt.contour(Xlon[:,:], 60, colors='k', linewidths=0.5)
         ccy = plt.contour(Xlat[:,:], 30, colors='k', linewidths=0.5)
                 
-    del XFLD
-    
     
     #cm = plt.imshow(pmsk, cmap=pal_lsm, norm=norm_lsm, interpolation='none')
     cm = plt.pcolormesh( pmsk, cmap=pal_lsm, norm=norm_lsm )
     
-    if cfield == 'Bathymetry' and l_add_true_filled:
-        # Ocean that has been filled turns black:
-        cfl = plt.imshow(pfilled, cmap=pal_filled, norm=norm_filled, interpolation='none' ) #, interpolation='none')
-    
-
     if l_add_true_filled: del pfilled
     
     
     plt.axis([ 0, Ni, 0, Nj])
+
+    # Showing trajectories:
+    ##ct = plt.scatter([Ni/2,Ni/3], [Nj/2,Nj/3], c=XFLD[indx], cmap=pal_fld, norm=norm_fld, alpha=0.5, marker='.', s=pt_sz_track )
+    #ct = plt.scatter([Ni/2,Ni/3], [Nj/2,Nj/3], cmap=pal_fld, norm=norm_fld, alpha=0.5, marker='.', s=pt_sz_track )
+
+    #ct = plt.scatter(COORX[:,jtt], COORY[:,jtt], color='r', marker='.', s=pt_sz_track )
+    ct = plt.scatter(COORX[:,jtt], COORY[:,jtt], c=FLDO1[:,jtt], cmap=pal_fld, norm=norm_fld, marker='.', s=pt_sz_track )
+
+
+
     
     if l_scientific_mode:
         plt.xlabel('i-points', **cfont_axis)
