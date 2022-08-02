@@ -27,7 +27,7 @@ import matplotlib.colors as colors
 
 import climporn as cp
 
-idebug = 1
+idebug = 0
 #followIDs = [ 1, 2, 3 ] ;# fixme # Trajectories to follow:
 #followIDs = [ 1, 2, 3, 4, 5, 6, 7 ] ;# fixme # Trajectories to follow:
 #
@@ -120,7 +120,7 @@ print(' cv_mod = '+cv_mod)
 
 if   cv_mod in ['sosstsst','tos']:
     cfield = 'SST'
-    tmin=-2. ;  tmax=10.   ;  df = 1. ; # Arctic!
+    tmin=-3. ;  tmax=2.   ;  df = 0.1 ; # Arctic!
     #tmin=14. ;  tmax=26.   ;  df = 1.    
     cpal_fld = 'inferno'    
     cunit = r'SST ($^{\circ}$C)'
@@ -221,27 +221,33 @@ Nt_traj = Nrec_traj + 1 ; #lilo
 
 
 # Time record stuff...
-cp.chck4f(cf_mod)
-id_fld = Dataset(cf_mod)
-list_var = id_fld.variables.keys()
-if 'time_counter' in list_var:    
-    vtime = id_fld.variables['time_counter'][:]
-    Nt_mod = len(vtime)
-    print('\n There is a "time_counter" in file '+cf_mod+' !')
-    print('   => '+str(Nt_mod)+' snapshots!')
-else:
-    print('\nWARNING: there is NO "time_counter" in file '+cf_mod+' !')
-    print('   ==> setting Nt_mod = 0 !\n')
-    Nt_mod = 0
-id_fld.close()
+if l_show_mod_field:
+    cp.chck4f(cf_mod)
+    id_fld = Dataset(cf_mod)
+    list_var = id_fld.variables.keys()
+    if 'time_counter' in list_var:    
+        vtime = id_fld.variables['time_counter'][:]
+        Nt_mod = len(vtime)
+        print('\n There is a "time_counter" in file '+cf_mod+' !')
+        print('   => '+str(Nt_mod)+' snapshots!')
+    else:
+        print('\nWARNING: there is NO "time_counter" in file '+cf_mod+' !')
+        print('   ==> setting Nt_mod = 0 !\n')
+        Nt_mod = 0
+    id_fld.close()
 
 
 print('\n\n *** So, we have '+str(Nt_traj)+' records for trajectories in CSV file')
-print('   => and '+str(Nt_mod)+' records of field '+cv_mod+' in NEMO file '+cf_mod+' !')
-#lilo
 
-if not Nt_traj%Nt_mod == 0:
-    print('==> ERROR: they are not a multiple of each other!'); sys.exit(0)
+if l_show_mod_field:
+    print('   => and '+str(Nt_mod)+' records of field '+cv_mod+' in NEMO file '+cf_mod+' !')
+
+    if not Nt_traj%Nt_mod == 0:
+        print('==> ERROR: they are not a multiple of each other!'); sys.exit(0)
+else:
+    Nt_mod = Nt_traj
+
+
 nsubC = Nt_traj//Nt_mod
 
 print('    ==> number of subcycles for trajectories =', nsubC)
