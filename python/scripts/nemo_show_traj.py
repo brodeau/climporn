@@ -113,6 +113,8 @@ cb_jump = 1
 
 if l_show_mod_field: print('\n *** Model field to show in bacground: = '+cv_mod)
 
+bgclr = 'w'   ; # background color for ocean in figure
+
 if   cv_mod in ['sosstsst','tos']:
     cfield = 'SST'
     tmin=-3. ;  tmax=2.   ;  df = 0.1 ; # Arctic!
@@ -131,6 +133,7 @@ elif cv_mod in ['siconc']:
     tmin=0. ;  tmax=1.   ;  df = 1. ; # Arctic!
     cpal_fld = 'viridis'
     cunit = 'Ice concentration'
+    bgclr = 'k'   ; # background color for ocean in figure
 
     
 else:
@@ -368,7 +371,7 @@ for jtt in range(NrTraj):
     if l_scientific_mode:
         ax  = plt.axes([0.09, 0.09, 0.9, 0.9], facecolor = 'r')
     else:
-        ax  = plt.axes([0., 0., 1., 1.],     facecolor = '0.9')
+        ax  = plt.axes([0., 0., 1., 1.],     facecolor = bgclr)
 
 
     if l_show_mod_field and l_read_mod:
