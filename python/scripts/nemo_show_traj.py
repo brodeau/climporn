@@ -28,9 +28,6 @@ import matplotlib.colors as colors
 import climporn as cp
 
 idebug = 0
-#followIDs = [ 1, 2, 3 ] ;# fixme # Trajectories to follow:
-#followIDs = [ 1, 2, 3, 4, 5, 6, 7 ] ;# fixme # Trajectories to follow:
-#
 
 l_show_mod_field = False
 
@@ -56,8 +53,8 @@ pt_sz_track = 30
 fig_type='png'
 
 narg = len(sys.argv)
-if not narg in [7]:
-    print('Usage: '+sys.argv[0]+' <CONF> <file_trj.csv> <file_mod,var> <name_fig> <LSM_file> <N>')
+if not narg in [6]:
+    print('Usage: '+sys.argv[0]+' <CONF> <file_trj.csv> <file_mod,var> <name_fig> <LSM_file>')
     sys.exit(0)
     
 CCONF  = sys.argv[1]
@@ -69,8 +66,8 @@ cnfig  = sys.argv[4]
 #
 cf_lsm = sys.argv[5]
 #
-N2follow = int(sys.argv[6]) ; # we will follow the `N2follow` first trajectories
-followIDs = nmp.arange(1,N2follow) ; #
+#N2follow = int(sys.argv[6]) ; # we will follow the `N2follow` first trajectories
+#followIDs = nmp.arange(1,N2follow) ; #
 
 #cpnt = 't'
 #if narg == 8 :
@@ -107,7 +104,6 @@ else:
 
 
 
-laplacian = False
 l_log_field = False
 l_pow_field = False
 cextend='both'
@@ -115,8 +111,7 @@ l_hide_cb_ticks = False
 tmin=0. ; tmax=1. ; df=0.01
 cb_jump = 1
 
-
-print(' cv_mod = '+cv_mod)
+if l_show_mod_field: print('\n *** Model field to show in bacground: = '+cv_mod)
 
 if   cv_mod in ['sosstsst','tos']:
     cfield = 'SST'
@@ -134,7 +129,8 @@ elif cv_mod in ['sosaline','sos']:
 elif cv_mod in ['siconc']:
     cfield = 'siconc'
     tmin=0. ;  tmax=1.   ;  df = 1. ; # Arctic!
-    cpal_fld = 'viridis'    
+    #cpal_fld = 'viridis'
+    cpal_fld = 'inferno_r'    
     cunit = 'Ice concentration'
 
     
@@ -150,58 +146,79 @@ else:
 # Testing, then reading CSV file
 #######################################################################################
 
-ft = open( cf_trj, newline='' )
-truc = csv.reader(ft, delimiter=',')
+# A/ Scan the begining of the file to see how many trajectories have been initiated (before possible "killing" occurs...)
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+with open(cf_trj, 'r') as ftxt:
+    NbTrajInit = -1
+    for line in csv.reader(ftxt, delimiter=','):
+        iID = int(line[0])    # ID of current trajectory as an integer
+        if iID < NbTrajInit: break # Then we are starting a new time record
+        NbTrajInit = iID
+print('\n *** Number of initiated trajectories: = ',NbTrajInit)
 
-jl=0
-jt=0
-for line in truc:
-    jl = jl + 1
-    iID = int(line[0])      ; # ID of trajectory as an integer
-    ctraj = '%4.4i'%(iID)  ; #       "      as a 4-char long string
-    if iID == 1:
-        jt = jt + 1
-        if idebug > 1: print('\n record #',jt,':')
-        # This is a new time record as we are dealing with first trajectory (again)
-    
-    if idebug > 1: print( 'Line:', jl, ' => traj #',iID, ' LINE => ', line )
-    #print( line[0] , '\n')
-Nrec_traj = jt
-ft.close()
+# B/ Scan the end of the file to identify the `NbTrajEnd` trajectories (by their IDs) that made it to the end
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+LastStandIDs = []
+with open(cf_trj, 'r') as ftxt:
+    iID_o = 999999999
+    for line in reversed(list(csv.reader(ftxt, delimiter=','))):
+        #print(line)
+        iID = int(line[0])    # ID of current trajectory as an integer        
+        if iID > iID_o: break # Then we are starting a new time record
+        LastStandIDs.append(iID)
+        iID_o = iID
+NbTrajEnd = len(LastStandIDs)
+print('\n *** Number of remaining trajectories at the end: = ',NbTrajEnd)
+LastStandIDs = nmp.flipud(LastStandIDs) ; # back to increasing order + numpy array
+print('     ==> LastStandIDs = ', LastStandIDs[:], len(LastStandIDs) )
 
+# C/ Scan the entire file to see how many time records are present
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+with open(cf_trj, 'r') as ftxt:
+    iID_o = 999999999999
+    NrTraj=0 ; # time record for the trajectories
+    for line in csv.reader(ftxt, delimiter=','):
+        iID = int(line[0])     ; # ID of current trajectory as an integer
+        if iID < iID_o: NrTraj = NrTraj + 1 ; # This is the start of a new time record
+        iID_o = iID
+print('\n *** Number of time records for the trajectories: = ', NrTraj)
 
-NbTraj = len(followIDs)
+ftxt.close()
+
+# About the trajectories to follow / work with:
+followIDs = LastStandIDs  ; # For now that the ones we are going to follow
+NbTraj    = len(followIDs)
 
 print('\n Number of trajectories to follow:', NbTraj)
 print('   => with IDs:', followIDs )
-print('   => along ',Nrec_traj,' integration time steps!')
+print('   => along ',NrTraj,' integration time steps!')
 
-ITRID = nmp.zeros( (NbTraj, Nrec_traj), dtype=int ) ; #trajectory ID (integer)
-COORX = nmp.zeros( (NbTraj, Nrec_traj) )            ; # coordinates in terms of `ji` as float
-COORY = nmp.zeros( (NbTraj, Nrec_traj) )            ; # coordinates in terms of `jj` as float
-FLDO1 = nmp.zeros( (NbTraj, Nrec_traj) ) ; # first field at position column #8 (7 in C)
 
-ft = open( cf_trj, newline='' )
-truc = csv.reader(ft, delimiter=',')
-print('\n')
-jt=0
-for line in truc:    
-    iID = int(line[0])      ; # ID of trajectory as an integer
-    if iID == 1:
-        # This is a new time record as we are dealing with first trajectory (again)
-        jt = jt + 1
-        jtraj=0        
-    if iID in followIDs:
-        ITRID[jtraj,jt-1] = iID
-        COORX[jtraj,jt-1] = float(line[1]) #- 1. ; # Fortran to C !!! ???
-        COORY[jtraj,jt-1] = float(line[2]) #- 1. ; # Fortran to C !!! ???
-        FLDO1[jtraj,jt-1] = float(line[7])
-        jtraj = jtraj+1   # itteration of 1 trajectory for this particular record
-ft.close()
+ITRID = nmp.zeros( (NbTraj, NrTraj), dtype=int ) ; #trajectory ID (integer)
+COORX = nmp.zeros( (NbTraj, NrTraj) )            ; # coordinates in terms of `ji` as float
+COORY = nmp.zeros( (NbTraj, NrTraj) )            ; # coordinates in terms of `jj` as float
+FLDO1 = nmp.zeros( (NbTraj, NrTraj) ) ; # first field at position column #8 (7 in C)
+
+
+with open(cf_trj, 'r') as ftxt:
+    jt=0
+    for line in csv.reader(ftxt, delimiter=','):    
+        iID = int(line[0])      ; # ID of trajectory as an integer
+        if iID == followIDs[0]:
+            # This is a new time record as we are dealing with first trajectory (again)
+            jt = jt + 1
+            jtraj=0        
+        if iID in followIDs:
+            ITRID[jtraj,jt-1] = iID
+            COORX[jtraj,jt-1] = float(line[1]) #- 1. ; # Fortran to C !!! ???
+            COORY[jtraj,jt-1] = float(line[2]) #- 1. ; # Fortran to C !!! ???
+            FLDO1[jtraj,jt-1] = float(line[7])
+            jtraj = jtraj+1   # itteration of 1 trajectory for this particular record
+ftxt.close()
         
 # Debug, checking trajectories:
 if idebug > 0:
-    for jt in range(Nrec_traj):
+    for jt in range(NrTraj):
         print('\n *** Record #',jt,':')
         for jtraj in range(NbTraj):
             print(' Traj. #',jtraj+1,' ==> ID =', ITRID[jtraj,jt], ' | x =', COORX[jtraj,jt], ' | y =', COORY[jtraj,jt] )
@@ -209,12 +226,7 @@ if idebug > 0:
 #######################################################################################
 #######################################################################################
 
-Nt_traj = Nrec_traj + 1 ; #lilo            
 
-
-
-
-    
 
 
     
@@ -237,20 +249,19 @@ if l_show_mod_field:
     id_fld.close()
 
 
-print('\n\n *** So, we have '+str(Nt_traj)+' records for trajectories in CSV file')
+print('\n\n *** Trajectories contain '+str(NrTraj)+' records each in CSV file')
 
 if l_show_mod_field:
     print('   => and '+str(Nt_mod)+' records of field '+cv_mod+' in NEMO file '+cf_mod+' !')
-
-    if not Nt_traj%Nt_mod == 0:
+    if not NrTraj%Nt_mod == 0:
         print('==> ERROR: they are not a multiple of each other!'); sys.exit(0)
+    nsubC = NrTraj//Nt_mod
+    print('    ==> number of subcycles for trajectories w.r.t model data =>', nsubC)
+    
 else:
-    Nt_mod = Nt_traj
+    Nt_mod = NrTraj
+    nsubC  = 1
 
-
-nsubC = Nt_traj//Nt_mod
-
-print('    ==> number of subcycles for trajectories =', nsubC)
 
 ibath=1
 
@@ -340,7 +351,7 @@ id_fld = Dataset(cf_mod)
 
 jtm = -1 ; # time record to use for model
 l_read_mod = True
-for jtt in range(Nt_traj-1):
+for jtt in range(NrTraj):
     
     if jtt%nsubC == 0:
         jtm = jtm+1
