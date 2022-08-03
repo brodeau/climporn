@@ -129,8 +129,7 @@ elif cv_mod in ['sosaline','sos']:
 elif cv_mod in ['siconc']:
     cfield = 'siconc'
     tmin=0. ;  tmax=1.   ;  df = 1. ; # Arctic!
-    #cpal_fld = 'viridis'
-    cpal_fld = 'inferno_r'    
+    cpal_fld = 'viridis'
     cunit = 'Ice concentration'
 
     
