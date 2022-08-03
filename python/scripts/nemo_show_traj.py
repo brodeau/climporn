@@ -234,10 +234,10 @@ if idebug > 0:
 # Time record stuff...
 if l_show_mod_field:
     cp.chck4f(cf_mod)
-    id_fld = Dataset(cf_mod)
-    list_var = id_fld.variables.keys()
+    id_f_mod = Dataset(cf_mod)
+    list_var = id_f_mod.variables.keys()
     if 'time_counter' in list_var:    
-        vtime = id_fld.variables['time_counter'][:]
+        vtime = id_f_mod.variables['time_counter'][:]
         Nt_mod = len(vtime)
         print('\n There is a "time_counter" in file '+cf_mod+' !')
         print('   => '+str(Nt_mod)+' snapshots!')
@@ -245,7 +245,7 @@ if l_show_mod_field:
         print('\nWARNING: there is NO "time_counter" in file '+cf_mod+' !')
         print('   ==> setting Nt_mod = 0 !\n')
         Nt_mod = 0
-    id_fld.close()
+    id_f_mod.close()
 
 
 print('\n\n *** Trajectories contain '+str(NrTraj)+' records each in CSV file')
@@ -341,9 +341,9 @@ vc_fld = nmp.arange(tmin, tmax + df, df)
 
 
 
-
-print('\n *** Opening file '+cf_mod)
-id_fld = Dataset(cf_mod)
+if l_show_mod_field:
+    print('\n *** Opening file '+cf_mod)
+    id_f_mod = Dataset(cf_mod)
 
 
 # Loop over time records:
@@ -373,7 +373,7 @@ for jtt in range(NrTraj):
 
     if l_show_mod_field and l_read_mod:
         print('    => Reading record #'+str(jtm)+' of '+cv_mod+' in '+cf_mod)
-        XFLD  = id_fld.variables[cv_mod][jtm-1,j1:j2,i1:i2] ; # t, y, x
+        XFLD  = id_f_mod.variables[cv_mod][jtm-1,j1:j2,i1:i2] ; # t, y, x
         print('          Done!\n')
 
         if jtm == 0:
@@ -492,4 +492,4 @@ for jtt in range(NrTraj):
     del cm, fig, ax
 # END OF LOOP !!!
 
-id_fld.close()
+if l_show_mod_field: id_f_mod.close()
