@@ -131,7 +131,8 @@ elif cv_mod in ['sosaline','sos']:
 elif cv_mod in ['siconc']:
     cfield = 'siconc'
     tmin=0. ;  tmax=1.   ;  df = 1. ; # Arctic!
-    cpal_fld = 'viridis'
+    #cpal_fld = 'viridis'
+    cpal_fld = 'ncview_ice'
     cunit = 'Ice concentration'
     bgclr = 'k'   ; # background color for ocean in figure
 
@@ -197,9 +198,9 @@ print('   => along ',NrTraj,' integration time steps!')
 
 
 ITRID = nmp.zeros( (NbTraj, NrTraj), dtype=int ) ; #trajectory ID (integer)
-COORX = nmp.zeros( (NbTraj, NrTraj) )            ; # coordinates in terms of `ji` as float
-COORY = nmp.zeros( (NbTraj, NrTraj) )            ; # coordinates in terms of `jj` as float
-FLDO1 = nmp.zeros( (NbTraj, NrTraj) ) ; # first field at position column #8 (7 in C)
+COORX = nmp.zeros( (NbTraj, NrTraj), dtype=nmp.float32 )            ; # coordinates in terms of `ji` as float
+COORY = nmp.zeros( (NbTraj, NrTraj), dtype=nmp.float32 )            ; # coordinates in terms of `jj` as float
+FLDO1 = nmp.zeros( (NbTraj, NrTraj), dtype=nmp.float32 ) ; # first field at position column #8 (7 in C)
 
 
 with open(cf_trj, 'r') as ftxt:
@@ -442,7 +443,7 @@ for jtt in range(NrTraj):
     #ct = plt.scatter([Ni/2,Ni/3], [Nj/2,Nj/3], cmap=pal_fld, norm=norm_fld, alpha=0.5, marker='.', s=pt_sz_track )
 
     ##ct = plt.scatter(COORX[:,jtt], COORY[:,jtt], color='r', marker='.', s=pt_sz_track )
-    ct = plt.scatter(COORX[:,jtt], COORY[:,jtt], c=FLDO1[:,jtt], cmap=pal_fld, norm=norm_fld, alpha=0.5, marker='.', s=pt_sz_track )
+    ct = plt.scatter(COORX[:,jtt], COORY[:,jtt], c=FLDO1[:,jtt], cmap=pal_fld, norm=norm_fld, marker='.', s=pt_sz_track )
     #ct = plt.scatter(COORX[:,jtt], COORY[:,jtt], c=FLDO1[:,jtt], cmap=pal_fld, norm=norm_fld, marker=',', s=pt_sz_track )  ; # 1 pixel!!!
 
 
