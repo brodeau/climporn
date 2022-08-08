@@ -53,8 +53,8 @@ pt_sz_track = 30
 fig_type='png'
 
 narg = len(sys.argv)
-if not narg in [6]:
-    print('Usage: '+sys.argv[0]+' <CONF> <file_trj.csv> <file_mod,var> <name_fig> <LSM_file>')
+if not narg in [6,7]:
+    print('Usage: '+sys.argv[0]+' <CONF> <file_trj.csv> <file_mod,var> <name_fig> <LSM_file> (iTsubsampl)')
     sys.exit(0)
     
 CCONF  = sys.argv[1]
@@ -66,16 +66,11 @@ cnfig  = sys.argv[4]
 #
 cf_lsm = sys.argv[5]
 #
-#N2follow = int(sys.argv[6]) ; # we will follow the `N2follow` first trajectories
-#followIDs = nmp.arange(1,N2follow) ; #
+# Subsampling in time...
+itsubs = 1
+if narg == 7 :
+    itsubs = int(sys.argv[6])
 
-#cpnt = 't'
-#if narg == 8 :
-#    cpnt = sys.argv[7]
-
-#if not cpnt in ['t','f','u','v']:
-#    print('ERROR: what to do with C-grid "'+cpnt+'" point!?')
-#    sys.exit(0)
 
 dir_conf = path.dirname(cf_trj)
 if dir_conf == '':  dir_conf = '.'
@@ -365,135 +360,138 @@ for jtt in range(NrTraj):
     print( ' ### jtt, jtm = ',jtt, jtm )
         
     ct   = '%4.4i'%(jtt+1)
-    cfig = cnfig+'_'+ct+'.'+fig_type
 
-    fig = plt.figure(num = 1, figsize=fsize, dpi=rDPI, facecolor='k', edgecolor='k')
-
-    if l_scientific_mode:
-        ax  = plt.axes([0.09, 0.09, 0.9, 0.9], facecolor = 'r')
-    else:
-        ax  = plt.axes([0., 0., 1., 1.],     facecolor = bgclr)
-
-
-    if l_show_mod_field and l_read_mod:
-        print('    => Reading record #'+str(jtm)+' of '+cv_mod+' in '+cf_mod)
-        XFLD  = id_f_mod.variables[cv_mod][jtm-1,j1:j2,i1:i2] ; # t, y, x
-        print('          Done!\n')
-
-        if jtm == 0:
-            if XMSK[:,:].shape != XFLD.shape:
-                print('\n PROBLEM: field and mask do not agree in shape!')
-                print(XMSK.shape , XFLD.shape)
-                sys.exit(0)
-            print('  *** Shape of field and mask => ', nmp.shape(XFLD))
+    if jtt%itsubs == 0:
     
+        cfig = cnfig+'_'+ct+'.'+fig_type
     
+        fig = plt.figure(num = 1, figsize=fsize, dpi=rDPI, facecolor='k', edgecolor='k')
     
-    l_add_true_filled = False
-    
-    #if cfield == 'Bathymetry':
-    #    (idy_nan,idx_nan) = nmp.where( nmp.isnan(XFLD) )
-    #    #
-    #    # LSM with different masking for true lsm and filled lsm...
-    #    cf_mask_lbc = dir_conf+'/lsm_LBC_'+CCONF+'.nc'
-    #    if path.exists(cf_mask_lbc):
-    #        print('\n *** '+cf_mask_lbc+' found !!!')
-    #        l_add_true_filled = True 
-    #        id_filled = Dataset(cf_mask_lbc)
-    #        xtmp = id_filled.variables['lsm'][j1:j2,i1:i2]
-    #        id_filled.close()
-    #        pfilled = nmp.ma.masked_where(xtmp[:,:] != -1., xtmp[:,:]*0.+40.)
-    #        del xtmp
-    #
-    #        print('  => done filling "pfilled" !\n')
-    
-        
-    #if cv_mod == 'track':
-    #    
-    #    XFLD[nmp.where(nmp.isnan(XFLD))] = -1000
-    #    indx = nmp.where( XFLD > 0 )
-    #    (idy,idx) = indx
-    #    
-    #    tmin=nmp.amin(XFLD[indx]) ;  tmax=nmp.amax(XFLD[indx])
-    #    norm_fld = colors.Normalize(vmin = tmin, vmax = tmax, clip = False)
-    # 
-    #    cf = plt.scatter(idx, idy, c=XFLD[indx], cmap=pal_fld, norm=norm_fld, alpha=0.5, marker='.', s=pt_sz_track )
-    #
-    #else:
-    
-    #cf = plt.imshow(XFLD[:,:], cmap=pal_fld, norm=norm_fld, interpolation='none')
-    if l_show_mod_field:
-        cf = plt.pcolormesh(XFLD[:,:], cmap=pal_fld, norm=norm_fld )
-            
-    if l_show_msh:
-        ccx = plt.contour(Xlon[:,:], 60, colors='k', linewidths=0.5)
-        ccy = plt.contour(Xlat[:,:], 30, colors='k', linewidths=0.5)
-                
-    
-    #cm = plt.imshow(pmsk, cmap=pal_lsm, norm=norm_lsm, interpolation='none')
-    cm = plt.pcolormesh( pmsk, cmap=pal_lsm, norm=norm_lsm )
-    
-    if l_add_true_filled: del pfilled
-    
-    
-    plt.axis([ 0, Ni, 0, Nj])
-
-    # Showing trajectories:
-    ##ct = plt.scatter([Ni/2,Ni/3], [Nj/2,Nj/3], c=XFLD[indx], cmap=pal_fld, norm=norm_fld, alpha=0.5, marker='.', s=pt_sz_track )
-    #ct = plt.scatter([Ni/2,Ni/3], [Nj/2,Nj/3], cmap=pal_fld, norm=norm_fld, alpha=0.5, marker='.', s=pt_sz_track )
-
-    ##ct = plt.scatter(COORX[:,jtt], COORY[:,jtt], color='r', marker='.', s=pt_sz_track )
-    ct = plt.scatter(COORX[:,jtt], COORY[:,jtt], c=FLDO1[:,jtt], cmap=pal_fld, norm=norm_fld, marker='.', s=pt_sz_track )
-    #ct = plt.scatter(COORX[:,jtt], COORY[:,jtt], c=FLDO1[:,jtt], cmap=pal_fld, norm=norm_fld, marker=',', s=pt_sz_track )  ; # 1 pixel!!!
-
-
-
-    
-    if l_scientific_mode:
-        plt.xlabel('i-points', **cfont_axis)
-        plt.ylabel('j-points', **cfont_axis)
-    
-    if l_show_cb:
-    
-        ax2 = plt.axes(vcb)
-    
-        if l_pow_field or l_log_field:
-            clb = mpl.colorbar.ColorbarBase(ax=ax2,               cmap=pal_fld, norm=norm_fld, orientation='horizontal', extend='neither')
+        if l_scientific_mode:
+            ax  = plt.axes([0.09, 0.09, 0.9, 0.9], facecolor = 'r')
         else:
-            clb = mpl.colorbar.ColorbarBase(ax=ax2, ticks=vc_fld, cmap=pal_fld, norm=norm_fld, orientation='horizontal', extend=cextend)
+            ax  = plt.axes([0., 0., 1., 1.],     facecolor = bgclr)
     
-        if cb_jump > 1:
-            cb_labs = [] ; cpt = 0
-            for rr in vc_fld:
-                if cpt % cb_jump == 0:
-                    if df >= 1.: cb_labs.append(str(int(rr)))
-                    if df <  1.: cb_labs.append(str(rr))
-                else:
-                    cb_labs.append(' ')
-                cpt = cpt + 1
-            clb.ax.set_xticklabels(cb_labs)    
-        clb.set_label(cunit, **cfont_clb)
-        clb.ax.yaxis.set_tick_params(color=color_top) ; # set colorbar tick color    
-        #clb.outline.set_edgecolor(color_top) ; # set colorbar edgecolor
-        if l_hide_cb_ticks: clb.ax.tick_params(axis=u'both', which=u'both',length=0) ; # remove ticks!
-        plt.setp(plt.getp(clb.ax.axes, 'xticklabels'), color=color_top) ; # set colorbar ticklabels
-            
-        del cf
+    
+        if l_show_mod_field and l_read_mod:
+            print('    => Reading record #'+str(jtm)+' of '+cv_mod+' in '+cf_mod)
+            XFLD  = id_f_mod.variables[cv_mod][jtm-1,j1:j2,i1:i2] ; # t, y, x
+            print('          Done!\n')
+    
+            if jtm == 0:
+                if XMSK[:,:].shape != XFLD.shape:
+                    print('\n PROBLEM: field and mask do not agree in shape!')
+                    print(XMSK.shape , XFLD.shape)
+                    sys.exit(0)
+                print('  *** Shape of field and mask => ', nmp.shape(XFLD))
         
-    if l_show_nm:  ax.annotate(CCONF, xy=(1, 4), xytext=(x_cnf, y_cnf), **cfont_cnfn)
+        
+        
+        l_add_true_filled = False
+        
+        #if cfield == 'Bathymetry':
+        #    (idy_nan,idx_nan) = nmp.where( nmp.isnan(XFLD) )
+        #    #
+        #    # LSM with different masking for true lsm and filled lsm...
+        #    cf_mask_lbc = dir_conf+'/lsm_LBC_'+CCONF+'.nc'
+        #    if path.exists(cf_mask_lbc):
+        #        print('\n *** '+cf_mask_lbc+' found !!!')
+        #        l_add_true_filled = True 
+        #        id_filled = Dataset(cf_mask_lbc)
+        #        xtmp = id_filled.variables['lsm'][j1:j2,i1:i2]
+        #        id_filled.close()
+        #        pfilled = nmp.ma.masked_where(xtmp[:,:] != -1., xtmp[:,:]*0.+40.)
+        #        del xtmp
+        #
+        #        print('  => done filling "pfilled" !\n')
+        
+            
+        #if cv_mod == 'track':
+        #    
+        #    XFLD[nmp.where(nmp.isnan(XFLD))] = -1000
+        #    indx = nmp.where( XFLD > 0 )
+        #    (idy,idx) = indx
+        #    
+        #    tmin=nmp.amin(XFLD[indx]) ;  tmax=nmp.amax(XFLD[indx])
+        #    norm_fld = colors.Normalize(vmin = tmin, vmax = tmax, clip = False)
+        # 
+        #    cf = plt.scatter(idx, idy, c=XFLD[indx], cmap=pal_fld, norm=norm_fld, alpha=0.5, marker='.', s=pt_sz_track )
+        #
+        #else:
+        
+        #cf = plt.imshow(XFLD[:,:], cmap=pal_fld, norm=norm_fld, interpolation='none')
+        if l_show_mod_field:
+            cf = plt.pcolormesh(XFLD[:,:], cmap=pal_fld, norm=norm_fld )
+                
+        if l_show_msh:
+            ccx = plt.contour(Xlon[:,:], 60, colors='k', linewidths=0.5)
+            ccy = plt.contour(Xlat[:,:], 30, colors='k', linewidths=0.5)
+                    
+        
+        #cm = plt.imshow(pmsk, cmap=pal_lsm, norm=norm_lsm, interpolation='none')
+        cm = plt.pcolormesh( pmsk, cmap=pal_lsm, norm=norm_lsm )
+        
+        if l_add_true_filled: del pfilled
+        
+        
+        plt.axis([ 0, Ni, 0, Nj])
     
-    if l_show_ttl: ax.annotate(CCONF, xy=(1, 4), xytext=(x_ttl, y_ttl), **cfont_ttl)
+        # Showing trajectories:
+        ##ct = plt.scatter([Ni/2,Ni/3], [Nj/2,Nj/3], c=XFLD[indx], cmap=pal_fld, norm=norm_fld, alpha=0.5, marker='.', s=pt_sz_track )
+        #ct = plt.scatter([Ni/2,Ni/3], [Nj/2,Nj/3], cmap=pal_fld, norm=norm_fld, alpha=0.5, marker='.', s=pt_sz_track )
+    
+        ##ct = plt.scatter(COORX[:,jtt], COORY[:,jtt], color='r', marker='.', s=pt_sz_track )
+        ct = plt.scatter(COORX[:,jtt], COORY[:,jtt], c=FLDO1[:,jtt], cmap=pal_fld, norm=norm_fld, marker='.', s=pt_sz_track )
+        #ct = plt.scatter(COORX[:,jtt], COORY[:,jtt], c=FLDO1[:,jtt], cmap=pal_fld, norm=norm_fld, marker=',', s=pt_sz_track )  ; # 1 pixel!!!
     
     
     
-    #plt.savefig(cfig, dpi=rDPI, orientation='portrait', facecolor='b', transparent=True)
-    plt.savefig(cfig, dpi=rDPI, orientation='portrait') #, transparent=True)
-    print(cfig+' created!\n')
-    plt.close(1)
-
-
-
-    del cm, fig, ax
+        
+        if l_scientific_mode:
+            plt.xlabel('i-points', **cfont_axis)
+            plt.ylabel('j-points', **cfont_axis)
+        
+        if l_show_cb:
+        
+            ax2 = plt.axes(vcb)
+        
+            if l_pow_field or l_log_field:
+                clb = mpl.colorbar.ColorbarBase(ax=ax2,               cmap=pal_fld, norm=norm_fld, orientation='horizontal', extend='neither')
+            else:
+                clb = mpl.colorbar.ColorbarBase(ax=ax2, ticks=vc_fld, cmap=pal_fld, norm=norm_fld, orientation='horizontal', extend=cextend)
+        
+            if cb_jump > 1:
+                cb_labs = [] ; cpt = 0
+                for rr in vc_fld:
+                    if cpt % cb_jump == 0:
+                        if df >= 1.: cb_labs.append(str(int(rr)))
+                        if df <  1.: cb_labs.append(str(rr))
+                    else:
+                        cb_labs.append(' ')
+                    cpt = cpt + 1
+                clb.ax.set_xticklabels(cb_labs)    
+            clb.set_label(cunit, **cfont_clb)
+            clb.ax.yaxis.set_tick_params(color=color_top) ; # set colorbar tick color    
+            #clb.outline.set_edgecolor(color_top) ; # set colorbar edgecolor
+            if l_hide_cb_ticks: clb.ax.tick_params(axis=u'both', which=u'both',length=0) ; # remove ticks!
+            plt.setp(plt.getp(clb.ax.axes, 'xticklabels'), color=color_top) ; # set colorbar ticklabels
+                
+            del cf
+            
+        if l_show_nm:  ax.annotate(CCONF, xy=(1, 4), xytext=(x_cnf, y_cnf), **cfont_cnfn)
+        
+        if l_show_ttl: ax.annotate(CCONF, xy=(1, 4), xytext=(x_ttl, y_ttl), **cfont_ttl)
+        
+        
+        
+        #plt.savefig(cfig, dpi=rDPI, orientation='portrait', facecolor='b', transparent=True)
+        plt.savefig(cfig, dpi=rDPI, orientation='portrait') #, transparent=True)
+        print(cfig+' created!\n')
+        plt.close(1)
+    
+    
+    
+        del cm, fig, ax
 # END OF LOOP !!!
 
 if l_show_mod_field: id_f_mod.close()
