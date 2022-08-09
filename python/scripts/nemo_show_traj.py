@@ -146,16 +146,18 @@ else:
 
 # A/ Scan the begining of the file to see how many trajectories have been initiated (before possible "killing" occurs...)
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+print('\n *** Scanning #1 !')
 with open(cf_trj, 'r') as ftxt:
     NbTrajInit = -1
     for line in csv.reader(ftxt, delimiter=','):
         iID = int(line[0])    # ID of current trajectory as an integer
         if iID < NbTrajInit: break # Then we are starting a new time record
         NbTrajInit = iID
-print('\n *** Number of initiated trajectories: = ',NbTrajInit)
+print('      ===> number of initiated trajectories: = ',NbTrajInit)
 
 # B/ Scan the end of the file to identify the `NbTrajEnd` trajectories (by their IDs) that made it to the end
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+print('\n *** Scanning #2 !')
 LastStandIDs = []
 with open(cf_trj, 'r') as ftxt:
     iID_o = 999999999
@@ -166,12 +168,13 @@ with open(cf_trj, 'r') as ftxt:
         LastStandIDs.append(iID)
         iID_o = iID
 NbTrajEnd = len(LastStandIDs)
-print('\n *** Number of remaining trajectories at the end: = ',NbTrajEnd)
+print('      ===> number of remaining trajectories at the end: = ',NbTrajEnd)
 LastStandIDs = nmp.flipud(LastStandIDs) ; # back to increasing order + numpy array
-print('     ==> LastStandIDs = ', LastStandIDs[:], len(LastStandIDs) )
+print('        ==> LastStandIDs = ', LastStandIDs[:], len(LastStandIDs) )
 
 # C/ Scan the entire file to see how many time records are present
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+print('\n *** Scanning #3 !')
 with open(cf_trj, 'r') as ftxt:
     iID_o = 999999999999
     NrTraj=0 ; # time record for the trajectories
@@ -179,7 +182,7 @@ with open(cf_trj, 'r') as ftxt:
         iID = int(line[0])     ; # ID of current trajectory as an integer
         if iID < iID_o: NrTraj = NrTraj + 1 ; # This is the start of a new time record
         iID_o = iID
-print('\n *** Number of time records for the trajectories: = ', NrTraj)
+print('      ===> number of time records for the trajectories: = ', NrTraj)
 
 ftxt.close()
 
