@@ -191,13 +191,14 @@ print('\n Number of trajectories to follow:', NbTraj)
 print('   => with IDs:', followIDs )
 print('   => along ',NrTraj,' integration time steps!')
 
-
+print('\n *** Allocating arrays ***')
 ITRID = nmp.zeros( (NbTraj, NrTraj), dtype=int ) ; #trajectory ID (integer)
 COORX = nmp.zeros( (NbTraj, NrTraj), dtype=nmp.float32 )            ; # coordinates in terms of `ji` as float
 COORY = nmp.zeros( (NbTraj, NrTraj), dtype=nmp.float32 )            ; # coordinates in terms of `jj` as float
 FLDO1 = nmp.zeros( (NbTraj, NrTraj), dtype=nmp.float32 ) ; # first field at position column #8 (7 in C)
+print('   => done!\n')
 
-
+print('\n *** Filling arrays ***')
 with open(cf_trj, 'r') as ftxt:
     jt=0
     for line in csv.reader(ftxt, delimiter=','):    
@@ -213,6 +214,7 @@ with open(cf_trj, 'r') as ftxt:
             FLDO1[jtraj,jt-1] = float(line[7])
             jtraj = jtraj+1   # itteration of 1 trajectory for this particular record
 ftxt.close()
+print('   => done!\n')
         
 # Debug, checking trajectories:
 if idebug > 0:
