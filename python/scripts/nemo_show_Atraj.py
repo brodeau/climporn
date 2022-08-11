@@ -254,7 +254,10 @@ xFFs[:Nliv,NrTraj-1] = FFsR[:]
 
 
 # Masking dead buoys:
-xIDs  = nmp.ma.masked_where(xIDs[:,:]==0, xIDs[:,:])
+xIDs = nmp.ma.masked_where(xIDs[:,:]==0, xIDs[:,:])
+xJIs = nmp.ma.masked_where(xIDs[:,:]==0, xJIs[:,:])
+xJJs = nmp.ma.masked_where(xIDs[:,:]==0, xJJs[:,:])
+xFFs = nmp.ma.masked_where(xIDs[:,:]==0, xFFs[:,:])
 
 if idebug > 1:
     print('\n Content of NbAlive:')
