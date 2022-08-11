@@ -202,21 +202,26 @@ with open(cf_trj, 'r') as ftxt:
         Nliv = Nliv + 1
         IDsR.append(iID)
         if iID < ID_o: # Then we are starting a new time record
+            Nliv = Nliv-1 ; # do not count this one as this is the first of the new record!
             NbAlive[jrec] = Nliv
             vi = nmp.array(IDsR)
-            IDalive[0:Nliv,jrec] = vi[:] ;#lilo
-            #print('*** IDsR =', IDsR)
+            IDalive[0:Nliv,jrec] = vi[0:Nliv] ;#lilo
             jrec = jrec + 1 ; # we are already next record
             Nliv = 1 ; # That's number #1 of this "next" record
             IDsR = [] ; # start we a new empty list
+            del vi
             #
         ID_o = iID
-NbAlive[NrTraj-1] = NbTrajEnd ; # last value
+NbAlive[      NrTraj-1] = NbTrajEnd     ; # last value
+#print('\n *** Nliv, NbTrajEnd, len(IDsR):', Nliv, NbTrajEnd, len(IDsR))
+IDalive[:Nliv,NrTraj-1] = LastStandIDs[:]
+
 
 if idebug > 0:
     print('\n Content of NbAlive:')
     for jrec in range(NrTraj): print('     rec # '+str(jrec)+' ==> '+str(NbAlive[jrec]))
 
+    print('\n', IDalive[:,NrTraj-1])
 
 sys.exit(0)
 #lilo        
