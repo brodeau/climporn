@@ -90,9 +90,10 @@ if   CCONF == 'ORCA1':
     pt_sz_track = 1
     
 if   CCONF == 'NANUK2':
-    i1 = 0 ; j1 = 0 ; i2 = 247 ; j2 = 286 ; rfact_zoom = 3. ; vcb = [0.5, 0.875, 0.49, 0.02] ; font_rat = 0.1
+    i1 = 0 ; j1 = 0 ; i2 = 247 ; j2 = 286 ; rfact_zoom = 3. ; vcb = [0.1, 0.1, 0.8, 0.02] ; font_rat = 0.4
     l_show_cb = False ; l_show_nm = False
     pt_sz_track = 3
+    l_show_cb = True
     
 else:
     print('\n WARNING [nemo_imshow_2d_field.py]: "'+CCONF+'" is an unknown config!\n     ==> falling back on default setup')
@@ -127,12 +128,10 @@ elif cv_mod in ['sosaline','sos']:
 
 elif cv_mod in ['siconc']:
     cfield = 'siconc'
-    tmin=0. ;  tmax=1.   ;  df = 1. ; # Arctic!
-    #cpal_fld = 'viridis'
+    tmin=0. ;  tmax=1.   ;  df = 0.1 ; # Arctic!
     cpal_fld = 'ncview_ice'
     cunit = 'Ice concentration'
     bgclr = 'k'   ; # background color for ocean in figure
-
     
 else:
     print('ERROR: variable '+cv_mod+' is not known yet...'); sys.exit(0)
@@ -455,14 +454,11 @@ for jtt in range(NrTraj):
             plt.ylabel('j-points', **cfont_axis)
         
         if l_show_cb:
-        
             ax2 = plt.axes(vcb)
-        
             if l_pow_field or l_log_field:
                 clb = mpl.colorbar.ColorbarBase(ax=ax2,               cmap=pal_fld, norm=norm_fld, orientation='horizontal', extend='neither')
             else:
                 clb = mpl.colorbar.ColorbarBase(ax=ax2, ticks=vc_fld, cmap=pal_fld, norm=norm_fld, orientation='horizontal', extend=cextend)
-        
             if cb_jump > 1:
                 cb_labs = [] ; cpt = 0
                 for rr in vc_fld:
@@ -479,7 +475,7 @@ for jtt in range(NrTraj):
             if l_hide_cb_ticks: clb.ax.tick_params(axis=u'both', which=u'both',length=0) ; # remove ticks!
             plt.setp(plt.getp(clb.ax.axes, 'xticklabels'), color=color_top) ; # set colorbar ticklabels
                 
-            del cf
+            del ct
             
         if l_show_nm:  ax.annotate(CCONF, xy=(1, 4), xytext=(x_cnf, y_cnf), **cfont_cnfn)
         
