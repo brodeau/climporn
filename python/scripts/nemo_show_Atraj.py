@@ -26,6 +26,9 @@ import matplotlib.colors as colors
 
 import climporn as cp
 
+
+i_field_plot = 7 ; # (C) column index of field to plot
+
 idebug = 1
 
 l_show_mod_field = False
@@ -190,157 +193,80 @@ print('      ===> number of time records for the trajectories: = ', NrTraj)
 # D/ Scan the entire file to store how many buoys are still alive at each of the NrTraj records
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 print('\n *** Scanning #4 !')
-NbAlive = nmp.zeros(  NrTraj             , dtype=int ) ; # number of buoys alive at each record
-IDalive = nmp.zeros( (NbTrajInit, NrTraj), dtype=int ) ; # will mask dead IDs...
+NbAlive = nmp.zeros(           NrTraj , dtype=int ) ; # number of buoys alive at each record
+xIDs = nmp.zeros( (NbTrajInit, NrTraj), dtype=int ) ; # will mask dead IDs...
+xJIs = nmp.zeros( (NbTrajInit, NrTraj), dtype=nmp.float32 ) ; # coordinates in terms of `ji` as float
+xJJs = nmp.zeros( (NbTrajInit, NrTraj), dtype=nmp.float32 ) ; # coordinates in terms of `jj` as float
+xFFs = nmp.zeros( (NbTrajInit, NrTraj), dtype=nmp.float32 ) ; # field #1 at position column #8 (7 in C)
+
 with open(cf_trj, 'r') as ftxt:
     ID_o = -1
     jrec = 0
     Nliv = 0
     IDsR = []
+    JIsR = []
+    JJsR = []
+    FFsR = []
+    #
     for line in csv.reader(ftxt, delimiter=','):
-        iID = int(line[0])    # ID of current trajectory as an integer
-        Nliv = Nliv + 1
+        iID =   int(line[0])    # ID of current trajectory as an integer
+        rJI = float(line[1])
+        rJJ = float(line[2])
+        rFF = float(line[i_field_plot])
         IDsR.append(iID)
+        JIsR.append(rJI)
+        JJsR.append(rJJ)
+        FFsR.append(rFF)
+        Nliv = Nliv + 1
+        #
         if iID < ID_o: # Then we are starting a new time record
-            ilast_back = IDsR[len(IDsR)-1] ; # we have appended one extra but we must remember for next record!!!
-            #print('\n reach start of new record:')
-            #print('  ==> IDsR =', IDsR[:-1])
-            Nliv = Nliv-1 ; # do not count this one as this is the first of the new record!
+            Nliv = Nliv-1      ; # do not count this one as this is the first of the new record!
+            ip = len(IDsR)-1   ; # index of last element
+            iID_bkp = IDsR[ip] ; # we have appended one extra but we must remember for next record!!!
+            rJI_bkp = JIsR[ip] ; # we have appended one extra but we must remember for next record!!!
+            rJJ_bkp = JJsR[ip] ; # we have appended one extra but we must remember for next record!!!
+            rFF_bkp = FFsR[ip] ; # we have appended one extra but we must remember for next record!!!
+            #            
             NbAlive[jrec] = Nliv
-            vi = nmp.array(IDsR[:-1])            
-            IDalive[0:Nliv,jrec] = vi[:] ;#lilo
-            jrec = jrec + 1 ; # we are already next record
-            Nliv = 1 ; # That's number #1 of this "next" record            
-            IDsR = [ilast_back] ; # start with an almost new empty list
-            del vi
+            #
+            xIDs[0:Nliv,jrec] = nmp.array(IDsR[:-1])
+            xJIs[0:Nliv,jrec] = nmp.array(JIsR[:-1])
+            xJJs[0:Nliv,jrec] = nmp.array(JJsR[:-1])
+            xFFs[0:Nliv,jrec] = nmp.array(FFsR[:-1])
+            #
+            # Preparin for next record, we have already everything for first value:
+            jrec = jrec + 1    ; # we are already next record
+            Nliv = 1           ; # That's number #1 of this "next" record            
+            IDsR = [ iID_bkp ]
+            JIsR = [ rJI_bkp ]
+            JJsR = [ rJJ_bkp ]
+            FFsR = [ rFF_bkp ]
             #
         ID_o = iID
-NbAlive[      NrTraj-1] = NbTrajEnd     ; # last value
-IDalive[:Nliv,NrTraj-1] = LastStandIDs[:]
-#sys.exit(0)
-IDalive  = nmp.ma.masked_where(IDalive[:,:]==0, IDalive[:,:])
+    #
+#
+# Values for last record:
+NbAlive[   NrTraj-1] = NbTrajEnd     ; 
+xIDs[:Nliv,NrTraj-1] = LastStandIDs[:]
+xJIs[:Nliv,NrTraj-1] = JIsR[:]
+xJJs[:Nliv,NrTraj-1] = JJsR[:]
+xFFs[:Nliv,NrTraj-1] = FFsR[:]
 
-if idebug > 0:
+
+# Masking dead buoys:
+xIDs  = nmp.ma.masked_where(xIDs[:,:]==0, xIDs[:,:])
+
+if idebug > 1:
     print('\n Content of NbAlive:')
     for jrec in range(NrTraj):
-        print('     rec # '+str(jrec)+' ==> '+str(NbAlive[jrec]))
-        print( IDalive[:,jrec],'\n')
-
-sys.exit(0)
-#lilo        
-print('      ===> number of initiated trajectories: = ',jtrj)
-
-
-
-
-
-
-
-
-with open(cf_trj, 'r') as ftxt:
-    jl=-1 ; # line number
-    jt=0
-    for line in csv.reader(ftxt, delimiter=','):
-        jl = jl+1 ; # line number (C)        
-        iID = int(line[0])      ; # ID of trajectory as an integer
-        if iID == followIDs[0]:
-            # This is a new time record as we are dealing with first trajectory (again)
-            jt = jt + 1
-            jtraj=0        
-        if iID in followIDs:
-            ITRID[jtraj,jt-1] = iID
-            COORX[jtraj,jt-1] = float(line[1]) #- 1. ; # Fortran to C !!! ???
-            COORY[jtraj,jt-1] = float(line[2]) #- 1. ; # Fortran to C !!! ???
-            FLDO1[jtraj,jt-1] = float(line[7])
-            jtraj = jtraj+1   # itteration of 1 trajectory for this particular record
-
-
-
-
-
-
-print('\n *** Allocating arrays ***')
-ITRID = nmp.zeros( (NbTrajInit, NrTraj), dtype=int )         ; #trajectory ID (integer)
-COORX = nmp.zeros( (NbTrajInit, NrTraj), dtype=nmp.float32 ) ; # coordinates in terms of `ji` as float
-COORY = nmp.zeros( (NbTrajInit, NrTraj), dtype=nmp.float32 ) ; # coordinates in terms of `jj` as float
-FLDO1 = nmp.zeros( (NbTrajInit, NrTraj), dtype=nmp.float32 ) ; # first field at position column #8 (7 in C)
-print('   => done!\n')
-
-
-
-
-
-print('\n *** Filling arrays ***')
-with open(cf_trj, 'r') as ftxt:
-    jt=0
-    for line in csv.reader(ftxt, delimiter=','):    
-        iID = int(line[0])      ; # ID of trajectory as an integer
-        if iID == followIDs[0]:
-            # This is a new time record as we are dealing with first trajectory (again)
-            jt = jt + 1
-            jtraj=0        
-        if iID in followIDs:
-            ITRID[jtraj,jt-1] = iID
-            COORX[jtraj,jt-1] = float(line[1]) #- 1. ; # Fortran to C !!! ???
-            COORY[jtraj,jt-1] = float(line[2]) #- 1. ; # Fortran to C !!! ???
-            FLDO1[jtraj,jt-1] = float(line[7])
-            jtraj = jtraj+1   # itteration of 1 trajectory for this particular record
-
+        nba = NbAlive[jrec]
+        print('###  Rec. # '+str(jrec)+' ==> '+str(nba)+' buoys alive!')
+        print(' * IDs:\n',                       xIDs[:nba,jrec],'\n')
+        print(' * Longitudes `ji` positions:\n', xJIs[:nba,jrec],'\n')
+        print(' * Latitudes  `jj` positions:\n', xJJs[:nba,jrec],'\n')
+        print(' * Values of field #1:\n',        xFFs[:nba,jrec],'\n')
 
 print('   => done!\n')
-
-
-
-
-
-
-
-
-
-# ****
-
-# About the trajectories to follow / work with:
-followIDs = LastStandIDs  ; # For now that the ones we are going to follow
-NbTraj    = len(followIDs)
-
-print('\n Number of trajectories to follow:', NbTraj)
-print('   => with IDs:', followIDs )
-print('   => along ',NrTraj,' integration time steps!')
-
-
-print('\n *** Filling arrays ***')
-with open(cf_trj, 'r') as ftxt:
-    jt=0
-    for line in csv.reader(ftxt, delimiter=','):    
-        iID = int(line[0])      ; # ID of trajectory as an integer
-        if iID == followIDs[0]:
-            # This is a new time record as we are dealing with first trajectory (again)
-            jt = jt + 1
-            jtraj=0        
-        if iID in followIDs:
-            ITRID[jtraj,jt-1] = iID
-            COORX[jtraj,jt-1] = float(line[1]) #- 1. ; # Fortran to C !!! ???
-            COORY[jtraj,jt-1] = float(line[2]) #- 1. ; # Fortran to C !!! ???
-            FLDO1[jtraj,jt-1] = float(line[7])
-            jtraj = jtraj+1   # itteration of 1 trajectory for this particular record
-ftxt.close()
-print('   => done!\n')
-        
-# Debug, checking trajectories:
-if idebug > 0:
-    for jt in range(NrTraj):
-        print('\n *** Record #',jt,':')
-        for jtraj in range(NbTraj):
-            print(' Traj. #',jtraj+1,' ==> ID =', ITRID[jtraj,jt], ' | x =', COORX[jtraj,jt], ' | y =', COORY[jtraj,jt] )
-        
-#######################################################################################
-#######################################################################################
-
-
-
-
-    
-
 
 # Time record stuff...
 if l_show_mod_field:
@@ -373,7 +299,6 @@ else:
     nsubC  = 1
 
 
-ibath=1
 
 cp.chck4f(cf_lsm)
 cnmsk = 'tmask'
@@ -497,41 +422,8 @@ for jtt in range(NrTraj):
                     sys.exit(0)
                 print('  *** Shape of field and mask => ', nmp.shape(XFLD))
         
-        
-        
         l_add_true_filled = False
-        
-        #if cfield == 'Bathymetry':
-        #    (idy_nan,idx_nan) = nmp.where( nmp.isnan(XFLD) )
-        #    #
-        #    # LSM with different masking for true lsm and filled lsm...
-        #    cf_mask_lbc = dir_conf+'/lsm_LBC_'+CCONF+'.nc'
-        #    if path.exists(cf_mask_lbc):
-        #        print('\n *** '+cf_mask_lbc+' found !!!')
-        #        l_add_true_filled = True 
-        #        id_filled = Dataset(cf_mask_lbc)
-        #        xtmp = id_filled.variables['lsm'][j1:j2,i1:i2]
-        #        id_filled.close()
-        #        pfilled = nmp.ma.masked_where(xtmp[:,:] != -1., xtmp[:,:]*0.+40.)
-        #        del xtmp
-        #
-        #        print('  => done filling "pfilled" !\n')
-        
-            
-        #if cv_mod == 'track':
-        #    
-        #    XFLD[nmp.where(nmp.isnan(XFLD))] = -1000
-        #    indx = nmp.where( XFLD > 0 )
-        #    (idy,idx) = indx
-        #    
-        #    tmin=nmp.amin(XFLD[indx]) ;  tmax=nmp.amax(XFLD[indx])
-        #    norm_fld = colors.Normalize(vmin = tmin, vmax = tmax, clip = False)
-        # 
-        #    cf = plt.scatter(idx, idy, c=XFLD[indx], cmap=pal_fld, norm=norm_fld, alpha=0.5, marker='.', s=pt_sz_track )
-        #
-        #else:
-        
-        #cf = plt.imshow(XFLD[:,:], cmap=pal_fld, norm=norm_fld, interpolation='none')
+
         if l_show_mod_field:
             cf = plt.pcolormesh(XFLD[:,:], cmap=pal_fld, norm=norm_fld )
                 
@@ -549,12 +441,8 @@ for jtt in range(NrTraj):
         plt.axis([ 0, Ni, 0, Nj])
     
         # Showing trajectories:
-        ##ct = plt.scatter([Ni/2,Ni/3], [Nj/2,Nj/3], c=XFLD[indx], cmap=pal_fld, norm=norm_fld, alpha=0.5, marker='.', s=pt_sz_track )
-        #ct = plt.scatter([Ni/2,Ni/3], [Nj/2,Nj/3], cmap=pal_fld, norm=norm_fld, alpha=0.5, marker='.', s=pt_sz_track )
-    
-        ##ct = plt.scatter(COORX[:,jtt], COORY[:,jtt], color='r', marker='.', s=pt_sz_track )
-        ct = plt.scatter(COORX[:,jtt], COORY[:,jtt], c=FLDO1[:,jtt], cmap=pal_fld, norm=norm_fld, marker='.', s=pt_sz_track )
-        #ct = plt.scatter(COORX[:,jtt], COORY[:,jtt], c=FLDO1[:,jtt], cmap=pal_fld, norm=norm_fld, marker=',', s=pt_sz_track )  ; # 1 pixel!!!
+        ct = plt.scatter(xJIs[:,jtt], xJJs[:,jtt], c=xFFs[:,jtt], cmap=pal_fld, norm=norm_fld, marker='.', s=pt_sz_track )
+
     
     
     
