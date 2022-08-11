@@ -202,26 +202,29 @@ with open(cf_trj, 'r') as ftxt:
         Nliv = Nliv + 1
         IDsR.append(iID)
         if iID < ID_o: # Then we are starting a new time record
+            ilast_back = IDsR[len(IDsR)-1] ; # we have appended one extra but we must remember for next record!!!
+            #print('\n reach start of new record:')
+            #print('  ==> IDsR =', IDsR[:-1])
             Nliv = Nliv-1 ; # do not count this one as this is the first of the new record!
             NbAlive[jrec] = Nliv
-            vi = nmp.array(IDsR)
-            IDalive[0:Nliv,jrec] = vi[0:Nliv] ;#lilo
+            vi = nmp.array(IDsR[:-1])            
+            IDalive[0:Nliv,jrec] = vi[:] ;#lilo
             jrec = jrec + 1 ; # we are already next record
-            Nliv = 1 ; # That's number #1 of this "next" record
-            IDsR = [] ; # start we a new empty list
+            Nliv = 1 ; # That's number #1 of this "next" record            
+            IDsR = [ilast_back] ; # start with an almost new empty list
             del vi
             #
         ID_o = iID
 NbAlive[      NrTraj-1] = NbTrajEnd     ; # last value
-#print('\n *** Nliv, NbTrajEnd, len(IDsR):', Nliv, NbTrajEnd, len(IDsR))
 IDalive[:Nliv,NrTraj-1] = LastStandIDs[:]
-
+#sys.exit(0)
+IDalive  = nmp.ma.masked_where(IDalive[:,:]==0, IDalive[:,:])
 
 if idebug > 0:
     print('\n Content of NbAlive:')
-    for jrec in range(NrTraj): print('     rec # '+str(jrec)+' ==> '+str(NbAlive[jrec]))
-
-    print('\n', IDalive[:,NrTraj-1])
+    for jrec in range(NrTraj):
+        print('     rec # '+str(jrec)+' ==> '+str(NbAlive[jrec]))
+        print( IDalive[:,jrec],'\n')
 
 sys.exit(0)
 #lilo        
