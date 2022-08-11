@@ -4,8 +4,7 @@
 ##################################################################
 #     CLIMPORN
 #
-#  Prepare 2D maps (monthly) that will later become a movie!
-#  NEMO output and observations needed
+#  Plot only the trajectories of the buoys that made it to the finish line!
 #
 #    L. Brodeau, August 2022
 ##################################################################
