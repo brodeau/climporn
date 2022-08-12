@@ -97,6 +97,7 @@ print('\n *** Year = '+cyear)
 print('\n *** time increment = '+cdt)
 
 cyr0=cyear
+yr0=int(cyear)
 cmn0='01'
 cdd0='01'
 
@@ -111,7 +112,7 @@ else:
     print('ERROR: something is wrong with the format of your time step => '+cdt+' !'); sys.exit(0)
 
 vm = vmn
-if isleap(int(cyr0)): vm = vml
+if isleap(yr0): vm = vml
 #print(' year is ', vm, nmp.sum(vm)
 
 jd = int(cdd0) - 1
@@ -455,6 +456,13 @@ for jtt in range(NrTraj):
     if jd == vm[jm-1]+1 and (jtt)%ntpd == 0 :
         jd = 1
         jm = jm + 1
+        if jm==13:
+            yr0 = yr0+1
+            cyr0 = str(yr0)
+            jm = 1
+            vm = vmn
+            if isleap(yr0): vm = vml
+
     ch  = '%2.2i'%(jh)
     crh = '%2.2i'%(rjh)
     cd  = '%3.3i'%(jd)
