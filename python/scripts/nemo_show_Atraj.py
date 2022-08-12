@@ -7,6 +7,8 @@
 #  Plot only the trajectories of all the buoys, even those who disapear
 #
 #    L. Brodeau, August 2022
+#
+# TO DO: use `nemo_box = cp.nemo_hbox(CNEMO,CBOX)` !!!
 ##################################################################
 
 import sys
@@ -23,6 +25,9 @@ import matplotlib as mpl
 mpl.use('Agg')
 import matplotlib.pyplot as plt
 import matplotlib.colors as colors
+
+from calendar import isleap
+import datetime
 
 import climporn as cp
 
@@ -41,6 +46,7 @@ lknown = True
 rfact_zoom = 1.
 l_show_cb = False
 l_show_nm = False
+l_show_clock=False ; x_clock=0. ; y_clock=0.
 l_scientific_mode = False
 l_show_ttl = False
 vcb = [0.15, 0.96, 0.8, 0.02]
@@ -49,16 +55,20 @@ font_rat = 1.
 
 
 l_show_msh = False
-    
+
 pt_sz_track = 30
 
 fig_type='png'
+
+vmn = [ 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ]
+vml = [ 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ]
+
 
 narg = len(sys.argv)
 if not narg in [6,7]:
     print('Usage: '+sys.argv[0]+' <CONF> <file_trj.csv> <file_mod,var> <name_fig> <LSM_file> (iTsubsampl)')
     sys.exit(0)
-    
+
 CCONF  = sys.argv[1]
 cf_trj = sys.argv[2]
 vv = split(',',sys.argv[3])
@@ -72,6 +82,42 @@ cf_lsm = sys.argv[5]
 itsubs = 1
 if narg == 7 :
     itsubs = int(sys.argv[6])
+
+
+
+# Getting time info and time step from input model file:
+
+
+vv = split('-|_', path.basename(cf_mod))
+
+cyear = vv[-2]
+cdt   = vv[-3]
+
+print('\n *** Year = '+cyear)
+print('\n *** time increment = '+cdt)
+
+cyr0=cyear
+cmn0='01'
+cdd0='01'
+
+# Time step (h) as a string
+if not len(cdt)==2:
+    print('ERROR: something is wrong with the format of your time step => '+cdt+' !'); sys.exit(0)
+if cdt=='1d':
+    dt = 24 ; ntpd = 1
+elif cdt[1]=='h':
+    dt = int(cdt[0]) ; ntpd = 24 / dt
+else:
+    print('ERROR: something is wrong with the format of your time step => '+cdt+' !'); sys.exit(0)
+
+vm = vmn
+if isleap(int(cyr0)): vm = vml
+#print(' year is ', vm, nmp.sum(vm)
+
+jd = int(cdd0) - 1
+jm = int(cmn0)
+
+print('     ==> dt = ', dt,'h')
 
 
 dir_conf = path.dirname(cf_trj)
@@ -88,13 +134,14 @@ if   CCONF == 'ORCA1':
     i1 = 0 ; j1 = 0 ; i2 = 362 ; j2 = 292 ; rfact_zoom = 3. ; vcb = [0.15, 0.96, 0.8, 0.02] ; font_rat = 0.1
     l_show_cb = False ; l_show_nm = False
     pt_sz_track = 1
-    
+
 if   CCONF == 'NANUK2':
     i1 = 0 ; j1 = 0 ; i2 = 247 ; j2 = 286 ; rfact_zoom = 3. ; vcb = [0.1, 0.1, 0.8, 0.02] ; font_rat = 0.4
     l_show_cb = False ; l_show_nm = False
     pt_sz_track = 3
     l_show_cb = True
-    
+    l_show_clock = True ; x_clock=60.*rfact_zoom ; y_clock=90.*rfact_zoom
+
 else:
     print('\n WARNING [nemo_imshow_2d_field.py]: "'+CCONF+'" is an unknown config!\n     ==> falling back on default setup')
     lknown = False
@@ -116,14 +163,14 @@ bgclr = 'w'   ; # background color for ocean in figure
 if   cv_mod in ['sosstsst','tos']:
     cfield = 'SST'
     tmin=-3. ;  tmax=2.   ;  df = 0.1 ; # Arctic!
-    #tmin=14. ;  tmax=26.   ;  df = 1.    
-    cpal_fld = 'inferno'    
+    #tmin=14. ;  tmax=26.   ;  df = 1.
+    cpal_fld = 'inferno'
     cunit = r'SST ($^{\circ}$C)'
 
 elif cv_mod in ['sosaline','sos']:
     cfield = 'SSS'
     tmin=32. ;  tmax=36.   ;  df = 1.
-    cpal_fld = 'viridis'    
+    cpal_fld = 'viridis'
     cunit = r'SSS (PSU)'
 
 elif cv_mod in ['siconc']:
@@ -132,7 +179,7 @@ elif cv_mod in ['siconc']:
     cpal_fld = 'ncview_ice'
     cunit = 'Ice concentration'
     bgclr = 'k'   ; # background color for ocean in figure
-    
+
 else:
     print('ERROR: variable '+cv_mod+' is not known yet...'); sys.exit(0)
 
@@ -166,15 +213,14 @@ with open(cf_trj, 'r') as ftxt:
     iID_o = 999999999
     for line in reversed(list(csv.reader(ftxt, delimiter=','))):
         #print(line)
-        iID = int(line[0])    # ID of current trajectory as an integer        
+        iID = int(line[0])    # ID of current trajectory as an integer
         if iID > iID_o: break # Then we are starting a new time record
         LastStandIDs.append(iID)
         iID_o = iID
 NbTrajEnd = len(LastStandIDs)
 print('      ===> number of remaining trajectories at the end: = ',NbTrajEnd)
 LastStandIDs = nmp.flipud(LastStandIDs) ; # back to increasing order + numpy array
-print('        ==> LastStandIDs = ', LastStandIDs[:], len(LastStandIDs) )
-
+#print('        ==> LastStandIDs = ', LastStandIDs[:], len(LastStandIDs) )
 
 # C/ Scan the entire file to see how many time records are present
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -225,7 +271,7 @@ with open(cf_trj, 'r') as ftxt:
             rJI_bkp = JIsR[ip] ; # we have appended one extra but we must remember for next record!!!
             rJJ_bkp = JJsR[ip] ; # we have appended one extra but we must remember for next record!!!
             rFF_bkp = FFsR[ip] ; # we have appended one extra but we must remember for next record!!!
-            #            
+            #
             NbAlive[jrec] = Nliv
             #
             xIDs[0:Nliv,jrec] = nmp.array(IDsR[:-1])
@@ -235,7 +281,7 @@ with open(cf_trj, 'r') as ftxt:
             #
             # Preparin for next record, we have already everything for first value:
             jrec = jrec + 1    ; # we are already next record
-            Nliv = 1           ; # That's number #1 of this "next" record            
+            Nliv = 1           ; # That's number #1 of this "next" record
             IDsR = [ iID_bkp ]
             JIsR = [ rJI_bkp ]
             JJsR = [ rJJ_bkp ]
@@ -245,7 +291,7 @@ with open(cf_trj, 'r') as ftxt:
     #
 #
 # Values for last record:
-NbAlive[   NrTraj-1] = NbTrajEnd     ; 
+NbAlive[   NrTraj-1] = NbTrajEnd     ;
 xIDs[:Nliv,NrTraj-1] = LastStandIDs[:]
 xJIs[:Nliv,NrTraj-1] = JIsR[:]
 xJJs[:Nliv,NrTraj-1] = JJsR[:]
@@ -275,7 +321,7 @@ if l_show_mod_field:
     cp.chck4f(cf_mod)
     id_f_mod = Dataset(cf_mod)
     list_var = id_f_mod.variables.keys()
-    if 'time_counter' in list_var:    
+    if 'time_counter' in list_var:
         vtime = id_f_mod.variables['time_counter'][:]
         Nt_mod = len(vtime)
         print('\n There is a "time_counter" in file '+cf_mod+' !')
@@ -295,7 +341,7 @@ if l_show_mod_field:
         print('==> ERROR: they are not a multiple of each other!'); sys.exit(0)
     nsubC = NrTraj//Nt_mod
     print('    ==> number of subcycles for trajectories w.r.t model data =>', nsubC)
-    
+
 else:
     Nt_mod = NrTraj
     nsubC  = 1
@@ -356,7 +402,7 @@ cfont_mail = { 'fontname':'Times New Roman', 'fontweight':'normal', 'fontstyle':
 cfont_cnfn = { 'fontname':'Open Sans', 'fontweight':'light', 'fontsize':int(35.*font_rat), 'color':'w' }
 cfont_axis  = { 'fontname':'Open Sans', 'fontweight':'medium', 'fontsize':int(18.*font_rat), 'color':color_top }
 cfont_ttl = { 'fontname':'Open Sans', 'fontweight':'medium', 'fontsize':int(25.*font_rat), 'color':color_top }
-
+cfont_clock = { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(18.*font_rat), 'color':color_top }
 
 # Colormaps for fields:
 pal_fld = cp.chose_colmap(cpal_fld)
@@ -389,7 +435,7 @@ if l_show_mod_field:
 jtm = -1 ; # time record to use for model
 l_read_mod = True
 for jtt in range(NrTraj):
-    
+
     if jtt%nsubC == 0:
         jtm = jtm+1
         l_read_mod = True
@@ -397,62 +443,98 @@ for jtt in range(NrTraj):
         l_read_mod = False
 
     print( ' ### jtt, jtm = ',jtt, jtm )
-        
+
     ct   = '%4.4i'%(jtt+1)
 
+
+
+    #---------------------- Calendar stuff --------------------------------------------
+    jh   = (jtt*dt)%24
+    rjh  = ((float(jtt)+0.5)*dt)%24
+    if jtt%ntpd == 0: jd = jd + 1
+    if jd == vm[jm-1]+1 and (jtt)%ntpd == 0 :
+        jd = 1
+        jm = jm + 1
+    ch  = '%2.2i'%(jh)
+    crh = '%2.2i'%(rjh)
+    cd  = '%3.3i'%(jd)
+    cm  = '%2.2i'%(jm)
+    #
+    jhou = int(rjh)
+    jmin = int((rjh-jhou)*60)
+    chou = '%2.2i'%(jhou)
+    cmin = '%2.2i'%(jmin)
+    #
+    ct  = str(datetime.datetime.strptime(cyr0+'-'+cm+'-'+cd+' '+ch, '%Y-%m-%j %H'))
+    ct  = ct[:5]+cm+ct[7:] #lolo bug !!! need to do that to get the month and not '01
+    cday  = ct[:10]   ; #print(' *** cday  :', cday
+    if dt >= 24:
+        cdate = cday
+        cdats = cday
+    else:
+        chour = ct[11:13] ; #print(' *** chour :', chour
+        cdate = cday+'_'+chour
+        if jmin==0:
+            cdats = cday+' '+chour+':00'
+        else:
+            cdats = cday+' '+chou+':'+cmin
+    print('   ==> current date = ', cdats+' !')
+    #-----------------------------------------------------------------------------------
+
+
     if jtt%itsubs == 0:
-    
-        cfig = cnfig+'_'+ct+'.'+fig_type
-    
+
+        cfig = cnfig+'_'+cdats+'.'+fig_type
+
         fig = plt.figure(num = 1, figsize=fsize, dpi=rDPI, facecolor='k', edgecolor='k')
-    
+
         if l_scientific_mode:
             ax  = plt.axes([0.09, 0.09, 0.9, 0.9], facecolor = 'r')
         else:
             ax  = plt.axes([0., 0., 1., 1.],     facecolor = bgclr)
-    
-    
+
+
         if l_show_mod_field and l_read_mod:
             print('    => Reading record #'+str(jtm)+' of '+cv_mod+' in '+cf_mod)
             XFLD  = id_f_mod.variables[cv_mod][jtm-1,j1:j2,i1:i2] ; # t, y, x
             print('          Done!\n')
-    
+
             if jtm == 0:
                 if XMSK[:,:].shape != XFLD.shape:
                     print('\n PROBLEM: field and mask do not agree in shape!')
                     print(XMSK.shape , XFLD.shape)
                     sys.exit(0)
                 print('  *** Shape of field and mask => ', nmp.shape(XFLD))
-        
+
         l_add_true_filled = False
 
         if l_show_mod_field:
             cf = plt.pcolormesh(XFLD[:,:], cmap=pal_fld, norm=norm_fld )
-                
+
         if l_show_msh:
             ccx = plt.contour(Xlon[:,:], 60, colors='k', linewidths=0.5)
             ccy = plt.contour(Xlat[:,:], 30, colors='k', linewidths=0.5)
-                    
-        
+
+
         #cm = plt.imshow(pmsk, cmap=pal_lsm, norm=norm_lsm, interpolation='none')
         cm = plt.pcolormesh( pmsk, cmap=pal_lsm, norm=norm_lsm )
-        
+
         if l_add_true_filled: del pfilled
-        
-        
+
+
         plt.axis([ 0, Ni, 0, Nj])
-    
+
         # Showing trajectories:
         ct = plt.scatter(xJIs[:,jtt], xJJs[:,jtt], c=xFFs[:,jtt], cmap=pal_fld, norm=norm_fld, marker='.', s=pt_sz_track )
 
-    
-    
-    
-        
+
+
+
+
         if l_scientific_mode:
             plt.xlabel('i-points', **cfont_axis)
             plt.ylabel('j-points', **cfont_axis)
-        
+
         if l_show_cb:
             ax2 = plt.axes(vcb)
             if l_pow_field or l_log_field:
@@ -468,28 +550,32 @@ for jtt in range(NrTraj):
                     else:
                         cb_labs.append(' ')
                     cpt = cpt + 1
-                clb.ax.set_xticklabels(cb_labs)    
+                clb.ax.set_xticklabels(cb_labs)
             clb.set_label(cunit, **cfont_clb)
-            clb.ax.yaxis.set_tick_params(color=color_top) ; # set colorbar tick color    
+            clb.ax.yaxis.set_tick_params(color=color_top) ; # set colorbar tick color
             #clb.outline.set_edgecolor(color_top) ; # set colorbar edgecolor
             if l_hide_cb_ticks: clb.ax.tick_params(axis=u'both', which=u'both',length=0) ; # remove ticks!
             plt.setp(plt.getp(clb.ax.axes, 'xticklabels'), color=color_top) ; # set colorbar ticklabels
-                
+
             del ct
-            
+
         if l_show_nm:  ax.annotate(CCONF, xy=(1, 4), xytext=(x_cnf, y_cnf), **cfont_cnfn)
-        
+
         if l_show_ttl: ax.annotate(CCONF, xy=(1, 4), xytext=(x_ttl, y_ttl), **cfont_ttl)
+
+        if l_show_clock: ax.annotate('Date: '+cdats, xy=(1, 4), xytext=(x_clock,y_clock), **cfont_clock)
+
+
         
-        
-        
+
+
         #plt.savefig(cfig, dpi=rDPI, orientation='portrait', facecolor='b', transparent=True)
         plt.savefig(cfig, dpi=rDPI, orientation='portrait') #, transparent=True)
         print(cfig+' created!\n')
         plt.close(1)
-    
-    
-    
+
+
+
         del cm, fig, ax
 # END OF LOOP !!!
 
