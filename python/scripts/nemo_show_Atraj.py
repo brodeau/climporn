@@ -140,7 +140,7 @@ if   CCONF == 'NANUK2':
     l_show_cb = False ; l_show_nm = False
     pt_sz_track = 3
     l_show_cb = True
-    l_show_clock = True ; x_clock=60.*rfact_zoom ; y_clock=90.*rfact_zoom
+    l_show_clock = True ; x_clock=55.*rfact_zoom ; y_clock=90.*rfact_zoom
 
 else:
     print('\n WARNING [nemo_imshow_2d_field.py]: "'+CCONF+'" is an unknown config!\n     ==> falling back on default setup')
@@ -484,7 +484,7 @@ for jtt in range(NrTraj):
 
     if jtt%itsubs == 0:
 
-        cfig = cnfig+'_'+cdats+'.'+fig_type
+        cfig = cnfig+'_'+cdate+'.'+fig_type
 
         fig = plt.figure(num = 1, figsize=fsize, dpi=rDPI, facecolor='k', edgecolor='k')
 
