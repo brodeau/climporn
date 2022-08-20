@@ -144,11 +144,11 @@ elif CCONF == 'NANUK2':
     l_show_clock = True ; x_clock=55.*rfact_zoom ; y_clock=90.*rfact_zoom
 
 elif CCONF == 'NANUK4':
-    i1 = 0 ; j1 = 0 ; i2 = 492 ; j2 = 566 ; rfact_zoom = 1. ; vcb = [0.1, 0.1, 0.8, 0.02] ; font_rat = 0.4
+    i1 = 0 ; j1 = 0 ; i2 = 492 ; j2 = 566 ; rfact_zoom = 2. ; vcb = [0.1, 0.08, 0.8, 0.02] ; font_rat = 0.4
     l_show_cb = False ; l_show_nm = False
-    pt_sz_track = 3
+    pt_sz_track = 2
     l_show_cb = True
-    l_show_clock = True ; x_clock=55.*rfact_zoom ; y_clock=90.*rfact_zoom
+    l_show_clock = True ; x_clock=150.*rfact_zoom ; y_clock=260.*rfact_zoom
 
 else:
     print('\n WARNING [nemo_imshow_2d_field.py]: "'+CCONF+'" is an unknown config!\n     ==> falling back on default setup')
@@ -404,13 +404,11 @@ params = { 'font.family':'Open Sans',
            'ytick.labelsize': int(18.*font_rat),
            'axes.labelsize':  int(15.*font_rat) }
 mpl.rcParams.update(params)
-cfont_clb  = { 'fontname':'Open Sans', 'fontweight':'medium', 'fontsize':int(18.*font_rat), 'color':color_top }
-cfont_date = { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(12.*font_rat), 'color':'w' }
-cfont_mail = { 'fontname':'Times New Roman', 'fontweight':'normal', 'fontstyle':'italic', 'fontsize':int(14.*font_rat), 'color':'0.8'}
-cfont_cnfn = { 'fontname':'Open Sans', 'fontweight':'light', 'fontsize':int(35.*font_rat), 'color':'w' }
-cfont_axis  = { 'fontname':'Open Sans', 'fontweight':'medium', 'fontsize':int(18.*font_rat), 'color':color_top }
-cfont_ttl = { 'fontname':'Open Sans', 'fontweight':'medium', 'fontsize':int(25.*font_rat), 'color':color_top }
-cfont_clock = { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(18.*font_rat), 'color':color_top }
+cfont_clb   = { 'fontname':'Open Sans',   'fontweight':'medium', 'fontsize':int(18.*font_rat), 'color':color_top }
+cfont_cnfn  = { 'fontname':'Open Sans',   'fontweight':'light' , 'fontsize':int(35.*font_rat), 'color':color_top }
+cfont_axis  = { 'fontname':'Open Sans',   'fontweight':'medium', 'fontsize':int(18.*font_rat), 'color':color_top }
+cfont_ttl   = { 'fontname':'Open Sans',   'fontweight':'medium', 'fontsize':int(25.*font_rat), 'color':color_top }
+cfont_clock = { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(19.*font_rat), 'color':color_top }
 
 # Colormaps for fields:
 pal_fld = cp.chose_colmap(cpal_fld)
