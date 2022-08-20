@@ -136,8 +136,15 @@ if   CCONF == 'ORCA1':
     l_show_cb = False ; l_show_nm = False
     pt_sz_track = 1
 
-if   CCONF == 'NANUK2':
+elif CCONF == 'NANUK2':
     i1 = 0 ; j1 = 0 ; i2 = 247 ; j2 = 286 ; rfact_zoom = 3. ; vcb = [0.1, 0.1, 0.8, 0.02] ; font_rat = 0.4
+    l_show_cb = False ; l_show_nm = False
+    pt_sz_track = 3
+    l_show_cb = True
+    l_show_clock = True ; x_clock=55.*rfact_zoom ; y_clock=90.*rfact_zoom
+
+elif CCONF == 'NANUK4':
+    i1 = 0 ; j1 = 0 ; i2 = 492 ; j2 = 566 ; rfact_zoom = 1. ; vcb = [0.1, 0.1, 0.8, 0.02] ; font_rat = 0.4
     l_show_cb = False ; l_show_nm = False
     pt_sz_track = 3
     l_show_cb = True
