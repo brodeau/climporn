@@ -52,8 +52,6 @@ l_show_ttl = False
 vcb = [0.15, 0.96, 0.8, 0.02]
 font_rat = 1.
 
-
-
 l_show_msh = False
 
 pt_sz_track = 30
@@ -502,7 +500,7 @@ for jtt in range(NrTraj):
 
         
         cfig = './'+cnfig+'_'+cdate+'.'+fig_type
-
+        
         if not path.exists(cfig):
         
             fig = plt.figure(num = 1, figsize=fsize, dpi=rDPI, facecolor='k', edgecolor='k')
@@ -596,7 +594,7 @@ for jtt in range(NrTraj):
             del cm, fig, ax
 
         else:
-            print('\n ### Figure '+cfig+' already there!')
+            print('   ----- Figure '+cfig+' already there! -----\n')
             
 # END OF LOOP !!!
 
