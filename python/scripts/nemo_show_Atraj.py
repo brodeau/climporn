@@ -12,7 +12,7 @@
 ##################################################################
 
 import sys
-from os import path
+from os import path, mkdir
 import numpy as nmp
 
 from re import split
@@ -190,9 +190,7 @@ else:
     print('ERROR: variable '+cv_mod+' is not known yet...'); sys.exit(0)
 
 
-
-
-
+if not path.exists("figs"): mkdir("figs")
 
 #######################################################################################
 # Testing, then reading CSV file
@@ -454,7 +452,8 @@ for jtt in range(NrTraj):
 
     #---------------------- Calendar stuff --------------------------------------------
     jh   = (jtt*dt)%24
-    rjh  = ((float(jtt)+0.5)*dt)%24
+    #rjh  = ((float(jtt)+0.5)*dt)%24
+    rjh  = ( float(jtt)*dt )%24
     if jtt%ntpd == 0: jd = jd + 1
     if jd == vm[jm-1]+1 and (jtt)%ntpd == 0 :
         jd = 1
@@ -499,7 +498,7 @@ for jtt in range(NrTraj):
         # Only going if image not already present: lilo
 
         
-        cfig = './'+cnfig+'_'+cdate+'.'+fig_type
+        cfig = './figs/'+cnfig+'_'+cdate+'.'+fig_type
         
         if not path.exists(cfig):
         
