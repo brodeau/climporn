@@ -148,7 +148,7 @@ elif CCONF == 'NANUK4':
     l_show_cb = False ; l_show_nm = False
     pt_sz_track = 2
     l_show_cb = True
-    l_show_clock = True ; x_clock=150.*rfact_zoom ; y_clock=260.*rfact_zoom
+    l_show_clock = True ; x_clock=170.*rfact_zoom ; y_clock=265.*rfact_zoom
 
 else:
     print('\n WARNING [nemo_imshow_2d_field.py]: "'+CCONF+'" is an unknown config!\n     ==> falling back on default setup')
@@ -497,99 +497,107 @@ for jtt in range(NrTraj):
 
     if jtt%itsubs == 0:
 
-        cfig = cnfig+'_'+cdate+'.'+fig_type
 
-        fig = plt.figure(num = 1, figsize=fsize, dpi=rDPI, facecolor='k', edgecolor='k')
-
-        if l_scientific_mode:
-            ax  = plt.axes([0.09, 0.09, 0.9, 0.9], facecolor = 'r')
-        else:
-            ax  = plt.axes([0., 0., 1., 1.],     facecolor = bgclr)
-
-
-        if l_show_mod_field and l_read_mod:
-            print('    => Reading record #'+str(jtm)+' of '+cv_mod+' in '+cf_mod)
-            XFLD  = id_f_mod.variables[cv_mod][jtm-1,j1:j2,i1:i2] ; # t, y, x
-            print('          Done!\n')
-
-            if jtm == 0:
-                if XMSK[:,:].shape != XFLD.shape:
-                    print('\n PROBLEM: field and mask do not agree in shape!')
-                    print(XMSK.shape , XFLD.shape)
-                    sys.exit(0)
-                print('  *** Shape of field and mask => ', nmp.shape(XFLD))
-
-        l_add_true_filled = False
-
-        if l_show_mod_field:
-            cf = plt.pcolormesh(XFLD[:,:], cmap=pal_fld, norm=norm_fld )
-
-        if l_show_msh:
-            ccx = plt.contour(Xlon[:,:], 60, colors='k', linewidths=0.5)
-            ccy = plt.contour(Xlat[:,:], 30, colors='k', linewidths=0.5)
-
-
-        #cm = plt.imshow(pmsk, cmap=pal_lsm, norm=norm_lsm, interpolation='none')
-        cm = plt.pcolormesh( pmsk, cmap=pal_lsm, norm=norm_lsm )
-
-        if l_add_true_filled: del pfilled
-
-
-        plt.axis([ 0, Ni, 0, Nj])
-
-        # Showing trajectories:
-        ct = plt.scatter(xJIs[:,jtt], xJJs[:,jtt], c=xFFs[:,jtt], cmap=pal_fld, norm=norm_fld, marker='.', s=pt_sz_track )
-
-
-
-
-
-        if l_scientific_mode:
-            plt.xlabel('i-points', **cfont_axis)
-            plt.ylabel('j-points', **cfont_axis)
-
-        if l_show_cb:
-            ax2 = plt.axes(vcb)
-            if l_pow_field or l_log_field:
-                clb = mpl.colorbar.ColorbarBase(ax=ax2,               cmap=pal_fld, norm=norm_fld, orientation='horizontal', extend='neither')
-            else:
-                clb = mpl.colorbar.ColorbarBase(ax=ax2, ticks=vc_fld, cmap=pal_fld, norm=norm_fld, orientation='horizontal', extend=cextend)
-            if cb_jump > 1:
-                cb_labs = [] ; cpt = 0
-                for rr in vc_fld:
-                    if cpt % cb_jump == 0:
-                        if df >= 1.: cb_labs.append(str(int(rr)))
-                        if df <  1.: cb_labs.append(str(rr))
-                    else:
-                        cb_labs.append(' ')
-                    cpt = cpt + 1
-                clb.ax.set_xticklabels(cb_labs)
-            clb.set_label(cunit, **cfont_clb)
-            clb.ax.yaxis.set_tick_params(color=color_top) ; # set colorbar tick color
-            #clb.outline.set_edgecolor(color_top) ; # set colorbar edgecolor
-            if l_hide_cb_ticks: clb.ax.tick_params(axis=u'both', which=u'both',length=0) ; # remove ticks!
-            plt.setp(plt.getp(clb.ax.axes, 'xticklabels'), color=color_top) ; # set colorbar ticklabels
-
-            del ct
-
-        if l_show_nm:  ax.annotate(CCONF, xy=(1, 4), xytext=(x_cnf, y_cnf), **cfont_cnfn)
-
-        if l_show_ttl: ax.annotate(CCONF, xy=(1, 4), xytext=(x_ttl, y_ttl), **cfont_ttl)
-
-        if l_show_clock: ax.annotate('Date: '+cdats, xy=(1, 4), xytext=(x_clock,y_clock), **cfont_clock)
-
+        # Only going if image not already present: lilo
 
         
+        cfig = './'+cnfig+'_'+cdate+'.'+fig_type
 
+        if not path.exists(cfig):
+        
+            fig = plt.figure(num = 1, figsize=fsize, dpi=rDPI, facecolor='k', edgecolor='k')
+    
+            if l_scientific_mode:
+                ax  = plt.axes([0.09, 0.09, 0.9, 0.9], facecolor = 'r')
+            else:
+                ax  = plt.axes([0., 0., 1., 1.],     facecolor = bgclr)
+    
+    
+            if l_show_mod_field and l_read_mod:
+                print('    => Reading record #'+str(jtm)+' of '+cv_mod+' in '+cf_mod)
+                XFLD  = id_f_mod.variables[cv_mod][jtm-1,j1:j2,i1:i2] ; # t, y, x
+                print('          Done!\n')
+    
+                if jtm == 0:
+                    if XMSK[:,:].shape != XFLD.shape:
+                        print('\n PROBLEM: field and mask do not agree in shape!')
+                        print(XMSK.shape , XFLD.shape)
+                        sys.exit(0)
+                    print('  *** Shape of field and mask => ', nmp.shape(XFLD))
+    
+            l_add_true_filled = False
+    
+            if l_show_mod_field:
+                cf = plt.pcolormesh(XFLD[:,:], cmap=pal_fld, norm=norm_fld )
+    
+            if l_show_msh:
+                ccx = plt.contour(Xlon[:,:], 60, colors='k', linewidths=0.5)
+                ccy = plt.contour(Xlat[:,:], 30, colors='k', linewidths=0.5)
+    
+    
+            #cm = plt.imshow(pmsk, cmap=pal_lsm, norm=norm_lsm, interpolation='none')
+            cm = plt.pcolormesh( pmsk, cmap=pal_lsm, norm=norm_lsm )
+    
+            if l_add_true_filled: del pfilled
+    
+    
+            plt.axis([ 0, Ni, 0, Nj])
+    
+            # Showing trajectories:
+            ct = plt.scatter(xJIs[:,jtt], xJJs[:,jtt], c=xFFs[:,jtt], cmap=pal_fld, norm=norm_fld, marker='.', s=pt_sz_track )
+    
+    
+    
+    
+    
+            if l_scientific_mode:
+                plt.xlabel('i-points', **cfont_axis)
+                plt.ylabel('j-points', **cfont_axis)
+    
+            if l_show_cb:
+                ax2 = plt.axes(vcb)
+                if l_pow_field or l_log_field:
+                    clb = mpl.colorbar.ColorbarBase(ax=ax2,               cmap=pal_fld, norm=norm_fld, orientation='horizontal', extend='neither')
+                else:
+                    clb = mpl.colorbar.ColorbarBase(ax=ax2, ticks=vc_fld, cmap=pal_fld, norm=norm_fld, orientation='horizontal', extend=cextend)
+                if cb_jump > 1:
+                    cb_labs = [] ; cpt = 0
+                    for rr in vc_fld:
+                        if cpt % cb_jump == 0:
+                            if df >= 1.: cb_labs.append(str(int(rr)))
+                            if df <  1.: cb_labs.append(str(rr))
+                        else:
+                            cb_labs.append(' ')
+                        cpt = cpt + 1
+                    clb.ax.set_xticklabels(cb_labs)
+                clb.set_label(cunit, **cfont_clb)
+                clb.ax.yaxis.set_tick_params(color=color_top) ; # set colorbar tick color
+                #clb.outline.set_edgecolor(color_top) ; # set colorbar edgecolor
+                if l_hide_cb_ticks: clb.ax.tick_params(axis=u'both', which=u'both',length=0) ; # remove ticks!
+                plt.setp(plt.getp(clb.ax.axes, 'xticklabels'), color=color_top) ; # set colorbar ticklabels
+    
+                del ct
+    
+            if l_show_nm:  ax.annotate(CCONF, xy=(1, 4), xytext=(x_cnf, y_cnf), **cfont_cnfn)
+    
+            if l_show_ttl: ax.annotate(CCONF, xy=(1, 4), xytext=(x_ttl, y_ttl), **cfont_ttl)
+    
+            if l_show_clock: ax.annotate('Date: '+cdats, xy=(1, 4), xytext=(x_clock,y_clock), **cfont_clock)
+    
+    
+            
+    
+    
+            #plt.savefig(cfig, dpi=rDPI, orientation='portrait', facecolor='b', transparent=True)
+            plt.savefig(cfig, dpi=rDPI, orientation='portrait') #, transparent=True)
+            print(cfig+' created!\n')
+            plt.close(1)
+        
+            del cm, fig, ax
 
-        #plt.savefig(cfig, dpi=rDPI, orientation='portrait', facecolor='b', transparent=True)
-        plt.savefig(cfig, dpi=rDPI, orientation='portrait') #, transparent=True)
-        print(cfig+' created!\n')
-        plt.close(1)
-
-
-
-        del cm, fig, ax
+        else:
+            print('\n ### Figure '+cfig+' already there!')
+            
 # END OF LOOP !!!
 
 if l_show_mod_field: id_f_mod.close()
