@@ -27,14 +27,12 @@ def MsgExit( cmsg ):
 
 
 def chck4f(cf, script_name=''):
-
     cmesg = 'File '+cf+' does not exist !!!'
     if script_name != '': cmesg = 'in script '+script_name+': File '+cf+' does not exist !!!'
-
     if not os.path.exists(cf):
         MsgExit(cmesg)
-    else:
-        print(' *** will open file '+cf)
+    #else:
+    #    print(' *** will open file '+cf)
 
 
 
