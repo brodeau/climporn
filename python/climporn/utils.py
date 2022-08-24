@@ -812,6 +812,7 @@ def round_bounds( x1, x2,  base=5, prec=3 ):
 
 
 def fig_style( pzoom, clr_top='k' ):
+    from matplotlib import rcParams
     # Showing a map for each time step:
     params = { 'font.family':'Open Sans',
                'font.weight':    'normal',
@@ -820,7 +821,7 @@ def fig_style( pzoom, clr_top='k' ):
                'xtick.labelsize': int(18.*pzoom),
                'ytick.labelsize': int(18.*pzoom),
                'axes.labelsize':  int(15.*pzoom) }
-    mpl.rcParams.update(params)
+    rcParams.update(params)
     fig_style.cfont_clb  = { 'fontname':'Open Sans',       'fontweight':'medium', 'fontsize':int(18.*pzoom), 'color':clr_top }
     fig_style.cfont_date = { 'fontname':'Ubuntu Mono',     'fontweight':'normal', 'fontsize':int(12.*pzoom), 'color':clr_top }
     fig_style.cfont_mail = { 'fontname':'Times New Roman', 'fontweight':'normal', 'fontsize':int(14.*pzoom), 'color':'0.8' , 'fontstyle':'italic' }
