@@ -825,10 +825,10 @@ def fig_style( pzoom, clr_top='k' ):
     fig_style.cfont_clb  = { 'fontname':'Open Sans',       'fontweight':'medium', 'fontsize':int(18.*pzoom), 'color':clr_top }
     fig_style.cfont_date = { 'fontname':'Ubuntu Mono',     'fontweight':'normal', 'fontsize':int(12.*pzoom), 'color':clr_top }
     fig_style.cfont_mail = { 'fontname':'Times New Roman', 'fontweight':'normal', 'fontsize':int(14.*pzoom), 'color':'0.8' , 'fontstyle':'italic' }
-    fig_style.cfont_mrkr = { 'fontname':'Open Sans',       'fontweight':'light' , 'fontsize':int( 2.*pzoom), 'color':clr_top }
+    fig_style.cfont_mrkr = { 'fontname':'Open Sans',       'fontweight':'light' , 'fontsize':int( 5.*pzoom), 'color':clr_top }
     fig_style.cfont_axis = { 'fontname':'Open Sans',       'fontweight':'medium', 'fontsize':int(18.*pzoom), 'color':clr_top }
     fig_style.cfont_ttl  = { 'fontname':'Open Sans',       'fontweight':'medium', 'fontsize':int(25.*pzoom), 'color':clr_top }
-    fig_style.cfont_clck = { 'fontname':'Ubuntu Mono',     'fontweight':'normal', 'fontsize':int(14.*pzoom), 'color':clr_top }
+    fig_style.cfont_clck = { 'fontname':'Ubuntu Mono',     'fontweight':'normal', 'fontsize':int(12.*pzoom), 'color':clr_top }
     #
     return 0
 
