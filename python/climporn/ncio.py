@@ -611,33 +611,32 @@ def dump_2d_field( cf_out, XFLD, xlon=[], xlat=[], name='field', unit='', long_n
 
 
 
-def dump_2d_multi_field( cf_out, XFLD, vnames, xlon=[], xlat=[], vtime=[], \
+def Dump2DMultiField( cf_out, XFLD, vnames, vlnames=[], vunits=[], vndim=[], xlon=[], xlat=[], vtime=[], \
                          clon='nav_lon', clat='nav_lat', dim_nm=['lat','lon'], cFieldPres='f8', rfillval=None ):
-    
+    #
     if len(vtime)>0:
         l_add_time = True
         (nbfld, Nbt, nj, ni) = nmp.shape(XFLD)
-        if Nbt != len(vtime): print('ERROR (dump_2d_multi_field): array and time vector disagree!'); sys.exit(0)
+        if Nbt != len(vtime): print('ERROR (Dump2DMultiField): array and time vector disagree!'); sys.exit(0)
     else:
         l_add_time = False
         (nbfld,      nj, ni) = nmp.shape(XFLD)
 
+    l_add_long_names = ( len(vlnames) == nbfld )
+    l_add_units      = ( len(vunits)  == nbfld )
 
     vnbdim = nmp.zeros(nbfld)
     if vndim == []:
         vnbdim[:] = 3 ; # default dim is 3 (time_counter,y,x)
     else:
         nn0 = len(vndim)
-        if nbfld != nn0: print('ERROR (dump_2d_multi_field): vndim and main array dont agree in shape!'); sys.exit(0)
+        if nbfld != nn0: print('ERROR (Dump2DMultiField): vndim and main array dont agree in shape!'); sys.exit(0)
         vnbdim[:] = vndim[:]
-
-
         
     nf = len(vnames)
-    if nbfld != nf: print('ERROR (dump_2d_multi_field): list of names and main array dont agree in shape!'); sys.exit(0)
+    if nbfld != nf: print('ERROR (Dump2DMultiField): list of names and main array dont agree in shape!'); sys.exit(0)
 
     f_out = Dataset(cf_out, 'w', format='NETCDF4')
-
 
     l_coord_2d = False
     cnm_dim_y = dim_nm[0]
@@ -674,6 +673,9 @@ def dump_2d_multi_field( cf_out, XFLD, vnames, xlon=[], xlat=[], vtime=[], \
     for jv in range(nbfld):
         if (not l_add_time) or (vnbdim[jv]==2):
             id_fld  = f_out.createVariable(vnames[jv] ,cFieldPres,(cnm_dim_y,cnm_dim_x,), fill_value=rfillval, zlib=True, complevel=8)
+            if l_add_long_names: id_fld.long_name = vlnames[jv]
+            if l_add_units:      id_fld.units     =  vunits[jv]
+            #
             if l_add_time:
                 id_fld[:,:] = XFLD[jv,0,:,:]
             else:
@@ -681,8 +683,8 @@ def dump_2d_multi_field( cf_out, XFLD, vnames, xlon=[], xlat=[], vtime=[], \
         else:
             id_fld  = f_out.createVariable(vnames[jv] ,cFieldPres,('time_counter',cnm_dim_y,cnm_dim_x,), fill_value=rfillval, zlib=True, complevel=8)
             id_fld[:,:,:] = XFLD[jv,:,:,:]
-            
-    f_out.about = 'Diagnostics created with Climporn (https://github.com/brodeau/climporn)'
+        
+    f_out.about = 'File generated with `ncio.Dump2DMultiField()` of `climporn` (https://github.com/brodeau/climporn)'
     f_out.close()
 
     return
