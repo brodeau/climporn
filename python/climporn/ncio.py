@@ -612,7 +612,8 @@ def dump_2d_field( cf_out, XFLD, xlon=[], xlat=[], name='field', unit='', long_n
 
 
 def Dump2DMultiField( cf_out, XFLD, vnames, vlnames=[], vunits=[], vndim=[], xlon=[], xlat=[], vtime=[], \
-                         clon='nav_lon', clat='nav_lat', dim_nm=['lat','lon'], cFieldPres='f8', rfillval=None ):
+                      clon='nav_lon', clat='nav_lat', dim_nm=['lat','lon'], cFieldPres='f8',
+                      rfillval=None, cabout='' ):
     #
     if len(vtime)>0:
         l_add_time = True
@@ -683,8 +684,12 @@ def Dump2DMultiField( cf_out, XFLD, vnames, vlnames=[], vunits=[], vndim=[], xlo
         else:
             id_fld  = f_out.createVariable(vnames[jv] ,cFieldPres,('time_counter',cnm_dim_y,cnm_dim_x,), fill_value=rfillval, zlib=True, complevel=8)
             id_fld[:,:,:] = XFLD[jv,:,:,:]
-        
-    f_out.about = 'File generated with `ncio.Dump2DMultiField()` of `climporn` (https://github.com/brodeau/climporn)'
+            
+    if cabout == '':
+        f_out.about = 'File generated with `ncio.Dump2DMultiField()` of `climporn` (https://github.com/brodeau/climporn)'
+    else:
+        f_out.about = cabout+' [ + `ncio.Dump2DMultiField()` of `climporn` ]'
+    
     f_out.close()
 
     return
