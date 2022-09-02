@@ -832,3 +832,17 @@ def fig_style( pzoom, clr_top='k' ):
     #
     return 0
 
+def epoch2clock( rt ):
+    from datetime import datetime as dt
+    from datetime import timezone
+    ct = dt.fromtimestamp(rt, timezone.utc).strftime("%Y-%m-%d_%H:%M:%S")
+    return str(ct)
+
+def clock2epoch( cdate ):
+    from datetime import datetime as dt
+    from datetime import timezone    
+    rt = dt.strptime(cdate, "%Y-%m-%d_%H:%M:%S").replace(tzinfo=timezone.utc)
+    return rt.timestamp()
+
+
+
