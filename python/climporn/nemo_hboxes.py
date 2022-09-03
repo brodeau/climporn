@@ -147,15 +147,13 @@ class nemo_hbox:
             l_show_exp=False ; x_exp = 50 ; y_exp = 800
             l_fill_holes_k=True
 
-        #lolo
         elif [ config, box ] == [ 'NANUK4', 'ALL']:
-            i1=0 ; j1=0  ;  i2=Ni0 ; j2=Nj0  ; rfact_zoom=2. ; font_rat=0.4*rfact_zoom
+            i1=0 ; j1=0  ;  i2=Ni0 ; j2=Nj0  ; rfact_zoom=1. ; font_rat=0.4*rfact_zoom
             l_show_cb  = True ; vcb=[0.1, 0.075, 0.8, 0.018]
             l_show_clock=True ; x_clock = 330 ; y_clock = 500
             l_add_logo=False
             l_show_name=True ; x_name = 240 ; y_name = 525
             l_show_exp=False ; x_exp = 50 ; y_exp = 80
-
             l_fill_holes_k=False
 
         elif [ config, box ] == [ 'NANUK2', 'ALL']:

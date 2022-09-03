@@ -844,5 +844,14 @@ def clock2epoch( cdate ):
     rt = dt.strptime(cdate, "%Y-%m-%d_%H:%M:%S").replace(tzinfo=timezone.utc)
     return rt.timestamp()
 
+def epoch2clockS( rt ):
+    from datetime import datetime as dt
+    from datetime import timezone
+    ct = dt.fromtimestamp(rt, timezone.utc).strftime("%Y-%m-%d %H:%M")
+    return str(ct)
 
-
+def clock2epochS( cdate ):
+    from datetime import datetime as dt
+    from datetime import timezone    
+    rt = dt.strptime(cdate, "%Y-%m-%d %H:%M").replace(tzinfo=timezone.utc)
+    return rt.timestamp()
