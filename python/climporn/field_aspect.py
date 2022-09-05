@@ -176,7 +176,7 @@ class field_aspect:
 
         elif CWHAT in [ 'damage', 'damage-t', 'damage-f' ]:
             cv_in = CWHAT  ; cv_out = cv_in
-            cpal_fld='magma' ; color_top_cb='k'
+            cpal_fld='magma' ; color_top_cb='w'
             tmin=0. ;  tmax=1. ; l_pow_field=True ; pow_field=7. ; cb_extend = 'neither'
             vc_fld_powlog = [ 0., 0.7, 0.8, 0.9, 0.95, 1. ]
             cunit = 'Damage@T'
