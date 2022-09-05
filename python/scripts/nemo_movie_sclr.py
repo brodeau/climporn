@@ -590,8 +590,8 @@ for jt in range(jt0,Nt):
             if fa.l_pow_field or fa.l_log_field:
                 clb = mpl.colorbar.ColorbarBase(ax=ax2, ticks=fa.vc_fld_powlog, cmap=pal_fld, norm=norm_fld, orientation='horizontal', extend='neither')
                 cb_labs = clb.ax.get_xticklabels()
-                print(" fa.vc_fld_powlog = ", fa.vc_fld_powlog )
-                print(" cb_labs =", cb_labs) ; sys.exit(0)
+                #print(" fa.vc_fld_powlog = ", fa.vc_fld_powlog )
+                #print(" cb_labs =", cb_labs) ; sys.exit(0)
             else:
                 clb = mpl.colorbar.ColorbarBase(ax=ax2, ticks=vc_fld, cmap=pal_fld, norm=norm_fld, orientation='horizontal', extend=fa.cb_extend)
                 cb_labs = []
