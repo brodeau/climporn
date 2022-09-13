@@ -216,7 +216,6 @@ LastStandIDs = []
 with open(cf_trj, 'r') as ftxt:
     iID_o = 999999999
     for line in reversed(list(csv.reader(ftxt, delimiter=','))):
-        #print(line)
         iID = int(line[0])    # ID of current trajectory as an integer
         if iID > iID_o: break # Then we are starting a new time record
         LastStandIDs.append(iID)
