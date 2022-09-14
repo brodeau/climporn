@@ -42,25 +42,16 @@ color_top = 'w'
 clr_yellow = '#ffed00'
 
 # Defaults:
-lknown = True
-rfact_zoom = 1.
-l_show_cb = False
-l_show_nm = False
-l_show_clock=False ; x_clock=0. ; y_clock=0.
 l_scientific_mode = False
-l_show_ttl = False
-vcb = [0.15, 0.96, 0.8, 0.02]
-font_rat = 1.
 
 l_show_msh = False
-
-pt_sz_track = 30
 
 fig_type='png'
 
 vmn = [ 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ]
 vml = [ 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ]
 
+CBOX = 'ALL' ; # what box of `CCONF` ???
 
 narg = len(sys.argv)
 if not narg in [6,7]:
@@ -126,35 +117,12 @@ print('\n *** dir_conf =',dir_conf,'\n')
 if l_show_mod_field: print('\n Field to show in background: "'+cv_mod+'" of file "'+cf_mod+'" !\n')
 
 
-i2=0
-j2=0
 
-if   CCONF == 'ORCA1':
-    i1 = 0 ; j1 = 0 ; i2 = 362 ; j2 = 292 ; rfact_zoom = 3. ; vcb = [0.15, 0.96, 0.8, 0.02] ; font_rat = 0.1
-    l_show_cb = False ; l_show_nm = False
-    pt_sz_track = 1
+# Getting setup for NEMO CONFIG/BOX:
+HBX = cp.nemo_hbox(CCONF,CBOX)
+(i1,j1,i2,j2) = HBX.idx()
 
-elif CCONF == 'NANUK2':
-    i1 = 0 ; j1 = 0 ; i2 = 247 ; j2 = 286 ; rfact_zoom = 3. ; vcb = [0.1, 0.1, 0.8, 0.02] ; font_rat = 0.4
-    l_show_cb = False ; l_show_nm = False
-    pt_sz_track = 3
-    l_show_cb = True
-    l_show_clock = True ; x_clock=55.*rfact_zoom ; y_clock=90.*rfact_zoom
-
-elif CCONF == 'NANUK4':
-    i1 = 0 ; j1 = 0 ; i2 = 492 ; j2 = 566 ; rfact_zoom = 2. ; vcb = [0.1, 0.08, 0.8, 0.02] ; font_rat = 0.4
-    l_show_cb = False ; l_show_nm = False
-    pt_sz_track = 2
-    l_show_cb = True
-    l_show_clock = True ; x_clock=170.*rfact_zoom ; y_clock=265.*rfact_zoom
-
-else:
-    print('\n WARNING [nemo_imshow_2d_field.py]: "'+CCONF+'" is an unknown config!\n     ==> falling back on default setup')
-    lknown = False
-    i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0
-
-
-
+# About fields:
 l_log_field = False
 l_pow_field = False
 cextend='both'
@@ -377,10 +345,9 @@ print('  *** we are going to show: i1,i2,j1,j2 =>', i1,i2,j1,j2, '\n')
 nx_res = i2-i1
 ny_res = j2-j1
 yx_ratio = float(ny_res)/float(nx_res)
-if not lknown:
-    rfact_zoom = round(1000./float(ny_res),1)
-nxr = int(rfact_zoom*nx_res) ; # widt image (in pixels)
-nyr = int(rfact_zoom*ny_res) ; # height image (in pixels)
+#
+nxr = int(HBX.rfact_zoom*nx_res) ; # widt image (in pixels)
+nyr = int(HBX.rfact_zoom*ny_res) ; # height image (in pixels)
 rDPI = 200
 rh  = float(nxr)/float(rDPI) ; # width of figure as for figure...
 
@@ -393,17 +360,17 @@ idx_oce = nmp.where(XMSK[:,:] > 0.5)
 #params = { 'font.family':'Ubuntu',
 params = { 'font.family':'Open Sans',
            'font.weight':    'normal',
-           'font.size':       int(12.*font_rat),
-           'legend.fontsize': int(22.*font_rat),
-           'xtick.labelsize': int(18.*font_rat),
-           'ytick.labelsize': int(18.*font_rat),
-           'axes.labelsize':  int(15.*font_rat) }
+           'font.size':       int(12.*HBX.font_rat),
+           'legend.fontsize': int(22.*HBX.font_rat),
+           'xtick.labelsize': int(18.*HBX.font_rat),
+           'ytick.labelsize': int(18.*HBX.font_rat),
+           'axes.labelsize':  int(15.*HBX.font_rat) }
 mpl.rcParams.update(params)
-cfont_clb   = { 'fontname':'Open Sans',   'fontweight':'medium', 'fontsize':int(18.*font_rat), 'color':color_top }
-cfont_cnfn  = { 'fontname':'Open Sans',   'fontweight':'light' , 'fontsize':int(35.*font_rat), 'color':color_top }
-cfont_axis  = { 'fontname':'Open Sans',   'fontweight':'medium', 'fontsize':int(18.*font_rat), 'color':color_top }
-cfont_ttl   = { 'fontname':'Open Sans',   'fontweight':'medium', 'fontsize':int(25.*font_rat), 'color':color_top }
-cfont_clock = { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(19.*font_rat), 'color':color_top }
+cfont_clb   = { 'fontname':'Open Sans',   'fontweight':'medium', 'fontsize':int(18.*HBX.font_rat), 'color':color_top }
+cfont_cnfn  = { 'fontname':'Open Sans',   'fontweight':'light' , 'fontsize':int(35.*HBX.font_rat), 'color':color_top }
+cfont_axis  = { 'fontname':'Open Sans',   'fontweight':'medium', 'fontsize':int(18.*HBX.font_rat), 'color':color_top }
+cfont_ttl   = { 'fontname':'Open Sans',   'fontweight':'medium', 'fontsize':int(25.*HBX.font_rat), 'color':color_top }
+cfont_clock = { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(19.*HBX.font_rat), 'color':color_top }
 
 # Colormaps for fields:
 pal_fld = cp.chose_colmap(cpal_fld)
@@ -540,7 +507,7 @@ for jtt in range(NrTraj):
             plt.axis([ 0, Ni, 0, Nj])
     
             # Showing trajectories:
-            ct = plt.scatter(xJIs[:,jtt], xJJs[:,jtt], c=xFFs[:,jtt], cmap=pal_fld, norm=norm_fld, marker='.', s=pt_sz_track )
+            ct = plt.scatter(xJIs[:,jtt], xJJs[:,jtt], c=xFFs[:,jtt], cmap=pal_fld, norm=norm_fld, marker='.', s=HBX.pt_sz_track )
     
     
     
@@ -550,8 +517,8 @@ for jtt in range(NrTraj):
                 plt.xlabel('i-points', **cfont_axis)
                 plt.ylabel('j-points', **cfont_axis)
     
-            if l_show_cb:
-                ax2 = plt.axes(vcb)
+            if HBX.l_show_cb:
+                ax2 = plt.axes(HBX.vcb)
                 if l_pow_field or l_log_field:
                     clb = mpl.colorbar.ColorbarBase(ax=ax2,               cmap=pal_fld, norm=norm_fld, orientation='horizontal', extend='neither')
                 else:
@@ -574,11 +541,11 @@ for jtt in range(NrTraj):
     
                 del ct
     
-            if l_show_nm:  ax.annotate(CCONF, xy=(1, 4), xytext=(x_cnf, y_cnf), **cfont_cnfn)
+            if HBX.l_show_name:  ax.annotate(CCONF,          xy=(1, 4), xytext=HBX.name,  **cfont_cnfn)
     
-            if l_show_ttl: ax.annotate(CCONF, xy=(1, 4), xytext=(x_ttl, y_ttl), **cfont_ttl)
+            if HBX.l_show_exp:   ax.annotate(CCONF,          xy=(1, 4), xytext=HBX.exp,   **cfont_ttl)
     
-            if l_show_clock: ax.annotate('Date: '+cdats, xy=(1, 4), xytext=(x_clock,y_clock), **cfont_clock)
+            if HBX.l_show_clock: ax.annotate('Date: '+cdats, xy=(1, 4), xytext=HBX.clock, **cfont_clock)
     
     
             
