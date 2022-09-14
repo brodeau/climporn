@@ -88,7 +88,6 @@ class nemo_hbox:
         x_name = 100   ; y_name = 100
 
         pt_sz_track = 5
-        l_show_ttl  = False
         
         if   [ config, box ] == [ 'eNATL60', 'ALL']:
             i1=0   ; j1=0    ; i2=Ni0 ; j2=Nj0  ; rfact_zoom=1440./float(Nj0) ; vcb=[0.61, 0.1, 0.36, 0.018]  ; font_rat=8.*rfact_zoom
@@ -147,6 +146,7 @@ class nemo_hbox:
             l_show_exp=False ; x_exp = 50 ; y_exp = 800
             l_fill_holes_k=True
 
+            
         elif [ config, box ] == [ 'NANUK4', 'ALL']:
             i1=0 ; j1=0  ;  i2=Ni0 ; j2=Nj0  ; rfact_zoom=2. ; font_rat=0.2*rfact_zoom
             l_show_cb  = True ; vcb=[0.1, 0.08, 0.8, 0.02]
@@ -155,8 +155,9 @@ class nemo_hbox:
             l_show_name=False ; x_name = 240 ; y_name = 525
             l_show_exp=False ; x_exp = 50 ; y_exp = 80
             l_fill_holes_k=False
-            pt_sz_track = 2 ; l_show_ttl=True
+            pt_sz_track = 2
 
+            
         elif [ config, box ] == [ 'NANUK2', 'ALL']:
             i1=0 ; j1=0  ;  i2=Ni0 ; j2=Nj0  ; rfact_zoom=4. ; font_rat=0.2*rfact_zoom
             l_show_cb  = True ; vcb=[0.1, 0.07, 0.8, 0.018]
@@ -385,6 +386,8 @@ class nemo_hbox:
             exit(0)
 
 
+        print(' *** CONF: "'+config+'", BOX: "'+box+'" ==> i1,j1,i2,j2 = ',i1,j1,i2,j2,'\n')
+            
         self.rfact_zoom      = rfact_zoom
         self.vcb             = vcb
         self.font_rat        = font_rat
@@ -413,7 +416,6 @@ class nemo_hbox:
         self.cf_logo_prc = cf_logo_prc
 
         self.pt_sz_track = pt_sz_track
-        self.l_show_ttl  = l_show_ttl
         
         return (i1,j1, i2,j2)
 
