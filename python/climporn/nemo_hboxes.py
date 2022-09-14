@@ -87,8 +87,8 @@ class nemo_hbox:
         x_exp = 40     ; y_exp = 980
         x_name = 100   ; y_name = 100
 
-
-        
+        pt_sz_track = 5
+        l_show_ttl  = False
         
         if   [ config, box ] == [ 'eNATL60', 'ALL']:
             i1=0   ; j1=0    ; i2=Ni0 ; j2=Nj0  ; rfact_zoom=1440./float(Nj0) ; vcb=[0.61, 0.1, 0.36, 0.018]  ; font_rat=8.*rfact_zoom
@@ -148,13 +148,14 @@ class nemo_hbox:
             l_fill_holes_k=True
 
         elif [ config, box ] == [ 'NANUK4', 'ALL']:
-            i1=0 ; j1=0  ;  i2=Ni0 ; j2=Nj0  ; rfact_zoom=1. ; font_rat=0.4*rfact_zoom
-            l_show_cb  = True ; vcb=[0.1, 0.075, 0.8, 0.018]
-            l_show_clock=True ; x_clock = 330 ; y_clock = 500
+            i1=0 ; j1=0  ;  i2=Ni0 ; j2=Nj0  ; rfact_zoom=2. ; font_rat=0.2*rfact_zoom
+            l_show_cb  = True ; vcb=[0.1, 0.08, 0.8, 0.02]
+            l_show_clock=True ; x_clock = 170.*rfact_zoom ; y_clock = 265*rfact_zoom
             l_add_logo=False
-            l_show_name=True ; x_name = 240 ; y_name = 525
+            l_show_name=False ; x_name = 240 ; y_name = 525
             l_show_exp=False ; x_exp = 50 ; y_exp = 80
             l_fill_holes_k=False
+            pt_sz_track = 2 ; l_show_ttl=True
 
         elif [ config, box ] == [ 'NANUK2', 'ALL']:
             i1=0 ; j1=0  ;  i2=Ni0 ; j2=Nj0  ; rfact_zoom=4. ; font_rat=0.2*rfact_zoom
@@ -407,10 +408,12 @@ class nemo_hbox:
 
         self.c_imshow_interp = c_imshow_interp
 
-        self.cf_logo_on  = cf_logo_on # 
+        self.cf_logo_on  = cf_logo_on
         self.cf_logo_ige = cf_logo_ige
         self.cf_logo_prc = cf_logo_prc
 
-
+        self.pt_sz_track = pt_sz_track
+        self.l_show_ttl  = l_show_ttl
+        
         return (i1,j1, i2,j2)
 
