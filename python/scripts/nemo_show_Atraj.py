@@ -41,6 +41,8 @@ l_show_mod_field = False
 color_top = 'w'
 clr_yellow = '#ffed00'
 
+rDPI = 200
+
 # Defaults:
 l_scientific_mode = False
 
@@ -51,7 +53,8 @@ fig_type='png'
 vmn = [ 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ]
 vml = [ 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ]
 
-CBOX = 'ALL' ; # what box of `CCONF` ???
+#CBOX = 'ALL' ; # what box of `CCONF` ???
+CBOX = 'EastArctic' ; # what box of `CCONF` ???
 
 narg = len(sys.argv)
 if not narg in [6,7]:
@@ -269,6 +272,9 @@ xJJs[:Nliv,NrTraj-1] = JJsR[:]
 xFFs[:Nliv,NrTraj-1] = FFsR[:]
 
 
+xJIs[:Nliv,NrTraj-1] = JIsR[:]
+xJJs[:Nliv,NrTraj-1] = JJsR[:]
+
 # Masking dead buoys:
 xIDs = nmp.ma.masked_where(xIDs[:,:]==0, xIDs[:,:])
 xJIs = nmp.ma.masked_where(xIDs[:,:]==0, xJIs[:,:])
@@ -326,8 +332,8 @@ id_lsm = Dataset(cf_lsm)
 nb_dim = len(id_lsm.variables[cnmsk].dimensions)
 Ni = id_lsm.dimensions['x'].size
 Nj = id_lsm.dimensions['y'].size
-if i2 == 0: i2 = Ni
-if j2 == 0: j2 = Nj
+#if i2 == 0: i2 = Ni
+#if j2 == 0: j2 = Nj
 if nb_dim == 4: XMSK  = id_lsm.variables[cnmsk][0,0,j1:j2,i1:i2] ; # t, y, x
 if nb_dim == 3: XMSK  = id_lsm.variables[cnmsk][0,  j1:j2,i1:i2] ; # t, y, x
 if nb_dim == 2: XMSK  = id_lsm.variables[cnmsk][    j1:j2,i1:i2] ; # t, y, x
@@ -348,7 +354,6 @@ yx_ratio = float(ny_res)/float(nx_res)
 #
 nxr = int(HBX.rfact_zoom*nx_res) ; # widt image (in pixels)
 nyr = int(HBX.rfact_zoom*ny_res) ; # height image (in pixels)
-rDPI = 200
 rh  = float(nxr)/float(rDPI) ; # width of figure as for figure...
 
 print('\n *** width and height of image to create:', nxr, nyr, '\n')
@@ -387,7 +392,6 @@ norm_lsm = colors.Normalize(vmin = 0., vmax = 1., clip = False)
 pal_filled = cp.chose_colmap('gray_r')
 norm_filled = colors.Normalize(vmin = 0., vmax = 0.1, clip = False)
 
-fsize  = ( rh, rh*yx_ratio )
 vc_fld = nmp.arange(tmin, tmax + df, df)
 
 
@@ -468,7 +472,7 @@ for jtt in range(NrTraj):
         
         if not path.exists(cfig):
         
-            fig = plt.figure(num = 1, figsize=fsize, dpi=rDPI, facecolor='k', edgecolor='k')
+            fig = plt.figure(num=1, figsize=(rh,rh*yx_ratio), dpi=rDPI, facecolor='k', edgecolor='k')
     
             if l_scientific_mode:
                 ax  = plt.axes([0.09, 0.09, 0.9, 0.9], facecolor = 'r')
@@ -504,10 +508,10 @@ for jtt in range(NrTraj):
             if l_add_true_filled: del pfilled
     
     
-            plt.axis([ 0, Ni, 0, Nj])
+            plt.axis([ 0,i2-i1,0,j2-j1])
     
             # Showing trajectories:
-            ct = plt.scatter(xJIs[:,jtt], xJJs[:,jtt], c=xFFs[:,jtt], cmap=pal_fld, norm=norm_fld, marker='.', s=HBX.pt_sz_track )
+            ct = plt.scatter(xJIs[:,jtt]-i1, xJJs[:,jtt]-j1, c=xFFs[:,jtt], cmap=pal_fld, norm=norm_fld, marker='.', s=HBX.pt_sz_track )
     
     
     
