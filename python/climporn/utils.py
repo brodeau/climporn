@@ -855,3 +855,125 @@ def clock2epochS( cdate ):
     from datetime import timezone    
     rt = dt.strptime(cdate, "%Y-%m-%d %H:%M").replace(tzinfo=timezone.utc)
     return rt.timestamp()
+
+
+
+
+#def __extract_geom_meta__(country):
+#    '''
+#    extract from each geometry the name of the country
+#    and the geom_point data. The output will be a list
+#    of tuples and the country name as the last element.
+#    '''
+#    geoms = country.geometry
+#
+#    print(' geoms = ', geoms )
+#    exit(0)
+#    
+#    coords = nmp.empty(shape=[0, 2])
+#    for geom in geoms:
+#        coords = nmp.append(coords, geom.exterior.coords, axis = 0)
+#
+#    country_name = country.attributes["ADMIN"]
+#    return [coords, country_name]
+
+#def save_coastline_shape_file( fout ):
+#    '''
+#    store shp files locally, this functions will download
+#    shapefiles for the whole planet.
+#    '''
+#    #import shapely as sp
+#    import cartopy.io.shapereader as shpreader
+#    
+#   
+#    f_cl = shpreader.natural_earth(resolution = '10m', category = 'cultural', name='admin_0_countries')
+#    #f_cl = shpreader.natural_earth(resolution='50m', category='physical', name='coastline')
+#    
+#    reader = shpreader.Reader(f_cl)
+#    
+#    countries = reader.records()
+#
+#    #print(countries)
+#    #exit(0)
+#    
+#    # extract and create separate objects
+#    world_geoms = [__extract_geom_meta__(country) for country in countries]
+#
+#    coords_countries = nmp.vstack([[nmp.array(x[:-1]), x[-1]]
+#                                    for x in world_geoms])
+#    coastline = nmp.save(os.path.join(os.path.dirname(__file__),
+#                                     fout )
+#                        , coords_countries)
+#
+#    print('Saving coordinates into file "'+fout+'" !')
+
+
+
+
+#def Distance2Shore(lon, lat):
+#    '''
+#    This function will create a numpy array of distances
+#    to shore. It will contain and ID for AIS points and
+#    the distance to the nearest coastline point.
+#    '''
+#    coastline_coords = nmp.vstack([nmp.flip(x[0][0], axis=1) for x in coastline])
+#    
+#    countries        = nmp.hstack([nmp.repeat(str(x[1]), len(x[0][0])) for x in coastline])
+#
+#    tree = BallTree(nmp.radians(coastline_coords), metric='haversine')
+#    coords = pd.concat([nmp.radians(lat), nmp.radians(lon)], axis=1)
+#    dist, ind = tree.query(coords, k=1)
+#    df_distance_to_shore = pd.Series(dist.flatten()*6371, name='distance_to_shore')
+#    df_countries = pd.Series(countries[ind].flatten(), name='shore_country')
+#    return pd.concat([df_distance_to_shore, df_countries], axis=1)
+
+
+#def DistanceToLand( plon, plat ):
+#    ''' Compute distance in km of any given location to the nearest land '''
+#
+#    import cartopy
+#    import geopandas as gpd
+#
+#    print('Get shape file...')
+#    world = gpd.read_file(gpd.datasets.get_path('naturalearth_lowres'))
+#    print(' world = ', world )
+
+    
+#    #single geom for the coastline
+#    f_cl = cartopy.io.shapereader.natural_earth(resolution='50m', category='physical', name='coastline')
+
+#    c     = gpd.read_file(f_cl)
+    
+#    c.crs = 'EPSG:4326'
+
+#    print('Get coastline...')
+#    coastline = gpd.clip(c.to_crs('EPSG:4326'), aus.buffer(0.25)).iloc[0].geometry
+
+ 
+
+#    print(c)
+
+#    return 0.
+
+#import shapely
+#from   cartopy.io.shapereader import Reader
+#from   cartopy.feature        import ShapelyFeature
+
+#land = shapereader.gshhs(scale='h', level=1)
+                              
+#geoms = list(itertools.chain.from_iterable(geom.geoms for geom in shapereader.Reader(land).geometries()))
+#geometries = shapely.geometry.MultiPolygon(geoms)
+
+#src_crs = pyproj.CRS('EPSG:4326')
+#tgt_crs = pyproj.CRS('EPSG:32616')
+
+#project       = pyproj.Transformer.from_crs(src_crs, tgt_crs, always_xy=True).transform
+#xy_geometries = transform(project, geometries)
+
+#df['dist'] = nmp.nan
+
+#for i in df.index:
+#    xy = transform(project, shapely.geometry.Point(df.iloc[i]['lon'], df.iloc[i]['lat']))
+#    x, y = xy.xy[0][0], xy.xy[1][0]
+#    point = shapely.geometry.Point(x, y)
+#    df['dist'][i] = xy_geometries.distance(point)   
