@@ -77,7 +77,8 @@ parser.add_argument('-z', '--zld' ,                         help='topography net
 parser.add_argument('-t', '--tstep',  default="1h",         help='time step ("1h","2h",..,up to "1d") in input file')
 parser.add_argument('-N', '--oname',  default="",           help='a name that overides `CONF` on the plot...')
 parser.add_argument('-o', '--outdir', default="./figs",     help='path to directory where to save figures')
-parser.add_argument('-T', '--addSST', default="",      help='add this SST field if showing a sea-ice field')
+parser.add_argument('-f', '--fignm',  default="",           help='common string in name of figure to create')
+parser.add_argument('-T', '--addSST', default="",           help='add this SST field if showing a sea-ice field')
 
 args = parser.parse_args()
 
@@ -92,6 +93,7 @@ cf_topo_land = args.zld
 cdt    = args.tstep  ; # time step, in the form "1h", "2h", ..., "12h", ..., "1m", ..., "6m", ... "1y", ..., etc
 CONAME = args.oname
 cd_out = args.outdir
+cn_fig = args.fignm
 caSST  = args.addSST
 
 print('')
@@ -432,10 +434,13 @@ for jt in range(jt0,Nt):
     print('\n Current date = ', cdats+' !\n')
     #-----------------------------------------------------------------------------------
 
-    if l3d:
-        cfig = cdir_figs+'/'+fa.cv_out+'_'+CNEMO+'-'+CRUN+'_lev'+str(jk)+'_'+CBOX+'_'+cdate+'.'+fig_type
+    if cn_fig != "":
+        cfig = cdir_figs+'/'+fa.cv_out+'_'+cn_fig+'_'+cdate+'.'+fig_type
     else:
-        cfig = cdir_figs+'/'+fa.cv_out+'_'+CNEMO+'-'+CRUN+'_'+CBOX+'_'+cdate+'.'+fig_type
+        if l3d:
+            cfig = cdir_figs+'/'+fa.cv_out+'_'+CNEMO+'-'+CRUN+'_lev'+str(jk)+'_'+CBOX+'_'+cdate+'.'+fig_type
+        else:
+            cfig = cdir_figs+'/'+fa.cv_out+'_'+CNEMO+'-'+CRUN+'_'+CBOX+'_'+cdate+'.'+fig_type
 
 
     if not path.exists(cfig):

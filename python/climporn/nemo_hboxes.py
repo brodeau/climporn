@@ -152,7 +152,7 @@ class nemo_hbox:
             l_show_cb  = True ; vcb=[0.1, 0.08, 0.8, 0.02]
             l_show_clock=True ; x_clock = 170.*rfact_zoom ; y_clock = 265*rfact_zoom
             l_add_logo=False
-            l_show_name=False ; x_name = 240 ; y_name = 525
+            l_show_name=True ; x_name = 240 ; y_name = 525
             l_show_exp=False ; x_exp = 50 ; y_exp = 80
             l_fill_holes_k=False
             pt_sz_track = 2
@@ -166,7 +166,6 @@ class nemo_hbox:
             l_fill_holes_k=False
             pt_sz_track = 2
 
-            
         elif [ config, box ] == [ 'NANUK2', 'ALL']:
             i1=0 ; j1=0  ;  i2=Ni0 ; j2=Nj0  ; rfact_zoom=4. ; font_rat=0.2*rfact_zoom
             l_show_cb  = True ; vcb=[0.1, 0.07, 0.8, 0.018]
