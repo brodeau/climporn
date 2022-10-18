@@ -346,7 +346,7 @@ params = { 'font.family':'Helvetica Neue',
            'ytick.labelsize': int(9.*fontr),
            'axes.labelsize':  int(9.*fontr) }
 mpl.rcParams.update(params)
-cfont_clb_tcks = { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(7.5*fontr), 'color':fa.color_top_cb}
+cfont_clb_tcks = { 'fontname':'Arial', 'fontweight':'normal', 'fontsize':int(7.5*fontr), 'color':fa.color_top_cb}
 cfont_clb  =  { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(8.5*fontr), 'color':fa.color_top_cb}
 cfont_clock = { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(9.*fontr), 'color':fa.color_top }
 cfont_exp= { 'fontname':'Open Sans'  , 'fontweight':'light', 'fontsize':int(9.*fontr), 'color':fa.color_top }
