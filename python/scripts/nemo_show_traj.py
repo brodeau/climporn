@@ -39,6 +39,7 @@ idebug = 1
 l_show_mod_field = False
 
 color_top = 'w'
+color_top_cb = 'k'
 clr_yellow = '#ffed00'
 
 rDPI = 200
@@ -55,6 +56,10 @@ vml = [ 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ]
 
 CBOX = 'ALL' ; # what box of `CCONF` ???
 #CBOX = 'EastArctic' ; # what box of `CCONF` ???
+
+
+NbDays = np.sum(vmn[0:10]) ; #fixme: end of october !!!
+
 
 narg = len(argv)
 if not narg in [6,7]:
@@ -152,13 +157,22 @@ elif cv_mod in ['sosaline','sos']:
 elif cv_mod in ['siconc']:
     cfield = 'siconc'
     tmin=0. ;  tmax=1.   ;  df = 0.1 ; # Arctic!
-    cpal_fld = 'ncview_ice'
+    #cpal_fld = 'ncview_ice'
+    cpal_fld = 'viridis_r'
     cunit = 'Ice concentration'
     bgclr = 'k'   ; # background color for ocean in figure
 
+elif cv_mod in ['duration']:
+    cfield = 'duration'
+    #fixme: end of october!
+    tmin=0. ;  tmax=NbDays   ;  df = 30 ; # Arctic!
+    #cpal_fld = 'ncview_ice'
+    cpal_fld = 'viridis_r'
+    cunit = 'Time from seed (days)'
+    bgclr = 'w'   ; # background color for ocean in figure
+
 else:
     print('ERROR: variable '+cv_mod+' is not known yet...'); exit(0)
-
 
 if not path.exists("figs"): mkdir("figs")
 
@@ -244,7 +258,7 @@ params = { 'font.family':'Open Sans',
            'ytick.labelsize': int(18.*HBX.font_rat),
            'axes.labelsize':  int(15.*HBX.font_rat) }
 mpl.rcParams.update(params)
-cfont_clb   = { 'fontname':'Open Sans',   'fontweight':'medium', 'fontsize':int(18.*HBX.font_rat), 'color':color_top }
+cfont_clb   = { 'fontname':'Open Sans',   'fontweight':'medium', 'fontsize':int(18.*HBX.font_rat), 'color':color_top_cb }
 cfont_cnfn  = { 'fontname':'Open Sans',   'fontweight':'light' , 'fontsize':int(35.*HBX.font_rat), 'color':color_top }
 cfont_axis  = { 'fontname':'Open Sans',   'fontweight':'medium', 'fontsize':int(18.*HBX.font_rat), 'color':color_top }
 cfont_ttl   = { 'fontname':'Open Sans',   'fontweight':'medium', 'fontsize':int(25.*HBX.font_rat), 'color':color_top }
@@ -259,7 +273,7 @@ if l_pow_field:
 else:
     norm_fld = colors.Normalize(vmin = tmin, vmax = tmax, clip = False)
 
-pal_lsm = cp.chose_colmap('land_dark')
+pal_lsm = cp.chose_colmap('land')
 norm_lsm = colors.Normalize(vmin = 0., vmax = 1., clip = False)
 
 #pal_filled = cp.chose_colmap('gray_r')
@@ -291,73 +305,24 @@ cm = plt.pcolormesh( pmsk, cmap=pal_lsm, norm=norm_lsm )
 plt.axis([ 0,i2-i1,0,j2-j1])
 
 
+
+
+# If we show backward:
+#print(xJIs[:,NrTraj-1])
+#exit(0)
     
 # Loop over time records:
-
-jtm = -1 ; # time record to use for model
-l_read_mod = True
+icpt = -1
 for jtt in range(NrTraj):
+    #for jtt in np.arange(NrTraj-1,0,-1):
+    icpt = icpt+1
+    #    if jtt%itsubs == 0:
+    print('jtt =',jtt)
 
-    if jtt%nsubC == 0:
-        jtm = jtm+1
-        l_read_mod = True
-    else:
-        l_read_mod = False
-
-    print( ' ### jtt, jtm = ',jtt, jtm )
-
-    ct   = '%4.4i'%(jtt+1)
-
-
-
-    #---------------------- Calendar stuff --------------------------------------------
-    jh   = (jtt*dt)%24
-    #rjh  = ((float(jtt)+0.5)*dt)%24
-    rjh  = ( float(jtt)*dt )%24
-    if jtt%ntpd == 0: jd = jd + 1
-    if jd == vm[jm-1]+1 and (jtt)%ntpd == 0 :
-        jd = 1
-        jm = jm + 1
-        if jm==13:
-            yr0 = yr0+1
-            cyr0 = str(yr0)
-            jm = 1
-            vm = vmn
-            if isleap(yr0): vm = vml
-
-    ch  = '%2.2i'%(jh)
-    crh = '%2.2i'%(rjh)
-    cd  = '%3.3i'%(jd)
-    cm  = '%2.2i'%(jm)
-    #
-    jhou = int(rjh)
-    jmin = int((rjh-jhou)*60)
-    chou = '%2.2i'%(jhou)
-    cmin = '%2.2i'%(jmin)
-    #
-    ct  = str(datetime.datetime.strptime(cyr0+'-'+cm+'-'+cd+' '+ch, '%Y-%m-%j %H'))
-    ct  = ct[:5]+cm+ct[7:] #lolo bug !!! need to do that to get the month and not '01
-    cday  = ct[:10]   ; #print(' *** cday  :', cday
-    if dt >= 24:
-        cdate = cday
-        cdats = cday
-    else:
-        chour = ct[11:13] ; #print(' *** chour :', chour
-        cdate = cday+'_'+chour
-        if jmin==0:
-            cdats = cday+' '+chour+':00'
-        else:
-            cdats = cday+' '+chou+':'+cmin
-    print('   ==> current date = ', cdats+' !')
-    #-----------------------------------------------------------------------------------
-
-
-
+    rfade = float(icpt)/float(NrTraj-1)*NbDays
     
-    if jtt%itsubs == 0:
-    
-        # Showing trajectories:
-        ct = plt.scatter(xJIs[::20,jtt]-i1, xJJs[::20,jtt]-j1, color='w', norm=norm_fld, marker='.', s=0.2) ;#s=HBX.pt_sz_track ) ; # c=xFFs[:,jtt], 
+    # Showing trajectories:
+    ct = plt.scatter(xJIs[:,jtt]-i1, xJJs[:,jtt]-j1, c=xJIs[:,jtt]*0.+rfade, cmap=pal_fld , norm=norm_fld, marker='o', s=0.01) ; #, alpha=rfade ) ;#s=HBX.pt_sz_track ) ; # c=xFFs[:,jtt], 
 
 
 
@@ -385,17 +350,17 @@ if HBX.l_show_cb:
             cpt = cpt + 1
         clb.ax.set_xticklabels(cb_labs)
     clb.set_label(cunit, **cfont_clb)
-    clb.ax.yaxis.set_tick_params(color=color_top) ; # set colorbar tick color
-    #clb.outline.set_edgecolor(color_top) ; # set colorbar edgecolor
+    clb.ax.yaxis.set_tick_params(color=color_top_cb) ; # set colorbar tick color
+    #clb.outline.set_edgecolor(color_top_cb) ; # set colorbar edgecolor
     if l_hide_cb_ticks: clb.ax.tick_params(axis=u'both', which=u'both',length=0) ; # remove ticks!
-    plt.setp(plt.getp(clb.ax.axes, 'xticklabels'), color=color_top) ; # set colorbar ticklabels
+    plt.setp(plt.getp(clb.ax.axes, 'xticklabels'), color=color_top_cb) ; # set colorbar ticklabels
 
 
 if HBX.l_show_name:  ax1.annotate(CCONF,          xy=(1, 4), xytext=HBX.name,  **cfont_cnfn)
 
 if HBX.l_show_exp:   ax1.annotate(CCONF,          xy=(1, 4), xytext=HBX.exp,   **cfont_ttl)
 
-if HBX.l_show_clock: ax1.annotate('Date: '+cdats, xy=(1, 4), xytext=HBX.clock, **cfont_clock)
+#if HBX.l_show_clock: ax1.annotate('Date: '+cdats, xy=(1, 4), xytext=HBX.clock, **cfont_clock)
     
         
     
