@@ -53,8 +53,8 @@ fig_type='png'
 vmn = [ 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ]
 vml = [ 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ]
 
-#CBOX = 'ALL' ; # what box of `CCONF` ???
-CBOX = 'EastArctic' ; # what box of `CCONF` ???
+CBOX = 'ALL' ; # what box of `CCONF` ???
+#CBOX = 'EastArctic' ; # what box of `CCONF` ???
 
 narg = len(argv)
 if not narg in [6,7]:
@@ -262,8 +262,8 @@ else:
 pal_lsm = cp.chose_colmap('land_dark')
 norm_lsm = colors.Normalize(vmin = 0., vmax = 1., clip = False)
 
-pal_filled = cp.chose_colmap('gray_r')
-norm_filled = colors.Normalize(vmin = 0., vmax = 0.1, clip = False)
+#pal_filled = cp.chose_colmap('gray_r')
+#norm_filled = colors.Normalize(vmin = 0., vmax = 0.1, clip = False)
 
 vc_fld = np.arange(tmin, tmax + df, df)
 
@@ -278,10 +278,17 @@ cfig = './figs/'+cnfig+'.'+fig_type
 fig = plt.figure(num=1, figsize=(rh,rh*yx_ratio), dpi=rDPI, facecolor='k', edgecolor='k')
     
 if l_scientific_mode:
-    ax  = plt.axes([0.09, 0.09, 0.9, 0.9], facecolor = 'r')
+    ax1 = plt.axes([0.09, 0.09, 0.9, 0.9], facecolor = 'r')
 else:
-    ax  = plt.axes([0., 0., 1., 1.],     facecolor = bgclr)
+    ax1 = plt.axes([0., 0., 1., 1.],     facecolor = bgclr)
 
+
+
+    
+#cm = plt.imshow(pmsk, cmap=pal_lsm, norm=norm_lsm, interpolation='none')
+cm = plt.pcolormesh( pmsk, cmap=pal_lsm, norm=norm_lsm )
+    
+plt.axis([ 0,i2-i1,0,j2-j1])
 
 
     
@@ -345,79 +352,60 @@ for jtt in range(NrTraj):
     #-----------------------------------------------------------------------------------
 
 
+
+    
     if jtt%itsubs == 0:
-
-
-        # lilo
-        
-    
-    
-        l_add_true_filled = False
-
-        #if l_show_msh:
-        #    ccx = plt.contour(Xlon[:,:], 60, colors='k', linewidths=0.5)
-        #    ccy = plt.contour(Xlat[:,:], 30, colors='k', linewidths=0.5)
-    
-    
-        #cm = plt.imshow(pmsk, cmap=pal_lsm, norm=norm_lsm, interpolation='none')
-        cm = plt.pcolormesh( pmsk, cmap=pal_lsm, norm=norm_lsm )
-    
-        if l_add_true_filled: del pfilled
-    
-    
-        plt.axis([ 0,i2-i1,0,j2-j1])
     
         # Showing trajectories:
-        ct = plt.scatter(xJIs[::20,jtt]-i1, xJJs[::20,jtt]-j1, cmap=pal_fld, norm=norm_fld, marker='.', s=HBX.pt_sz_track ) ; # c=xFFs[:,jtt], 
+        ct = plt.scatter(xJIs[::20,jtt]-i1, xJJs[::20,jtt]-j1, color='w', norm=norm_fld, marker='.', s=0.2) ;#s=HBX.pt_sz_track ) ; # c=xFFs[:,jtt], 
+
+
+
+
+
+        
+if l_scientific_mode:
+    plt.xlabel('i-points', **cfont_axis)
+    plt.ylabel('j-points', **cfont_axis)
     
-    
-    
-    
-    
-        if l_scientific_mode:
-            plt.xlabel('i-points', **cfont_axis)
-            plt.ylabel('j-points', **cfont_axis)
-    
-        if HBX.l_show_cb:
-            ax2 = plt.axes(HBX.vcb)
-            if l_pow_field or l_log_field:
-                clb = mpl.colorbar.ColorbarBase(ax=ax2,               cmap=pal_fld, norm=norm_fld, orientation='horizontal', extend='neither')
+if HBX.l_show_cb:
+    ax2 = plt.axes(HBX.vcb)
+    if l_pow_field or l_log_field:
+        clb = mpl.colorbar.ColorbarBase(ax=ax2,               cmap=pal_fld, norm=norm_fld, orientation='horizontal', extend='neither')
+    else:
+        clb = mpl.colorbar.ColorbarBase(ax=ax2, ticks=vc_fld, cmap=pal_fld, norm=norm_fld, orientation='horizontal', extend=cextend)
+    if cb_jump > 1:
+        cb_labs = [] ; cpt = 0
+        for rr in vc_fld:
+            if cpt % cb_jump == 0:
+                if df >= 1.: cb_labs.append(str(int(rr)))
+                if df <  1.: cb_labs.append(str(rr))
             else:
-                clb = mpl.colorbar.ColorbarBase(ax=ax2, ticks=vc_fld, cmap=pal_fld, norm=norm_fld, orientation='horizontal', extend=cextend)
-            if cb_jump > 1:
-                cb_labs = [] ; cpt = 0
-                for rr in vc_fld:
-                    if cpt % cb_jump == 0:
-                        if df >= 1.: cb_labs.append(str(int(rr)))
-                        if df <  1.: cb_labs.append(str(rr))
-                    else:
-                        cb_labs.append(' ')
-                    cpt = cpt + 1
-                clb.ax.set_xticklabels(cb_labs)
-            clb.set_label(cunit, **cfont_clb)
-            clb.ax.yaxis.set_tick_params(color=color_top) ; # set colorbar tick color
-            #clb.outline.set_edgecolor(color_top) ; # set colorbar edgecolor
-            if l_hide_cb_ticks: clb.ax.tick_params(axis=u'both', which=u'both',length=0) ; # remove ticks!
-            plt.setp(plt.getp(clb.ax.axes, 'xticklabels'), color=color_top) ; # set colorbar ticklabels
-    
-            del ct
-    
-        if HBX.l_show_name:  ax.annotate(CCONF,          xy=(1, 4), xytext=HBX.name,  **cfont_cnfn)
-    
-        if HBX.l_show_exp:   ax.annotate(CCONF,          xy=(1, 4), xytext=HBX.exp,   **cfont_ttl)
-    
-        if HBX.l_show_clock: ax.annotate('Date: '+cdats, xy=(1, 4), xytext=HBX.clock, **cfont_clock)
-    
+                cb_labs.append(' ')
+            cpt = cpt + 1
+        clb.ax.set_xticklabels(cb_labs)
+    clb.set_label(cunit, **cfont_clb)
+    clb.ax.yaxis.set_tick_params(color=color_top) ; # set colorbar tick color
+    #clb.outline.set_edgecolor(color_top) ; # set colorbar edgecolor
+    if l_hide_cb_ticks: clb.ax.tick_params(axis=u'both', which=u'both',length=0) ; # remove ticks!
+    plt.setp(plt.getp(clb.ax.axes, 'xticklabels'), color=color_top) ; # set colorbar ticklabels
+
+
+if HBX.l_show_name:  ax1.annotate(CCONF,          xy=(1, 4), xytext=HBX.name,  **cfont_cnfn)
+
+if HBX.l_show_exp:   ax1.annotate(CCONF,          xy=(1, 4), xytext=HBX.exp,   **cfont_ttl)
+
+if HBX.l_show_clock: ax1.annotate('Date: '+cdats, xy=(1, 4), xytext=HBX.clock, **cfont_clock)
     
         
     
     
-        #plt.savefig(cfig, dpi=rDPI, orientation='portrait', facecolor='b', transparent=True)
-        plt.savefig(cfig, dpi=rDPI, orientation='portrait') #, transparent=True)
-        print(cfig+' created!\n')
-        plt.close(1)
+#plt.savefig(cfig, dpi=rDPI, orientation='portrait', facecolor='b', transparent=True)
+plt.savefig(cfig, dpi=rDPI, orientation='portrait') #, transparent=True)
+print(cfig+' created!\n')
+plt.close(1)
         
-        del cm, fig, ax
+
 
     
     ### if jtt%itsubs == 0
