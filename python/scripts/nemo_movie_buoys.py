@@ -6,6 +6,8 @@
 #
 #  Plot only the trajectories of all the buoys, even those who disapear
 #
+#  INPUT DATA: a `npz` file created with `trackice/scripts/traj2npz.py` (conversion from CSV to NPZ)
+#
 #    L. Brodeau, August 2022
 #
 # TO DO: use `nemo_box = cp.nemo_hbox(CNEMO,CBOX)` !!!
@@ -53,8 +55,8 @@ fig_type='png'
 vmn = [ 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ]
 vml = [ 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ]
 
-#CBOX = 'ALL' ; # what box of `CCONF` ???
-CBOX = 'EastArctic' ; # what box of `CCONF` ???
+CBOX = 'ALL' ; # what box of `CCONF` ???
+#CBOX = 'EastArctic' ; # what box of `CCONF` ???
 
 narg = len(argv)
 if not narg in [6,7]:
@@ -101,7 +103,7 @@ elif cdt[1]=='h':
     dt = int(cdt[0]) ; ntpd = 24 / dt
 else:
     print('ERROR: something is wrong with the format of your time step => '+cdt+' !'); exit(0)
-
+    
 vm = vmn
 if isleap(yr0): vm = vml
 #print(' year is ', vm, np.sum(vm)
