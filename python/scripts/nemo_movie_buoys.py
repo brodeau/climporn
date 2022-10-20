@@ -11,7 +11,7 @@
 # TO DO: use `nemo_box = cp.nemo_hbox(CNEMO,CBOX)` !!!
 ##################################################################
 
-import sys
+from sys import argv, exit
 from os import path, mkdir
 import numpy as np
 
@@ -56,24 +56,24 @@ vml = [ 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ]
 #CBOX = 'ALL' ; # what box of `CCONF` ???
 CBOX = 'EastArctic' ; # what box of `CCONF` ???
 
-narg = len(sys.argv)
+narg = len(argv)
 if not narg in [6,7]:
-    print('Usage: '+sys.argv[0]+' <CONF> <file_trj.csv> <file_mod,var> <name_fig> <LSM_file> (iTsubsampl)')
-    sys.exit(0)
+    print('Usage: '+argv[0]+' <CONF> <file_trj.npz> <file_mod,var> <name_fig> <LSM_file> (iTsubsampl)')
+    exit(0)
 
-CCONF  = sys.argv[1]
-cf_trj = sys.argv[2]
-vv = split(',',sys.argv[3])
+CCONF  = argv[1]
+cf_npz = argv[2]
+vv = split(',',argv[3])
 cf_mod = vv[0]
 cv_mod = vv[1]
-cnfig  = sys.argv[4]
+cnfig  = argv[4]
 #
-cf_lsm = sys.argv[5]
+cf_lsm = argv[5]
 #
 # Subsampling in time...
 itsubs = 1
 if narg == 7 :
-    itsubs = int(sys.argv[6])
+    itsubs = int(argv[6])
 
 cp.chck4f(cf_mod)
 cp.chck4f(cf_lsm)    
@@ -94,13 +94,13 @@ cdd0='01'
 
 # Time step (h) as a string
 if not len(cdt)==2:
-    print('ERROR: something is wrong with the format of your time step => '+cdt+' !'); sys.exit(0)
+    print('ERROR: something is wrong with the format of your time step => '+cdt+' !'); exit(0)
 if cdt=='1d':
     dt = 24 ; ntpd = 1
 elif cdt[1]=='h':
     dt = int(cdt[0]) ; ntpd = 24 / dt
 else:
-    print('ERROR: something is wrong with the format of your time step => '+cdt+' !'); sys.exit(0)
+    print('ERROR: something is wrong with the format of your time step => '+cdt+' !'); exit(0)
 
 vm = vmn
 if isleap(yr0): vm = vml
@@ -112,7 +112,7 @@ jm = int(cmn0)
 print('     ==> dt = ', dt,'h')
 
 
-dir_conf = path.dirname(cf_trj)
+dir_conf = path.dirname(cf_npz)
 if dir_conf == '':  dir_conf = '.'
 print('\n *** dir_conf =',dir_conf,'\n')
 
@@ -157,163 +157,40 @@ elif cv_mod in ['siconc']:
     bgclr = 'k'   ; # background color for ocean in figure
 
 else:
-    print('ERROR: variable '+cv_mod+' is not known yet...'); sys.exit(0)
+    print('ERROR: variable '+cv_mod+' is not known yet...'); exit(0)
 
 
 if not path.exists("figs"): mkdir("figs")
 
-#######################################################################################
-# Testing, then reading CSV file
-#######################################################################################
 
-# A/ Scan the begining of the file to see how many trajectories have been initiated (before possible "killing" occurs...)
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-print('\n *** Scanning #1 !')
-with open(cf_trj, 'r') as ftxt:
-    NbTrajInit = -1
-    for line in csv.reader(ftxt, delimiter=','):
-        iID = int(line[0])    # ID of current trajectory as an integer
-        if iID < NbTrajInit: break # Then we are starting a new time record
-        NbTrajInit = iID
-print('      ===> number of initiated trajectories: = ',NbTrajInit)
+
+if not path.exists(cf_npz):    
+    print('\n *** '+cf_npz+' NOT found !!!   :(  ')
+    exit(0)
+
+else:
+    print('\n *** '+cf_npz+' was found !!!   :D  ')
 
 
 
-# B/ Scan the end of the file to identify the `NbTrajEnd` trajectories (by their IDs) that made it to the end
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-print('\n *** Scanning #2 !')
-LastStandIDs = []
-with open(cf_trj, 'r') as ftxt:
-    iID_o = 999999999
-    for line in reversed(list(csv.reader(ftxt, delimiter=','))):
-        iID = int(line[0])    # ID of current trajectory as an integer
-        if iID > iID_o: break # Then we are starting a new time record
-        LastStandIDs.append(iID)
-        iID_o = iID
-NbTrajEnd = len(LastStandIDs)
-print('      ===> number of remaining trajectories at the end: = ',NbTrajEnd)
-LastStandIDs = np.flipud(LastStandIDs) ; # back to increasing order + numpy array
-#print('        ==> LastStandIDs = ', LastStandIDs[:], len(LastStandIDs) )
+#############################3
+print('\n *** Reading into '+cf_npz+' !!!')
+with np.load(cf_npz) as data:
+    NrTraj = data['NrTraj']
+    xmask   = data['mask']
+    xIDs    = data['IDs']
+    xJIs    = data['JIs']
+    xJJs    = data['JJs']
+    xFFs    = data['FFs']
 
-# C/ Scan the entire file to see how many time records are present
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-print('\n *** Scanning #3 !')
-with open(cf_trj, 'r') as ftxt:
-    iID_o = 999999999999
-    NrTraj=0 ; # time record for the trajectories
-    for line in csv.reader(ftxt, delimiter=','):
-        iID = int(line[0])     ; # ID of current trajectory as an integer
-        if iID < iID_o: NrTraj = NrTraj + 1 ; # This is the start of a new time record
-        iID_o = iID
-print('      ===> number of time records for the trajectories: = ', NrTraj)
-
-
-# D/ Scan the entire file to store how many buoys are still alive at each of the NrTraj records
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-print('\n *** Scanning #4 !')
-NbAlive = np.zeros(           NrTraj , dtype=int ) ; # number of buoys alive at each record
-xIDs = np.zeros( (NbTrajInit, NrTraj), dtype=int ) ; # will mask dead IDs...
-xJIs = np.zeros( (NbTrajInit, NrTraj), dtype=np.float32 ) ; # coordinates in terms of `ji` as float
-xJJs = np.zeros( (NbTrajInit, NrTraj), dtype=np.float32 ) ; # coordinates in terms of `jj` as float
-xFFs = np.zeros( (NbTrajInit, NrTraj), dtype=np.float32 ) ; # field #1 at position column #8 (7 in C)
-
-with open(cf_trj, 'r') as ftxt:
-    ID_o = -1
-    jrec = 0
-    Nliv = 0
-    IDsR = []
-    JIsR = []
-    JJsR = []
-    FFsR = []
-    #
-    for line in csv.reader(ftxt, delimiter=','):
-        iID =   int(line[0])    # ID of current trajectory as an integer
-        rJI = float(line[1])
-        rJJ = float(line[2])
-        rFF = float(line[i_field_plot])
-        IDsR.append(iID)
-        JIsR.append(rJI)
-        JJsR.append(rJJ)
-        FFsR.append(rFF)
-        Nliv = Nliv + 1
-        #
-        if iID < ID_o: # Then we are starting a new time record
-            Nliv = Nliv-1      ; # do not count this one as this is the first of the new record!
-            ip = len(IDsR)-1   ; # index of last element
-            iID_bkp = IDsR[ip] ; # we have appended one extra but we must remember for next record!!!
-            rJI_bkp = JIsR[ip] ; # we have appended one extra but we must remember for next record!!!
-            rJJ_bkp = JJsR[ip] ; # we have appended one extra but we must remember for next record!!!
-            rFF_bkp = FFsR[ip] ; # we have appended one extra but we must remember for next record!!!
-            #
-            NbAlive[jrec] = Nliv
-            #
-            xIDs[0:Nliv,jrec] = np.array(IDsR[:-1])
-            xJIs[0:Nliv,jrec] = np.array(JIsR[:-1])
-            xJJs[0:Nliv,jrec] = np.array(JJsR[:-1])
-            xFFs[0:Nliv,jrec] = np.array(FFsR[:-1])
-            #
-            # Preparin for next record, we have already everything for first value:
-            jrec = jrec + 1    ; # we are already next record
-            Nliv = 1           ; # That's number #1 of this "next" record
-            IDsR = [ iID_bkp ]
-            JIsR = [ rJI_bkp ]
-            JJsR = [ rJJ_bkp ]
-            FFsR = [ rFF_bkp ]
-            #
-        ID_o = iID
-    #
-#
-# Values for last record:
-NbAlive[   NrTraj-1] = NbTrajEnd     ;
-xIDs[:Nliv,NrTraj-1] = LastStandIDs[:]
-xJIs[:Nliv,NrTraj-1] = JIsR[:]
-xJJs[:Nliv,NrTraj-1] = JJsR[:]
-xFFs[:Nliv,NrTraj-1] = FFsR[:]
-
-
-xJIs[:Nliv,NrTraj-1] = JIsR[:]
-xJJs[:Nliv,NrTraj-1] = JJsR[:]
-
-# Masking dead buoys:
-xIDs = np.ma.masked_where(xIDs[:,:]==0, xIDs[:,:])
-xJIs = np.ma.masked_where(xIDs[:,:]==0, xJIs[:,:])
-xJJs = np.ma.masked_where(xIDs[:,:]==0, xJJs[:,:])
-xFFs = np.ma.masked_where(xIDs[:,:]==0, xFFs[:,:])
-
-if idebug > 1:
-    print('\n Content of NbAlive:')
-    for jrec in range(NrTraj):
-        nba = NbAlive[jrec]
-        print('###  Rec. # '+str(jrec)+' ==> '+str(nba)+' buoys alive!')
-        print(' * IDs:\n',                       xIDs[:nba,jrec],'\n')
-        print(' * Longitudes `ji` positions:\n', xJIs[:nba,jrec],'\n')
-        print(' * Latitudes  `jj` positions:\n', xJJs[:nba,jrec],'\n')
-        print(' * Values of field #1:\n',        xFFs[:nba,jrec],'\n')
-
-print('   => done!\n')
-
-# Time record stuff...
-if l_show_mod_field:
-    id_f_mod = Dataset(cf_mod)
-    list_var = id_f_mod.variables.keys()
-    if 'time_counter' in list_var:
-        vtime = id_f_mod.variables['time_counter'][:]
-        Nt_mod = len(vtime)
-        print('\n There is a "time_counter" in file '+cf_mod+' !')
-        print('   => '+str(Nt_mod)+' snapshots!')
-    else:
-        print('\nWARNING: there is NO "time_counter" in file '+cf_mod+' !')
-        print('   ==> setting Nt_mod = 0 !\n')
-        Nt_mod = 0
-    id_f_mod.close()
-
+    
 
 print('\n\n *** Trajectories contain '+str(NrTraj)+' records each in CSV file')
 
 if l_show_mod_field:
     print('   => and '+str(Nt_mod)+' records of field '+cv_mod+' in NEMO file '+cf_mod+' !')
     if not NrTraj%Nt_mod == 0:
-        print('==> ERROR: they are not a multiple of each other!'); sys.exit(0)
+        print('==> ERROR: they are not a multiple of each other!'); exit(0)
     nsubC = NrTraj//Nt_mod
     print('    ==> number of subcycles for trajectories w.r.t model data =>', nsubC)
 
@@ -485,7 +362,7 @@ for jtt in range(NrTraj):
                     if XMSK[:,:].shape != XFLD.shape:
                         print('\n PROBLEM: field and mask do not agree in shape!')
                         print(XMSK.shape , XFLD.shape)
-                        sys.exit(0)
+                        exit(0)
                     print('  *** Shape of field and mask => ', np.shape(XFLD))
     
             l_add_true_filled = False

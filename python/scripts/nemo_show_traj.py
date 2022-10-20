@@ -58,11 +58,11 @@ CBOX = 'EastArctic' ; # what box of `CCONF` ???
 
 narg = len(argv)
 if not narg in [6,7]:
-    print('Usage: '+argv[0]+' <CONF> <file_trj.csv> <file_mod,var> <name_fig> <LSM_file> (iTsubsampl)')
+    print('Usage: '+argv[0]+' <CONF> <file_trj.npz> <file_mod,var> <name_fig> <LSM_file> (iTsubsampl)')
     exit(0)
 
 CCONF  = argv[1]
-cf_trj = argv[2]
+cf_npz = argv[2]
 vv = split(',',argv[3])
 cf_mod = vv[0]
 cv_mod = vv[1]
@@ -75,15 +75,14 @@ itsubs = 1
 if narg == 7 :
     itsubs = int(argv[6])
 
-
+cp.chck4f(cf_mod)
+cp.chck4f(cf_lsm)    
 
 # Getting time info and time step from input model file:
-
-
 vv = split('-|_', path.basename(cf_mod))
 
-cyear = vv[-2]
-cdt   = vv[-3]
+cyear = vv[-3] ; cyear = cyear[0:4]
+cdt   = vv[-4]
 
 print('\n *** Year = '+cyear)
 print('\n *** time increment = '+cdt)
@@ -113,7 +112,7 @@ jm = int(cmn0)
 print('     ==> dt = ', dt,'h')
 
 
-dir_conf = path.dirname(cf_trj)
+dir_conf = path.dirname(cf_npz)
 if dir_conf == '':  dir_conf = '.'
 print('\n *** dir_conf =',dir_conf,'\n')
 
@@ -165,18 +164,18 @@ if not path.exists("figs"): mkdir("figs")
 
 
 
-if not path.exists('FILE_TRAJ.npz'):    
-    print('\n *** FILE_TRAJ.npz NOT found !!!   :(  ')
+if not path.exists(cf_npz):    
+    print('\n *** '+cf_npz+' NOT found !!!   :(  ')
     exit(0)
 
 else:
-    print('\n *** FILE_TRAJ.npz was found !!!   :D  ')
+    print('\n *** '+cf_npz+' was found !!!   :D  ')
 
 
 
 #############################3
-print('\n *** Reading into FILE_TRAJ.npz !!!')
-with np.load('FILE_TRAJ.npz') as data:
+print('\n *** Reading into '+cf_npz+' !!!')
+with np.load(cf_npz) as data:
     NrTraj = data['NrTraj']
     xmask   = data['mask']
     xIDs    = data['IDs']
@@ -200,8 +199,6 @@ else:
     nsubC  = 1
 
 
-
-cp.chck4f(cf_lsm)
 cnmsk = 'tmask'
 print('\n *** Reading "'+cnmsk+'" in meshmask file...')
 id_lsm = Dataset(cf_lsm)
