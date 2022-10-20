@@ -13,7 +13,7 @@
 
 import sys
 from os import path, mkdir
-import numpy as nmp
+import numpy as np
 
 from re import split
 
@@ -75,15 +75,14 @@ itsubs = 1
 if narg == 7 :
     itsubs = int(sys.argv[6])
 
-
+cp.chck4f(cf_mod)
+cp.chck4f(cf_lsm)    
 
 # Getting time info and time step from input model file:
-
-
 vv = split('-|_', path.basename(cf_mod))
 
-cyear = vv[-2]
-cdt   = vv[-3]
+cyear = vv[-3] ; cyear = cyear[0:4]
+cdt   = vv[-4]
 
 print('\n *** Year = '+cyear)
 print('\n *** time increment = '+cdt)
@@ -105,7 +104,7 @@ else:
 
 vm = vmn
 if isleap(yr0): vm = vml
-#print(' year is ', vm, nmp.sum(vm)
+#print(' year is ', vm, np.sum(vm)
 
 jd = int(cdd0) - 1
 jm = int(cmn0)
@@ -193,7 +192,7 @@ with open(cf_trj, 'r') as ftxt:
         iID_o = iID
 NbTrajEnd = len(LastStandIDs)
 print('      ===> number of remaining trajectories at the end: = ',NbTrajEnd)
-LastStandIDs = nmp.flipud(LastStandIDs) ; # back to increasing order + numpy array
+LastStandIDs = np.flipud(LastStandIDs) ; # back to increasing order + numpy array
 #print('        ==> LastStandIDs = ', LastStandIDs[:], len(LastStandIDs) )
 
 # C/ Scan the entire file to see how many time records are present
@@ -212,11 +211,11 @@ print('      ===> number of time records for the trajectories: = ', NrTraj)
 # D/ Scan the entire file to store how many buoys are still alive at each of the NrTraj records
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 print('\n *** Scanning #4 !')
-NbAlive = nmp.zeros(           NrTraj , dtype=int ) ; # number of buoys alive at each record
-xIDs = nmp.zeros( (NbTrajInit, NrTraj), dtype=int ) ; # will mask dead IDs...
-xJIs = nmp.zeros( (NbTrajInit, NrTraj), dtype=nmp.float32 ) ; # coordinates in terms of `ji` as float
-xJJs = nmp.zeros( (NbTrajInit, NrTraj), dtype=nmp.float32 ) ; # coordinates in terms of `jj` as float
-xFFs = nmp.zeros( (NbTrajInit, NrTraj), dtype=nmp.float32 ) ; # field #1 at position column #8 (7 in C)
+NbAlive = np.zeros(           NrTraj , dtype=int ) ; # number of buoys alive at each record
+xIDs = np.zeros( (NbTrajInit, NrTraj), dtype=int ) ; # will mask dead IDs...
+xJIs = np.zeros( (NbTrajInit, NrTraj), dtype=np.float32 ) ; # coordinates in terms of `ji` as float
+xJJs = np.zeros( (NbTrajInit, NrTraj), dtype=np.float32 ) ; # coordinates in terms of `jj` as float
+xFFs = np.zeros( (NbTrajInit, NrTraj), dtype=np.float32 ) ; # field #1 at position column #8 (7 in C)
 
 with open(cf_trj, 'r') as ftxt:
     ID_o = -1
@@ -248,10 +247,10 @@ with open(cf_trj, 'r') as ftxt:
             #
             NbAlive[jrec] = Nliv
             #
-            xIDs[0:Nliv,jrec] = nmp.array(IDsR[:-1])
-            xJIs[0:Nliv,jrec] = nmp.array(JIsR[:-1])
-            xJJs[0:Nliv,jrec] = nmp.array(JJsR[:-1])
-            xFFs[0:Nliv,jrec] = nmp.array(FFsR[:-1])
+            xIDs[0:Nliv,jrec] = np.array(IDsR[:-1])
+            xJIs[0:Nliv,jrec] = np.array(JIsR[:-1])
+            xJJs[0:Nliv,jrec] = np.array(JJsR[:-1])
+            xFFs[0:Nliv,jrec] = np.array(FFsR[:-1])
             #
             # Preparin for next record, we have already everything for first value:
             jrec = jrec + 1    ; # we are already next record
@@ -276,10 +275,10 @@ xJIs[:Nliv,NrTraj-1] = JIsR[:]
 xJJs[:Nliv,NrTraj-1] = JJsR[:]
 
 # Masking dead buoys:
-xIDs = nmp.ma.masked_where(xIDs[:,:]==0, xIDs[:,:])
-xJIs = nmp.ma.masked_where(xIDs[:,:]==0, xJIs[:,:])
-xJJs = nmp.ma.masked_where(xIDs[:,:]==0, xJJs[:,:])
-xFFs = nmp.ma.masked_where(xIDs[:,:]==0, xFFs[:,:])
+xIDs = np.ma.masked_where(xIDs[:,:]==0, xIDs[:,:])
+xJIs = np.ma.masked_where(xIDs[:,:]==0, xJIs[:,:])
+xJJs = np.ma.masked_where(xIDs[:,:]==0, xJJs[:,:])
+xFFs = np.ma.masked_where(xIDs[:,:]==0, xFFs[:,:])
 
 if idebug > 1:
     print('\n Content of NbAlive:')
@@ -295,7 +294,6 @@ print('   => done!\n')
 
 # Time record stuff...
 if l_show_mod_field:
-    cp.chck4f(cf_mod)
     id_f_mod = Dataset(cf_mod)
     list_var = id_f_mod.variables.keys()
     if 'time_counter' in list_var:
@@ -324,8 +322,6 @@ else:
     nsubC  = 1
 
 
-
-cp.chck4f(cf_lsm)
 cnmsk = 'tmask'
 print('\n *** Reading "'+cnmsk+'" in meshmask file...')
 id_lsm = Dataset(cf_lsm)
@@ -358,8 +354,8 @@ rh  = float(nxr)/float(rDPI) ; # width of figure as for figure...
 
 print('\n *** width and height of image to create:', nxr, nyr, '\n')
 
-pmsk    = nmp.ma.masked_where(XMSK[:,:] > 0.2, XMSK[:,:]*0.+40.)
-idx_oce = nmp.where(XMSK[:,:] > 0.5)
+pmsk    = np.ma.masked_where(XMSK[:,:] > 0.2, XMSK[:,:]*0.+40.)
+idx_oce = np.where(XMSK[:,:] > 0.5)
 
 #font_rat
 #params = { 'font.family':'Ubuntu',
@@ -392,7 +388,7 @@ norm_lsm = colors.Normalize(vmin = 0., vmax = 1., clip = False)
 pal_filled = cp.chose_colmap('gray_r')
 norm_filled = colors.Normalize(vmin = 0., vmax = 0.1, clip = False)
 
-vc_fld = nmp.arange(tmin, tmax + df, df)
+vc_fld = np.arange(tmin, tmax + df, df)
 
 
 
@@ -490,7 +486,7 @@ for jtt in range(NrTraj):
                         print('\n PROBLEM: field and mask do not agree in shape!')
                         print(XMSK.shape , XFLD.shape)
                         sys.exit(0)
-                    print('  *** Shape of field and mask => ', nmp.shape(XFLD))
+                    print('  *** Shape of field and mask => ', np.shape(XFLD))
     
             l_add_true_filled = False
     
