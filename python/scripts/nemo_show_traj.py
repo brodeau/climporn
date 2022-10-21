@@ -9,6 +9,11 @@
 #    L. Brodeau, August 2022
 #
 # TO DO: use `nemo_box = cp.nemo_hbox(CNEMO,CBOX)` !!!
+#
+#
+#  ABOUT input `npz` file:
+#   * Name: should be of the form `NANUK4_ICE-BBM00_6h_19960101_19961031(_xxx).npz`
+#
 ##################################################################
 
 from sys import argv, exit
@@ -31,12 +36,11 @@ import datetime
 
 import climporn as cp
 
+CBOX = 'ALL' ; # what box of `CCONF` ???
+#CBOX = 'EastArctic' ; # what box of `CCONF` ???
 
-i_field_plot = 7 ; # (C) column index of field to plot
 
 idebug = 1
-
-l_show_mod_field = False
 
 color_top = 'w'
 color_top_cb = 'k'
@@ -47,82 +51,65 @@ rDPI = 200
 # Defaults:
 l_scientific_mode = False
 
-l_show_msh = False
+#l_show_msh = False
 
 fig_type='png'
 
-vmn = [ 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ]
-vml = [ 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ]
-
-CBOX = 'ALL' ; # what box of `CCONF` ???
-#CBOX = 'EastArctic' ; # what box of `CCONF` ???
-
-
-NbDays = np.sum(vmn[0:10]) ; #fixme: end of october !!!
-
 
 narg = len(argv)
-if not narg in [6,7]:
-    print('Usage: '+argv[0]+' <CONF> <file_trj.npz> <file_mod,var> <name_fig> <LSM_file> (iTsubsampl)')
+if not narg in [3,4]:
+    print('Usage: '+argv[0]+' <file_trj.npz> <LSM_file> (iTsubsampl)')
     exit(0)
 
-CCONF  = argv[1]
-cf_npz = argv[2]
-vv = split(',',argv[3])
-cf_mod = vv[0]
-cv_mod = vv[1]
-cnfig  = argv[4]
-#
-cf_lsm = argv[5]
-#
-# Subsampling in time...
+cf_npz = argv[1]
+cf_lsm = argv[2]
+# Subsampling in time:
 itsubs = 1
-if narg == 7 :
-    itsubs = int(argv[6])
+if narg == 4 :
+    itsubs = int(argv[3])
 
-cp.chck4f(cf_mod)
-cp.chck4f(cf_lsm)    
+cp.chck4f(cf_npz)
+cp.chck4f(cf_lsm)
 
-# Getting time info and time step from input model file:
-vv = split('-|_', path.basename(cf_mod))
 
-cyear = vv[-3] ; cyear = cyear[0:4]
-cdt   = vv[-4]
 
-print('\n *** Year = '+cyear)
-print('\n *** time increment = '+cdt)
 
-cyr0=cyear
-yr0=int(cyear)
-cmn0='01'
-cdd0='01'
+cnfig  = str.replace( path.basename(cf_npz), '.npz', '.'+fig_type )
 
-# Time step (h) as a string
-if not len(cdt)==2:
-    print('ERROR: something is wrong with the format of your time step => '+cdt+' !'); exit(0)
-if cdt=='1d':
-    dt = 24 ; ntpd = 1
-elif cdt[1]=='h':
-    dt = int(cdt[0]) ; ntpd = 24 / dt
+
+# Getting time info and time step from input npz file which is should look like NEMO output file:
+vv = split('-|_', path.basename(cf_npz))
+
+print(vv)
+
+
+CCONF = vv[0]
+print('\n *** CONF = '+CCONF)
+
+cdt   = vv[3]
+print('\n *** Time frequency = '+cdt)
+
+cdt1, cdt2 = vv[4], vv[5]
+print('\n *** Start and End dates => '+cdt1+' -- '+cdt2)
+
+#cyear = cdt1[0:4]
+#print('\n *** Year = '+cyear+'\n')
+
+NbDays = cp.Dates2NbDays(cdt1,cdt2)
+print('     ==> number of days =', NbDays)
+
+if cdt[-1]=='h':
+    NbRecs = int(24/int(cdt[0:-1])*NbDays)
+    if cdt=='1h': NbRecs = NbRecs+24 ; # fixme: why???? not fotr '6h' ???
 else:
-    print('ERROR: something is wrong with the format of your time step => '+cdt+' !'); exit(0)
+    print('ERROR: please adapt unit frequency: "'+cdt[-1]+'" !!!'); exit(0)
+print('     ==> expected number of records =', NbRecs,'\n')
 
-vm = vmn
-if isleap(yr0): vm = vml
-#print(' year is ', vm, np.sum(vm)
-
-jd = int(cdd0) - 1
-jm = int(cmn0)
-
-print('     ==> dt = ', dt,'h')
 
 
 dir_conf = path.dirname(cf_npz)
 if dir_conf == '':  dir_conf = '.'
 print('\n *** dir_conf =',dir_conf,'\n')
-
-if l_show_mod_field: print('\n Field to show in background: "'+cv_mod+'" of file "'+cf_mod+'" !\n')
-
 
 
 # Getting setup for NEMO CONFIG/BOX:
@@ -137,42 +124,16 @@ l_hide_cb_ticks = False
 tmin=0. ; tmax=1. ; df=0.01
 cb_jump = 1
 
-if l_show_mod_field: print('\n *** Model field to show in bacground: = '+cv_mod)
 
 bgclr = 'w'   ; # background color for ocean in figure
 
-if   cv_mod in ['sosstsst','tos']:
-    cfield = 'SST'
-    tmin=-3. ;  tmax=2.   ;  df = 0.1 ; # Arctic!
-    #tmin=14. ;  tmax=26.   ;  df = 1.
-    cpal_fld = 'inferno'
-    cunit = r'SST ($^{\circ}$C)'
-
-elif cv_mod in ['sosaline','sos']:
-    cfield = 'SSS'
-    tmin=32. ;  tmax=36.   ;  df = 1.
-    cpal_fld = 'viridis'
-    cunit = r'SSS (PSU)'
-
-elif cv_mod in ['siconc']:
-    cfield = 'siconc'
-    tmin=0. ;  tmax=1.   ;  df = 0.1 ; # Arctic!
-    #cpal_fld = 'ncview_ice'
-    cpal_fld = 'viridis_r'
-    cunit = 'Ice concentration'
-    bgclr = 'k'   ; # background color for ocean in figure
-
-elif cv_mod in ['duration']:
-    cfield = 'duration'
-    #fixme: end of october!
-    tmin=0. ;  tmax=NbDays   ;  df = 30 ; # Arctic!
-    #cpal_fld = 'ncview_ice'
-    cpal_fld = 'viridis_r'
-    cunit = 'Time from seed (days)'
-    bgclr = 'w'   ; # background color for ocean in figure
-
-else:
-    print('ERROR: variable '+cv_mod+' is not known yet...'); exit(0)
+cfield = 'duration'
+#fixme: end of october!
+tmin=0. ;  tmax=NbDays-1  ;  df = 30 ; # Arctic!
+#cpal_fld = 'ncview_ice'
+cpal_fld = 'viridis_r'
+cunit = 'Time from seed (days)'
+bgclr = 'w'   ; # background color for ocean in figure
 
 if not path.exists("figs"): mkdir("figs")
 
@@ -199,18 +160,10 @@ with np.load(cf_npz) as data:
 
     
 
-print('\n\n *** Trajectories contain '+str(NrTraj)+' records each in CSV file')
-
-if l_show_mod_field:
-    print('   => and '+str(Nt_mod)+' records of field '+cv_mod+' in NEMO file '+cf_mod+' !')
-    if not NrTraj%Nt_mod == 0:
-        print('==> ERROR: they are not a multiple of each other!'); exit(0)
-    nsubC = NrTraj//Nt_mod
-    print('    ==> number of subcycles for trajectories w.r.t model data =>', nsubC)
-
-else:
-    Nt_mod = NrTraj
-    nsubC  = 1
+if NrTraj != NbRecs-1:
+    print('ERROR: NrTraj != NbRecs-1 !!!',NrTraj,NbRecs-1); exit(0)
+    
+print('\n\n *** Trajectories contain '+str(NrTraj)+' records...')
 
 
 cnmsk = 'tmask'
@@ -224,9 +177,9 @@ Nj = id_lsm.dimensions['y'].size
 if nb_dim == 4: XMSK  = id_lsm.variables[cnmsk][0,0,j1:j2,i1:i2] ; # t, y, x
 if nb_dim == 3: XMSK  = id_lsm.variables[cnmsk][0,  j1:j2,i1:i2] ; # t, y, x
 if nb_dim == 2: XMSK  = id_lsm.variables[cnmsk][    j1:j2,i1:i2] ; # t, y, x
-if l_show_msh:
-    Xlon = id_lsm.variables['glamu'][0,j1:j2,i1:i2]
-    Xlat = id_lsm.variables['gphiv'][0,j1:j2,i1:i2]
+#if l_show_msh:
+#    Xlon = id_lsm.variables['glamu'][0,j1:j2,i1:i2]
+#    Xlat = id_lsm.variables['gphiv'][0,j1:j2,i1:i2]
 id_lsm.close()
 print('      done.')
 
@@ -248,21 +201,9 @@ print('\n *** width and height of image to create:', nxr, nyr, '\n')
 pmsk    = np.ma.masked_where(XMSK[:,:] > 0.2, XMSK[:,:]*0.+40.)
 idx_oce = np.where(XMSK[:,:] > 0.5)
 
-#font_rat
-#params = { 'font.family':'Ubuntu',
-params = { 'font.family':'Open Sans',
-           'font.weight':    'normal',
-           'font.size':       int(12.*HBX.font_rat),
-           'legend.fontsize': int(22.*HBX.font_rat),
-           'xtick.labelsize': int(18.*HBX.font_rat),
-           'ytick.labelsize': int(18.*HBX.font_rat),
-           'axes.labelsize':  int(15.*HBX.font_rat) }
-mpl.rcParams.update(params)
-cfont_clb   = { 'fontname':'Open Sans',   'fontweight':'medium', 'fontsize':int(18.*HBX.font_rat), 'color':color_top_cb }
-cfont_cnfn  = { 'fontname':'Open Sans',   'fontweight':'light' , 'fontsize':int(35.*HBX.font_rat), 'color':color_top }
-cfont_axis  = { 'fontname':'Open Sans',   'fontweight':'medium', 'fontsize':int(18.*HBX.font_rat), 'color':color_top }
-cfont_ttl   = { 'fontname':'Open Sans',   'fontweight':'medium', 'fontsize':int(25.*HBX.font_rat), 'color':color_top }
-cfont_clock = { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(19.*HBX.font_rat), 'color':color_top }
+
+# Configuring fonts:
+kk = cp.fig_style( HBX.font_rat, clr_top=color_top, clr_top_cb=color_top_cb )
 
 # Colormaps for fields:
 pal_fld = cp.chose_colmap(cpal_fld)
@@ -275,9 +216,6 @@ else:
 
 pal_lsm = cp.chose_colmap('land')
 norm_lsm = colors.Normalize(vmin = 0., vmax = 1., clip = False)
-
-#pal_filled = cp.chose_colmap('gray_r')
-#norm_filled = colors.Normalize(vmin = 0., vmax = 0.1, clip = False)
 
 vc_fld = np.arange(tmin, tmax + df, df)
 
@@ -349,16 +287,16 @@ if HBX.l_show_cb:
                 cb_labs.append(' ')
             cpt = cpt + 1
         clb.ax.set_xticklabels(cb_labs)
-    clb.set_label(cunit, **cfont_clb)
+    clb.set_label(cunit, **cp.fig_style.cfont_clb)
     clb.ax.yaxis.set_tick_params(color=color_top_cb) ; # set colorbar tick color
     #clb.outline.set_edgecolor(color_top_cb) ; # set colorbar edgecolor
     if l_hide_cb_ticks: clb.ax.tick_params(axis=u'both', which=u'both',length=0) ; # remove ticks!
     plt.setp(plt.getp(clb.ax.axes, 'xticklabels'), color=color_top_cb) ; # set colorbar ticklabels
 
 
-if HBX.l_show_name:  ax1.annotate(CCONF,          xy=(1, 4), xytext=HBX.name,  **cfont_cnfn)
+if HBX.l_show_name:  ax1.annotate(CCONF,          xy=(1, 4), xytext=HBX.name,  **cp.fig_style.cfont_ttl)
 
-if HBX.l_show_exp:   ax1.annotate(CCONF,          xy=(1, 4), xytext=HBX.exp,   **cfont_ttl)
+if HBX.l_show_exp:   ax1.annotate(CCONF,          xy=(1, 4), xytext=HBX.exp,   **cp.fig_style.cfont_ttl)
 
 #if HBX.l_show_clock: ax1.annotate('Date: '+cdats, xy=(1, 4), xytext=HBX.clock, **cfont_clock)
     
@@ -369,13 +307,3 @@ if HBX.l_show_exp:   ax1.annotate(CCONF,          xy=(1, 4), xytext=HBX.exp,   *
 plt.savefig(cfig, dpi=rDPI, orientation='portrait') #, transparent=True)
 print(cfig+' created!\n')
 plt.close(1)
-        
-
-
-    
-    ### if jtt%itsubs == 0
-
-
-### for jtt in range(NrTraj)
-
-

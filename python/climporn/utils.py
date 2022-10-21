@@ -811,7 +811,7 @@ def round_bounds( x1, x2,  base=5, prec=3 ):
     return rmin, rmax
 
 
-def fig_style( pzoom, clr_top='k' ):
+def fig_style( pzoom, clr_top='k', clr_top_cb='k' ):
     from matplotlib import rcParams
     # Showing a map for each time step:
     params = { 'font.family':'Open Sans',
@@ -822,12 +822,12 @@ def fig_style( pzoom, clr_top='k' ):
                'ytick.labelsize': int(18.*pzoom),
                'axes.labelsize':  int(15.*pzoom) }
     rcParams.update(params)
-    fig_style.cfont_clb  = { 'fontname':'Open Sans',       'fontweight':'medium', 'fontsize':int(18.*pzoom), 'color':clr_top }
+    fig_style.cfont_clb  = { 'fontname':'Open Sans',       'fontweight':'medium', 'fontsize':int(18.*pzoom), 'color':clr_top_cb }
     fig_style.cfont_date = { 'fontname':'Ubuntu Mono',     'fontweight':'normal', 'fontsize':int(12.*pzoom), 'color':clr_top }
     fig_style.cfont_mail = { 'fontname':'Times New Roman', 'fontweight':'normal', 'fontsize':int(14.*pzoom), 'color':'0.8' , 'fontstyle':'italic' }
     fig_style.cfont_mrkr = { 'fontname':'Open Sans',       'fontweight':'light' , 'fontsize':int( 5.*pzoom), 'color':clr_top }
     fig_style.cfont_axis = { 'fontname':'Open Sans',       'fontweight':'medium', 'fontsize':int(18.*pzoom), 'color':clr_top }
-    fig_style.cfont_ttl  = { 'fontname':'Open Sans',       'fontweight':'medium', 'fontsize':int(25.*pzoom), 'color':clr_top }
+    fig_style.cfont_ttl  = { 'fontname':'Open Sans',       'fontweight':'medium', 'fontsize':int(32.*pzoom), 'color':clr_top }
     fig_style.cfont_clck = { 'fontname':'Ubuntu Mono',     'fontweight':'normal', 'fontsize':int(12.*pzoom), 'color':clr_top }
     #
     return 0
@@ -857,6 +857,25 @@ def clock2epochS( cdate ):
     return rt.timestamp()
 
 
+def Dates2NbDays( cdt1, cdt2):
+    '''
+       Returns the number of day beteewn two dates provided as "YYYYMMDD"
+    '''
+    #from calendar import isleap
+    from datetime import date
+    #
+    if len(cdt1)!=8 or len(cdt2)!=8:
+        print('ERROR [cp.Dates2NbDays]: len(cdt1)!=8 or len(cdt2)!=8 !'); exit(0)
+    #
+    iy1, iy2 = int(cdt1[0:4]), int(cdt2[0:4])
+    im1, im2 = int(cdt1[4:6]), int(cdt2[4:6])
+    id1, id2 = int(cdt1[6:8]), int(cdt2[6:8])
+    kdelta = date(iy2, im2, id2) - date(iy1, im1, id1)
+    #
+    return kdelta.days
+
+
+    
 
 
 #def __extract_geom_meta__(country):
