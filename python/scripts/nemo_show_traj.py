@@ -6,6 +6,8 @@
 #
 #  Plot only the trajectories of all the buoys, even those who disapear
 #
+#  INPUT DATA: a `npz` file created with `trackice/scripts/traj2npz.py` (conversion from CSV to NPZ)
+#
 #    L. Brodeau, August 2022
 #
 # TO DO: use `nemo_box = cp.nemo_hbox(CNEMO,CBOX)` !!!
@@ -51,7 +53,7 @@ rDPI = 200
 # Defaults:
 l_scientific_mode = False
 
-#l_show_msh = False
+l_show_msh = False
 
 fig_type='png'
 
@@ -63,14 +65,13 @@ if not narg in [3,4]:
 
 cf_npz = argv[1]
 cf_lsm = argv[2]
-# Subsampling in time:
+# Subsampling in time...
 itsubs = 1
 if narg == 4 :
     itsubs = int(argv[3])
 
 cp.chck4f(cf_npz)
 cp.chck4f(cf_lsm)
-
 
 
 
@@ -106,7 +107,6 @@ else:
 print('     ==> expected number of records =', NbRecs,'\n')
 
 
-
 dir_conf = path.dirname(cf_npz)
 if dir_conf == '':  dir_conf = '.'
 print('\n *** dir_conf =',dir_conf,'\n')
@@ -135,17 +135,19 @@ cpal_fld = 'viridis_r'
 cunit = 'Time from seed (days)'
 bgclr = 'w'   ; # background color for ocean in figure
 
-if not path.exists("figs"): mkdir("figs")
 
 
 
-if not path.exists(cf_npz):    
+
+if not path.exists(cf_npz):
     print('\n *** '+cf_npz+' NOT found !!!   :(  ')
     exit(0)
 
 else:
     print('\n *** '+cf_npz+' was found !!!   :D  ')
 
+
+if not path.exists("figs"): mkdir("figs")
 
 
 #############################3
@@ -158,11 +160,11 @@ with np.load(cf_npz) as data:
     xJJs    = data['JJs']
     xFFs    = data['FFs']
 
-    
+
 
 if NrTraj != NbRecs-1:
     print('ERROR: NrTraj != NbRecs-1 !!!',NrTraj,NbRecs-1); exit(0)
-    
+
 print('\n\n *** Trajectories contain '+str(NrTraj)+' records...')
 
 
@@ -177,9 +179,9 @@ Nj = id_lsm.dimensions['y'].size
 if nb_dim == 4: XMSK  = id_lsm.variables[cnmsk][0,0,j1:j2,i1:i2] ; # t, y, x
 if nb_dim == 3: XMSK  = id_lsm.variables[cnmsk][0,  j1:j2,i1:i2] ; # t, y, x
 if nb_dim == 2: XMSK  = id_lsm.variables[cnmsk][    j1:j2,i1:i2] ; # t, y, x
-#if l_show_msh:
-#    Xlon = id_lsm.variables['glamu'][0,j1:j2,i1:i2]
-#    Xlat = id_lsm.variables['gphiv'][0,j1:j2,i1:i2]
+if l_show_msh:
+    Xlon = id_lsm.variables['glamu'][0,j1:j2,i1:i2]
+    Xlat = id_lsm.variables['gphiv'][0,j1:j2,i1:i2]
 id_lsm.close()
 print('      done.')
 
@@ -228,7 +230,7 @@ cfig = './figs/'+cnfig+'.'+fig_type
 
 
 fig = plt.figure(num=1, figsize=(rh,rh*yx_ratio), dpi=rDPI, facecolor='k', edgecolor='k')
-    
+
 if l_scientific_mode:
     ax1 = plt.axes([0.09, 0.09, 0.9, 0.9], facecolor = 'r')
 else:
@@ -236,10 +238,10 @@ else:
 
 
 
-    
-#cm = plt.imshow(pmsk, cmap=pal_lsm, norm=norm_lsm, interpolation='none')
-cm = plt.pcolormesh( pmsk, cmap=pal_lsm, norm=norm_lsm )
-    
+
+#ccm = plt.imshow(pmsk, cmap=pal_lsm, norm=norm_lsm, interpolation='none')
+ccm = plt.pcolormesh( pmsk, cmap=pal_lsm, norm=norm_lsm )
+
 plt.axis([ 0,i2-i1,0,j2-j1])
 
 
@@ -248,7 +250,7 @@ plt.axis([ 0,i2-i1,0,j2-j1])
 # If we show backward:
 #print(xJIs[:,NrTraj-1])
 #exit(0)
-    
+
 # Loop over time records:
 icpt = -1
 for jtt in range(NrTraj):
@@ -258,19 +260,19 @@ for jtt in range(NrTraj):
     print('jtt =',jtt)
 
     rfade = float(icpt)/float(NrTraj-1)*NbDays
-    
+
     # Showing trajectories:
-    ct = plt.scatter(xJIs[:,jtt]-i1, xJJs[:,jtt]-j1, c=xJIs[:,jtt]*0.+rfade, cmap=pal_fld , norm=norm_fld, marker='o', s=0.01) ; #, alpha=rfade ) ;#s=HBX.pt_sz_track ) ; # c=xFFs[:,jtt], 
+    csct = plt.scatter(xJIs[:,jtt]-i1, xJJs[:,jtt]-j1, c=xJIs[:,jtt]*0.+rfade, cmap=pal_fld , norm=norm_fld, marker='o', s=0.01) ; #, alpha=rfade ) ;#s=HBX.pt_sz_track ) ; # c=xFFs[:,jtt],
 
 
 
 
 
-        
+
 if l_scientific_mode:
     plt.xlabel('i-points', **cfont_axis)
     plt.ylabel('j-points', **cfont_axis)
-    
+
 if HBX.l_show_cb:
     ax2 = plt.axes(HBX.vcb)
     if l_pow_field or l_log_field:
@@ -299,10 +301,10 @@ if HBX.l_show_name:  ax1.annotate(CCONF,          xy=(1, 4), xytext=HBX.name,  *
 if HBX.l_show_exp:   ax1.annotate(CCONF,          xy=(1, 4), xytext=HBX.exp,   **cp.fig_style.cfont_ttl)
 
 #if HBX.l_show_clock: ax1.annotate('Date: '+cdats, xy=(1, 4), xytext=HBX.clock, **cfont_clock)
-    
-        
-    
-    
+
+
+
+
 #plt.savefig(cfig, dpi=rDPI, orientation='portrait', facecolor='b', transparent=True)
 plt.savefig(cfig, dpi=rDPI, orientation='portrait') #, transparent=True)
 print(cfig+' created!\n')

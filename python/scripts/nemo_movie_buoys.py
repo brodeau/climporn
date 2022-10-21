@@ -11,6 +11,11 @@
 #    L. Brodeau, August 2022
 #
 # TO DO: use `nemo_box = cp.nemo_hbox(CNEMO,CBOX)` !!!
+#
+#
+#  ABOUT input `npz` file:
+#   * Name: should be of the form `NANUK4_ICE-BBM00_6h_19960101_19961031(_xxx).npz`
+#
 ##################################################################
 
 from sys import argv, exit
@@ -33,14 +38,16 @@ import datetime
 
 import climporn as cp
 
+CBOX = 'ALL' ; # what box of `CCONF` ???
+#CBOX = 'EastArctic' ; # what box of `CCONF` ???
 
-i_field_plot = 7 ; # (C) column index of field to plot
 
 idebug = 1
 
 l_show_mod_field = False
 
 color_top = 'w'
+color_top_cb = 'k'
 clr_yellow = '#ffed00'
 
 rDPI = 200
@@ -55,63 +62,65 @@ fig_type='png'
 vmn = [ 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ]
 vml = [ 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ]
 
-CBOX = 'ALL' ; # what box of `CCONF` ???
-#CBOX = 'EastArctic' ; # what box of `CCONF` ???
+###################################################################################
 
 narg = len(argv)
-if not narg in [6,7]:
-    print('Usage: '+argv[0]+' <CONF> <file_trj.npz> <file_mod,var> <name_fig> <LSM_file> (iTsubsampl)')
+if not narg in [4,5]:
+    print('Usage: '+argv[0]+' <file_trj.npz> <file_mod,var/"none"> <LSM_file> (iTsubsampl)')
     exit(0)
 
-CCONF  = argv[1]
-cf_npz = argv[2]
-vv = split(',',argv[3])
-cf_mod = vv[0]
-cv_mod = vv[1]
-cnfig  = argv[4]
-#
-cf_lsm = argv[5]
-#
+cf_npz = argv[1]
+
+l_show_mod_field = ( argv[2]!="none" )
+if l_show_mod_field:
+    vv = split(',',argv[2])
+    cf_mod = vv[0]
+    cv_mod = vv[1]
+
+cf_lsm = argv[3]
+
 # Subsampling in time...
 itsubs = 1
-if narg == 7 :
-    itsubs = int(argv[6])
+if narg == 5 :
+    itsubs = int(argv[4])
 
-cp.chck4f(cf_mod)
-cp.chck4f(cf_lsm)    
+cp.chck4f(cf_npz)
+if l_show_mod_field: cp.chck4f(cf_mod)
+cp.chck4f(cf_lsm)
 
-# Getting time info and time step from input model file:
-vv = split('-|_', path.basename(cf_mod))
 
-cyear = vv[-3] ; cyear = cyear[0:4]
-cdt   = vv[-4]
 
-print('\n *** Year = '+cyear)
-print('\n *** time increment = '+cdt)
+cnfig  = str.replace( path.basename(cf_npz), '.npz', '' )
 
-cyr0=cyear
-yr0=int(cyear)
-cmn0='01'
-cdd0='01'
 
-# Time step (h) as a string
-if not len(cdt)==2:
-    print('ERROR: something is wrong with the format of your time step => '+cdt+' !'); exit(0)
-if cdt=='1d':
-    dt = 24 ; ntpd = 1
-elif cdt[1]=='h':
-    dt = int(cdt[0]) ; ntpd = 24 / dt
+# Getting time info and time step from input npz file which is should look like NEMO output file:
+vv = split('-|_', path.basename(cf_npz))
+
+print(vv)
+
+
+CCONF = vv[0]
+print('\n *** CONF = '+CCONF)
+
+cdt   = vv[3]
+print('\n *** Time frequency = '+cdt)
+
+cdt1, cdt2 = vv[4], vv[5]
+print('\n *** Start and End dates => '+cdt1+' -- '+cdt2)
+
+#cyear = cdt1[0:4]
+#print('\n *** Year = '+cyear+'\n')
+
+NbDays = cp.Dates2NbDays(cdt1,cdt2)
+print('     ==> number of days =', NbDays)
+
+if cdt[-1]=='h':
+    dt = int(cdt[0:-1]) ; ntpd = 24 / dt
+    NbRecs = int(24/int(cdt[0:-1])*NbDays)
+    if cdt=='1h': NbRecs = NbRecs+24 ; # fixme: why???? not fotr '6h' ???
 else:
-    print('ERROR: something is wrong with the format of your time step => '+cdt+' !'); exit(0)
-    
-vm = vmn
-if isleap(yr0): vm = vml
-#print(' year is ', vm, np.sum(vm)
-
-jd = int(cdd0) - 1
-jm = int(cmn0)
-
-print('     ==> dt = ', dt,'h')
+    print('ERROR: please adapt unit frequency: "'+cdt[-1]+'" !!!'); exit(0)
+print('     ==> expected number of records =', NbRecs,'\n')
 
 
 dir_conf = path.dirname(cf_npz)
@@ -119,8 +128,6 @@ if dir_conf == '':  dir_conf = '.'
 print('\n *** dir_conf =',dir_conf,'\n')
 
 if l_show_mod_field: print('\n Field to show in background: "'+cv_mod+'" of file "'+cf_mod+'" !\n')
-
-
 
 # Getting setup for NEMO CONFIG/BOX:
 HBX = cp.nemo_hbox(CCONF,CBOX)
@@ -138,41 +145,32 @@ if l_show_mod_field: print('\n *** Model field to show in bacground: = '+cv_mod)
 
 bgclr = 'w'   ; # background color for ocean in figure
 
-if   cv_mod in ['sosstsst','tos']:
-    cfield = 'SST'
-    tmin=-3. ;  tmax=2.   ;  df = 0.1 ; # Arctic!
-    #tmin=14. ;  tmax=26.   ;  df = 1.
-    cpal_fld = 'inferno'
-    cunit = r'SST ($^{\circ}$C)'
+if l_show_mod_field:
+    if   cv_mod in ['sosstsst','tos']:
+        cfield = 'SST'
+        tmin=-3. ;  tmax=2.   ;  df = 0.1 ; # Arctic!
+        #tmin=14. ;  tmax=26.   ;  df = 1.
+        cpal_fld = 'inferno'
+        cunit = r'SST ($^{\circ}$C)'
 
-elif cv_mod in ['sosaline','sos']:
-    cfield = 'SSS'
-    tmin=32. ;  tmax=36.   ;  df = 1.
-    cpal_fld = 'viridis'
-    cunit = r'SSS (PSU)'
+    elif cv_mod in ['sosaline','sos']:
+        cfield = 'SSS'
+        tmin=32. ;  tmax=36.   ;  df = 1.
+        cpal_fld = 'viridis'
+        cunit = r'SSS (PSU)'
 
-elif cv_mod in ['siconc']:
-    cfield = 'siconc'
-    tmin=0. ;  tmax=1.   ;  df = 0.1 ; # Arctic!
-    cpal_fld = 'ncview_ice'
-    cunit = 'Ice concentration'
-    bgclr = 'k'   ; # background color for ocean in figure
+    elif cv_mod in ['siconc']:
+        cfield = 'siconc'
+        tmin=0. ;  tmax=1.   ;  df = 0.1 ; # Arctic!
+        cpal_fld = 'ncview_ice'
+        cunit = 'Ice concentration'
+        bgclr = 'k'   ; # background color for ocean in figure
 
-else:
-    print('ERROR: variable '+cv_mod+' is not known yet...'); exit(0)
+    else:
+        print('ERROR: variable '+cv_mod+' is not known yet...'); exit(0)
 
 
 if not path.exists("figs"): mkdir("figs")
-
-
-
-if not path.exists(cf_npz):    
-    print('\n *** '+cf_npz+' NOT found !!!   :(  ')
-    exit(0)
-
-else:
-    print('\n *** '+cf_npz+' was found !!!   :D  ')
-
 
 
 #############################3
@@ -185,9 +183,12 @@ with np.load(cf_npz) as data:
     xJJs    = data['JJs']
     xFFs    = data['FFs']
 
-    
 
-print('\n\n *** Trajectories contain '+str(NrTraj)+' records each in CSV file')
+
+if NrTraj != NbRecs-1:
+    print('ERROR: NrTraj != NbRecs-1 !!!',NrTraj,NbRecs-1); exit(0)
+
+print('\n\n *** Trajectories contain '+str(NrTraj)+' records...')
 
 if l_show_mod_field:
     print('   => and '+str(Nt_mod)+' records of field '+cv_mod+' in NEMO file '+cf_mod+' !')
@@ -236,30 +237,19 @@ print('\n *** width and height of image to create:', nxr, nyr, '\n')
 pmsk    = np.ma.masked_where(XMSK[:,:] > 0.2, XMSK[:,:]*0.+40.)
 idx_oce = np.where(XMSK[:,:] > 0.5)
 
-#font_rat
-#params = { 'font.family':'Ubuntu',
-params = { 'font.family':'Open Sans',
-           'font.weight':    'normal',
-           'font.size':       int(12.*HBX.font_rat),
-           'legend.fontsize': int(22.*HBX.font_rat),
-           'xtick.labelsize': int(18.*HBX.font_rat),
-           'ytick.labelsize': int(18.*HBX.font_rat),
-           'axes.labelsize':  int(15.*HBX.font_rat) }
-mpl.rcParams.update(params)
-cfont_clb   = { 'fontname':'Open Sans',   'fontweight':'medium', 'fontsize':int(18.*HBX.font_rat), 'color':color_top }
-cfont_cnfn  = { 'fontname':'Open Sans',   'fontweight':'light' , 'fontsize':int(35.*HBX.font_rat), 'color':color_top }
-cfont_axis  = { 'fontname':'Open Sans',   'fontweight':'medium', 'fontsize':int(18.*HBX.font_rat), 'color':color_top }
-cfont_ttl   = { 'fontname':'Open Sans',   'fontweight':'medium', 'fontsize':int(25.*HBX.font_rat), 'color':color_top }
-cfont_clock = { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(19.*HBX.font_rat), 'color':color_top }
+
+# Configuring fonts:
+kk = cp.fig_style( HBX.font_rat, clr_top=color_top, clr_top_cb=color_top_cb )
 
 # Colormaps for fields:
-pal_fld = cp.chose_colmap(cpal_fld)
-if l_log_field:
-    norm_fld = colors.LogNorm(  vmin = tmin, vmax = tmax, clip = False)
-if l_pow_field:
-    norm_fld = colors.PowerNorm(gamma=pow_field, vmin = tmin, vmax = tmax, clip = False)
-else:
-    norm_fld = colors.Normalize(vmin = tmin, vmax = tmax, clip = False)
+if l_show_mod_field:
+    pal_fld = cp.chose_colmap(cpal_fld)
+    if l_log_field:
+        norm_fld = colors.LogNorm(  vmin = tmin, vmax = tmax, clip = False)
+    elif l_pow_field:
+        norm_fld = colors.PowerNorm(gamma=pow_field, vmin = tmin, vmax = tmax, clip = False)
+    else:
+        norm_fld = colors.Normalize(vmin = tmin, vmax = tmax, clip = False)
 
 pal_lsm = cp.chose_colmap('land_dark')
 norm_lsm = colors.Normalize(vmin = 0., vmax = 1., clip = False)
@@ -278,7 +268,12 @@ if l_show_mod_field:
 
 
 # Loop over time records:
-
+cyr0 = cdt1[0:4]
+yr0 = int(cyr0)
+vm = vmn
+if isleap(yr0): vm = vml
+jd = int(cdt1[6:8]) - 1
+jm = int(cdt1[4:6])
 jtm = -1 ; # time record to use for model
 l_read_mod = True
 for jtt in range(NrTraj):
@@ -342,61 +337,62 @@ for jtt in range(NrTraj):
 
         # Only going if image not already present: lilo
 
-        
+
         cfig = './figs/'+cnfig+'_'+cdate+'.'+fig_type
-        
+
         if not path.exists(cfig):
-        
+
             fig = plt.figure(num=1, figsize=(rh,rh*yx_ratio), dpi=rDPI, facecolor='k', edgecolor='k')
-    
+
             if l_scientific_mode:
                 ax  = plt.axes([0.09, 0.09, 0.9, 0.9], facecolor = 'r')
             else:
                 ax  = plt.axes([0., 0., 1., 1.],     facecolor = bgclr)
-    
-    
+
+
             if l_show_mod_field and l_read_mod:
                 print('    => Reading record #'+str(jtm)+' of '+cv_mod+' in '+cf_mod)
                 XFLD  = id_f_mod.variables[cv_mod][jtm-1,j1:j2,i1:i2] ; # t, y, x
                 print('          Done!\n')
-    
+
                 if jtm == 0:
                     if XMSK[:,:].shape != XFLD.shape:
                         print('\n PROBLEM: field and mask do not agree in shape!')
                         print(XMSK.shape , XFLD.shape)
                         exit(0)
                     print('  *** Shape of field and mask => ', np.shape(XFLD))
-    
+
             l_add_true_filled = False
-    
+
             if l_show_mod_field:
                 cf = plt.pcolormesh(XFLD[:,:], cmap=pal_fld, norm=norm_fld )
-    
+
             if l_show_msh:
                 ccx = plt.contour(Xlon[:,:], 60, colors='k', linewidths=0.5)
                 ccy = plt.contour(Xlat[:,:], 30, colors='k', linewidths=0.5)
-    
-    
-            #cm = plt.imshow(pmsk, cmap=pal_lsm, norm=norm_lsm, interpolation='none')
-            cm = plt.pcolormesh( pmsk, cmap=pal_lsm, norm=norm_lsm )
-    
+
+
+            #ccm = plt.imshow(pmsk, cmap=pal_lsm, norm=norm_lsm, interpolation='none')
+            ccm = plt.pcolormesh( pmsk, cmap=pal_lsm, norm=norm_lsm )
+
             if l_add_true_filled: del pfilled
-    
-    
+
+
             plt.axis([ 0,i2-i1,0,j2-j1])
-    
+
             # Showing trajectories:
-            ct = plt.scatter(xJIs[:,jtt]-i1, xJJs[:,jtt]-j1, c=xFFs[:,jtt], cmap=pal_fld, norm=norm_fld, marker='.', s=HBX.pt_sz_track )
-    
-    
-    
-    
-    
+            if l_show_mod_field:
+                # Points have the color of the field!
+                csct = plt.scatter(xJIs[:,jtt]-i1, xJJs[:,jtt]-j1, c=xFFs[:,jtt], cmap=pal_fld, norm=norm_fld, marker='.', s=HBX.pt_sz_track )
+            else:
+                csct = plt.scatter(xJIs[:,jtt]-i1, xJJs[:,jtt]-j1, c='b', marker='.', s=HBX.pt_sz_track )
+
+
             if l_scientific_mode:
-                plt.xlabel('i-points', **cfont_axis)
-                plt.ylabel('j-points', **cfont_axis)
-    
-            if HBX.l_show_cb:
+                plt.xlabel('i-points', **cp.fig_style.cfont_axis)
+                plt.ylabel('j-points', **cp.fig_style.cfont_axis)
+
+            if l_show_mod_field and HBX.l_show_cb:
                 ax2 = plt.axes(HBX.vcb)
                 if l_pow_field or l_log_field:
                     clb = mpl.colorbar.ColorbarBase(ax=ax2,               cmap=pal_fld, norm=norm_fld, orientation='horizontal', extend='neither')
@@ -412,34 +408,34 @@ for jtt in range(NrTraj):
                             cb_labs.append(' ')
                         cpt = cpt + 1
                     clb.ax.set_xticklabels(cb_labs)
-                clb.set_label(cunit, **cfont_clb)
+                clb.set_label(cunit, **cp.fig_style.cfont_clb)
                 clb.ax.yaxis.set_tick_params(color=color_top) ; # set colorbar tick color
                 #clb.outline.set_edgecolor(color_top) ; # set colorbar edgecolor
                 if l_hide_cb_ticks: clb.ax.tick_params(axis=u'both', which=u'both',length=0) ; # remove ticks!
                 plt.setp(plt.getp(clb.ax.axes, 'xticklabels'), color=color_top) ; # set colorbar ticklabels
-    
-                del ct
-    
-            if HBX.l_show_name:  ax.annotate(CCONF,          xy=(1, 4), xytext=HBX.name,  **cfont_cnfn)
-    
-            if HBX.l_show_exp:   ax.annotate(CCONF,          xy=(1, 4), xytext=HBX.exp,   **cfont_ttl)
-    
-            if HBX.l_show_clock: ax.annotate('Date: '+cdats, xy=(1, 4), xytext=HBX.clock, **cfont_clock)
-    
-    
-            
-    
-    
+
+                del csct
+
+            if HBX.l_show_name:  ax.annotate(CCONF,          xy=(1, 4), xytext=HBX.name,  **cp.fig_style.cfont_ttl)
+
+            if HBX.l_show_exp:   ax.annotate(CCONF,          xy=(1, 4), xytext=HBX.exp,   **cp.fig_style.cfont_ttl)
+
+            if HBX.l_show_clock: ax.annotate('Date: '+cdats, xy=(1, 4), xytext=HBX.clock, **cp.fig_style.cfont_clck)
+
+
+
+
+
             #plt.savefig(cfig, dpi=rDPI, orientation='portrait', facecolor='b', transparent=True)
             plt.savefig(cfig, dpi=rDPI, orientation='portrait') #, transparent=True)
             print(cfig+' created!\n')
             plt.close(1)
-        
-            del cm, fig, ax
+
+            del ccm, fig, ax
 
         else:
             print('   ----- Figure '+cfig+' already there! -----\n')
-            
+
 # END OF LOOP !!!
 
 if l_show_mod_field: id_f_mod.close()

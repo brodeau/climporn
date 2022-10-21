@@ -828,7 +828,7 @@ def fig_style( pzoom, clr_top='k', clr_top_cb='k' ):
     fig_style.cfont_mrkr = { 'fontname':'Open Sans',       'fontweight':'light' , 'fontsize':int( 5.*pzoom), 'color':clr_top }
     fig_style.cfont_axis = { 'fontname':'Open Sans',       'fontweight':'medium', 'fontsize':int(18.*pzoom), 'color':clr_top }
     fig_style.cfont_ttl  = { 'fontname':'Open Sans',       'fontweight':'medium', 'fontsize':int(32.*pzoom), 'color':clr_top }
-    fig_style.cfont_clck = { 'fontname':'Ubuntu Mono',     'fontweight':'normal', 'fontsize':int(12.*pzoom), 'color':clr_top }
+    fig_style.cfont_clck = { 'fontname':'Ubuntu Mono',     'fontweight':'normal', 'fontsize':int(18.*pzoom), 'color':clr_top }
     #
     return 0
 
@@ -840,7 +840,7 @@ def epoch2clock( rt ):
 
 def clock2epoch( cdate ):
     from datetime import datetime as dt
-    from datetime import timezone    
+    from datetime import timezone
     rt = dt.strptime(cdate, "%Y-%m-%d_%H:%M:%S").replace(tzinfo=timezone.utc)
     return rt.timestamp()
 
@@ -852,7 +852,7 @@ def epoch2clockS( rt ):
 
 def clock2epochS( cdate ):
     from datetime import datetime as dt
-    from datetime import timezone    
+    from datetime import timezone
     rt = dt.strptime(cdate, "%Y-%m-%d %H:%M").replace(tzinfo=timezone.utc)
     return rt.timestamp()
 
@@ -875,7 +875,7 @@ def Dates2NbDays( cdt1, cdt2):
     return kdelta.days
 
 
-    
+
 
 
 #def __extract_geom_meta__(country):
@@ -888,7 +888,7 @@ def Dates2NbDays( cdt1, cdt2):
 #
 #    print(' geoms = ', geoms )
 #    exit(0)
-#    
+#
 #    coords = nmp.empty(shape=[0, 2])
 #    for geom in geoms:
 #        coords = nmp.append(coords, geom.exterior.coords, axis = 0)
@@ -903,18 +903,18 @@ def Dates2NbDays( cdt1, cdt2):
 #    '''
 #    #import shapely as sp
 #    import cartopy.io.shapereader as shpreader
-#    
-#   
+#
+#
 #    f_cl = shpreader.natural_earth(resolution = '10m', category = 'cultural', name='admin_0_countries')
 #    #f_cl = shpreader.natural_earth(resolution='50m', category='physical', name='coastline')
-#    
+#
 #    reader = shpreader.Reader(f_cl)
-#    
+#
 #    countries = reader.records()
 #
 #    #print(countries)
 #    #exit(0)
-#    
+#
 #    # extract and create separate objects
 #    world_geoms = [__extract_geom_meta__(country) for country in countries]
 #
@@ -936,7 +936,7 @@ def Dates2NbDays( cdt1, cdt2):
 #    the distance to the nearest coastline point.
 #    '''
 #    coastline_coords = nmp.vstack([nmp.flip(x[0][0], axis=1) for x in coastline])
-#    
+#
 #    countries        = nmp.hstack([nmp.repeat(str(x[1]), len(x[0][0])) for x in coastline])
 #
 #    tree = BallTree(nmp.radians(coastline_coords), metric='haversine')
@@ -957,18 +957,18 @@ def Dates2NbDays( cdt1, cdt2):
 #    world = gpd.read_file(gpd.datasets.get_path('naturalearth_lowres'))
 #    print(' world = ', world )
 
-    
+
 #    #single geom for the coastline
 #    f_cl = cartopy.io.shapereader.natural_earth(resolution='50m', category='physical', name='coastline')
 
 #    c     = gpd.read_file(f_cl)
-    
+
 #    c.crs = 'EPSG:4326'
 
 #    print('Get coastline...')
 #    coastline = gpd.clip(c.to_crs('EPSG:4326'), aus.buffer(0.25)).iloc[0].geometry
 
- 
+
 
 #    print(c)
 
@@ -979,7 +979,7 @@ def Dates2NbDays( cdt1, cdt2):
 #from   cartopy.feature        import ShapelyFeature
 
 #land = shapereader.gshhs(scale='h', level=1)
-                              
+
 #geoms = list(itertools.chain.from_iterable(geom.geoms for geom in shapereader.Reader(land).geometries()))
 #geometries = shapely.geometry.MultiPolygon(geoms)
 
@@ -995,4 +995,4 @@ def Dates2NbDays( cdt1, cdt2):
 #    xy = transform(project, shapely.geometry.Point(df.iloc[i]['lon'], df.iloc[i]['lat']))
 #    x, y = xy.xy[0][0], xy.xy[1][0]
 #    point = shapely.geometry.Point(x, y)
-#    df['dist'][i] = xy_geometries.distance(point)   
+#    df['dist'][i] = xy_geometries.distance(point)
