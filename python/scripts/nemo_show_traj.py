@@ -226,7 +226,7 @@ vc_fld = np.arange(tmin, tmax + df, df)
 
 
 # Only 1 figure
-cfig = './figs/'+cnfig+'.'+fig_type
+cfig = './figs/'+cnfig
 
 
 fig = plt.figure(num=1, figsize=(rh,rh*yx_ratio), dpi=rDPI, facecolor='k', edgecolor='k')
