@@ -20,6 +20,7 @@
 
 from sys import argv, exit
 from os import path, mkdir
+import argparse as ap
 import numpy as np
 
 from re import split
@@ -64,31 +65,33 @@ vml = [ 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ]
 
 ###################################################################################
 
-narg = len(argv)
-if not narg in [4,5]:
-    print('Usage: '+argv[0]+' <file_trj.npz> <file_mod,var/"none"> <LSM_file> (iTsubsampl)')
-    exit(0)
+################## ARGUMENT PARSING / USAGE ################################################################################################
+parser = ap.ArgumentParser(description='Generate pixel maps of a given scalar.')
 
-cf_npz = argv[1]
-
-l_show_mod_field = ( argv[2]!="none" )
-if l_show_mod_field:
-    vv = split(',',argv[2])
-    cf_mod = vv[0]
-    cv_mod = vv[1]
-
-cf_lsm = argv[3]
-
-# Subsampling in time...
-itsubs = 1
-if narg == 5 :
-    itsubs = int(argv[4])
+requiredNamed = parser.add_argument_group('required arguments')
+requiredNamed.add_argument('-i', '--fin' , required=True,       help='`npz` file containing the csv comversion of TrackIce output')
+requiredNamed.add_argument('-m', '--fmm' , required=True,       help='`mesh_mask` file of the NEMO config used...')
+#
+parser.add_argument(       '-j', '--fmd' , default="",          help='NEMO/SI3 output file that TrackIce used to build the npz file...')
+parser.add_argument(       '-v', '--var' , default="siconc",    help='NEMO/SI3 name of the variable of field saved into npz file, to use for coloring buoys')
+parser.add_argument(       '-s', '--tss' , type=int, default=1, help='temporal subsampling for generating figures')
+parser.add_argument(       '-N', '--nrc' , type=int, default=0, help='`N` force number of records to use (example file name dates do not correspond to reality) ')
+#
+args = parser.parse_args()
+#
+cf_npz = args.fin
+cf_lsm = args.fmm
+cf_mod = args.fmd
+l_show_mod_field = ( cf_mod != "" )
+cv_mod = args.var
+itsubs = args.tss
+NrecF  = args.nrc
+l_force_Nrec = ( NrecF > 0 )
+################################################################################################
 
 cp.chck4f(cf_npz)
 if l_show_mod_field: cp.chck4f(cf_mod)
 cp.chck4f(cf_lsm)
-
-
 
 cnfig  = str.replace( path.basename(cf_npz), '.npz', '' )
 
@@ -120,8 +123,12 @@ if cdt[-1]=='h':
     if cdt=='1h': NbRecs = NbRecs+24 ; # fixme: why???? not fotr '6h' ???
 else:
     print('ERROR: please adapt unit frequency: "'+cdt[-1]+'" !!!'); exit(0)
-print('     ==> expected number of records =', NbRecs,'\n')
+print('     ==> expected number of records from file name =', NbRecs)
 
+if l_force_Nrec:
+    NbRecs = NrecF
+    print('     ==> FORCED to:', NbRecs)
+print('')
 
 dir_conf = path.dirname(cf_npz)
 if dir_conf == '':  dir_conf = '.'
@@ -145,29 +152,28 @@ if l_show_mod_field: print('\n *** Model field to show in bacground: = '+cv_mod)
 
 bgclr = 'w'   ; # background color for ocean in figure
 
-if l_show_mod_field:
-    if   cv_mod in ['sosstsst','tos']:
-        cfield = 'SST'
-        tmin=-3. ;  tmax=2.   ;  df = 0.1 ; # Arctic!
-        #tmin=14. ;  tmax=26.   ;  df = 1.
-        cpal_fld = 'inferno'
-        cunit = r'SST ($^{\circ}$C)'
+if   cv_mod in ['sosstsst','tos']:
+    cfield = 'SST'
+    tmin=-3. ;  tmax=2.   ;  df = 0.1 ; # Arctic!
+    #tmin=14. ;  tmax=26.   ;  df = 1.
+    cpal_fld = 'inferno'
+    cunit = r'SST ($^{\circ}$C)'
 
-    elif cv_mod in ['sosaline','sos']:
-        cfield = 'SSS'
-        tmin=32. ;  tmax=36.   ;  df = 1.
-        cpal_fld = 'viridis'
-        cunit = r'SSS (PSU)'
+elif cv_mod in ['sosaline','sos']:
+    cfield = 'SSS'
+    tmin=32. ;  tmax=36.   ;  df = 1.
+    cpal_fld = 'viridis'
+    cunit = r'SSS (PSU)'
 
-    elif cv_mod in ['siconc']:
-        cfield = 'siconc'
-        tmin=0. ;  tmax=1.   ;  df = 0.1 ; # Arctic!
-        cpal_fld = 'ncview_ice'
-        cunit = 'Ice concentration'
-        bgclr = 'k'   ; # background color for ocean in figure
+elif cv_mod in ['siconc']:
+    cfield = cv_mod
+    tmin=0. ;  tmax=1.   ;  df = 0.1 ; # Arctic!
+    cpal_fld = 'ncview_ice'
+    cunit = 'Ice concentration'
+    bgclr = 'k'   ; # background color for ocean in figure
 
-    else:
-        print('ERROR: variable '+cv_mod+' is not known yet...'); exit(0)
+else:
+    print('ERROR: variable '+cv_mod+' is not known yet...'); exit(0)
 
 
 if not path.exists("figs"): mkdir("figs")
@@ -191,6 +197,8 @@ if NrTraj != NbRecs-1:
 print('\n\n *** Trajectories contain '+str(NrTraj)+' records...')
 
 if l_show_mod_field:
+    with Dataset(cf_mod) as id_f_mod:
+        Nt_mod = id_f_mod.dimensions['time_counter'].size - 1
     print('   => and '+str(Nt_mod)+' records of field '+cv_mod+' in NEMO file '+cf_mod+' !')
     if not NrTraj%Nt_mod == 0:
         print('==> ERROR: they are not a multiple of each other!'); exit(0)
@@ -242,14 +250,13 @@ idx_oce = np.where(XMSK[:,:] > 0.5)
 kk = cp.fig_style( HBX.font_rat, clr_top=color_top, clr_top_cb=color_top_cb )
 
 # Colormaps for fields:
-if l_show_mod_field:
-    pal_fld = cp.chose_colmap(cpal_fld)
-    if l_log_field:
-        norm_fld = colors.LogNorm(  vmin = tmin, vmax = tmax, clip = False)
-    elif l_pow_field:
-        norm_fld = colors.PowerNorm(gamma=pow_field, vmin = tmin, vmax = tmax, clip = False)
-    else:
-        norm_fld = colors.Normalize(vmin = tmin, vmax = tmax, clip = False)
+pal_fld = cp.chose_colmap(cpal_fld)
+if l_log_field:
+    norm_fld = colors.LogNorm(  vmin = tmin, vmax = tmax, clip = False)
+elif l_pow_field:
+    norm_fld = colors.PowerNorm(gamma=pow_field, vmin = tmin, vmax = tmax, clip = False)
+else:
+    norm_fld = colors.Normalize(vmin = tmin, vmax = tmax, clip = False)
 
 pal_lsm = cp.chose_colmap('land_dark')
 norm_lsm = colors.Normalize(vmin = 0., vmax = 1., clip = False)
@@ -381,11 +388,8 @@ for jtt in range(NrTraj):
             plt.axis([ 0,i2-i1,0,j2-j1])
 
             # Showing trajectories:
-            if l_show_mod_field:
-                # Points have the color of the field!
-                csct = plt.scatter(xJIs[:,jtt]-i1, xJJs[:,jtt]-j1, c=xFFs[:,jtt], cmap=pal_fld, norm=norm_fld, marker='.', s=HBX.pt_sz_track )
-            else:
-                csct = plt.scatter(xJIs[:,jtt]-i1, xJJs[:,jtt]-j1, c='b', marker='.', s=HBX.pt_sz_track )
+            # Points have the color of the field!
+            csct = plt.scatter(xJIs[:,jtt]-i1, xJJs[:,jtt]-j1, c=xFFs[:,jtt], cmap=pal_fld, norm=norm_fld, marker='.', s=HBX.pt_sz_track )
 
 
             if l_scientific_mode:
