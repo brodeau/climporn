@@ -18,7 +18,7 @@
 #
 ##################################################################
 
-from sys import argv, exit
+from sys import exit
 from os import path, mkdir
 import argparse as ap
 import numpy as np
