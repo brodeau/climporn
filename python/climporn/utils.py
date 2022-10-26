@@ -832,10 +832,20 @@ def fig_style( pzoom, clr_top='k', clr_top_cb='k' ):
     #
     return 0
 
-def epoch2clock( rt ):
+def epoch2clock( rt, precision='s' ):
     from datetime import datetime as dt
     from datetime import timezone
-    ct = dt.fromtimestamp(rt, timezone.utc).strftime("%Y-%m-%d_%H:%M:%S")
+    if   precision=='s':
+        ct = dt.fromtimestamp(rt, timezone.utc).strftime("%Y-%m-%d_%H:%M:%S")
+    elif precision=='m':
+        ct = dt.fromtimestamp(rt, timezone.utc).strftime("%Y-%m-%d_%H:%M")
+    elif precision=='h':
+        ct = dt.fromtimestamp(rt, timezone.utc).strftime("%Y-%m-%d_%H")
+    elif precision=='D':
+        ct = dt.fromtimestamp(rt, timezone.utc).strftime("%Y-%m-%d")
+    else:
+        print('ERROR [epoch2clock]: unknown precision "'+precision+'" !')
+        exit(0)
     return str(ct)
 
 def clock2epoch( cdate ):
