@@ -60,9 +60,6 @@ l_show_msh = False
 
 fig_type='png'
 
-vmn = [ 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ]
-vml = [ 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ]
-
 ###################################################################################
 
 ################## ARGUMENT PARSING / USAGE ################################################################################################
@@ -75,7 +72,6 @@ requiredNamed.add_argument('-m', '--fmm' , required=True,       help='`mesh_mask
 parser.add_argument(       '-j', '--fmd' , default="",          help='NEMO/SI3 output file that TrackIce used to build the npz file...')
 parser.add_argument(       '-v', '--var' , default="siconc",    help='NEMO/SI3 name of the variable of field saved into npz file, to use for coloring buoys')
 parser.add_argument(       '-s', '--tss' , type=int, default=1, help='temporal subsampling for generating figures')
-parser.add_argument(       '-N', '--nrc' , type=int, default=0, help='`N` force number of records to use (example file name dates do not correspond to reality) ')
 #
 args = parser.parse_args()
 #
@@ -85,8 +81,6 @@ cf_mod = args.fmd
 l_show_mod_field = ( cf_mod != "" )
 cv_mod = args.var
 itsubs = args.tss
-NrecF  = args.nrc
-l_force_Nrec = ( NrecF > 0 )
 ################################################################################################
 
 cp.chck4f(cf_npz)
@@ -124,11 +118,6 @@ if cdt[-1]=='h':
 else:
     print('ERROR: please adapt unit frequency: "'+cdt[-1]+'" !!!'); exit(0)
 print('     ==> expected number of records from file name =', NbRecs)
-
-if l_force_Nrec:
-    NbRecs = NrecF
-    print('     ==> FORCED to:', NbRecs)
-print('')
 
 dir_conf = path.dirname(cf_npz)
 if dir_conf == '':  dir_conf = '.'
@@ -182,17 +171,19 @@ if not path.exists("figs"): mkdir("figs")
 #############################3
 print('\n *** Reading into '+cf_npz+' !!!')
 with np.load(cf_npz) as data:
+    vtime  = data['time'] ; # calendar in epoch time...
     NrTraj = data['NrTraj']
-    xmask   = data['mask']
-    xIDs    = data['IDs']
-    xJIs    = data['JIs']
-    xJJs    = data['JJs']
-    xFFs    = data['FFs']
+    xmask  = data['mask']
+    xIDs   = data['IDs']
+    xJIs   = data['JIs']
+    xJJs   = data['JJs']
+    xFFs   = data['FFs']
 
+#for rt in vtime:    print(cp.epoch2clock(rt))
 
 
 if NrTraj != NbRecs-1:
-    print('ERROR: NrTraj != NbRecs-1 !!!',NrTraj,NbRecs-1); exit(0)
+    print('Warning: NrTraj != NbRecs-1 !!!',NrTraj,NbRecs-1)
 
 print('\n\n *** Trajectories contain '+str(NrTraj)+' records...')
 
@@ -267,22 +258,17 @@ norm_filled = colors.Normalize(vmin = 0., vmax = 0.1, clip = False)
 vc_fld = np.arange(tmin, tmax + df, df)
 
 
-
-
 if l_show_mod_field:
     print('\n *** Opening file '+cf_mod)
     id_f_mod = Dataset(cf_mod)
 
 
+    
 # Loop over time records:
-cyr0 = cdt1[0:4]
-yr0 = int(cyr0)
-vm = vmn
-if isleap(yr0): vm = vml
-jd = int(cdt1[6:8]) - 1
-jm = int(cdt1[4:6])
+
 jtm = -1 ; # time record to use for model
 l_read_mod = True
+
 for jtt in range(NrTraj):
 
     if jtt%nsubC == 0:
@@ -293,58 +279,12 @@ for jtt in range(NrTraj):
 
     print( ' ### jtt, jtm = ',jtt, jtm )
 
-    ct   = '%4.4i'%(jtt+1)
-
-
-
-    #---------------------- Calendar stuff --------------------------------------------
-    jh   = (jtt*dt)%24
-    #rjh  = ((float(jtt)+0.5)*dt)%24
-    rjh  = ( float(jtt)*dt )%24
-    if jtt%ntpd == 0: jd = jd + 1
-    if jd == vm[jm-1]+1 and (jtt)%ntpd == 0 :
-        jd = 1
-        jm = jm + 1
-        if jm==13:
-            yr0 = yr0+1
-            cyr0 = str(yr0)
-            jm = 1
-            vm = vmn
-            if isleap(yr0): vm = vml
-
-    ch  = '%2.2i'%(jh)
-    crh = '%2.2i'%(rjh)
-    cd  = '%3.3i'%(jd)
-    cm  = '%2.2i'%(jm)
-    #
-    jhou = int(rjh)
-    jmin = int((rjh-jhou)*60)
-    chou = '%2.2i'%(jhou)
-    cmin = '%2.2i'%(jmin)
-    #
-    ct  = str(datetime.datetime.strptime(cyr0+'-'+cm+'-'+cd+' '+ch, '%Y-%m-%j %H'))
-    ct  = ct[:5]+cm+ct[7:] #lolo bug !!! need to do that to get the month and not '01
-    cday  = ct[:10]   ; #print(' *** cday  :', cday
-    if dt >= 24:
-        cdate = cday
-        cdats = cday
-    else:
-        chour = ct[11:13] ; #print(' *** chour :', chour
-        cdate = cday+'_'+chour
-        if jmin==0:
-            cdats = cday+' '+chour+':00'
-        else:
-            cdats = cday+' '+chou+':'+cmin
-    print('   ==> current date = ', cdats+' !')
-    #-----------------------------------------------------------------------------------
-
 
     if jtt%itsubs == 0:
 
+        cdate = cp.epoch2clock(vtime[jtt])
 
-        # Only going if image not already present: lilo
-
-
+        # Only going if image not already present:
         cfig = './figs/'+cnfig+'_'+cdate+'.'+fig_type
 
         if not path.exists(cfig):
@@ -424,7 +364,7 @@ for jtt in range(NrTraj):
 
             if HBX.l_show_exp:   ax.annotate(CCONF,          xy=(1, 4), xytext=HBX.exp,   **cp.fig_style.cfont_ttl)
 
-            if HBX.l_show_clock: ax.annotate('Date: '+cdats, xy=(1, 4), xytext=HBX.clock, **cp.fig_style.cfont_clck)
+            if HBX.l_show_clock: ax.annotate('Date: '+cdate, xy=(1, 4), xytext=HBX.clock, **cp.fig_style.cfont_clck)
 
 
 
