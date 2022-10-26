@@ -87,26 +87,6 @@ print(vv)
 CCONF = vv[0]
 print('\n *** CONF = '+CCONF)
 
-cdt   = vv[3]
-print('\n *** Time frequency = '+cdt)
-
-cdt1, cdt2 = vv[4], vv[5]
-print('\n *** Start and End dates => '+cdt1+' -- '+cdt2)
-
-#cyear = cdt1[0:4]
-#print('\n *** Year = '+cyear+'\n')
-
-NbDays = cp.Dates2NbDays(cdt1,cdt2)
-print('     ==> number of days =', NbDays)
-
-if cdt[-1]=='h':
-    NbRecs = int(24/int(cdt[0:-1])*NbDays)
-    if cdt=='1h': NbRecs = NbRecs+24 ; # fixme: why???? not fotr '6h' ???
-else:
-    print('ERROR: please adapt unit frequency: "'+cdt[-1]+'" !!!'); exit(0)
-print('     ==> expected number of records =', NbRecs,'\n')
-
-
 dir_conf = path.dirname(cf_npz)
 if dir_conf == '':  dir_conf = '.'
 print('\n *** dir_conf =',dir_conf,'\n')
@@ -129,7 +109,7 @@ bgclr = 'w'   ; # background color for ocean in figure
 
 cfield = 'duration'
 #fixme: end of october!
-tmin=0. ;  tmax=NbDays-1  ;  df = 30 ; # Arctic!
+#tmin=0. ;  tmax=NbDays-1  ;  df = 30 ; # Arctic!
 #cpal_fld = 'ncview_ice'
 cpal_fld = 'viridis_r'
 cunit = 'Time from seed (days)'
@@ -154,6 +134,7 @@ if not path.exists("figs"): mkdir("figs")
 print('\n *** Reading into '+cf_npz+' !!!')
 with np.load(cf_npz) as data:
     NrTraj = data['NrTraj']
+    vtime   = data['time']
     xmask   = data['mask']
     xIDs    = data['IDs']
     xJIs    = data['JIs']
@@ -162,11 +143,17 @@ with np.load(cf_npz) as data:
 
 
 
-if NrTraj != NbRecs-1:
-    print('ERROR: NrTraj != NbRecs-1 !!!',NrTraj,NbRecs-1); exit(0)
+NbDays = int( (vtime[-1] - vtime[0]) / (3600.*24.) )
+cdt1 = cp.epoch2clock(vtime[0] )
+cdt2 = cp.epoch2clock(vtime[-1])
+
+print('\n *** Start and End dates => '+cdt1+' -- '+cdt2)
+print('      ==> nb of days =', NbDays)
+    
+
+tmin=0. ;  tmax=NbDays-1  ;  df = int(NbDays/10) ; # colorbar min max...
 
 print('\n\n *** Trajectories contain '+str(NrTraj)+' records...')
-
 
 cnmsk = 'tmask'
 print('\n *** Reading "'+cnmsk+'" in meshmask file...')
