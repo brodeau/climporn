@@ -74,7 +74,6 @@ cp.chck4f(cf_npz)
 cp.chck4f(cf_lsm)
 
 
-
 cnfig  = str.replace( path.basename(cf_npz), '.npz', '.'+fig_type )
 
 
@@ -249,11 +248,7 @@ for jtt in range(NrTraj):
     rfade = float(icpt)/float(NrTraj-1)*NbDays
 
     # Showing trajectories:
-    csct = plt.scatter(xJIs[:,jtt]-i1, xJJs[:,jtt]-j1, c=xJIs[:,jtt]*0.+rfade, cmap=pal_fld , norm=norm_fld, marker='o', s=0.01) ; #, alpha=rfade ) ;#s=HBX.pt_sz_track ) ; # c=xFFs[:,jtt],
-
-
-
-
+    csct = plt.scatter(xJIs[:,jtt]-i1, xJJs[:,jtt]-j1, c=xJIs[:,jtt]*0.+rfade, cmap=pal_fld , norm=norm_fld, s=1) ; #, alpha=rfade ) ;#s=HBX.pt_sz_track ) ; # c=xFFs[:,jtt],
 
 
 if l_scientific_mode:
