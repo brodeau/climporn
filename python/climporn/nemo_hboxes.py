@@ -157,8 +157,8 @@ class nemo_hbox:
             l_fill_holes_k=False
             pt_sz_track = 2
             #
-        elif [ config, box ] == [ 'NANUK4', 'EastArctic']:
-            i1=90 ; j1=240  ;  i2=380 ; j2=540  ; rfact_zoom=3. ; font_rat=0.12*rfact_zoom
+        elif [ config, box ] == [ 'NANUK4', 'ZoomArctic1']:
+            i1=90 ; j1=240  ;  i2=430 ; j2=540  ; rfact_zoom=3. ; font_rat=0.12*rfact_zoom
             l_show_cb  = True ; vcb=[0.1, 0.1, 0.8, 0.02]
             l_show_clock=True ; x_clock = 90.*rfact_zoom ; y_clock = 143*rfact_zoom
             l_add_logo=False

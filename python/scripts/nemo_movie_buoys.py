@@ -39,8 +39,8 @@ import datetime
 
 import climporn as cp
 
-CBOX = 'ALL' ; # what box of `CCONF` ???
-#CBOX = 'EastArctic' ; # what box of `CCONF` ???
+#CBOX = 'ALL' ; # what box of `CCONF` ???
+CBOX = 'ZoomArctic1' ; # what box of `CCONF` ???
 
 
 idebug = 1
