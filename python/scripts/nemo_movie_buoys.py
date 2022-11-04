@@ -172,7 +172,7 @@ if not path.exists("figs"): mkdir("figs")
 print('\n *** Reading into '+cf_npz+' !!!')
 with np.load(cf_npz) as data:
     vtime  = data['time'] ; # calendar in epoch time...
-    NrTraj = data['NrTraj']
+    Nrec = data['NbRec']
     xmask  = data['mask']
     xIDs   = data['IDs']
     xJIs   = data['JIs']
@@ -182,22 +182,22 @@ with np.load(cf_npz) as data:
 #for rt in vtime:    print(cp.epoch2clock(rt))
 
 
-if NrTraj != NbRecs-1:
-    print('Warning: NrTraj != NbRecs-1 !!!',NrTraj,NbRecs-1)
+if Nrec != NbRecs-1:
+    print('Warning: Nrec != NbRecs-1 !!!',Nrec,NbRecs-1)
 
-print('\n\n *** Trajectories contain '+str(NrTraj)+' records...')
+print('\n\n *** Trajectories contain '+str(Nrec)+' records...')
 
 if l_show_mod_field:
     with Dataset(cf_mod) as id_f_mod:
         Nt_mod = id_f_mod.dimensions['time_counter'].size - 1
     print('   => and '+str(Nt_mod)+' records of field '+cv_mod+' in NEMO file '+cf_mod+' !')
-    if not NrTraj%Nt_mod == 0:
+    if not Nrec%Nt_mod == 0:
         print('==> ERROR: they are not a multiple of each other!'); exit(0)
-    nsubC = NrTraj//Nt_mod
+    nsubC = Nrec//Nt_mod
     print('    ==> number of subcycles for trajectories w.r.t model data =>', nsubC)
 
 else:
-    Nt_mod = NrTraj
+    Nt_mod = Nrec
     nsubC  = 1
 
 
@@ -269,7 +269,7 @@ if l_show_mod_field:
 jtm = -1 ; # time record to use for model
 l_read_mod = True
 
-for jtt in range(NrTraj):
+for jtt in range(Nrec):
 
     if jtt%nsubC == 0:
         jtm = jtm+1

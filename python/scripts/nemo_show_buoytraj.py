@@ -133,7 +133,7 @@ if __name__ == '__main__':
     #############################
     print('\n *** Reading into '+cf_npz+' !!!')
     with np.load(cf_npz) as data:
-        NrTraj = data['NrTraj']
+        Nrec = data['NbRec']
         vtime   = data['time']
         xmask   = data['mask']
         xIDs    = data['IDs']
@@ -153,7 +153,7 @@ if __name__ == '__main__':
     
     tmin=0. ;  tmax=NbDays-1  ;  df = int(NbDays/10) ; # colorbar min max...
     
-    print('\n\n *** Trajectories contain '+str(NrTraj)+' records...')
+    print('\n\n *** Trajectories contain '+str(Nrec)+' records...')
     
     cnmsk = 'tmask'
     print('\n *** Reading "'+cnmsk+'" in meshmask file...')
@@ -235,18 +235,18 @@ if __name__ == '__main__':
     
     
     # If we show backward:
-    #print(xJIs[:,NrTraj-1])
+    #print(xJIs[:,Nrec-1])
     #exit(0)
     
     # Loop over time records:
     icpt = -1
-    for jtt in range(NrTraj):
-        #for jtt in np.arange(NrTraj-1,0,-1):
+    for jtt in range(Nrec):
+        #for jtt in np.arange(Nrec-1,0,-1):
         icpt = icpt+1
         #    if jtt%itsubs == 0:
         print('jtt =',jtt)
     
-        rfade = float(icpt)/float(NrTraj-1)*NbDays
+        rfade = float(icpt)/float(Nrec-1)*NbDays
     
         # Showing trajectories:
         csct = plt.scatter(xJIs[:,jtt]-i1, xJJs[:,jtt]-j1, c=xJIs[:,jtt]*0.+rfade, cmap=pal_fld , norm=norm_fld, s=1) ; #, alpha=rfade ) ;#s=HBX.pt_sz_track ) ; # c=xFFs[:,jtt],
