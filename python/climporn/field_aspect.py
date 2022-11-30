@@ -48,9 +48,12 @@ class field_aspect:
 
         if   CWHAT == 'MLD':
             cv_in = 'somxl010' ; cv_out = 'MLD'
-            tmin=0. ;  tmax=1800.  ;  df = 50. ; cpal_fld='ncview_hotres' ;     cb_jump = 4
+            tmin=0. ;  tmax=1800.  ;  df = 50. ; cpal_fld='magma_r' ;     cb_jump = 4
             cunit = r'MLD [m]'
-            if CBOX == 'Nordic': tmin=0. ; tmax=1000. ; cb_jump = 2 ; cpal_fld='magma_r' ; color_top_cb='k'
+            if CBOX in ['Nordic']:
+                tmin=0. ; tmax=1000. ; cb_jump = 2 ; cpal_fld='magma_r' ; color_top_cb='k'
+            if CBOX in ['ALL','ALLFR']:
+                tmin=0. ; tmax=1000. ; cb_jump = 2 ; cpal_fld='magma_r' ; color_top_cb='w'
 
         elif CWHAT == 'SST':
             cv_in = 'sosstsst' ; cv_out = CWHAT ; #in ['sosstsst','tos']:

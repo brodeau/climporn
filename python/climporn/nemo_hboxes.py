@@ -68,7 +68,7 @@ class nemo_hbox:
         l_fill_holes_k=False
         l_show_clock = True
         l_show_sign = False
-        l_add_logo=True
+        l_add_logo=False
         l_add_logo_ige=False
         l_add_logo_prc=False
         
@@ -89,21 +89,7 @@ class nemo_hbox:
 
         pt_sz_track = 5
         
-        if   [ config, box ] == [ 'eNATL60', 'ALL']:
-            i1=0   ; j1=0    ; i2=Ni0 ; j2=Nj0  ; rfact_zoom=1440./float(Nj0) ; vcb=[0.61, 0.1, 0.36, 0.018]  ; font_rat=8.*rfact_zoom
-            x_clock = 1600 ; y_clock = 200 ; x_logo=2200 ; y_logo=1200
-            l_show_exp = True ; x_exp = 1750 ; y_exp = 300
-            l_fill_holes_k=True
-
-        if   [ config, box ] == [ 'eNATL60', 'ALL4K']:
-            l_add_logo=False
-            i1=0   ; j1=0    ; i2=Ni0 ; j2=Nj0  ; rfact_zoom=2400./float(Nj0) ; vcb=[0.61, 0.1, 0.36, 0.018]  ; font_rat=8.*rfact_zoom
-            x_clock = 2666 ; y_clock = 333
-            l_show_exp = False ; x_exp = 2916 ; y_exp = 500
-            l_show_sign = True ; x_sign = 3450 ; y_sign = 80
-            l_fill_holes_k=True
-
-        elif [ config, box ] == [ 'ORCA36', 'ALL']:
+        if   [ config, box ] == [ 'ORCA36', 'ALL']:
             i1=0   ; j1=900    ; i2=Ni0 ; j2=Nj0-982  ; rfact_zoom=1920./float(Ni0) ; vcb=[0.02, 0.91, 0.23, 0.018]  ; font_rat=12.*rfact_zoom
             l_show_clock=False; x_clock = 1600 ; y_clock = 200
             l_add_logo=False ; x_logo=2200 ; y_logo=1200
@@ -199,9 +185,36 @@ class nemo_hbox:
             # FR = FullRes !
             i1=0   ; j1=1000    ; i2=Ni0 ; j2=Nj0-1500  ; rfact_zoom=1. ; vcb=[0.02, 0.97, 0.23, 0.018]  ; font_rat=12.*rfact_zoom
             l_show_clock=False; x_clock = 1600 ; y_clock = 200
-            l_add_logo=False ; x_logo=2200 ; y_logo=1200
             l_show_exp = False ; x_exp = 1750 ; y_exp = 300
             l_fill_holes_k=False
+
+            
+            ###########
+            # eNATL60 #
+            ###########
+        elif [ config, box ] == [ 'eNATL60', 'ALL']:
+            l_add_logo=False
+            i1=0   ; j1=0    ; i2=Ni0 ; j2=Nj0  ; rfact_zoom=1440./float(Nj0) ; vcb=[0.61, 0.1, 0.36, 0.018]  ; font_rat=4.*rfact_zoom
+            l_show_clock=False; x_clock = 1600 ; y_clock = 200
+            l_show_exp = False ; x_exp = 1750 ; y_exp = 300
+            l_fill_holes_k=True
+
+        elif [ config, box ] == [ 'eNATL60', 'ALLFR']:
+            # FR = FullRes !
+            i1=0   ; j1=0    ; i2=Ni0 ; j2=Nj0  ; rfact_zoom=1. ; vcb=[0.59, 0.1, 0.39, 0.018]  ; font_rat=4.*rfact_zoom
+            l_show_clock=True; x_clock=6000 ; y_clock=3000
+            l_fill_holes_k=True
+            l_show_exp=True; x_clock=6000 ; y_clock=2000
+            
+        elif [ config, box ] == [ 'eNATL60', 'ALL4K']:
+            l_add_logo=False
+            i1=0   ; j1=0    ; i2=Ni0 ; j2=Nj0  ; rfact_zoom=2400./float(Nj0) ; vcb=[0.61, 0.1, 0.36, 0.018]  ; font_rat=8.*rfact_zoom
+            x_clock = 2666 ; y_clock = 333
+            l_show_exp = False ; x_exp = 2916 ; y_exp = 500
+            l_show_sign = True ; x_sign = 3450 ; y_sign = 80
+            l_fill_holes_k=True
+
+
             
         elif   [ config, box ] == [ 'eNATL60', 'ALLC']:
             # pour la com!!!
@@ -217,14 +230,7 @@ class nemo_hbox:
         elif [ config, box ] == [ 'eNATL60', 'EUROPAs']:
             i2=6500 ; j2=3600 ; i1=i2-1920; j1=j2-1080; rfact_zoom=1.  ; vcb=[0.5, 0.875, 0.485, 0.02] ; font_rat=2.*rfact_zoom
             x_clock = 30 ; y_clock = 1040 ; x_logo = 1500 ; y_logo = 16
-            
-        elif   [ config, box ] == [ 'eNATL60', 'ALLFR']:
-            # FR = FullRes !
-            i1=0   ; j1=0    ; i2=Ni0 ; j2=Nj0  ; rfact_zoom=1. ; vcb=[0.59, 0.1, 0.39, 0.018]  ; font_rat=8.*rfact_zoom
-            x_clock = 4000 ; y_clock = 200 ; x_logo = 6000 ; y_logo  = 50; 
-            l_fill_holes_k=True
-            l_show_clock=False; l_add_logo=False ; l_add_logo_ige=False ; l_add_logo_prc=False; l_show_exp=False
-    
+                
         elif   [ config, box ] == [ 'eNATL60', 'SALL']:
             i1=0   ; j1=0    ; i2=Ni0 ; j2=Nj0  ; rfact_zoom=1080./float(Nj0) ; vcb=[0.59, 0.1, 0.39, 0.018]  ; font_rat=8.*rfact_zoom
             x_clock = 1600 ; y_clock = 200 ; x_logo = 2200 ; y_logo  = 50
@@ -253,10 +259,9 @@ class nemo_hbox:
             cf_logo_on  = 'ocean-next_trans_white_210x142.png' ; x_logo = 1670 ; y_logo  = 30
     
         elif [ config, box ] == [ 'eNATL60', 'Nordic']:
-            i1=2200; j2=4715; i2=i1+2560 ; j1=j2-1440 ; rfact_zoom=1. ; vcb=[0.25, 0.06, 0.5, 0.02] ; font_rat=2.*rfact_zoom
+            i1=2200; j2=4715; i2=i1+2560 ; j1=j2-1440 ; rfact_zoom=1. ; vcb=[0.25, 0.06, 0.5, 0.02] ; font_rat=1.*rfact_zoom
             x_clock = 1010 ; y_clock = 1300
             l_show_exp = True ; x_exp = 1010 ; y_exp = 1340
-            l_add_logo_ige=False ; l_add_logo_prc=False
             x_logo = 50 ; y_logo  = 50
     
         elif [ config, box ] == [ 'eNATL60', 'Med+BS']:

@@ -137,6 +137,7 @@ if CNEMO == 'none':
         print('ERROR: your file name is not consistent with '+CNEMO+' !!! ('+vv[0]+')'); sys.exit(0)
     CRUN = vv[1]
     print('\n Run is called: ''+CRUN+'' !\n')
+    CRUN='-'+CRUN
 
 #---------------------------------------------------------------
 
@@ -438,9 +439,9 @@ for jt in range(jt0,Nt):
         cfig = cdir_figs+'/'+fa.cv_out+'_'+cn_fig+'_'+cdate+'.'+fig_type
     else:
         if l3d:
-            cfig = cdir_figs+'/'+fa.cv_out+'_'+CNEMO+'-'+CRUN+'_lev'+str(jk)+'_'+CBOX+'_'+cdate+'.'+fig_type
+            cfig = cdir_figs+'/'+fa.cv_out+'_'+CNEMO+CRUN+'_lev'+str(jk)+'_'+CBOX+'_'+cdate+'.'+fig_type
         else:
-            cfig = cdir_figs+'/'+fa.cv_out+'_'+CNEMO+'-'+CRUN+'_'+CBOX+'_'+cdate+'.'+fig_type
+            cfig = cdir_figs+'/'+fa.cv_out+'_'+CNEMO+CRUN+'_'+CBOX+'_'+cdate+'.'+fig_type
 
 
     if not path.exists(cfig):
@@ -557,9 +558,9 @@ for jt in range(jt0,Nt):
     
         if l_save_nc:
             if l3d:
-                cf_out = 'nc/'+CWHAT+'_NEMO_'+CNEMO+'-'+CRUN+'_lev'+str(jk)+'_'+CBOX+'_'+cdate+'.nc'
+                cf_out = 'nc/'+CWHAT+'_NEMO_'+CNEMO+CRUN+'_lev'+str(jk)+'_'+CBOX+'_'+cdate+'.nc'
             else:
-                cf_out = 'nc/'+CWHAT+'_NEMO_'+CNEMO+'-'+CRUN+'_'+CBOX+'_'+cdate+'.nc'
+                cf_out = 'nc/'+CWHAT+'_NEMO_'+CNEMO+CRUN+'_'+CBOX+'_'+cdate+'.nc'
             print(' Saving in '+cf_out)
             cp.dump_2d_field(cf_out, Xplot, xlon=Xlon, xlat=Xlat, name=CWHAT)
             print('')
@@ -625,7 +626,7 @@ for jt in range(jt0,Nt):
         if nemo_box.l_show_exp:
             xl = float(x_exp)
             yl = float(y_exp)
-            ax.annotate('Experiment: '+CNEMO+'-'+CRUN, xy=(1, 4), xytext=(xl,yl), **cfont_exp)
+            ax.annotate('Experiment: '+CNEMO+CRUN, xy=(1, 4), xytext=(xl,yl), **cfont_exp)
     
     
         #ax.annotate('laurent.brodeau@ocean-next.fr', xy=(1, 4), xytext=(xl+150, 20), **cfont_mail)
