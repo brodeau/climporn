@@ -206,6 +206,14 @@ class nemo_hbox:
             l_fill_holes_k=True
             l_show_exp=True; x_clock=6000 ; y_clock=2000
             
+        elif [ config, box ] == [ 'eNATL60', 'MNATFR']:
+            # Mid-North-Atlantic (bottom left corner @ Cuba)
+            i1=940   ; j1=1010 ; i2=Ni0 ; j2=Nj0  ; rfact_zoom=1. ; vcb=[0.59, 0.09, 0.32, 0.018]  ; font_rat=3.5*rfact_zoom
+            l_show_clock=True; x_clock=6100 ; y_clock=3000
+            l_fill_holes_k=True
+            l_show_exp=True; x_exp = 100 ; y_exp = 2300
+            l_show_sign=True; x_sign = 6100 ; y_sign = 100
+            
         elif [ config, box ] == [ 'eNATL60', 'ALL4K']:
             l_add_logo=False
             i1=0   ; j1=0    ; i2=Ni0 ; j2=Nj0  ; rfact_zoom=2400./float(Nj0) ; vcb=[0.61, 0.1, 0.36, 0.018]  ; font_rat=8.*rfact_zoom
