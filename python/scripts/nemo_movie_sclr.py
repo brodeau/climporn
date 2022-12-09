@@ -126,7 +126,7 @@ if caSST != "":
     print(' *** We shall add following SST field below ice: ', caSST)
 
 l_add_sign = ( CSIGN != '' )
-    
+
 ##########################################################################################
 
 if not path.exists(cd_out): mkdir(cd_out)
@@ -553,7 +553,7 @@ for jt in range(jt0,Nt):
             cp.dump_2d_field(cf_out, Xplot, xlon=Xlon, xlat=Xlat, name=CWHAT)
             print('')
     
-            
+
         cf = plt.imshow( Xplot[:,:], cmap=pal_fld, norm=norm_fld, interpolation=nemo_box.c_imshow_interp )
         #cf = plt.pcolormesh( Xplot[:,:], cmap=pal_fld, norm=norm_fld )
 

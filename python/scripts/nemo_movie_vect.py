@@ -30,7 +30,7 @@ import datetime
 from re import split
 
 import climporn as cp
-
+from climporn import fig_style_mov as fsm
 
 cwd = getcwd()
 
@@ -93,6 +93,7 @@ parser.add_argument('-t', '--tstep',  default="1h",           help='time step ("
 parser.add_argument('-N', '--oname',  default="",             help='a name that overides `CONF` on the plot...')
 parser.add_argument('-o', '--outdir', default="./figs",       help='path to directory where to save figures')
 parser.add_argument('-f', '--fignm',  default="",             help='common string in name of figure to create')
+parser.add_argument('-S', '--sign',   default="",             help='sign the image with some text')
 
 args = parser.parse_args()
 
@@ -112,6 +113,7 @@ cdt    = args.tstep  ; # time step, in the form "1h", "2h", ..., "12h", ..., "1m
 CONAME = args.oname
 cd_out = args.outdir
 cn_fig = args.fignm
+CSIGN  = args.sign
 
 print('')
 print(' *** CNEMO = ', CNEMO)
@@ -134,10 +136,13 @@ if jk > 0:
     l3d=True
 else:
     jk=0
-###############################################################################################################################################
 
-if not path.exists('figs'): mkdir('figs')
-cdir_figs = './figs/'+CWHAT
+l_add_sign = ( CSIGN != '' )
+
+##########################################################################################
+
+if not path.exists(cd_out): mkdir(cd_out)
+cdir_figs = cd_out+'/'+CWHAT
 if not path.exists(cdir_figs): mkdir(cdir_figs)
 
 if l_save_nc and not path.exists('nc'): mkdir('nc')
@@ -162,16 +167,11 @@ print(' '+CNEMO+': Ni0,Nj0 => ', Ni0,Nj0)
 (i1,j1, i2,j2) = nemo_box.idx()
 print(' i1,j1, i2,j2 => ', i1,j1, i2,j2,'\n')
 
+if nemo_box.l_show_name:  (x_name,y_name)   = nemo_box.name
 if nemo_box.l_show_clock: (x_clock,y_clock) = nemo_box.clock
-#print(' x_clock,y_clock =', x_clock,y_clock
-
-if nemo_box.l_show_exp: (x_exp,y_exp) = nemo_box.exp
-#print(' x_exp,y_exp =', x_exp,y_exp
-
-if nemo_box.l_add_logo: (x_logo,y_logo) = nemo_box.logo
-
-if nemo_box.l_show_sign: (x_sign,y_sign) = nemo_box.sign
-
+if nemo_box.l_show_exp:   (x_exp,y_exp)     = nemo_box.exp
+if nemo_box.l_add_logo:   (x_logo,y_logo)   = nemo_box.logo
+if l_add_sign and nemo_box.l_show_sign:  (x_sign,y_sign)   = nemo_box.sign
 #---------------------------------------------------------------
 
 
@@ -416,22 +416,9 @@ if l_add_topo_land:
 
 XLSM[nmp.where( XMSK > 0.5)] = 1
 
-        
-params = { 'font.family':'Helvetica Neue',
-           'font.weight':    'normal',
-           'font.size':       int(9.*fontr),
-           'legend.fontsize': int(9.*fontr),
-           'xtick.labelsize': int(9.*fontr),
-           'ytick.labelsize': int(9.*fontr),
-           'axes.labelsize':  int(9.*fontr) }
-mpl.rcParams.update(params)
-cfont_clb_tcks = { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(7.5*fontr), 'color':color_top_cb}
-cfont_clb  =  { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(8.5*fontr), 'color':color_top_cb}
-cfont_clock = { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(9.*fontr), 'color':color_top }
-cfont_exp= { 'fontname':'Open Sans'  , 'fontweight':'light', 'fontsize':int(9.*fontr), 'color':color_top }
-cfont_mail =  { 'fontname':'Times New Roman', 'fontweight':'normal', 'fontstyle':'italic', 'fontsize':int(14.*fontr), 'color':'0.8'}
-cfont_titl =  { 'fontname':'Open Sans', 'fontweight':'light', 'fontsize':int(30.*fontr), 'color':color_top }
-cfont_sign = { 'fontname':'Open Sans', 'fontweight':'normal', 'fontstyle':'italic','fontsize':int(5.*fontr), 'color':color_top }
+
+# Font style:
+kk = fsm( fontr, clr_top=fa.color_top, clr_top_cb=fa.color_top_cb )
 
 
 # Colormaps for fields:
@@ -548,17 +535,24 @@ id_fy = Dataset(cfy_in)
 for jt in range(jt0,Nt):
 
     #---------------------- Calendar stuff --------------------------------------------    
-    #jh  = (jt*dt)%24
-    jh  = int( (float(jt)+0.5)*float(dt) ) % 24 ; # average is centered
+    jh   = (jt*dt)%24
+    rjh  = ((float(jt)+0.5)*dt)%24
     if jt%ntpd == 0: jd = jd + 1
     if jd == vm[jm-1]+1 and (jt)%ntpd == 0 :
         jd = 1
         jm = jm + 1
-    ch = '%2.2i'%(jh)
-    cd = '%3.3i'%(jd)
-    cm = '%2.2i'%(jm)
-    ct = str(datetime.datetime.strptime(cyr0+'-'+cm+'-'+cd+' '+ch, '%Y-%m-%j %H'))    
-    ct=ct[:5]+cm+ct[7:] #lolo bug !!! need to do that to get the month and not '01    
+    ch  = '%2.2i'%(jh)
+    crh = '%2.2i'%(rjh)
+    cd  = '%3.3i'%(jd)
+    cm  = '%2.2i'%(jm)
+    #
+    jhou = int(rjh)
+    jmin = int((rjh-jhou)*60)
+    chou = '%2.2i'%(jhou)
+    cmin = '%2.2i'%(jmin)
+    #
+    ct  = str(datetime.datetime.strptime(cyr0+'-'+cm+'-'+cd+' '+ch, '%Y-%m-%j %H'))    
+    ct  = ct[:5]+cm+ct[7:] #lolo bug !!! need to do that to get the month and not '01    
     cday  = ct[:10]   ; #print(' *** cday  :', cday        
     if dt >= 24:
         cdate = cday
@@ -566,8 +560,11 @@ for jt in range(jt0,Nt):
     else:
         chour = ct[11:13] ; #print(' *** chour :', chour
         cdate = cday+'_'+chour
-        cdats = cday+' '+chour+':00'
-    print('\n Current date = ', cdate+' !\n')
+        if jmin==0:
+            cdats = cday+' '+chour+':00'
+        else:
+            cdats = cday+' '+chou+':'+cmin
+    print('\n Current date = ', cdats+' !\n')
     #-----------------------------------------------------------------------------------
 
     if l3d:
@@ -655,18 +652,19 @@ for jt in range(jt0,Nt):
         if nemo_box.c_imshow_interp == 'none':
             Xplot[idx_land] = nmp.nan
         else:
+            print(" *** drowning array `Xplot`....\n")
             cp.drown(Xplot, XMSK, k_ew=-1, nb_max_inc=10, nb_smooth=10)
     
         if l_save_nc:
             if l3d:
-                cf_out = 'nc/'+CWHAT+'_NEMO_'+CNEMO+'-'+CRUN+'_lev'+str(jk)+'_'+CBOX+'_'+cdate+'_'+cpal_fld+'.nc'
+                cf_out = 'nc/'+CWHAT+'_NEMO_'+CNEMO+CRUN+'_lev'+str(jk)+'_'+CBOX+'_'+cdate+'.nc'
             else:
-                cf_out = 'nc/'+CWHAT+'_NEMO_'+CNEMO+'-'+CRUN+'_'+CBOX+'_'+cdate+'_'+cpal_fld+'.nc'
+                cf_out = 'nc/'+CWHAT+'_NEMO_'+CNEMO+CRUN+'_'+CBOX+'_'+cdate+'.nc'
             print(' Saving in '+cf_out)
             cp.dump_2d_field(cf_out, Xplot, xlon=Xlon, xlat=Xlat, name=CWHAT)
             print('')
     
-    
+
         cf = plt.imshow( Xplot[:,:], cmap=pal_fld, norm=norm_fld, interpolation=nemo_box.c_imshow_interp )
     
         if nemo_box.l_add_quiver:
@@ -704,8 +702,8 @@ for jt in range(jt0,Nt):
             #else:
             #    for rr in vc_fld: cb_labs.append(str(round(rr,int(nmp.ceil(nmp.log10(1./df)))+1) ))
     
-            clb.ax.set_xticklabels(cb_labs, **cfont_clb_tcks)
-            clb.set_label(cunit, **cfont_clb)
+            clb.ax.set_xticklabels(cb_labs, **fsm.cfont_clb_tcks)
+            clb.set_label(cunit, **fsm.cfont_clb)
             clb.ax.yaxis.set_tick_params(color=color_top_cb) ; # set colorbar tick color
             clb.outline.set_edgecolor(color_top_cb) ; # set colorbar edgecolor
             clb.ax.tick_params(which = 'minor', length = 2, color = color_top_cb )
@@ -715,25 +713,24 @@ for jt in range(jt0,Nt):
         if nemo_box.l_show_clock:
             xl = float(x_clock)/rfz
             yl = float(y_clock)/rfz
-            ax.annotate('Date: '+cdats, xy=(1, 4), xytext=(xl,yl), **cfont_clock)
+            ax.annotate('Date: '+cdats, xy=(1, 4), xytext=(xl,yl), **fsm.cfont_clock)
     
         if nemo_box.l_show_exp:
             xl = float(x_exp)/rfz
             yl = float(y_exp)/rfz
-            ax.annotate('Experiment: '+CNEMO+'-'+CRUN, xy=(1, 4), xytext=(xl,yl), **cfont_exp)
+            ax.annotate('Experiment: '+CNEMO+CRUN, xy=(1, 4), xytext=(xl,yl), **fsm.cfont_exp)
 
-        if nemo_box.l_show_sign:
+        if l_add_sign and nemo_box.l_show_sign:
             xl = float(x_sign)/rfz
             yl = float(y_sign)/rfz
-            ax.annotate('Laurent Brodeau, 2021 / vimeo.com/oceannumerique', xy=(1, 4), xytext=(xl,yl), **cfont_sign)
-            #ax.annotate('laurent.brodeau@ocean-next.fr', xy=(1, 4), xytext=(xl+150, 20), **cfont_mail)
+            ax.annotate(CSIGN, xy=(1, 4), xytext=(xl,yl), **fsm.cfont_sign)
     
         if nemo_box.l_show_name:
             cbla = CNEMO
             if CONAME != "": cbla = CONAME
             xl = float(x_name)/rfz
             yl = float(y_name)/rfz
-            ax.annotate(cbla, xy=(1, 4), xytext=(xl, yl), **cfont_titl)
+            ax.annotate(cbla, xy=(1, 4), xytext=(xl, yl), **fsm.cfont_titl)
     
         if nemo_box.l_add_logo:
             datafile = cbook.get_sample_data(dir_logos+'/'+nemo_box.cf_logo_on, asfileobj=False)
