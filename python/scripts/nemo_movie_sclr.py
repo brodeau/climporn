@@ -30,7 +30,7 @@ import datetime
 from re import split
 
 import climporn as cp
-
+from climporn import fig_style_mov as fsm
 
 cwd = getcwd()
 
@@ -80,6 +80,7 @@ parser.add_argument('-N', '--oname',  default="",             help='a name that 
 parser.add_argument('-o', '--outdir', default="./figs",       help='path to directory where to save figures')
 parser.add_argument('-f', '--fignm',  default="",             help='common string in name of figure to create')
 parser.add_argument('-T', '--addSST', default="",             help='add this SST field if showing a sea-ice field')
+parser.add_argument('-S', '--sign',   default="",             help='sign the image with some text')
 
 args = parser.parse_args()
 
@@ -97,6 +98,8 @@ CONAME = args.oname
 cd_out = args.outdir
 cn_fig = args.fignm
 caSST  = args.addSST
+CSIGN  = args.sign
+
 
 print('')
 print(' *** CNEMO = ', CNEMO)
@@ -122,6 +125,7 @@ if caSST != "":
     l_add_SST_to_ice_field = True
     print(' *** We shall add following SST field below ice: ', caSST)
 
+l_add_sign = ( CSIGN != '' )
     
 ##########################################################################################
 
@@ -155,7 +159,7 @@ if nemo_box.l_show_name:  (x_name,y_name)   = nemo_box.name
 if nemo_box.l_show_clock: (x_clock,y_clock) = nemo_box.clock
 if nemo_box.l_show_exp:   (x_exp,y_exp)     = nemo_box.exp
 if nemo_box.l_add_logo:   (x_logo,y_logo)   = nemo_box.logo
-
+if l_add_sign and nemo_box.l_show_sign:  (x_sign,y_sign)   = nemo_box.sign
 #---------------------------------------------------------------
 
 
@@ -334,22 +338,9 @@ if l_add_topo_land:
 
 XLSM[nmp.where( XMSK > 0.5)] = 1
 
-        
-params = { 'font.family':'Helvetica Neue',
-           'font.weight':    'normal',
-           'font.size':       int(9.*fontr),
-           'legend.fontsize': int(9.*fontr),
-           'xtick.labelsize': int(9.*fontr),
-           'ytick.labelsize': int(9.*fontr),
-           'axes.labelsize':  int(9.*fontr) }
-mpl.rcParams.update(params)
-cfont_clb_tcks = { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(7.5*fontr), 'color':fa.color_top_cb}
-cfont_clb  =  { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(8.5*fontr), 'color':fa.color_top_cb}
-cfont_clock = { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(9.*fontr), 'color':fa.color_top }
-cfont_exp= { 'fontname':'Open Sans'  , 'fontweight':'light', 'fontsize':int(9.*fontr), 'color':fa.color_top }
-cfont_mail =  { 'fontname':'Times New Roman', 'fontweight':'normal', 'fontstyle':'italic', 'fontsize':int(14.*fontr), 'color':'0.8'}
-cfont_titl =  { 'fontname':'Open Sans', 'fontweight':'light', 'fontsize':int(14.*fontr), 'color':fa.color_top }
-cfont_sign = { 'fontname':'Open Sans', 'fontweight':'normal', 'fontstyle':'italic','fontsize':int(5.*fontr), 'color':color_top }
+
+# Font style:
+kk = fsm( fontr, clr_top=fa.color_top, clr_top_cb=fa.color_top_cb )
 
 
 # Colormaps for fields:
@@ -608,8 +599,8 @@ for jt in range(jt0,Nt):
                     cpt = cpt + 1
             #            
             
-            clb.ax.set_xticklabels(cb_labs, **cfont_clb_tcks)                
-            clb.set_label(fa.cunit, **cfont_clb)
+            clb.ax.set_xticklabels(cb_labs, **fsm.cfont_clb_tcks)                
+            clb.set_label(fa.cunit, **fsm.cfont_clb)
             clb.ax.yaxis.set_tick_params(color=fa.color_top_cb) ; # set colorbar tick color
             clb.outline.set_edgecolor(fa.color_top_cb) ; # set colorbar edgecolor
             clb.ax.tick_params(which = 'minor', length = 2, color = fa.color_top_cb )
@@ -618,25 +609,24 @@ for jt in range(jt0,Nt):
         if nemo_box.l_show_clock:
             xl = float(x_clock)/rfz
             yl = float(y_clock)/rfz
-            ax.annotate('Date: '+cdats, xy=(1, 4), xytext=(xl,yl), **cfont_clock)
+            ax.annotate('Date: '+cdats, xy=(1, 4), xytext=(xl,yl), **fsm.cfont_clock)
     
         if nemo_box.l_show_exp:
             xl = float(x_exp)/rfz
             yl = float(y_exp)/rfz
-            ax.annotate('Experiment: '+CNEMO+CRUN, xy=(1, 4), xytext=(xl,yl), **cfont_exp)
+            ax.annotate('Experiment: '+CNEMO+CRUN, xy=(1, 4), xytext=(xl,yl), **fsm.cfont_exp)
 
-        if nemo_box.l_show_sign:
+        if l_add_sign and nemo_box.l_show_sign:
             xl = float(x_sign)/rfz
             yl = float(y_sign)/rfz
-            ax.annotate('Laurent Brodeau, 2021 / vimeo.com/oceannumerique', xy=(1, 4), xytext=(xl,yl), **cfont_sign)
-            #ax.annotate('laurent.brodeau@ocean-next.fr', xy=(1, 4), xytext=(xl+150, 20), **cfont_mail)
+            ax.annotate(CSIGN, xy=(1, 4), xytext=(xl,yl), **fsm.cfont_sign)
     
         if nemo_box.l_show_name:
             cbla = CNEMO
             if CONAME != "": cbla = CONAME
             xl = float(x_name)/rfz
             yl = float(y_name)/rfz
-            ax.annotate(cbla, xy=(1, 4), xytext=(xl, yl), **cfont_titl)
+            ax.annotate(cbla, xy=(1, 4), xytext=(xl, yl), **fsm.cfont_titl)
     
         if nemo_box.l_add_logo:
             datafile = cbook.get_sample_data(dir_logos+'/'+nemo_box.cf_logo_on, asfileobj=False)

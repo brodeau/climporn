@@ -832,6 +832,31 @@ def fig_style( pzoom, clr_top='k', clr_top_cb='k' ):
     #
     return 0
 
+
+def fig_style_mov( pzoom, clr_top='k', clr_top_cb='k' ):
+    from matplotlib import rcParams
+    params = { 'font.family':'Helvetica Neue',
+               'font.weight':    'normal',
+               'font.size':       int(9.*pzoom),
+               'legend.fontsize': int(9.*pzoom),
+               'xtick.labelsize': int(9.*pzoom),
+               'ytick.labelsize': int(9.*pzoom),
+               'axes.labelsize':  int(9.*pzoom) }
+    rcParams.update(params)
+    fig_style_mov.cfont_clb_tcks = { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(7.5*pzoom), 'color':clr_top_cb}
+    fig_style_mov.cfont_clb      = { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(8.5*pzoom), 'color':clr_top_cb}
+    fig_style_mov.cfont_clock    = { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(9.*pzoom), 'color':clr_top }
+    fig_style_mov.cfont_exp      = { 'fontname':'Open Sans'  , 'fontweight':'light', 'fontsize':int(9.*pzoom), 'color':clr_top }
+    fig_style_mov.cfont_mail     = { 'fontname':'Times New Roman', 'fontweight':'normal', 'fontstyle':'italic', 'fontsize':int(14.*pzoom), 'color':'0.8'}
+    fig_style_mov.cfont_titl     = { 'fontname':'Open Sans'  , 'fontweight':'light', 'fontsize':int(14.*pzoom), 'color':clr_top }
+    fig_style_mov.cfont_sign     = { 'fontname':'Open Sans'  , 'fontweight':'normal', 'fontstyle':'italic','fontsize':int(5.*pzoom), 'color':clr_top }
+    #
+    return 0
+
+
+
+
+
 def epoch2clock( rt, precision='s' ):
     from datetime import datetime as dt
     from datetime import timezone

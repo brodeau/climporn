@@ -52,7 +52,7 @@ class field_aspect:
             cunit = r'MLD [m]'
             if CBOX in ['Nordic']:
                 tmin=0. ; tmax=1000. ; cb_jump = 2 ; cpal_fld='magma_r' ; color_top_cb='k'
-            if CBOX in ['ALL','ALLFR']:
+            if CBOX in ['ALL','ALLFR','MNATFR']:
                 tmin=0. ; tmax=1000. ; cb_jump = 2 ; cpal_fld='magma_r' ; color_top_cb='w'
 
         elif CWHAT == 'SST':
