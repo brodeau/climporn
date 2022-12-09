@@ -67,22 +67,24 @@ parser = ap.ArgumentParser(description='Generate pixel maps of a given scalar.')
 requiredNamed = parser.add_argument_group('required arguments')
 requiredNamed.add_argument('-i', '--fin' , required=True,                help='NEMO netCDF file to read from...')
 requiredNamed.add_argument('-w', '--what', required=True, help='field/diagnostic to plot (ex: CSPEED,CURLOF,ect.)')
-#
-parser.add_argument('-C', '--conf', default="none",         help='name of NEMO config (ex: eNATL60) (defined into `nemo_hboxes.py`)')
-parser.add_argument('-b', '--box' , default="ALL",          help='extraction box name (ex: ALL) (defined into `nemo_hboxes.py`)')
-parser.add_argument('-m', '--fmm' , default="mesh_mask.nc", help='NEMO mesh_mask file (ex: mesh_mask.nc)')
-parser.add_argument('-s', '--sd0' , default="20090101",     help='initial date as <YYYYMMDD>')
-parser.add_argument('-l', '--lev' , type=int, default=0,    help='level to use if 3D field (default: 0 => 2D)')
-parser.add_argument('-z', '--zld' ,                         help='topography netCDF file to use (field="z")')
-parser.add_argument('-t', '--tstep',  default="1h",         help='time step ("1h","2h",..,up to "1d") in input file')
-parser.add_argument('-N', '--oname',  default="",           help='a name that overides `CONF` on the plot...')
-parser.add_argument('-o', '--outdir', default="./figs",     help='path to directory where to save figures')
-parser.add_argument('-f', '--fignm',  default="",           help='common string in name of figure to create')
-parser.add_argument('-T', '--addSST', default="",           help='add this SST field if showing a sea-ice field')
+
+parser.add_argument('-C', '--conf', default="none",           help='name of NEMO config (ex: eNATL60) (defined into `nemo_hboxes.py`)')
+parser.add_argument('-E', '--exp',  default="none",           help='name of experiment')
+parser.add_argument('-b', '--box' , default="ALL",            help='extraction box name (ex: ALL) (defined into `nemo_hboxes.py`)')
+parser.add_argument('-m', '--fmm' , default="mesh_mask.nc",   help='NEMO mesh_mask file (ex: mesh_mask.nc)')
+parser.add_argument('-s', '--sd0' , default="20090101",       help='initial date as <YYYYMMDD>')
+parser.add_argument('-l', '--lev' , type=int, default=0,      help='level to use if 3D field (default: 0 => 2D)')
+parser.add_argument('-z', '--zld' ,                           help='topography netCDF file to use (field="z")')
+parser.add_argument('-t', '--tstep',  default="1h",           help='time step ("1h","2h",..,up to "1d") in input file')
+parser.add_argument('-N', '--oname',  default="",             help='a name that overides `CONF` on the plot...')
+parser.add_argument('-o', '--outdir', default="./figs",       help='path to directory where to save figures')
+parser.add_argument('-f', '--fignm',  default="",             help='common string in name of figure to create')
+parser.add_argument('-T', '--addSST', default="",             help='add this SST field if showing a sea-ice field')
 
 args = parser.parse_args()
 
 CNEMO = args.conf
+CEXP  = args.exp
 CBOX  = args.box
 CWHAT = args.what
 cf_in = args.fin
@@ -156,17 +158,11 @@ if nemo_box.l_add_logo:   (x_logo,y_logo)   = nemo_box.logo
 
 #---------------------------------------------------------------
 
-# Some defaults:
-#df = 1.
-#cb_jump = 1
-#cv_out = CWHAT
-
 
 
     
 rfz   = nemo_box.rfact_zoom
 fontr = nemo_box.font_rat
-
 
 print('\n================================================================')
 print('\n rfact_zoom = ', rfz)
@@ -353,6 +349,7 @@ cfont_clock = { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(
 cfont_exp= { 'fontname':'Open Sans'  , 'fontweight':'light', 'fontsize':int(9.*fontr), 'color':fa.color_top }
 cfont_mail =  { 'fontname':'Times New Roman', 'fontweight':'normal', 'fontstyle':'italic', 'fontsize':int(14.*fontr), 'color':'0.8'}
 cfont_titl =  { 'fontname':'Open Sans', 'fontweight':'light', 'fontsize':int(14.*fontr), 'color':fa.color_top }
+cfont_sign = { 'fontname':'Open Sans', 'fontweight':'normal', 'fontstyle':'italic','fontsize':int(5.*fontr), 'color':color_top }
 
 
 # Colormaps for fields:
@@ -375,7 +372,7 @@ if fa.l_show_lsm or l_add_topo_land:
         #pal_lsm = cp.chose_colmap('land_dark')
         pal_lsm = cp.chose_colmap('landm')
         norm_lsm = colors.Normalize(vmin=0., vmax=1., clip=False)
-        
+
 cyr0=csd0[0:4]
 cmn0=csd0[4:6]
 cdd0=csd0[6:8]
@@ -619,23 +616,26 @@ for jt in range(jt0,Nt):
             clb.ax.tick_params(which = 'major', length = 4, color = fa.color_top_cb )
         
         if nemo_box.l_show_clock:
-            xl = float(x_clock)
-            yl = float(y_clock)
+            xl = float(x_clock)/rfz
+            yl = float(y_clock)/rfz
             ax.annotate('Date: '+cdats, xy=(1, 4), xytext=(xl,yl), **cfont_clock)
     
         if nemo_box.l_show_exp:
-            xl = float(x_exp)
-            yl = float(y_exp)
+            xl = float(x_exp)/rfz
+            yl = float(y_exp)/rfz
             ax.annotate('Experiment: '+CNEMO+CRUN, xy=(1, 4), xytext=(xl,yl), **cfont_exp)
-    
-    
-        #ax.annotate('laurent.brodeau@ocean-next.fr', xy=(1, 4), xytext=(xl+150, 20), **cfont_mail)
+
+        if nemo_box.l_show_sign:
+            xl = float(x_sign)/rfz
+            yl = float(y_sign)/rfz
+            ax.annotate('Laurent Brodeau, 2021 / vimeo.com/oceannumerique', xy=(1, 4), xytext=(xl,yl), **cfont_sign)
+            #ax.annotate('laurent.brodeau@ocean-next.fr', xy=(1, 4), xytext=(xl+150, 20), **cfont_mail)
     
         if nemo_box.l_show_name:
             cbla = CNEMO
             if CONAME != "": cbla = CONAME
-            xl = float(x_name)
-            yl = float(y_name)
+            xl = float(x_name)/rfz
+            yl = float(y_name)/rfz
             ax.annotate(cbla, xy=(1, 4), xytext=(xl, yl), **cfont_titl)
     
         if nemo_box.l_add_logo:

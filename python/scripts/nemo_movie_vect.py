@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
+# -*- Mode: Python; coding: utf-8; indent-tabs-mode: nil; tab-width: 4 -*-
 #
+##################################################################
 #     CLIMPORN
 #
 #  Prepare 2D maps (monthly) that will later become a movie!
 #  NEMO output and observations needed
 #
 #    L. Brodeau, November 2019
+##################################################################
 
 import sys
 from os import path, getcwd, mkdir
@@ -21,16 +24,12 @@ import matplotlib.colors as colors
 import matplotlib.image as image
 import matplotlib.cbook as cbook
 
-import warnings
-warnings.filterwarnings("ignore")
-
 from calendar import isleap
 import datetime
 
 from re import split
 
 import climporn as cp
-
 
 
 cwd = getcwd()
@@ -77,25 +76,28 @@ print("\n --- logos found into : "+dir_logos+" !\n")
 parser = ap.ArgumentParser(description='Generate pixel maps of a given scalar.')
 
 requiredNamed = parser.add_argument_group('required arguments')
-requiredNamed.add_argument('-u', '--fiu' , required=True, help='specify the NEMO netCDF U file to read from...')
-requiredNamed.add_argument('-v', '--fiv' , required=True, help='specify the NEMO netCDF V file to read from...')
-requiredNamed.add_argument('-x', '--fldx', required=True, help='specify the name of the NEMO U field in U file')
-requiredNamed.add_argument('-y', '--fldy', required=True, help='specify the name of the NEMO V field in V file')
-requiredNamed.add_argument('-w', '--what', required=True, help='specify the field/diagnostic to plot (ex: CSPEED,CURLOF,ect.)')
+requiredNamed.add_argument('-u', '--fiu' , required=True, help='NEMO netCDF U file to read from...')
+requiredNamed.add_argument('-v', '--fiv' , required=True, help='NEMO netCDF V file to read from...')
+requiredNamed.add_argument('-x', '--fldx', required=True, help='name of the NEMO U field in U file')
+requiredNamed.add_argument('-y', '--fldy', required=True, help='name of the NEMO V field in V file')
+requiredNamed.add_argument('-w', '--what', required=True, help='field/diagnostic to plot (ex: CSPEED,CURLOF,ect.)')
 
-parser.add_argument('-C', '--conf', default="none",           help='specify NEMO config (ex: eNATL60)')
-parser.add_argument('-E', '--exp',  default="none",           help='specify name of experiment')
-parser.add_argument('-b', '--box' , default="ALL",            help='specify extraction box name (ex: ALL)')
-parser.add_argument('-m', '--fmm' , default="mesh_mask.nc",   help='specify the NEMO mesh_mask file (ex: mesh_mask.nc)')
-parser.add_argument('-s', '--sd0' , default="20090101",       help='specify initial date as <YYYYMMDD>')
-parser.add_argument('-l', '--lev' , type=int, default=0,      help='specify the level to use if 3D field (default: 0 => 2D)')
-parser.add_argument('-z', '--zld' ,                           help='specify the topography netCDF file to use (field="z")')
-parser.add_argument('-t', '--tstep', type=int, default=1, help='specify the time step (hours) in input file')
+parser.add_argument('-C', '--conf', default="none",           help='name of NEMO config (ex: eNATL60) (defined into `nemo_hboxes.py`)')
+parser.add_argument('-E', '--exp',  default="none",           help='name of experiment')
+parser.add_argument('-b', '--box' , default="ALL",            help='extraction box name (ex: ALL) (defined into `nemo_hboxes.py`)')
+parser.add_argument('-m', '--fmm' , default="mesh_mask.nc",   help='NEMO mesh_mask file (ex: mesh_mask.nc)')
+parser.add_argument('-s', '--sd0' , default="20090101",       help='initial date as <YYYYMMDD>')
+parser.add_argument('-l', '--lev' , type=int, default=0,      help='level to use if 3D field (default: 0 => 2D)')
+parser.add_argument('-z', '--zld' ,                           help='topography netCDF file to use (field="z")')
+parser.add_argument('-t', '--tstep',  default="1h",           help='time step ("1h","2h",..,up to "1d") in input file')
+parser.add_argument('-N', '--oname',  default="",             help='a name that overides `CONF` on the plot...')
+parser.add_argument('-o', '--outdir', default="./figs",       help='path to directory where to save figures')
+parser.add_argument('-f', '--fignm',  default="",             help='common string in name of figure to create')
 
 args = parser.parse_args()
 
 CNEMO = args.conf
-CEXP = args.exp
+CEXP  = args.exp
 CBOX  = args.box
 CWHAT = args.what
 cfx_in = args.fiu
@@ -106,7 +108,10 @@ cf_mm = args.fmm
 csd0  = args.sd0
 jk    = args.lev
 cf_topo_land = args.zld
-dt    = args.tstep  ; # time step in hours
+cdt    = args.tstep  ; # time step, in the form "1h", "2h", ..., "12h", ..., "1m", ..., "6m", ... "1y", ..., etc
+CONAME = args.oname
+cd_out = args.outdir
+cn_fig = args.fignm
 
 print('')
 print(' *** CNEMO = ', CNEMO)
@@ -119,6 +124,7 @@ print(' *** cvx_in = ', cvy_in)
 print(' *** cf_mm = ', cf_mm)
 print(' *** csd0 = ', csd0)
 print(' ***   jk  = ', jk)
+if CONAME != "": print(' *** CONAME = ', CONAME)
 l_add_topo_land = False
 if args.zld != None:
     print(' *** cf_topo_land = ', cf_topo_land)
@@ -144,8 +150,7 @@ if CNEMO == 'none':
         print('ERROR: your file name is not consistent with '+CNEMO+' !!! ('+vv[0]+')'); sys.exit(0)
     CRUN = vv[1]
     print('\n Run is called: ''+CRUN+'' !\n')
-
-if CEXP != 'none': CRUN=CEXP
+    CRUN='-'+CRUN
 
 #---------------------------------------------------------------
 
@@ -274,7 +279,7 @@ if l3d and not l_3d_field:
     
 rfz   = nemo_box.rfact_zoom
 fontr = nemo_box.font_rat
-    
+
 print('\n================================================================')
 print('\n rfact_zoom = ', rfz)
 print(' font_rat = ', fontr, '\n')
@@ -446,18 +451,23 @@ if l_show_lsm or l_add_topo_land:
         #norm_lsm = colors.Normalize(vmin = nmp.log10(min(-100.+rof_dpt/3.,0.) + rof_log), vmax = nmp.log10(4000.+rof_dpt + rof_log), clip = False)
         norm_lsm = colors.Normalize(vmin = nmp.log10(-100. + rof_log), vmax = nmp.log10(4000.+rof_dpt + rof_log), clip = False)
     else:
-        pal_lsm = cp.chose_colmap('land_dark')
-        norm_lsm = colors.Normalize(vmin = 0., vmax = 1., clip = False)
+        #pal_lsm = cp.chose_colmap('land_dark')
+        pal_lsm = cp.chose_colmap('landm')
+        norm_lsm = colors.Normalize(vmin=0., vmax=1., clip=False)
 
 cyr0=csd0[0:4]
 cmn0=csd0[4:6]
 cdd0=csd0[6:8]
 
 # Time step as a string
-if not dt in [ 24, 6, 3, 1 ]:
-    print('ERROR: unknown dt! '+str(dt))
-    sys.exit(0)
-ntpd = 24/dt
+if not len(cdt)==2:
+    print('ERROR: something is wrong with the format of your time step => '+cdt+' !'); sys.exit(0)
+if cdt=='1d':
+    dt = 24 ; ntpd = 1
+elif cdt[1]=='h':
+    dt = int(cdt[0]) ; ntpd = 24 / dt
+else:
+    print('ERROR: something is wrong with the format of your time step => '+cdt+' !'); sys.exit(0)
 
 vm = vmn
 if isleap(int(cyr0)): vm = vml
@@ -713,17 +723,17 @@ for jt in range(jt0,Nt):
             ax.annotate('Experiment: '+CNEMO+'-'+CRUN, xy=(1, 4), xytext=(xl,yl), **cfont_exp)
 
         if nemo_box.l_show_sign:
-            xl = float(x_sign)/rfz # 
+            xl = float(x_sign)/rfz
             yl = float(y_sign)/rfz
             ax.annotate('Laurent Brodeau, 2021 / vimeo.com/oceannumerique', xy=(1, 4), xytext=(xl,yl), **cfont_sign)
-    
-    
-        #ax.annotate('laurent.brodeau@ocean-next.fr', xy=(1, 4), xytext=(xl+150, 20), **cfont_mail)
+            #ax.annotate('laurent.brodeau@ocean-next.fr', xy=(1, 4), xytext=(xl+150, 20), **cfont_mail)
     
         if nemo_box.l_show_name:
-            xl = rnxr/20./rfz
-            yl = rnyr/1.33/rfz
-            ax.annotate(CNEMO, xy=(1, 4), xytext=(xl, yl), **cfont_titl)
+            cbla = CNEMO
+            if CONAME != "": cbla = CONAME
+            xl = float(x_name)/rfz
+            yl = float(y_name)/rfz
+            ax.annotate(cbla, xy=(1, 4), xytext=(xl, yl), **cfont_titl)
     
         if nemo_box.l_add_logo:
             datafile = cbook.get_sample_data(dir_logos+'/'+nemo_box.cf_logo_on, asfileobj=False)
