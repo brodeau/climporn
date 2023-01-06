@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
-
-
-# L. Brodeau, 2017
+#
+# Takes a file `file_in.nc`, makes a copy of it: `file_in_NEW.nc`, and in this new file 
+# overwrites all values of field `var_in` with constant (as for now) value `value` !!!
+# L. Brodeau, 2023
+#
 
 import sys
 import os
