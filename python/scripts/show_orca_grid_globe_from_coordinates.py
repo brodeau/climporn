@@ -141,4 +141,8 @@ if __name__ == '__main__':
     ii = cp.PlotGridGlobe( XVF[id_glamf,:,:], XVF[id_gphif,:,:], chemi='N', lon0=-35., lat0=68., cfig_name=cfig+'_NH_35W_f_OUT_ortho_WHITE.svg',  nsubsamp=isubsamp, rdpi=DPIsvg, ldark=False )
     ii = cp.PlotGridGlobe( XVF[id_glamf,:,:], XVF[id_gphif,:,:], chemi='N', lon0=130., lat0=68., cfig_name=cfig+'_NH_130E_f_OUT_ortho_WHITE.svg', nsubsamp=isubsamp, rdpi=DPIsvg, ldark=False )
 
+    # Black:
+    ii = cp.PlotGridGlobe( XVF[id_glamf,:,:], XVF[id_gphif,:,:], chemi='N', lon0=-35., lat0=68., cfig_name=cfig+'_NH_35W_f_OUT_ortho_DARK.svg',  nsubsamp=isubsamp, rdpi=DPIsvg, ldark=True )
+    ii = cp.PlotGridGlobe( XVF[id_glamf,:,:], XVF[id_gphif,:,:], chemi='N', lon0=130., lat0=68., cfig_name=cfig+'_NH_130E_f_OUT_ortho_DARK.svg', nsubsamp=isubsamp, rdpi=DPIsvg, ldark=True )
+
 
