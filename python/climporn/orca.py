@@ -467,6 +467,17 @@ def CheckNBfolding( pX, jperio, cpnt='T', cwhat='longitude' ):
             # For T-point fields:
             zv1 = pX[ ny-1 ,    1:nx//2-1      ]   ; # Fortran: pX(2:nx/2,ny)
             zv2 = pX[ ny-3 , nx-1:nx-nx//2+1:-1]   ; # Fortran: pX(nx:nx-nx/2+2:-1,ny-2)
+            #
+        if cpnt=='U':
+            # For U-point fields:
+            zv1 = pX[ ny-1 ,    1:nx//2-1      ]   ; # Fortran: Xtest(2:nx/2,ny) 
+            zv2 = pX[ ny-3 , nx-2:nx-nx//2  :-1]   ; # Fortran: Xtest(nx-1:nx-nx/2+1:-1,ny-2)
+            #
+        if cpnt=='V':
+            # For V-point fields:
+            zv1 = pX[ ny-1 ,    1:nx//2-1      ]   ; # Fortran: Xtest(2:nx/2,ny)
+            zv2 = pX[ ny-4 , nx-1:nx-nx//2+1:-1]   ; # Fortran: Xtest(nx:nx-nx/2+2:-1,ny-3)
+            
         else:
             print('DO ME: point type =',cpnt)
         
@@ -490,10 +501,10 @@ def CheckNBfolding( pX, jperio, cpnt='T', cwhat='longitude' ):
     print('\n *** DIFF sum(|v1-v2|) = ', diff)
 
     if diff==0.:
-        print('\n ==> SUCCESSFULY PASSED !  :D')
+        print('\n ==> SUCCESSFULY PASSED !  :D\n')
         irtrn = 0
     else:
-        print('\n ==> NOT PASSED !  :()')
+        print('\n ==> NOT PASSED !  :(\n')
         irtrn = -1
         print(zv1[::10])
         print(zv2[::10])
