@@ -462,6 +462,7 @@ def CheckNBfolding( pX, jperio, cpnt='T', cwhat='longitude' ):
 
     
     if   jperio==4:
+        ### Pivot point is a T-point
 
         if cpnt=='T':
             # For T-point fields:
@@ -482,11 +483,23 @@ def CheckNBfolding( pX, jperio, cpnt='T', cwhat='longitude' ):
             print('DO ME: point type =',cpnt)
         
     elif jperio==6:
+        ### Pivot point is a F-point
 
         if cpnt=='T':
             # For T-point fields:
             zv1 = pX[ny-1 ,    1:nx//2-1    ]      ; # Fortran: pX(2:nx/2,ny)
             zv2 = pX[ny-2 , nx-2:nx-nx//2:-1]      ; # Fortran: pX(nx-1:nx-nx/2+1:-1,ny-1)
+            #
+        if cpnt=='U':
+            # For U-point fields:
+            zv1 = pX[ ny-1 ,    1:nx//2-1      ]   ; # Fortran: Xtest(2:nx/2,ny)
+            zv2 = pX[ ny-2 , nx-3:nx-nx//2-1:-1]   ; # Fortran: Xtest(nx-2:nx-nx/2:-1,ny-1)
+            #
+        if cpnt=='V':
+            # For V-point fields:
+            zv1 = pX[ ny-1 ,    1:nx//2-1      ]   ; # Fortran: Xtest(2:nx/2,ny)
+            zv2 = pX[ ny-3 , nx-2:nx-nx//2  :-1]   ; # Fortran: Xtest(nx-1:nx-nx/2+1:-1,ny-2)
+
         else:
             print('DO ME: point type =',cpnt)
 
