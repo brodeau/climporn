@@ -451,6 +451,9 @@ def CheckNBfolding( pX, jperio, cpnt='T', cwhat='longitude' ):
     * cwhat:  string 'longitude' or 'latitude'
     
     '''
+
+    print('\n *** `CheckNBfolding`: jperio='+str(jperio)+' / Testing at points "'+str(cpnt)+'"')
+    
     if not cpnt in ['T','U','V','F']:
         print('util_orca.CheckNBfolding: ERROR => grid point type unknown: '+cpnt)
         sys.exit(0)
@@ -471,9 +474,8 @@ def CheckNBfolding( pX, jperio, cpnt='T', cwhat='longitude' ):
 
         if cpnt=='T':
             # For T-point fields:
-            #zv1 = pX[2:nx//2,ny]                  ; # Fortran: pX(2:nx/2,ny)
-            #zv2 = pX[nx-1:nx-nx//2+1:-1,ny-1]     ; # Fortran: pX(nx-1:nx-nx/2+1:-1,ny-1)
-            print('6')
+            zv1 = pX[ny-1 ,    1:nx//2-1    ]      ; # Fortran: pX(2:nx/2,ny)
+            zv2 = pX[ny-2 , nx-2:nx-nx//2:-1]      ; # Fortran: pX(nx-1:nx-nx/2+1:-1,ny-1)
         else:
             print('DO ME: point type =',cpnt)
 
@@ -487,11 +489,15 @@ def CheckNBfolding( pX, jperio, cpnt='T', cwhat='longitude' ):
 
     print('\n *** DIFF sum(|v1-v2|) = ', diff)
 
-        
-    print(zv1[::10])
-    print(zv2[::10])
+    if diff==0.:
+        print('\n ==> SUCCESSFULY PASSED !  :D')
+        irtrn = 0
+    else:
+        print('\n ==> NOT PASSED !  :()')
+        irtrn = -1
+        print(zv1[::10])
+        print(zv2[::10])
     
     
-    print('Write me!'); sys.exit(0)
 
-    return 0
+    return irtrn
