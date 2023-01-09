@@ -436,3 +436,35 @@ def PlotGridGlobe( Xglamf, Xgphif, Xglamt=[], Xgphit=[], chemi='N', lon0=-35., l
     print(cfig_name+' created!\n')
     plt.close(1)
     return 0
+
+
+
+def CheckNBfolding( pX, jperio, cwhat='longitude' ):
+    '''
+       Assuming we are dealing with an ORCA grid, look at the periodic northern
+       boundary condition (bi-polar: Siberia and Canadian Archipelago).
+
+    * pX:      2D array of latitudes or longitudes
+    * jperio: just as in the NEMO world => what type of periodicity/folding to expect
+              - jperio == 4 => North fold T-point pivot (ex: ORCA2, ORCA025, ORCA12, etc.)
+              - jperio == 6 => North fold F-point pivot (ex: ORCA1, ORCA05)
+    * cwhat:  string 'longitude' or 'latitude'
+    
+    '''
+
+    if   jperio==4:
+
+        # For T-point fields:
+        zv1 = pX(2:nx/2-1,ny-1)              ; # Fortran: pX(2:nx/2,ny)
+        zv2 = pX(nx-1:nx-nx/2+2-1:-1,ny-3)   ; # Fortran: pX(nx:nx-nx/2+2:-1,ny-2)
+    
+    elif jperio==6:
+
+        # For T-point fields:
+        zv1 = pX(2:nx/2,ny)                  ; # Fortran: pX(2:nx/2,ny)
+        zv2 = pX(nx-1:nx-nx/2+1:-1,ny-1)     ; # Fortran: pX(nx-1:nx-nx/2+1:-1,ny-1)
+
+
+    # ....
+    print('Write me!'); sys.exit(0)
+
