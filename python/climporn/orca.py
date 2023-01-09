@@ -8,7 +8,7 @@
 ############################################################################
 
 import sys
-import numpy as nmp
+import numpy as np
 
 #TRG_NAME_CONF = 'HEMI'
 
@@ -46,14 +46,14 @@ def lon_reorg_orca(ZZ, Xlong, ilon_ext=0, v_jx_jump_p=170., v_jx_jump_m=-170.):
     #
     import climporn.utils as cpu
     #
-    idim_lon = len(nmp.shape(Xlong))
+    idim_lon = len(np.shape(Xlong))
     if idim_lon not in [ 1 , 2 ]:
         print('util_orca.lon_reorg_orca: ERROR => longitude array "Xlong" must be 1D or 2D !'); sys.exit(0)
     #
-    if idim_lon == 2: (nj,ni) = nmp.shape(Xlong)
+    if idim_lon == 2: (nj,ni) = np.shape(Xlong)
     if idim_lon == 1:      ni = len(Xlong)
     #
-    vlon = nmp.zeros(ni)
+    vlon = np.zeros(ni)
     #
     if idim_lon == 2: vlon[:] = Xlong[nj/3,:]
     if idim_lon == 1: vlon[:] = Xlong[:]
@@ -88,8 +88,8 @@ def lon_reorg_orca(ZZ, Xlong, ilon_ext=0, v_jx_jump_p=170., v_jx_jump_m=-170.):
     if ndim == 4:
         #
         [ nr, nz , ny , nx ] = vdim ;     nx0 = nx - jx_oo
-        ZZx  = nmp.zeros((nr, nz, ny, nx0))
-        ZZx_ext  = nmp.zeros((nr, nz, ny, (nx0+ilon_ext)))
+        ZZx  = np.zeros((nr, nz, ny, nx0))
+        ZZx_ext  = np.zeros((nr, nz, ny, (nx0+ilon_ext)))
         #
         for jx in range(jx_zero,nx):
             ZZx[:,:,:,jx-jx_zero] = ZZ[:,:,:,jx]
@@ -104,8 +104,8 @@ def lon_reorg_orca(ZZ, Xlong, ilon_ext=0, v_jx_jump_p=170., v_jx_jump_m=-170.):
         [ nz , ny , nx ] = vdim ;     nx0 = nx - jx_oo
         #print('nx, ny, nz = ', nx, ny, nz
         #
-        ZZx  = nmp.zeros(nx0*ny*nz) ;  ZZx.shape = [nz, ny, nx0]
-        ZZx_ext  = nmp.zeros((nx0+ilon_ext)*ny*nz) ;  ZZx_ext.shape = [nz, ny, (nx0+ilon_ext)]
+        ZZx  = np.zeros(nx0*ny*nz) ;  ZZx.shape = [nz, ny, nx0]
+        ZZx_ext  = np.zeros((nx0+ilon_ext)*ny*nz) ;  ZZx_ext.shape = [nz, ny, (nx0+ilon_ext)]
         #
         for jx in range(jx_zero,nx):
             ZZx[:,:,jx-jx_zero] = ZZ[:,:,jx]
@@ -120,8 +120,8 @@ def lon_reorg_orca(ZZ, Xlong, ilon_ext=0, v_jx_jump_p=170., v_jx_jump_m=-170.):
         [ ny , nx ] = vdim ;     nx0 = nx - jx_oo
         #print('nx, ny = ', nx, ny
         #
-        ZZx  = nmp.zeros(nx0*ny) ;  ZZx.shape = [ny, nx0]
-        ZZx_ext  = nmp.zeros((nx0+ilon_ext)*ny) ;  ZZx_ext.shape = [ny, (nx0+ilon_ext)]
+        ZZx  = np.zeros(nx0*ny) ;  ZZx.shape = [ny, nx0]
+        ZZx_ext  = np.zeros((nx0+ilon_ext)*ny) ;  ZZx_ext.shape = [ny, (nx0+ilon_ext)]
         #
         for jx in range(jx_zero,nx):
             ZZx[:,jx-jx_zero] = ZZ[:,jx]
@@ -136,8 +136,8 @@ def lon_reorg_orca(ZZ, Xlong, ilon_ext=0, v_jx_jump_p=170., v_jx_jump_m=-170.):
         [ nx ] = vdim ;     nx0 = nx - jx_oo
         #print('nx = ', nx
         #
-        ZZx  = nmp.zeros(nx0) ;  ZZx.shape = [nx0]
-        ZZx_ext  = nmp.zeros(nx0+ilon_ext) ;  ZZx_ext.shape = [nx0+ilon_ext]
+        ZZx  = np.zeros(nx0) ;  ZZx.shape = [nx0]
+        ZZx_ext  = np.zeros(nx0+ilon_ext) ;  ZZx_ext.shape = [nx0+ilon_ext]
         #
         for jx in range(jx_zero,nx):
             ZZx[jx-jx_zero] = ZZ[jx]
@@ -149,7 +149,7 @@ def lon_reorg_orca(ZZ, Xlong, ilon_ext=0, v_jx_jump_p=170., v_jx_jump_m=-170.):
             #print(jx+(nx-jx_zero)-jx_oo, 'prend', jx, '    ', vlon[jx]
         #
         if ilon_ext == 0: ZZx_ext[:] = ZZx[:]
-        #iwa = nmp.where(vlon0 < 0.) ; vlon0[iwa] = vlon0[iwa] + 360.
+        #iwa = np.where(vlon0 < 0.) ; vlon0[iwa] = vlon0[iwa] + 360.
         #
         #
         #
@@ -185,25 +185,25 @@ def mean_3d(XD, LSM, XVOL):
     #
     # RETURN vmean: vector containing 3d-averaged values at each time record
 
-    ( lt, lz, ly, lx ) = nmp.shape(XD)
+    ( lt, lz, ly, lx ) = np.shape(XD)
 
-    if nmp.shape(LSM) != ( lz, ly, lx ):
+    if np.shape(LSM) != ( lz, ly, lx ):
         print('ERROR: mean_3d.clprn_orca.py => XD and LSM do not agree in shape!')
         sys.exit(0)
-    if nmp.shape(XVOL) != ( lz, ly, lx ):
+    if np.shape(XVOL) != ( lz, ly, lx ):
         print('ERROR: mean_3d.clprn_orca.py => XD and XVOL do not agree in shape!')
         sys.exit(0)
 
-    vmean = nmp.zeros(lt)
+    vmean = np.zeros(lt)
     
     XX = LSM[:,:,:]*XVOL[:,:,:]
-    rd = nmp.sum( XX )
+    rd = np.sum( XX )
     XX = XX/rd
     if rd > 0.:
         for jt in range(lt):
-            vmean[jt] = nmp.sum( XD[jt,:,:,:]*XX )
+            vmean[jt] = np.sum( XD[jt,:,:,:]*XX )
     else:
-        vmean[:] = nmp.nan
+        vmean[:] = np.nan
 
     return vmean
 
@@ -216,26 +216,26 @@ def mean_2d(XD, LSM, XAREA):
     #
     # RETURN vmean: vector containing 2d-averaged values at each time record
 
-    ( lt, ly, lx ) = nmp.shape(XD)
+    ( lt, ly, lx ) = np.shape(XD)
 
-    if nmp.shape(LSM) != ( ly, lx ):
+    if np.shape(LSM) != ( ly, lx ):
         print('ERROR: mean_2d.clprn_orca.py => XD and LSM do not agree in shape!')
         sys.exit(0)
-    if nmp.shape(XAREA) != ( ly, lx ):
+    if np.shape(XAREA) != ( ly, lx ):
         print('ERROR: mean_2d.clprn_orca.py => XD and XAREA do not agree in shape!')
         sys.exit(0)
 
-    vmean = nmp.zeros(lt)
+    vmean = np.zeros(lt)
     XX = LSM[:,:]*XAREA[:,:]
-    rd = nmp.sum( XX )
+    rd = np.sum( XX )
 
     # Sometimes LSM can be 0 everywhere! => rd == 0. !
     if rd > 0.:
         XX = XX/rd
         for jt in range(lt):
-            vmean[jt] = nmp.sum( XD[jt,:,:]*XX )
+            vmean[jt] = np.sum( XD[jt,:,:]*XX )
     else:
-        vmean[:] = nmp.nan
+        vmean[:] = np.nan
 
     return vmean
 
@@ -261,21 +261,21 @@ def ij_from_xy(xx, yy, xlon, xlat):
     if xx < 0.: xx = xx + 360.
     #
     (nj , ni) = xlon.shape
-    iwa = nmp.where(xlon < 0.) ; xlon[iwa] = xlon[iwa] + 360. # Want only positive values in longitude:
+    iwa = np.where(xlon < 0.) ; xlon[iwa] = xlon[iwa] + 360. # Want only positive values in longitude:
     #
     # Southernmost latitude of the ORCA domain:
-    ji0 = nmp.argmin(xlat[0,:])
+    ji0 = np.argmin(xlat[0,:])
     lat_min = xlat[0,ji0]
     ji = ji0
     yy = max( yy, lat_min )
     #
     # Northernmost latitude of the ORCA domain:    
-    ji0 = nmp.argmax(xlat[nj-1,:])
+    ji0 = np.argmax(xlat[nj-1,:])
     lat_max = xlat[nj-1,ji0]
     yy = min( yy, lat_max )
     #
-    A = nmp.abs( xlat[:-2,:-2]-yy ) + nmp.abs( xlon[:-2,:-2]-xx )
-    (jj,ji) = nmp.unravel_index(A.argmin(), A.shape)
+    A = np.abs( xlat[:-2,:-2]-yy ) + np.abs( xlon[:-2,:-2]-xx )
+    (jj,ji) = np.unravel_index(A.argmin(), A.shape)
     #
     return ( ji, jj )
 
@@ -322,16 +322,16 @@ def shrink_domain(LSM):
     # Output:
     #  (i1,j1,i2,j2): coordinates of the 2 points defining the rectangular region 
     #
-    ( ly, lx ) = nmp.shape(LSM)
+    ( ly, lx ) = np.shape(LSM)
     #
-    #if nmp.shape(LSM) != ( lz, ly, lx ):
+    #if np.shape(LSM) != ( lz, ly, lx ):
     #    print('ERROR: shrink_domain.clprn_orca.py => XD and LSM do not agree in shape!'
     #    sys.exit(0)
-    (vjj , vji)  = nmp.where(LSM[:,:]>0.5)
-    j1 = max( nmp.min(vjj)-2 , 0    )
-    i1 = max( nmp.min(vji)-2 , 0    )
-    j2 = min( nmp.max(vjj)+2 , ly-1 ) + 1
-    i2 = min( nmp.max(vji)+2 , lx-1 ) + 1
+    (vjj , vji)  = np.where(LSM[:,:]>0.5)
+    j1 = max( np.min(vjj)-2 , 0    )
+    i1 = max( np.min(vji)-2 , 0    )
+    j2 = min( np.max(vjj)+2 , ly-1 ) + 1
+    i2 = min( np.max(vji)+2 , lx-1 ) + 1
     #
     if (i1,j1,i2,j2) != (0,0,lx,ly):
         print('       ===> zooming on i1,j1 -> i2,j2:', i1,j1,'->',i2,j2)
@@ -377,16 +377,16 @@ def PlotGridGlobe( Xglamf, Xgphif, Xglamt=[], Xgphit=[], chemi='N', lon0=-35., l
     from mpl_toolkits.basemap import Basemap
     from mpl_toolkits.basemap import shiftgrid
     #
-    ishape   = nmp.shape(Xglamf)
+    ishape   = np.shape(Xglamf)
     (ny,nx,) = ishape
     if len(ishape) != 2:
         print('ERROR: `PlotGridGlobe()` => coordinate arrays should have 2 dimensions!'); sys.exit(0)
-    if nmp.shape(Xgphif) != ishape:
+    if np.shape(Xgphif) != ishape:
         print('ERROR: `PlotGridGlobe()` => coordinate arrays should have the same shape!'); sys.exit(0)
 
 
     # Providing glamt and gphit means we want to plot one of them in the background:
-    l_show_lat_bg = (nmp.shape(Xglamt)==nmp.shape(Xglamf)) and (nmp.shape(Xgphit)==nmp.shape(Xgphif))
+    l_show_lat_bg = (np.shape(Xglamt)==np.shape(Xglamf)) and (np.shape(Xgphit)==np.shape(Xgphif))
 
 
 
@@ -415,7 +415,7 @@ def PlotGridGlobe( Xglamf, Xgphif, Xglamt=[], Xgphit=[], chemi='N', lon0=-35., l
         rl0 = 90. - 2*hres
         # Add field of latitude:
         x0,y0 = carte(Xglamf[:,:], Xgphif[:,:])
-        XP = nmp.ma.masked_where( Xgphit[:,:]<rl0, Xgphit[:,:] )
+        XP = np.ma.masked_where( Xgphit[:,:]<rl0, Xgphit[:,:] )
         carte.pcolor( x0, y0, XP, cmap=plt.get_cmap('cubehelix_r'), norm=colors.Normalize(vmin=rl0,vmax=90.,clip=False), zorder=1 )
         
     # Vertical lines connecting F-points:
@@ -439,7 +439,7 @@ def PlotGridGlobe( Xglamf, Xgphif, Xglamt=[], Xgphit=[], chemi='N', lon0=-35., l
 
 
 
-def CheckNBfolding( pX, jperio, cwhat='longitude' ):
+def CheckNBfolding( pX, jperio, cpnt='T', cwhat='longitude' ):
     '''
        Assuming we are dealing with an ORCA grid, look at the periodic northern
        boundary condition (bi-polar: Siberia and Canadian Archipelago).
@@ -451,20 +451,47 @@ def CheckNBfolding( pX, jperio, cwhat='longitude' ):
     * cwhat:  string 'longitude' or 'latitude'
     
     '''
+    if not cpnt in ['T','U','V','F']:
+        print('util_orca.CheckNBfolding: ERROR => grid point type unknown: '+cpnt)
+        sys.exit(0)
+    
+    (ny,nx) = np.shape(pX)
 
+    
     if   jperio==4:
 
-        # For T-point fields:
-        zv1 = pX(2:nx/2-1,ny-1)              ; # Fortran: pX(2:nx/2,ny)
-        zv2 = pX(nx-1:nx-nx/2+2-1:-1,ny-3)   ; # Fortran: pX(nx:nx-nx/2+2:-1,ny-2)
-    
+        if cpnt=='T':
+            # For T-point fields:
+            zv1 = pX[ ny-1 ,    1:nx//2-1      ]   ; # Fortran: pX(2:nx/2,ny)
+            zv2 = pX[ ny-3 , nx-1:nx-nx//2+1:-1]   ; # Fortran: pX(nx:nx-nx/2+2:-1,ny-2)
+        else:
+            print('DO ME: point type =',cpnt)
+        
     elif jperio==6:
 
-        # For T-point fields:
-        zv1 = pX(2:nx/2,ny)                  ; # Fortran: pX(2:nx/2,ny)
-        zv2 = pX(nx-1:nx-nx/2+1:-1,ny-1)     ; # Fortran: pX(nx-1:nx-nx/2+1:-1,ny-1)
-
+        if cpnt=='T':
+            # For T-point fields:
+            #zv1 = pX[2:nx//2,ny]                  ; # Fortran: pX(2:nx/2,ny)
+            #zv2 = pX[nx-1:nx-nx//2+1:-1,ny-1]     ; # Fortran: pX(nx-1:nx-nx/2+1:-1,ny-1)
+            print('6')
+        else:
+            print('DO ME: point type =',cpnt)
 
     # ....
+    if len(zv1) != len(zv2):
+        print('ERROR: len(v1) != len(v2) ! ', len(zv1), len(zv2))
+        exit(0)
+
+
+    diff = np.sum(np.abs(zv1-zv2))
+
+    print('\n *** DIFF sum(|v1-v2|) = ', diff)
+
+        
+    print(zv1[::10])
+    print(zv2[::10])
+    
+    
     print('Write me!'); sys.exit(0)
 
+    return 0
