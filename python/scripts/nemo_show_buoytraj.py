@@ -10,9 +10,6 @@
 #
 #    L. Brodeau, August 2022
 #
-# TO DO: use `nemo_box = cp.nemo_hbox(CNEMO,CBOX)` !!!
-#
-#
 #  ABOUT input `npz` file:
 #   * Name: should be of the form `NANUK4_ICE-BBM00_6h_19960101_19961031(_xxx).npz`
 #
@@ -249,9 +246,9 @@ if __name__ == '__main__':
         rfade = float(icpt)/float(Nrec-1)*NbDays
     
         # Showing trajectories:
-        csct = plt.scatter(xJIs[:,jtt]-i1, xJJs[:,jtt]-j1, c=xJIs[:,jtt]*0.+rfade, cmap=pal_fld , norm=norm_fld, s=1) ; #, alpha=rfade ) ;#s=HBX.pt_sz_track ) ; # c=xFFs[:,jtt],
-    
-    
+        csct = plt.scatter(xJIs[:,jtt]-i1, xJJs[:,jtt]-j1, c=xJIs[:,jtt]*0.+rfade, cmap=pal_fld , norm=norm_fld,
+                           marker='.',s=HBX.pt_sz_track) ; #, alpha=rfade ) ;#s=HBX.pt_sz_track ) ; # c=xFFs[:,jtt],
+        
     if l_scientific_mode:
         plt.xlabel('i-points', **cfont_axis)
         plt.ylabel('j-points', **cfont_axis)

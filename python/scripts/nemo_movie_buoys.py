@@ -10,9 +10,6 @@
 #
 #    L. Brodeau, August 2022
 #
-# TO DO: use `nemo_box = cp.nemo_hbox(CNEMO,CBOX)` !!!
-#
-#
 #  ABOUT input `npz` file:
 #   * Name: should be of the form `NANUK4_ICE-BBM00_6h_19960101_19961031(_xxx).npz`
 #
@@ -339,9 +336,11 @@ for jtt in range(Nrec):
             if l_show_mod_field and HBX.l_show_cb:
                 ax2 = plt.axes(HBX.vcb)
                 if l_pow_field or l_log_field:
-                    clb = mpl.colorbar.ColorbarBase(ax=ax2,               cmap=pal_fld, norm=norm_fld, orientation='horizontal', extend='neither')
+                    clb = mpl.colorbar.ColorbarBase(ax=ax2,               cmap=pal_fld, norm=norm_fld,
+                                                    orientation='horizontal', extend='neither')
                 else:
-                    clb = mpl.colorbar.ColorbarBase(ax=ax2, ticks=vc_fld, cmap=pal_fld, norm=norm_fld, orientation='horizontal', extend=cextend)
+                    clb = mpl.colorbar.ColorbarBase(ax=ax2, ticks=vc_fld, cmap=pal_fld, norm=norm_fld,
+                                                    orientation='horizontal', extend=cextend)
                 if cb_jump > 1:
                     cb_labs = [] ; cpt = 0
                     for rr in vc_fld:
