@@ -10,7 +10,7 @@
 ##################################################################
 
 import sys
-from os import path
+from os import path, mkdir
 import numpy as nmp
 
 from re import split
@@ -47,7 +47,7 @@ font_rat = 1.
 
 l_show_msh = False
     
-pt_sz_track = 30
+pt_sz_track = 10
 
 fig_type='png'
 
@@ -78,6 +78,10 @@ print('\n *** dir_conf =',dir_conf,'\n')
 if l_show_mod_field: print('\n Field to show in background: "'+cv_mod+'" of file "'+cf_mod+'" !\n')
 
 
+
+if not path.exists("figs"): mkdir("figs")
+
+
 i2=0
 j2=0
 
@@ -86,7 +90,7 @@ if   CCONF == 'ORCA1':
     l_show_cb = False ; l_show_nm = False
     pt_sz_track = 1
     
-if   CCONF == 'NANUK2':
+elif   CCONF == 'NANUK2':
     i1 = 0 ; j1 = 0 ; i2 = 247 ; j2 = 286 ; rfact_zoom = 3. ; vcb = [0.5, 0.875, 0.49, 0.02] ; font_rat = 0.1
     l_show_cb = False ; l_show_nm = False
     pt_sz_track = 3
@@ -367,7 +371,7 @@ for jtt in range(NrTraj):
 
     if jtt%itsubs == 0:
     
-        cfig = cnfig+'_'+ct+'.'+fig_type
+        cfig = './figs/'+cnfig+'_'+ct+'.'+fig_type
     
         fig = plt.figure(num = 1, figsize=fsize, dpi=rDPI, facecolor='k', edgecolor='k')
     

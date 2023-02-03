@@ -141,7 +141,7 @@ class nemo_hbox:
             l_show_name=True ; x_name = rfact_zoom*20 ; y_name = rfact_zoom*260
             l_show_exp=False ; x_exp = 50 ; y_exp = 80
             l_fill_holes_k=False
-            pt_sz_track = 2
+            pt_sz_track = 1
             #
         elif [ config, box ] == [ 'NANUK4', 'ZoomArctic1']:
             i1=90 ; j1=240  ;  i2=430 ; j2=540  ; rfact_zoom=3. ; font_rat=0.12*rfact_zoom
@@ -151,7 +151,7 @@ class nemo_hbox:
             l_show_name=False ; x_name = 240 ; y_name = 525
             l_show_exp=False ; x_exp = 50 ; y_exp = 80
             l_fill_holes_k=False
-            pt_sz_track = 2
+            pt_sz_track = 1
 
         elif [ config, box ] == [ 'NANUK2', 'ALL']:
             i1=0 ; j1=0  ;  i2=Ni0 ; j2=Nj0  ; rfact_zoom=4. ; font_rat=0.2*rfact_zoom
