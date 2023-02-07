@@ -582,7 +582,7 @@ def dump_2d_field( cf_out, XFLD, xlon=[], xlat=[], name='field', unit='', long_n
     f_out.createDimension('x', ni)
 
     if (xlon != []) and (xlat != []):
-        if (xlon.shape == (nj,ni)) and (xlon.shape == xlat.shape):
+        if xlon.shape==XFLD.shape and xlon.shape==xlat.shape:
             id_lon  = f_out.createVariable(clon ,'f4',('y','x',), zlib=True, complevel=8)
             id_lat  = f_out.createVariable(clat ,'f4',('y','x',), zlib=True, complevel=8)
             id_lon[:,:] = xlon[:,:]
