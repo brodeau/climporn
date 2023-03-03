@@ -240,10 +240,14 @@ elif CWHAT in [ 'damage','damage-f','damage-t' ] :
     cpal_fld = 'ncview_bone_r' ; l_only_over_ice=True
     cunit = 'Damage [-]'
 
-elif CWHAT in [ 'Qns', 'nshfls' ]:
+elif CWHAT in [ 'Qns', 'nshfls', 'qns_oce' ]:
     cv_in = 'nshfls'
     cv_if = 'ice_cover'
     cv_out = 'Qns'
+    if CWHAT=='qns_oce':
+        cv_in = 'qns_oce'
+        cv_if = 'siconc'
+    
     #tmin=-1250 ;  tmax=250. ; df = 50. ; cb_jump = 5 ; cpal_fld = 'gist_stern_r'
     #tmin=-500. ;  tmax=500. ; df = 100. ; cb_jump = 2 ; cpal_fld = 'ncview_parula'
     tmin=-100. ;  tmax=0. ; df = 25. ; cb_jump = 1 ; cpal_fld = 'ncview_parula_r' ; rexp_ctrl=2.
@@ -362,8 +366,10 @@ elif cfreq == '3h':
     dt = 3
 elif cfreq == '1h':
     dt = 1
+elif cfreq in ['1d','24']:
+    dt = 24
 else:
-    print('ERROR: unknown frequency!'); sys.exit(0)
+    print('ERROR: unknown frequency: '+cfreq+'!'); sys.exit(0)
 
 
 if rexp_ctrl > 0.:
@@ -533,8 +539,8 @@ for jt in range(jt0,Nt):
     #ry0 = 0.9
     ax.annotate(cxtra_info1, xy=(0.02, ry0+0.05), xycoords='figure fraction', **cfont_titl1)
 
-    if ctitle != "":
-        ax.annotate(ctitle, xy=(0.03, ry0-0.01), xycoords='figure fraction', **cfont_titl2)
+    #if ctitle != "":
+    #    ax.annotate(ctitle, xy=(0.03, ry0-0.01), xycoords='figure fraction', **cfont_titl2)
     
     #
     if l_show_logos:
