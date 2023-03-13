@@ -362,7 +362,12 @@ class nemo_hbox:
             i2=4300; j2=2140 ; i1=i2-360; j1=j2-360; rfact_zoom=1. ; vcb=[0.05, 0.12, 0.9, 0.018] ; font_rat = 1.5
             l_add_logo=False; l_add_logo_prc=False; l_add_logo_ige=False
             x_clock = 400 ; y_clock = 120
-    
+
+        elif [ config, box ] == [ 'eNATL60', 'Bahamas']:
+            #lili  -F -d x,1194,1434 -d y,909,1443 
+            i2=1433; j2=1442 ; i1=1193; j1=908; rfact_zoom=1. ; vcb=[0.05, 0.05, 0.9, 0.018] ; font_rat = 2.
+            x_clock = 400 ; y_clock = 120
+            
         elif [ config, box ] == [ 'eNATL60', 'Band']:
             i1=5100-1920; j1=2200; i2=5100; j2=j1+1080 ; rfact_zoom=1. ; vcb=[0.59, 0.1, 0.38, 0.018] ; font_rat = 2.          
             l_show_clock = False ; l_add_logo = False ; #x_clock = 1420 ; y_clock = 1030 ; x_logo = 1500 ; y_logo = 16
