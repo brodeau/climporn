@@ -42,6 +42,7 @@ class field_aspect:
         l_apply_geov  = False
         l_apply_lap   = False
         l_apply_hgrad = False
+        lSubstractMean = False
         l_smooth  = False
         nb_smooth = 0
 
@@ -119,8 +120,14 @@ class field_aspect:
             cb_jump = 1
             cunit = r'SSH [m]'
             if CBOX == 'Med' or CBOX == 'Med+BS': tmin=-0.7; tmax=0.2   ; df = 0.1
-            if CRUN[:4] == 'BLB0':                tmin=-1.2; tmax=-tmin ; df = 0.2
             if CBOX in [ 'Bretagne']:             tmin=-4.;  tmax=-tmin ; df = 0.5
+            if CBOX == 'Bahamas':
+                lSubstractMean = True
+                tmin=-0.4;  tmax=-tmin ; df = 0.1
+                color_top    = 'k'
+                color_top_cb = 'k'
+
+            
 
         elif CWHAT == 'CURLOF':
             cv_in = 'socurloverf' ; cv_out = CWHAT ;
@@ -240,6 +247,7 @@ class field_aspect:
         self.l_apply_geov  = l_apply_geov
         self.l_apply_lap   = l_apply_lap
         self.l_apply_hgrad = l_apply_hgrad
+        self.lSubstractMean = lSubstractMean
         self.l_smooth      = l_smooth
         self.nb_smooth     = nb_smooth
 

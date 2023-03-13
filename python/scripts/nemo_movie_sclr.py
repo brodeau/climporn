@@ -13,7 +13,7 @@
 import sys
 from os import path, getcwd, mkdir
 import argparse as ap
-import numpy as nmp
+import numpy as np
 
 from netCDF4 import Dataset
 
@@ -53,7 +53,7 @@ grav = 9.80665    # acceleration of gravity, [m/s^2] (same as in NEMO 3.6)
 
 l_save_nc = False ; # save the field we built in a netcdf file !!!
 
-romega = 7.292115083046062E-005 # Coriolis [1/s] (same as in NEMO 3.6 / #romega = 2.*nmp.pi/86400.0)
+romega = 7.292115083046062E-005 # Coriolis [1/s] (same as in NEMO 3.6 / #romega = 2.*np.pi/86400.0)
 
 
 # Normally logos should be found there:
@@ -147,6 +147,7 @@ if CNEMO == 'none':
 
 #---------------------------------------------------------------
 
+#print(CNEMO,CBOX)
 nemo_box = cp.nemo_hbox(CNEMO,CBOX)
 
 (Ni0,Nj0) = nemo_box.size()
@@ -223,7 +224,7 @@ if fa.l_show_ice:
     #cpal_ice = 'ncview_bw'
     #cpal_ice = 'Blues_r'
     cpal_ice = 'bone'
-    vcont_ice = nmp.arange(rmin_ice, 1.05, 0.05)
+    vcont_ice = np.arange(rmin_ice, 1.05, 0.05)
     #
     pal_ice = cp.chose_colmap(cpal_ice)
     norm_ice = colors.Normalize(vmin = rmin_ice, vmax = 0.95, clip = False)
@@ -261,7 +262,7 @@ if fa.l_show_lsm:
     if nb_dim==4: XMSK = id_lsm.variables[fa.cv_msk][0,jk,j1:j2,i1:i2]
     if nb_dim==3: XMSK = id_lsm.variables[fa.cv_msk][jk,j1:j2,i1:i2]
     if nb_dim==2: XMSK = id_lsm.variables[fa.cv_msk][j1:j2,i1:i2]
-    (nj,ni) = nmp.shape(XMSK)
+    (nj,ni) = np.shape(XMSK)
     
     if fa.l_apply_lap:
         print(' *** Reading e1t and e2t !')
@@ -287,7 +288,7 @@ if fa.l_show_lsm:
     if fa.l_apply_geov:        
         ## Coriolis Parameter:
         ff  = id_lsm.variables['gphif'][0,j1:j2,i1:i2]
-        ff[:,:] = 2.*romega*nmp.sin(ff[:,:]*nmp.pi/180.0)
+        ff[:,:] = 2.*romega*np.sin(ff[:,:]*np.pi/180.0)
 
     if l_save_nc:
         Xlon = id_lsm.variables['glamt'][0,j1:j2,i1:i2]
@@ -307,8 +308,8 @@ if fa.l_show_lsm:
 
 
 
-idx_land = nmp.where( XMSK <  0.5 )
-#idx_ocea = nmp.where( XMSK >= 0.5 )
+idx_land = np.where( XMSK <  0.5 )
+#idx_ocea = np.where( XMSK >= 0.5 )
 
 #(vjj_land, vji_land) = idx_land
 #print(idx_land
@@ -318,7 +319,7 @@ idx_land = nmp.where( XMSK <  0.5 )
 #sys.exit(0)
 
 
-XLSM = nmp.zeros((nj,ni)) ; # will define real continents not NEMO mask...
+XLSM = np.zeros((nj,ni)) ; # will define real continents not NEMO mask...
 
 if l_add_topo_land:
     cp.chck4f(cf_topo_land)
@@ -326,17 +327,17 @@ if l_add_topo_land:
     print(' *** Reading "z" into:\n'+cf_topo_land)
     xtopo = id_top.variables['z'][0,j1:j2,i1:i2]
     id_top.close()
-    if nmp.shape(xtopo) != (nj,ni):
+    if np.shape(xtopo) != (nj,ni):
         print('ERROR: topo and mask do not agree in shape!'); sys.exit(0)
     xtopo = xtopo*(1. - XMSK)
     #cp.dump_2d_field('topo_'+CBOX+'.nc', xtopo, name='z')    
     if l3d: xtopo = xtopo + rof_dpt
-    xtopo[nmp.where( XMSK > 0.01)] = nmp.nan
+    xtopo[np.where( XMSK > 0.01)] = np.nan
     if nemo_box.l_fill_holes_k and not l3d:
-        XLSM[nmp.where( xtopo < 0.0)] = 1
-        xtopo[nmp.where( xtopo < 0.0)] = nmp.nan
+        XLSM[np.where( xtopo < 0.0)] = 1
+        xtopo[np.where( xtopo < 0.0)] = np.nan
 
-XLSM[nmp.where( XMSK > 0.5)] = 1
+XLSM[np.where( XMSK > 0.5)] = 1
 
 
 # Font style:
@@ -355,10 +356,10 @@ else:
 
 if fa.l_show_lsm or l_add_topo_land:
     if l_add_topo_land:
-        xtopo = nmp.log10(xtopo+rof_log)
+        xtopo = np.log10(xtopo+rof_log)
         pal_lsm = cp.chose_colmap('gray_r')
-        #norm_lsm = colors.Normalize(vmin = nmp.log10(min(-100.+rof_dpt/3.,0.) + rof_log), vmax = nmp.log10(4000.+rof_dpt + rof_log), clip = False)
-        norm_lsm = colors.Normalize(vmin = nmp.log10(-100. + rof_log), vmax = nmp.log10(4000.+rof_dpt + rof_log), clip = False)
+        #norm_lsm = colors.Normalize(vmin = np.log10(min(-100.+rof_dpt/3.,0.) + rof_log), vmax = np.log10(4000.+rof_dpt + rof_log), clip = False)
+        norm_lsm = colors.Normalize(vmin = np.log10(-100. + rof_log), vmax = np.log10(4000.+rof_dpt + rof_log), clip = False)
     else:
         #pal_lsm = cp.chose_colmap('land_dark')
         pal_lsm = cp.chose_colmap('landm')
@@ -380,7 +381,7 @@ else:
 
 vm = vmn
 if isleap(int(cyr0)): vm = vml
-#print(' year is ', vm, nmp.sum(vm)
+#print(' year is ', vm, np.sum(vm)
 
 jd = int(cdd0) - 1
 jm = int(cmn0)
@@ -439,7 +440,7 @@ for jt in range(jt0,Nt):
     
         ax  = plt.axes([0., 0., 1., 1.], facecolor = '0.7') # missing seas will be in 'facecolor' !
     
-        vc_fld = nmp.arange(fa.tmin, fa.tmax + fa.df, fa.df)
+        vc_fld = np.arange(fa.tmin, fa.tmax + fa.df, fa.df)
     
     
         print('Reading record #'+str(jt)+' of '+fa.cv_in+' in '+cf_in)
@@ -479,8 +480,8 @@ for jt in range(jt0,Nt):
     
         if fa.l_apply_lap:
             print(' *** Computing Laplacian of "'+fa.cv_in+'"!')
-            lx = nmp.zeros((nj,ni))
-            ly = nmp.zeros((nj,ni))
+            lx = np.zeros((nj,ni))
+            ly = np.zeros((nj,ni))
             lx[:,1:ni-1] = 1.E9*(Xplot[:,2:ni] -2.*Xplot[:,1:ni-1] + Xplot[:,0:ni-2])/XE1T2[:,1:ni-1]
             ly[1:nj-1,:] = 1.E9*(Xplot[2:nj,:] -2.*Xplot[1:nj-1,:] + Xplot[0:nj-2,:])/XE2T2[1:nj-1,:]
             Xplot[:,:] = lx[:,:] + ly[:,:]
@@ -488,8 +489,8 @@ for jt in range(jt0,Nt):
     
         if fa.l_apply_hgrad:
             print(' *** Computing gradient of "'+fa.cv_in+'"!')
-            lx = nmp.zeros((nj,ni))
-            ly = nmp.zeros((nj,ni))
+            lx = np.zeros((nj,ni))
+            ly = np.zeros((nj,ni))
     
             if fa.l_smooth: cp.smoother(Xplot, XMSK, nb_smooth=fa.nb_smooth)
             
@@ -503,15 +504,15 @@ for jt in range(jt0,Nt):
             #cp.dump_2d_field('dsst_dy_gridT.nc', ly, xlon=Xlon, xlat=Xlat, name='dsst_dy')
             Xplot[:,:] = 0.0
             # Modulus of vector gradient:        
-            Xplot[:,:] = nmp.sqrt(  lx[:,:]*lx[:,:] + ly[:,:]*ly[:,:] )
+            Xplot[:,:] = np.sqrt(  lx[:,:]*lx[:,:] + ly[:,:]*ly[:,:] )
             #cp.dump_2d_field('mod_grad_sst.nc', Xplot, xlon=Xlon, xlat=Xlat, name='dsst')
             del lx, ly
     
     
         if fa.l_apply_geov:
             print(' *** Computing gradient of "'+fa.cv_in+'"!')
-            lx = nmp.zeros((nj,ni))
-            ly = nmp.zeros((nj,ni))
+            lx = np.zeros((nj,ni))
+            ly = np.zeros((nj,ni))
     
             # Zonal gradient on T-points:
             lx[:,1:ni-1] = (Xplot[:,2:ni] - Xplot[:,0:ni-2]) / (e1u[:,1:ni-1] + e1u[:,0:ni-2]) * UMSK[:,1:ni-1] * UMSK[:,0:ni-2]
@@ -523,15 +524,19 @@ for jt in range(jt0,Nt):
             #cp.dump_2d_field('dsst_dy_gridT.nc', ly, xlon=Xlon, xlat=Xlat, name='dsst_dy')
             Xplot[:,:] = 0.0
             # Modulus of vector gradient:        
-            Xplot[:,:] = grav/ff * nmp.sqrt( lx[:,:]*lx[:,:] + ly[:,:]*ly[:,:] )
+            Xplot[:,:] = grav/ff * np.sqrt( lx[:,:]*lx[:,:] + ly[:,:]*ly[:,:] )
             #cp.dump_2d_field('mod_grad_sst.nc', Xplot, xlon=Xlon, xlat=Xlat, name='dsst')
             del lx, ly
-    
+
+        if fa.lSubstractMean:
+            zmean = np.sum( Xplot[:,:]*XMSK[:,:])/np.sum(XMSK[:,:])
+            Xplot[:,:] = Xplot[:,:] - zmean
+            
     
             
         print('')
-        if not fa.l_show_lsm and jt == jt0: ( nj , ni ) = nmp.shape(Xplot)
-        print('  *** dimension of array => ', ni, nj, nmp.shape(Xplot))
+        if not fa.l_show_lsm and jt == jt0: ( nj , ni ) = np.shape(Xplot)
+        print('  *** dimension of array => ', ni, nj, np.shape(Xplot))
         
 
         print('Ploting')
@@ -539,7 +544,7 @@ for jt in range(jt0,Nt):
         plt.axis([ 0, ni, 0, nj])
         
         if nemo_box.c_imshow_interp == 'none':
-            Xplot[idx_land] = nmp.nan
+            Xplot[idx_land] = np.nan
         else:
             print(" *** drowning array `Xplot`....\n")
             cp.drown(Xplot, XMSK, k_ew=-1, nb_max_inc=10, nb_smooth=10)
@@ -559,22 +564,22 @@ for jt in range(jt0,Nt):
 
         # Add SST onto a sea-ice field:
         if l_add_SST_to_ice_field:
-            psst = nmp.ma.masked_where(Xpsic > 0.05, Xpsst)
+            psst = np.ma.masked_where(Xpsic > 0.05, Xpsst)
             ct   = plt.imshow(psst, cmap=pal_sst, norm=norm_sst, interpolation='none')
             del psst, ct
             
         # Add Sea-Ice onto a open ocean field:
         if fa.l_show_ice:
-            pice = nmp.ma.masked_where(XICE < rmin_ice, XICE)
+            pice = np.ma.masked_where(XICE < rmin_ice, XICE)
             ci = plt.imshow(pice, cmap=pal_ice, norm=norm_ice, interpolation='none') ; del pice, ci
     
         if fa.l_show_lsm or l_add_topo_land:
             if l_add_topo_land:
-                clsm = plt.imshow( nmp.ma.masked_where(XLSM>0.0001, xtopo), cmap=pal_lsm, norm=norm_lsm, interpolation='none' )
+                clsm = plt.imshow( np.ma.masked_where(XLSM>0.0001, xtopo), cmap=pal_lsm, norm=norm_lsm, interpolation='none' )
                 if nemo_box.c_imshow_interp == 'none':
                     plt.contour(XLSM, [0.9], colors='k', linewidths=0.5)
             else:
-                pmsk = nmp.ma.masked_where(XLSM[:,:] > 0.2, XLSM[:,:])
+                pmsk = np.ma.masked_where(XLSM[:,:] > 0.2, XLSM[:,:])
                 clsm = plt.imshow( pmsk, cmap=pal_lsm, norm=norm_lsm, interpolation='none' )                
                 del pmsk
     
@@ -593,7 +598,7 @@ for jt in range(jt0,Nt):
                 for rr in vc_fld:
                     if cpt % fa.cb_jump == 0:
                         if fa.df >= 1.: cb_labs.append(str(int(rr)))
-                        if fa.df <  1.: cb_labs.append(str(round(rr,int(nmp.ceil(nmp.log10(1./fa.df)))+1) ))
+                        if fa.df <  1.: cb_labs.append(str(round(rr,int(np.ceil(np.log10(1./fa.df)))+1) ))
                     else:
                         cb_labs.append(' ')
                     cpt = cpt + 1

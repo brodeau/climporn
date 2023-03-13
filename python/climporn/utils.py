@@ -828,7 +828,7 @@ def fig_style( pzoom, clr_top='k', clr_top_cb='k' ):
     fig_style.cfont_mrkr = { 'fontname':'Open Sans',       'fontweight':'light' , 'fontsize':int( 8.*pzoom), 'color':clr_top }
     fig_style.cfont_axis = { 'fontname':'Open Sans',       'fontweight':'medium', 'fontsize':int(18.*pzoom), 'color':clr_top }
     fig_style.cfont_ttl  = { 'fontname':'Open Sans',       'fontweight':'medium', 'fontsize':int(20.*pzoom), 'color':clr_top }
-    fig_style.cfont_clck = { 'fontname':'Ubuntu Mono',     'fontweight':'normal', 'fontsize':int(13.*pzoom), 'color':clr_top }
+    fig_style.cfont_clck = { 'fontname':'Ubuntu Mono',     'fontweight':'normal', 'fontsize':int(12.*pzoom), 'color':clr_top }
     #
     return 0
 
@@ -843,13 +843,13 @@ def fig_style_mov( pzoom, clr_top='k', clr_top_cb='k' ):
                'ytick.labelsize': int(9.*pzoom),
                'axes.labelsize':  int(9.*pzoom) }
     rcParams.update(params)
-    fig_style_mov.cfont_clb_tcks = { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(7.5*pzoom), 'color':clr_top_cb}
-    fig_style_mov.cfont_clb      = { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(8.5*pzoom), 'color':clr_top_cb}
-    fig_style_mov.cfont_clock    = { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(9.*pzoom), 'color':clr_top }
+    fig_style_mov.cfont_clb_tcks = { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(9*pzoom), 'color':clr_top_cb}
+    fig_style_mov.cfont_clb      = { 'fontname':'Open Sans',   'fontweight':'normal', 'fontsize':int(8.5*pzoom), 'color':clr_top_cb}
+    fig_style_mov.cfont_clock    = { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(8.*pzoom), 'color':clr_top }
     fig_style_mov.cfont_exp      = { 'fontname':'Open Sans'  , 'fontweight':'light', 'fontsize':int(9.*pzoom), 'color':clr_top }
     fig_style_mov.cfont_mail     = { 'fontname':'Times New Roman', 'fontweight':'normal', 'fontstyle':'italic', 'fontsize':int(14.*pzoom), 'color':'0.8'}
     fig_style_mov.cfont_titl     = { 'fontname':'Open Sans'  , 'fontweight':'light', 'fontsize':int(14.*pzoom), 'color':clr_top }
-    fig_style_mov.cfont_sign     = { 'fontname':'Open Sans'  , 'fontweight':'normal', 'fontstyle':'italic','fontsize':int(5.*pzoom), 'color':clr_top }
+    fig_style_mov.cfont_sign     = { 'fontname':'Open Sans'  , 'fontweight':'normal', 'fontstyle':'italic','fontsize':int(6.*pzoom), 'color':'0.4' }
     #
     return 0
 
