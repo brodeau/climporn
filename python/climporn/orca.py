@@ -358,8 +358,8 @@ def shrink_domain(LSM):
 
 
 def PlotGridGlobe( Xglamf, Xgphif, Xglamt=[], Xgphit=[], chemi='N', lon0=-35., lat0=45., cfig_name='mesh_globe_ortho.svg',
-                   nsubsamp=5, rdpi=200, nxcld_n=0, hres=0.25, ldark=False, nzoom=1, linew=0.2,
-                   lNPzoom=False ):
+                   nsubsamp=5, rdpi=200, nxcld_n=0, hres=0.25, ldark=False, nzoom=1, linew=0.2, grid_color='b',
+                   lNPzoom=False, coastlineRes='c' ):
     """
             Shows the actual grid meshes on an orthographic projection of the globe
             * chemi     => which hemisphere to look at (N/S)
@@ -392,7 +392,7 @@ def PlotGridGlobe( Xglamf, Xgphif, Xglamt=[], Xgphit=[], chemi='N', lon0=-35., l
 
         
     vsporg = [0., 0., 1., 1.]
-    col_bg = 'w' ; col_fg = 'k' ; col_gr = 'b' ; col_cl = 'k' ; col_fc = '0.85'
+    col_bg = 'w' ; col_fg = 'k' ; col_gr = grid_color ; col_cl = 'k' ; col_fc = '0.85'
     if ldark:
         col_bg = 'k' ; col_fg = 'w' ; col_gr = 'w' ; col_cl = '0.5' ; col_fc = '0.15'
 
@@ -402,11 +402,11 @@ def PlotGridGlobe( Xglamf, Xgphif, Xglamt=[], Xgphit=[], chemi='N', lon0=-35., l
     if   chemi== 'N':
         if lNPzoom:
             rr = hres/0.027
-            carte = Basemap(projection='ortho', lon_0=lon0, lat_0=89.9999, llcrnrx=-rr*20000, llcrnry=-rr*20000, urcrnrx=rr*20000, urcrnry=rr*20000, resolution='c')
+            carte = Basemap(projection='ortho', lon_0=lon0, lat_0=89.9999, llcrnrx=-rr*20000, llcrnry=-rr*20000, urcrnrx=rr*20000, urcrnry=rr*20000, resolution=coastlineRes)
         else:
-            carte = Basemap(projection='ortho', lon_0=lon0, lat_0= lat0, resolution='c')
+            carte = Basemap(projection='ortho', lon_0=lon0, lat_0= lat0, resolution=coastlineRes)
     elif chemi== 'S':
-        carte = Basemap(projection='ortho', lon_0=lon0, lat_0=-lat0, resolution='c')
+        carte = Basemap(projection='ortho', lon_0=lon0, lat_0=-lat0, resolution=coastlineRes)
     else:
         print('ERROR: `PlotGridGlobe()` => only "N" and "S" hemispheres are known!'); sys.exit(0)
 
@@ -427,8 +427,13 @@ def PlotGridGlobe( Xglamf, Xgphif, Xglamt=[], Xgphit=[], chemi='N', lon0=-35., l
     for jj in range(0,ny-nxcld_n,nsubsamp):
         x0,y0 = carte(Xglamf[jj,::nsubsamp], Xgphif[jj,::nsubsamp])
         fth = carte.plot( x0, y0, color=col_gr, linestyle='-', linewidth=linew, marker=None )
-        
-    carte.drawcoastlines(linewidth=1.,  color=col_cl)
+
+
+    if coastlineRes == 'c':
+        clw = 1.
+    else:
+        clw = 0.5
+    carte.drawcoastlines(linewidth=clw,  color=col_cl)
     carte.fillcontinents( color=col_fc )
 
 
