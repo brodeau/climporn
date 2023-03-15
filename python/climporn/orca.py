@@ -357,7 +357,7 @@ def shrink_domain(LSM):
 #    return 0
 
 
-def PlotGridGlobe( Xglamf, Xgphif, Xglamt=[], Xgphit=[], chemi='N', lon0=-35., lat0=45., cfig_name='mesh_globe_ortho.svg',
+def PlotGridGlobe( Xglamf, Xgphif, Xglamt=[], Xgphit=[], xField=[], chemi='N', lon0=-35., lat0=45., cfig_name='mesh_globe_ortho.svg',
                    nsubsamp=5, rdpi=200, nxcld_n=0, hres=0.25, ldark=False, nzoom=1, linew=0.2, grid_color='b',
                    lNPzoom=False, coastlineRes='c' ):
     """
@@ -384,11 +384,14 @@ def PlotGridGlobe( Xglamf, Xgphif, Xglamt=[], Xgphit=[], chemi='N', lon0=-35., l
     if np.shape(Xgphif) != ishape:
         print('ERROR: `PlotGridGlobe()` => coordinate arrays should have the same shape!'); sys.exit(0)
 
+    lField = (np.shape(xField) == ishape)
 
     # Providing glamt and gphit means we want to plot one of them in the background:
-    l_show_lat_bg = (np.shape(Xglamt)==np.shape(Xglamf)) and (np.shape(Xgphit)==np.shape(Xgphif))
+    l_show_lat_bg = (np.shape(Xglamt)==np.shape(Xglamf)) and (np.shape(Xgphit)==np.shape(Xgphif)) and (not lField)
 
-
+    if lField and l_show_lat_bg:
+        print('ERROR [PlotGridGlobe]: chose between `lField` and `l_show_lat_bg` !!!')
+        exit(0)
 
         
     vsporg = [0., 0., 1., 1.]
@@ -417,6 +420,12 @@ def PlotGridGlobe( Xglamf, Xgphif, Xglamt=[], Xgphit=[], chemi='N', lon0=-35., l
         x0,y0 = carte(Xglamf[:,:], Xgphif[:,:])
         XP = np.ma.masked_where( Xgphit[:,:]<rl0, Xgphit[:,:] )
         carte.pcolor( x0, y0, XP, cmap=plt.get_cmap('cubehelix_r'), norm=colors.Normalize(vmin=rl0,vmax=90.,clip=False), zorder=1 )
+
+    if lField:
+        col_gr = 'k'
+        x0,y0 = carte(Xglamf[::nsubsamp,::nsubsamp], Xgphif[::nsubsamp,::nsubsamp])
+        carte.pcolormesh( x0, y0, xField[::nsubsamp,::nsubsamp], cmap=plt.get_cmap('viridis'),
+                          zorder=1 ) ; # norm=colors.Normalize(np.min(xField),np.max(xField),clip=False)
         
     # Vertical lines connecting F-points:
     for ji in range(0,nx,nsubsamp):

@@ -6,7 +6,7 @@
 
 import sys
 from os import path
-import numpy as nmp
+import numpy as np
 from netCDF4 import Dataset
 
 # Extra
@@ -18,6 +18,12 @@ import matplotlib.colors as colors
 import climporn as cp
 
 DPIsvg=200
+
+l_add_res_km = True
+
+
+fl2d_mandat = [ 'glamf', 'gphif', 'glamt', 'gphit' ]
+
 
 def init_fig( font_rat=1, color_top='k' ):
     rr = font_rat
@@ -45,6 +51,7 @@ if __name__ == '__main__':
     isubsamp = int(sys.argv[2])
     ires     = int(sys.argv[3])
 
+    if l_add_res_km: fl2d_mandat = np.concatenate([fl2d_mandat , ['e1t','e2t','tmask']])
     
     cfig = path.basename( str.replace(cf_coor,".nc","") )
     cfig = str.replace(cfig,"coordinates_","")
@@ -82,16 +89,16 @@ if __name__ == '__main__':
                 if not cc in ['t','u','v','f']: cc = 't'
                 list_point.append(cc)
     nbv = len(list_treat)
-    xcv_n = nmp.asarray(list_treat)
-    xcv_d = nmp.asarray(list_ndims)       
-    xcv_p = nmp.asarray(list_point)
+    xcv_n = np.asarray(list_treat)
+    xcv_d = np.asarray(list_ndims)       
+    xcv_p = np.asarray(list_point)
 
 
-    XVF = nmp.zeros((nbv,Nj,Ni))
+    XVF = np.zeros((nbv,Nj,Ni))
     jv  = 0
     for cv in xcv_n:
 
-        if cv in [ 'glamf', 'gphif', 'glamt', 'gphit' ]:
+        if cv in fl2d_mandat:
         
             print('\n  ==> reading variable # '+str(jv+1)+' :'+cv+' ('+str(xcv_d[jv])+'D), grid point = '+xcv_p[jv])
     
@@ -99,8 +106,9 @@ if __name__ == '__main__':
             if cv == 'gphif': id_gphif=jv
             if cv == 'glamt': id_glamt=jv
             if cv == 'gphit': id_gphit=jv
-            #if cv == 'e1t'  : id_e1t=jv
-            #if cv == 'e2t'  : id_e2t=jv
+            if cv == 'e1t'  : id_e1t=jv
+            if cv == 'e2t'  : id_e2t=jv
+            if cv == 'tmask' : id_tmsk=jv
     
             # There is always time_counter as a dimmension
             if   xcv_d[jv] == nbdim:
@@ -119,7 +127,7 @@ if __name__ == '__main__':
 
     
     # Location of north pole:
-    (NjNP,NiNP) = nmp.unravel_index(XVF[id_gphit,:,:].argmax(), XVF[id_gphit,:,:].shape)
+    (NjNP,NiNP) = np.unravel_index(XVF[id_gphit,:,:].argmax(), XVF[id_gphit,:,:].shape)
     print( "\n *** North Pole found at : Ni, Nj = ", NiNP, NjNP, ' => ', XVF[id_gphit,NjNP,NiNP]  )    
     #cp.dump_2d_field( 'LAT.nc',  XVF[id_gphit,:,:] ) ; #debug
 
@@ -131,18 +139,27 @@ if __name__ == '__main__':
     i1=NiNP-15 ; i2=NiNP+15
     j1=NjNP-15 ; j2=NjNP+15
     
-
     # Small box including the North Pole to spot possible inconsistencies in the grid:
-    ii = cp.PlotGridGlobe( XVF[id_glamf,j1:j2,i1:i2], XVF[id_gphif,j1:j2,i1:i2], Xglamt=XVF[id_glamt,j1:j2,i1:i2], Xgphit=XVF[id_gphit,j1:j2,i1:i2],
+    ii = cp.PlotGridGlobe( XVF[id_glamf,j1:j2,i1:i2], XVF[id_gphif,j1:j2,i1:i2],
+                           Xglamt=XVF[id_glamt,j1:j2,i1:i2], Xgphit=XVF[id_gphit,j1:j2,i1:i2],                           
                            chemi='N', lon0=0., cfig_name='zoom_'+cfig+'_NH_35W_f_OUT_ortho_WHITE.png',
                            nsubsamp=1, rdpi=DPIsvg, hres=1./float(ires), ldark=False, nzoom=1, linew=1., lNPzoom=True )
 
     # White:
-    ii = cp.PlotGridGlobe( XVF[id_glamf,:,:], XVF[id_gphif,:,:], chemi='N', lon0=-35., lat0=68., cfig_name=cfig+'_NH_35W_f_OUT_ortho_WHITE.svg',  nsubsamp=isubsamp, rdpi=DPIsvg, ldark=False )
-    ii = cp.PlotGridGlobe( XVF[id_glamf,:,:], XVF[id_gphif,:,:], chemi='N', lon0=130., lat0=68., cfig_name=cfig+'_NH_130E_f_OUT_ortho_WHITE.svg', nsubsamp=isubsamp, rdpi=DPIsvg, ldark=False )
+    if l_add_res_km:
+        zfld = np.ma.masked_where( XVF[id_tmsk,:,:]<0.1 , XVF[id_e1t,:,:]/1000.)    
+        ii = cp.PlotGridGlobe( XVF[id_glamf,:,:], XVF[id_gphif,:,:], xField=zfld,
+                               chemi='N', lon0=-35., lat0=68., cfig_name=cfig+'_NH_35W_f_OUT_ortho_WHITE.svg',  nsubsamp=isubsamp, rdpi=DPIsvg, ldark=False )
+        ii = cp.PlotGridGlobe( XVF[id_glamf,:,:], XVF[id_gphif,:,:], xField=zfld,
+                               chemi='N', lon0=130., lat0=68., cfig_name=cfig+'_NH_130E_f_OUT_ortho_WHITE.svg', nsubsamp=isubsamp, rdpi=DPIsvg, ldark=False )
+    else:
+        ii = cp.PlotGridGlobe( XVF[id_glamf,:,:], XVF[id_gphif,:,:],
+                               chemi='N', lon0=-35., lat0=68., cfig_name=cfig+'_NH_35W_f_OUT_ortho_WHITE.svg',  nsubsamp=isubsamp, rdpi=DPIsvg, ldark=False )
+        ii = cp.PlotGridGlobe( XVF[id_glamf,:,:], XVF[id_gphif,:,:],
+                               chemi='N', lon0=130., lat0=68., cfig_name=cfig+'_NH_130E_f_OUT_ortho_WHITE.svg', nsubsamp=isubsamp, rdpi=DPIsvg, ldark=False )
 
     # Black:
-    ii = cp.PlotGridGlobe( XVF[id_glamf,:,:], XVF[id_gphif,:,:], chemi='N', lon0=-35., lat0=68., cfig_name=cfig+'_NH_35W_f_OUT_ortho_DARK.svg',  nsubsamp=isubsamp, rdpi=DPIsvg, ldark=True )
-    ii = cp.PlotGridGlobe( XVF[id_glamf,:,:], XVF[id_gphif,:,:], chemi='N', lon0=130., lat0=68., cfig_name=cfig+'_NH_130E_f_OUT_ortho_DARK.svg', nsubsamp=isubsamp, rdpi=DPIsvg, ldark=True )
+    #ii = cp.PlotGridGlobe( XVF[id_glamf,:,:], XVF[id_gphif,:,:], chemi='N', lon0=-35., lat0=68., cfig_name=cfig+'_NH_35W_f_OUT_ortho_DARK.svg',  nsubsamp=isubsamp, rdpi=DPIsvg, ldark=True )
+    #ii = cp.PlotGridGlobe( XVF[id_glamf,:,:], XVF[id_gphif,:,:], chemi='N', lon0=130., lat0=68., cfig_name=cfig+'_NH_130E_f_OUT_ortho_DARK.svg', nsubsamp=isubsamp, rdpi=DPIsvg, ldark=True )
 
 
