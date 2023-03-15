@@ -113,8 +113,9 @@ elif CNEMO == 'HUDSON12': # half proc [i/2]
     l_show_cb = False ; color_top = 'k'
 
 elif CNEMO == 'NANUK4':
-    i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 2. ; vcb = [0.2, 0.085, 0.6, 0.02] ; font_rat = 0.1*rfact_zoom
+    i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 2. ; vcb = [0.63, 0.95, 0.33, 0.015] ; font_rat = 0.1*rfact_zoom
     l_show_cb=True
+    l_show_nm=True ; x_cnf=15*rfact_zoom ; y_cnf=250*rfact_zoom ; 
     
 elif CNEMO == 'NANUK025':
     i1 = 0 ; j1 = 0 ; i2 = 0 ; j2 = 0 ; rfact_zoom = 1. ; vcb = [0.5, 0.875, 0.49, 0.02] ; font_rat = 0.5*rfact_zoom
@@ -274,10 +275,10 @@ elif cv_in in l_bathy_var:   #
     #cpal_fld = 'ncview_helix'
     cunit = r'Bathymetry (m)'
     l_pow_field = True
-    pow_field = 1.5
+    pow_field = 1.3
     #l_log_field = False
     cextend='max'
-    l_hide_cb_ticks=True
+    #l_hide_cb_ticks=True
     if cv_in == 'elevation':
         #cpal_fld = 'ncview_hotres' ; l_pow_field = False
         cpal_fld = 'ncview_nrl' ; l_pow_field = True
@@ -789,7 +790,7 @@ if l_show_cb:
     ax2 = plt.axes(vcb)
 
     if l_pow_field or l_log_field:
-        clb = mpl.colorbar.ColorbarBase(ax=ax2,               cmap=pal_fld, norm=norm_fld, orientation='horizontal', extend='neither')
+        clb = mpl.colorbar.ColorbarBase(ax=ax2,               cmap=pal_fld, norm=norm_fld, orientation='horizontal', extend=cextend)
     else:
         clb = mpl.colorbar.ColorbarBase(ax=ax2, ticks=vc_fld, cmap=pal_fld, norm=norm_fld, orientation='horizontal', extend=cextend)
 
@@ -802,12 +803,18 @@ if l_show_cb:
             else:
                 cb_labs.append(' ')
             cpt = cpt + 1
-        clb.ax.set_xticklabels(cb_labs)    
+        clb.ax.set_xticklabels(cb_labs)
+    zlw = 0.3 ; #linewidth for everything in colorbar
     clb.set_label(cunit, **cfont_clb)
     clb.ax.yaxis.set_tick_params(color=color_top) ; # set colorbar tick color    
-    #clb.outline.set_edgecolor(color_top) ; # set colorbar edgecolor
-    if l_hide_cb_ticks: clb.ax.tick_params(axis=u'both', which=u'both',length=0) ; # remove ticks!
-    plt.setp(plt.getp(clb.ax.axes, 'xticklabels'), color=color_top) ; # set colorbar ticklabels
+    clb.outline.set_edgecolor(color_top) ; # set colorbar edgecolor
+    clb.outline.set_linewidth(zlw)
+    clb.ax.set_facecolor(color_top) ;
+    if l_hide_cb_ticks:
+        clb.ax.tick_params(axis=u'both', which=u'both',length=0) ; # remove ticks!
+    else:
+        clb.ax.tick_params(color=color_top, length=1, width=zlw) ; # good-looking setup...
+    plt.setp(plt.getp(clb.ax.axes, 'xticklabels'), color=color_top) ; # set colorbar ticklabels with right color...
         
     del cf
     
