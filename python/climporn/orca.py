@@ -384,7 +384,7 @@ def PlotGridGlobe( Xglamf, Xgphif, Xglamt=[], Xgphit=[], xField=[], chemi='N', l
     if np.shape(Xgphif) != ishape:
         print('ERROR: `PlotGridGlobe()` => coordinate arrays should have the same shape!'); sys.exit(0)
 
-    lField = (np.shape(xField) == ishape)
+    lField = (np.shape(xField) == ishape) ; # => will need a colorbar!
 
     # Providing glamt and gphit means we want to plot one of them in the background:
     l_show_lat_bg = (np.shape(Xglamt)==np.shape(Xglamf)) and (np.shape(Xgphit)==np.shape(Xgphif)) and (not lField)
@@ -393,14 +393,22 @@ def PlotGridGlobe( Xglamf, Xgphif, Xglamt=[], Xgphit=[], xField=[], chemi='N', l
         print('ERROR [PlotGridGlobe]: chose between `lField` and `l_show_lat_bg` !!!')
         exit(0)
 
-        
-    vsporg = [0., 0., 1., 1.]
+
     col_bg = 'w' ; col_fg = 'k' ; col_gr = grid_color ; col_cl = 'k' ; col_fc = '0.85'
     if ldark:
         col_bg = 'k' ; col_fg = 'w' ; col_gr = 'w' ; col_cl = '0.5' ; col_fc = '0.15'
 
-    fig = plt.figure(num = 1, figsize=(nzoom*7.,nzoom*7.), dpi=rdpi, facecolor=col_fg, edgecolor=col_fg)
-    ax  = plt.axes(vsporg, facecolor=col_bg)
+    figsz = (nzoom*7.,nzoom*7.)
+    vcanva = [0., 0., 1., 1.]
+    if lField:
+        col_gr = 'k'
+        figsz = (nzoom*7.,nzoom*7*1.11)
+        vcanva = [0., 0.1, 1., 0.9]
+        pal_fld  = plt.get_cmap('viridis_r')
+        norm_fld = colors.Normalize(vmin=10., vmax=20., clip = False)
+        
+    fig = plt.figure(num = 1, figsize=figsz, dpi=rdpi, facecolor=col_fg, edgecolor=col_fg)
+    ax  = plt.axes(vcanva, facecolor=col_bg)
 
     if   chemi== 'N':
         if lNPzoom:
@@ -422,10 +430,8 @@ def PlotGridGlobe( Xglamf, Xgphif, Xglamt=[], Xgphit=[], xField=[], chemi='N', l
         carte.pcolor( x0, y0, XP, cmap=plt.get_cmap('cubehelix_r'), norm=colors.Normalize(vmin=rl0,vmax=90.,clip=False), zorder=1 )
 
     if lField:
-        col_gr = 'k'
         x0,y0 = carte(Xglamf[::nsubsamp,::nsubsamp], Xgphif[::nsubsamp,::nsubsamp])
-        carte.pcolormesh( x0, y0, xField[::nsubsamp,::nsubsamp], cmap=plt.get_cmap('viridis'),
-                          zorder=1 ) ; # norm=colors.Normalize(np.min(xField),np.max(xField),clip=False)
+        carte.pcolormesh( x0, y0, xField[::nsubsamp,::nsubsamp], cmap=pal_fld, norm=norm_fld, zorder=1 )
         
     # Vertical lines connecting F-points:
     for ji in range(0,nx,nsubsamp):
@@ -445,6 +451,21 @@ def PlotGridGlobe( Xglamf, Xgphif, Xglamt=[], Xgphit=[], xField=[], chemi='N', l
     carte.drawcoastlines(linewidth=clw,  color=col_cl)
     carte.fillcontinents( color=col_fc )
 
+
+    # Colorbar is displaying a field:
+    if lField:
+        params = { 'font.family':'Open Sans',
+           'font.weight':    'normal',
+           'font.size':       int(12.) }
+        #'legend.fontsize': int(22.),
+        #   'xtick.labelsize': int(18.),
+        #   'ytick.labelsize': int(18.),
+        #   'axes.labelsize':  int(15.) }
+        mpl.rcParams.update(params)
+        ax2 = plt.axes([0.15, 0.065, 0.7, 0.02])
+        clb = mpl.colorbar.ColorbarBase(ax=ax2, cmap=pal_fld, norm=norm_fld, orientation='horizontal', extend='both') ;#, ticks=vc_fld
+        cfont_clb  = { 'fontname':'Open Sans', 'fontweight':'medium', 'fontsize':int(12.), 'color':'k'}
+        clb.set_label('Local grid resolution [km]', **cfont_clb)
 
     plt.savefig(cfig_name, dpi=rdpi, orientation='portrait', transparent=(not l_show_lat_bg))
     print(cfig_name+' created!\n')

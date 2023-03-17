@@ -145,21 +145,32 @@ if __name__ == '__main__':
                            chemi='N', lon0=0., cfig_name='zoom_'+cfig+'_NH_35W_f_OUT_ortho_WHITE.png',
                            nsubsamp=1, rdpi=DPIsvg, hres=1./float(ires), ldark=False, nzoom=1, linew=1., lNPzoom=True )
 
+    rLat0 = 68.
     # White:
     if l_add_res_km:
-        zfld = np.ma.masked_where( XVF[id_tmsk,:,:]<0.1 , XVF[id_e1t,:,:]/1000.)    
+        if np.shape(XVF[id_glamf,:,:]) == (566, 492):
+            # nanuk4
+            zmsk = np.ones( np.shape(XVF[id_glamf,:,:]), dtype='i1')
+            zlon = np.mod( XVF[id_glamf,:,:], 360. )
+            idx0 = np.where( (zlon>0.) & (zlon<100.) & (XVF[id_gphif,:,:]<48.) )   ; zmsk[idx0] = 0 ; # MedSea #1
+            idx0 = np.where( (zlon<360.) & (zlon>355.) & (XVF[id_gphif,:,:]<43.) ) ; zmsk[idx0] = 0 ; # MedSea #2
+            idx0 = np.where( (zlon>200.) & (zlon<230.) & (XVF[id_gphif,:,:]<62.) ) ; zmsk[idx0] = 0 ; # Alaska
+            zfld = np.ma.masked_where( zmsk==0, XVF[id_e1t,:,:]/1000.)
+            del zmsk, zlon, idx0
+            rLat0 = 75.
+
         ii = cp.PlotGridGlobe( XVF[id_glamf,:,:], XVF[id_gphif,:,:], xField=zfld,
-                               chemi='N', lon0=-35., lat0=68., cfig_name=cfig+'_NH_35W_f_OUT_ortho_WHITE.svg',  nsubsamp=isubsamp, rdpi=DPIsvg, ldark=False )
-        ii = cp.PlotGridGlobe( XVF[id_glamf,:,:], XVF[id_gphif,:,:], xField=zfld,
-                               chemi='N', lon0=130., lat0=68., cfig_name=cfig+'_NH_130E_f_OUT_ortho_WHITE.svg', nsubsamp=isubsamp, rdpi=DPIsvg, ldark=False )
+                               chemi='N', lon0=-35., lat0=rLat0, cfig_name=cfig+'_NH_35W_f_OUT_ortho_WHITE.svg',  nsubsamp=isubsamp, rdpi=DPIsvg, ldark=False )
+        #ii = cp.PlotGridGlobe( XVF[id_glamf,:,:], XVF[id_gphif,:,:], xField=zfld,
+        #                       chemi='N', lon0=130., lat0=rLat0, cfig_name=cfig+'_NH_130E_f_OUT_ortho_WHITE.svg', nsubsamp=isubsamp, rdpi=DPIsvg, ldark=False )
     else:
         ii = cp.PlotGridGlobe( XVF[id_glamf,:,:], XVF[id_gphif,:,:],
-                               chemi='N', lon0=-35., lat0=68., cfig_name=cfig+'_NH_35W_f_OUT_ortho_WHITE.svg',  nsubsamp=isubsamp, rdpi=DPIsvg, ldark=False )
+                               chemi='N', lon0=-35., lat0=rLat0, cfig_name=cfig+'_NH_35W_f_OUT_ortho_WHITE.svg',  nsubsamp=isubsamp, rdpi=DPIsvg, ldark=False )
         ii = cp.PlotGridGlobe( XVF[id_glamf,:,:], XVF[id_gphif,:,:],
-                               chemi='N', lon0=130., lat0=68., cfig_name=cfig+'_NH_130E_f_OUT_ortho_WHITE.svg', nsubsamp=isubsamp, rdpi=DPIsvg, ldark=False )
+                               chemi='N', lon0=130., lat0=rLat0, cfig_name=cfig+'_NH_130E_f_OUT_ortho_WHITE.svg', nsubsamp=isubsamp, rdpi=DPIsvg, ldark=False )
 
     # Black:
-    #ii = cp.PlotGridGlobe( XVF[id_glamf,:,:], XVF[id_gphif,:,:], chemi='N', lon0=-35., lat0=68., cfig_name=cfig+'_NH_35W_f_OUT_ortho_DARK.svg',  nsubsamp=isubsamp, rdpi=DPIsvg, ldark=True )
-    #ii = cp.PlotGridGlobe( XVF[id_glamf,:,:], XVF[id_gphif,:,:], chemi='N', lon0=130., lat0=68., cfig_name=cfig+'_NH_130E_f_OUT_ortho_DARK.svg', nsubsamp=isubsamp, rdpi=DPIsvg, ldark=True )
+    #ii = cp.PlotGridGlobe( XVF[id_glamf,:,:], XVF[id_gphif,:,:], chemi='N', lon0=-35., lat0=rLat0, cfig_name=cfig+'_NH_35W_f_OUT_ortho_DARK.svg',  nsubsamp=isubsamp, rdpi=DPIsvg, ldark=True )
+    #ii = cp.PlotGridGlobe( XVF[id_glamf,:,:], XVF[id_gphif,:,:], chemi='N', lon0=130., lat0=rLat0, cfig_name=cfig+'_NH_130E_f_OUT_ortho_DARK.svg', nsubsamp=isubsamp, rdpi=DPIsvg, ldark=True )
 
 
