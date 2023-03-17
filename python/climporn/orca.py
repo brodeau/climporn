@@ -429,9 +429,9 @@ def PlotGridGlobe( Xglamf, Xgphif, Xglamt=[], Xgphit=[], xField=[], chemi='N', l
         XP = np.ma.masked_where( Xgphit[:,:]<rl0, Xgphit[:,:] )
         carte.pcolor( x0, y0, XP, cmap=plt.get_cmap('cubehelix_r'), norm=colors.Normalize(vmin=rl0,vmax=90.,clip=False), zorder=1 )
 
-    if lField:
-        x0,y0 = carte(Xglamf[::nsubsamp,::nsubsamp], Xgphif[::nsubsamp,::nsubsamp])
-        carte.pcolormesh( x0, y0, xField[::nsubsamp,::nsubsamp], cmap=pal_fld, norm=norm_fld, zorder=1 )
+    #if lField:
+    #    x0,y0 = carte(Xglamf[::nsubsamp,::nsubsamp], Xgphif[::nsubsamp,::nsubsamp])
+    #    carte.pcolormesh( x0, y0, xField[::nsubsamp,::nsubsamp], cmap=pal_fld, norm=norm_fld, zorder=1 )
         
     # Vertical lines connecting F-points:
     for ji in range(0,nx,nsubsamp):
@@ -467,6 +467,7 @@ def PlotGridGlobe( Xglamf, Xgphif, Xglamt=[], Xgphit=[], xField=[], chemi='N', l
         cfont_clb  = { 'fontname':'Open Sans', 'fontweight':'medium', 'fontsize':int(12.), 'color':'k'}
         clb.set_label('Local grid resolution [km]', **cfont_clb)
 
+    #plt.savefig('fond.png', dpi=rdpi, orientation='portrait', transparent=(not l_show_lat_bg))
     plt.savefig(cfig_name, dpi=rdpi, orientation='portrait', transparent=(not l_show_lat_bg))
     print(cfig_name+' created!\n')
     plt.close(1)
