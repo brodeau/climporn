@@ -72,7 +72,7 @@ parser.add_argument('-C', '--conf', default="none",           help='name of NEMO
 parser.add_argument('-E', '--exp',  default="none",           help='name of experiment')
 parser.add_argument('-b', '--box' , default="ALL",            help='extraction box name (ex: ALL) (defined into `nemo_hboxes.py`)')
 parser.add_argument('-m', '--fmm' , default="mesh_mask.nc",   help='NEMO mesh_mask file (ex: mesh_mask.nc)')
-parser.add_argument('-s', '--sd0' , default="20090101",       help='initial date as <YYYYMMDD>')
+parser.add_argument('-s', '--sd0' , default=None,       help='initial date as <YYYYMMDD>')
 parser.add_argument('-l', '--lev' , type=int, default=0,      help='level to use if 3D field (default: 0 => 2D)')
 parser.add_argument('-z', '--zld' ,                           help='topography netCDF file to use (field="z")')
 parser.add_argument('-t', '--tstep',  default="1h",           help='time step ("1h","2h",..,up to "1d") in input file')
@@ -107,7 +107,12 @@ print(' *** CBOX  = ', CBOX)
 print(' *** CWHAT = ', CWHAT)
 print(' *** cf_in = ', cf_in)
 print(' *** cf_mm = ', cf_mm)
-print(' *** csd0 = ', csd0)
+
+lForceD0 = False
+if csd0:
+    lForceD0 = True
+    print(' *** csd0 = ', csd0)
+
 print(' ***   jk  = ', jk)
 if CONAME != "": print(' *** CONAME = ', CONAME)
 l_add_topo_land = False
@@ -248,6 +253,9 @@ elif 'time' in list_var:
 else:
     l_notime=True
     print('Did not find a time variable! Assuming no time and Nt=1')
+    if not lForceD0:
+        print('    ==> then use the `-s` switch to specify an initial date!!!')
+        exit(0)
 id_f.close()
 
 Nt = 1
@@ -365,9 +373,18 @@ if fa.l_show_lsm or l_add_topo_land:
         pal_lsm = cp.chose_colmap('landm')
         norm_lsm = colors.Normalize(vmin=0., vmax=1., clip=False)
 
+if not lForceD0:
+    csd0 = cp.epoch2clock( int(vtime[jt0]), frmt='nodash' )
+
 cyr0=csd0[0:4]
 cmn0=csd0[4:6]
 cdd0=csd0[6:8]
+
+
+#lili
+print(' ==> csd0, cyr0, cmn0, cdd0 = ',csd0, cyr0, cmn0, cdd0)
+
+exit(0)
 
 # Time step as a string
 if not len(cdt)==2:
@@ -391,6 +408,15 @@ id_f = Dataset(cf_in)
 
 for jt in range(jt0,Nt):
 
+
+    itime = int( id_f.variables['time_counter'][jt] )
+
+
+    #print('LOLO: jt, itime, ctime =', jt, itime )
+    print('LOLO: jt, itime, ctime =', jt, itime, cp.epoch2clock(itime) )
+
+
+    exit(0)
     #---------------------- Calendar stuff --------------------------------------------    
     jh   = (jt*dt)%24
     rjh  = ((float(jt)+0.5)*dt)%24

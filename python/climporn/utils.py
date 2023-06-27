@@ -35,6 +35,61 @@ def chck4f(cf, script_name=''):
     #    print(' *** will open file '+cf)
 
 
+def epoch2clock( it, precision='s', frmt='default' ):
+    from datetime import datetime as dt
+    from datetime import timezone
+    #
+    frmtdflt = '%Y-%m-%d'
+    if frmt=='nodash':
+        frmtdflt = '%Y%m%d'
+    #
+    it = int(it)
+    if   precision=='s':
+        ct = dt.fromtimestamp(it, timezone.utc).strftime(frmtdflt+"_%H:%M:%S")
+    elif precision=='m':
+        ct = dt.fromtimestamp(it, timezone.utc).strftime(frmtdflt+"_%H:%M")
+    elif precision=='h':
+        ct = dt.fromtimestamp(it, timezone.utc).strftime(frmtdflt+"_%H")
+    elif precision=='D':
+        ct = dt.fromtimestamp(it, timezone.utc).strftime(frmtdflt+"")
+    else:
+        printEE('[epoch2clock]: unknown precision "'+precision+'" !')
+    return str(ct)
+
+def clock2epoch( cdate, precision='s', cfrmt='advanced' ):
+    from datetime import datetime as dt
+    from datetime import timezone
+    #
+    if precision=='D':
+        cdate = cdate+'_00:00:00'
+    elif precision=='h':
+        cdate = cdate+':00:00'
+    elif precision=='m':
+        cdate = cdate+':00'
+    #
+    if   cfrmt=='advanced':
+        it = dt.strptime(cdate, "%Y-%m-%d_%H:%M:%S").replace(tzinfo=timezone.utc)
+    elif cfrmt=='basic':
+        it = dt.strptime(cdate, "%Y%m%d_%H:%M:%S").replace(tzinfo=timezone.utc)
+    else:
+        printEE('[clock2epoch()]: format "'+cfrmt+'" is unknown!')
+
+    return int(it.timestamp())
+
+
+def epoch2clockS( rt ):
+    from datetime import datetime as dt
+    from datetime import timezone
+    ct = dt.fromtimestamp(rt, timezone.utc).strftime("%Y-%m-%d %H:%M")
+    return str(ct)
+
+def clock2epochS( cdate ):
+    from datetime import datetime as dt
+    from datetime import timezone
+    rt = dt.strptime(cdate, "%Y-%m-%d %H:%M").replace(tzinfo=timezone.utc)
+    return rt.timestamp()
+
+
 
 def check_env_var(cnm, list):
 
@@ -58,18 +113,6 @@ def check_env_var(cnm, list):
 
     print("")
     return env_var_dic
-
-
-def EpochT2Str( time ):
-    '''
-    # Input: UNIX epoch time (integer or float)
-    # Returns: a string of the date understandable by mamals...
-    '''
-    from datetime import datetime as dtm
-    #
-    itime = int(round(time,0))
-    #
-    return dtm.utcfromtimestamp(itime).strftime('%c')
 
 
 def round_to_multiple_of(x, prec=2, base=0.5):
@@ -857,39 +900,7 @@ def fig_style_mov( pzoom, clr_top='k', clr_top_cb='k' ):
 
 
 
-def epoch2clock( rt, precision='s' ):
-    from datetime import datetime as dt
-    from datetime import timezone
-    if   precision=='s':
-        ct = dt.fromtimestamp(rt, timezone.utc).strftime("%Y-%m-%d_%H:%M:%S")
-    elif precision=='m':
-        ct = dt.fromtimestamp(rt, timezone.utc).strftime("%Y-%m-%d_%H:%M")
-    elif precision=='h':
-        ct = dt.fromtimestamp(rt, timezone.utc).strftime("%Y-%m-%d_%H")
-    elif precision=='D':
-        ct = dt.fromtimestamp(rt, timezone.utc).strftime("%Y-%m-%d")
-    else:
-        print('ERROR [epoch2clock]: unknown precision "'+precision+'" !')
-        exit(0)
-    return str(ct)
 
-def clock2epoch( cdate ):
-    from datetime import datetime as dt
-    from datetime import timezone
-    rt = dt.strptime(cdate, "%Y-%m-%d_%H:%M:%S").replace(tzinfo=timezone.utc)
-    return rt.timestamp()
-
-def epoch2clockS( rt ):
-    from datetime import datetime as dt
-    from datetime import timezone
-    ct = dt.fromtimestamp(rt, timezone.utc).strftime("%Y-%m-%d %H:%M")
-    return str(ct)
-
-def clock2epochS( cdate ):
-    from datetime import datetime as dt
-    from datetime import timezone
-    rt = dt.strptime(cdate, "%Y-%m-%d %H:%M").replace(tzinfo=timezone.utc)
-    return rt.timestamp()
 
 
 def Dates2NbDays( cdt1, cdt2):
