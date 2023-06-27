@@ -375,16 +375,12 @@ if fa.l_show_lsm or l_add_topo_land:
 
 if not lForceD0:
     csd0 = cp.epoch2clock( int(vtime[jt0]), frmt='nodash' )
-
+#
 cyr0=csd0[0:4]
 cmn0=csd0[4:6]
 cdd0=csd0[6:8]
 
-
-#lili
-print(' ==> csd0, cyr0, cmn0, cdd0 = ',csd0, cyr0, cmn0, cdd0)
-
-exit(0)
+print(' ==> csd0, cyr0, cmn0, cdd0 = ',csd0, cyr0, cmn0, cdd0,'\n')
 
 # Time step as a string
 if not len(cdt)==2:
@@ -411,45 +407,48 @@ for jt in range(jt0,Nt):
 
     itime = int( id_f.variables['time_counter'][jt] )
 
+    cdate = cp.epoch2clock(itime, precision='h')
+    cdats = cp.epoch2clock(itime)
+    
+    #print('LOLO: jt, itime, ctime =', jt, itime, cdats,'\n' )
 
-    #print('LOLO: jt, itime, ctime =', jt, itime )
-    print('LOLO: jt, itime, ctime =', jt, itime, cp.epoch2clock(itime) )
-
-
-    exit(0)
     #---------------------- Calendar stuff --------------------------------------------    
-    jh   = (jt*dt)%24
-    rjh  = ((float(jt)+0.5)*dt)%24
-    if jt%ntpd == 0: jd = jd + 1
-    if jd == vm[jm-1]+1 and (jt)%ntpd == 0 :
-        jd = 1
-        jm = jm + 1
-    ch  = '%2.2i'%(jh)
-    crh = '%2.2i'%(rjh)
-    cd  = '%3.3i'%(jd)
-    cm  = '%2.2i'%(jm)
-    #
-    jhou = int(rjh)
-    jmin = int((rjh-jhou)*60)
-    chou = '%2.2i'%(jhou)
-    cmin = '%2.2i'%(jmin)
-    #
-    ct  = str(datetime.datetime.strptime(cyr0+'-'+cm+'-'+cd+' '+ch, '%Y-%m-%j %H'))    
-    ct  = ct[:5]+cm+ct[7:] #lolo bug !!! need to do that to get the month and not '01    
-    cday  = ct[:10]   ; #print(' *** cday  :', cday        
-    if dt >= 24:
-        cdate = cday
-        cdats = cday
-    else:
-        chour = ct[11:13] ; #print(' *** chour :', chour
-        cdate = cday+'_'+chour
-        if jmin==0:
-            cdats = cday+' '+chour+':00'
-        else:
-            cdats = cday+' '+chou+':'+cmin
-    print('\n Current date = ', cdats+' !\n')
+    #jh   = (jt*dt)%24
+    #rjh  = ((float(jt)+0.5)*dt)%24
+    #if jt%ntpd == 0: jd = jd + 1
+    #if jd == vm[jm-1]+1 and (jt)%ntpd == 0 :
+    #    jd = 1
+    #    jm = jm + 1
+    #ch  = '%2.2i'%(jh)
+    #crh = '%2.2i'%(rjh)
+    #cd  = '%3.3i'%(jd)
+    #cm  = '%2.2i'%(jm)
+    ##
+    #jhou = int(rjh)
+    #jmin = int((rjh-jhou)*60)
+    #chou = '%2.2i'%(jhou)
+    #cmin = '%2.2i'%(jmin)
+    ##
+    #ct  = str(datetime.datetime.strptime(cyr0+'-'+cm+'-'+cd+' '+ch, '%Y-%m-%j %H'))    
+    #ct  = ct[:5]+cm+ct[7:] #lolo bug !!! need to do that to get the month and not '01    
+    #cday  = ct[:10]   ; #print(' *** cday  :', cday        
+    #if dt >= 24:
+    #    cdate = cday
+    #    cdats = cday
+    #else:
+    #    chour = ct[11:13] ; #print(' *** chour :', chour
+    #    cdate = cday+'_'+chour
+    #    if jmin==0:
+    #        cdats = cday+' '+chour+':00'
+    #    else:
+    #        cdats = cday+' '+chou+':'+cmin
+    #print('\n Current date = ', cdats+' !\n')
+
     #-----------------------------------------------------------------------------------
 
+
+
+    
     if cn_fig != "":
         cfig = cdir_figs+'/'+fa.cv_out+'_'+cn_fig+'_'+cdate+'.'+fig_type
     else:
