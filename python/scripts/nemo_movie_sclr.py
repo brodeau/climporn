@@ -613,9 +613,12 @@ for jt in range(jt0,Nt):
             ax2 = plt.axes(nemo_box.vcb)
             if fa.l_pow_field or fa.l_log_field:
                 clb = mpl.colorbar.ColorbarBase(ax=ax2, ticks=fa.vc_fld_powlog, cmap=pal_fld, norm=norm_fld, orientation='horizontal', extend='neither')
-                cb_labs = clb.ax.get_xticklabels()
+                #cb_labs = clb.ax.get_xticklabels()
+                cb_labs = np.array( [ str(i) for i in fa.vc_fld_powlog ], dtype='U16' )
+                cb_labs[(cb_labs=='0.0')]  = '0'
+                cb_labs[(cb_labs=='1.0')]  = '1'
                 #print(" fa.vc_fld_powlog = ", fa.vc_fld_powlog )
-                #print(" cb_labs =", cb_labs) ; sys.exit(0)
+                #print(" cb_labs =", cb_labs) ; exit(0)
             else:
                 clb = mpl.colorbar.ColorbarBase(ax=ax2, ticks=vc_fld, cmap=pal_fld, norm=norm_fld, orientation='horizontal', extend=fa.cb_extend)
                 cb_labs = []
@@ -629,8 +632,9 @@ for jt in range(jt0,Nt):
                     cpt = cpt + 1
             #            
             
-            clb.ax.set_xticklabels(cb_labs, **fsm.cfont_clb_tcks)                
+            
             clb.set_label(fa.cunit, **fsm.cfont_clb)
+            clb.ax.set_xticklabels(cb_labs, **fsm.cfont_clb_tcks)            
             clb.ax.yaxis.set_tick_params(color=fa.color_top_cb) ; # set colorbar tick color
             clb.outline.set_edgecolor(fa.color_top_cb) ; # set colorbar edgecolor
             clb.ax.tick_params(which = 'minor', length = 2, color = fa.color_top_cb )
