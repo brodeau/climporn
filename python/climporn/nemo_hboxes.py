@@ -146,7 +146,7 @@ class nemo_hbox:
         elif [ config, box ] == [ 'NANUK4', 'ALLS']:
             i1=0 ; j1=70  ;  i2=Ni0 ; j2=Nj0  ; rfact_zoom=2. ; font_rat=0.4*rfact_zoom
             l_show_cb  = True ; vcb=[0.1, 0.1, 0.8, 0.02]
-            l_show_clock=True ; x_clock = 320.*rfact_zoom ; y_clock = 460*rfact_zoom
+            l_show_clock=True ; x_clock = 310.*rfact_zoom ; y_clock = 460*rfact_zoom
             l_add_logo=False
             l_show_name=True ; x_name = rfact_zoom*20 ; y_name = rfact_zoom*440
             l_show_exp=False ; x_exp = 50 ; y_exp = 80
