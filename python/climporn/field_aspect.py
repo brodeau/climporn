@@ -186,7 +186,8 @@ class field_aspect:
 
         elif CWHAT in [ 'damage', 'damage-t', 'damage-f' ]:
             cv_in = CWHAT  ; cv_out = cv_in
-            cpal_fld='magma' ; color_top_cb='w'
+            #cpal_fld='magma' ; color_top_cb='w'
+            cpal_fld='bone_r' ; color_top_cb='k'
             tmin=0. ;  tmax=1. ; l_pow_field=True ; pow_field=7. ; cb_extend = 'neither'
             vc_fld_powlog = [ 0., 0.7, 0.8, 0.9, 0.95, 1. ]
             cunit = 'Damage@T'
@@ -210,8 +211,8 @@ class field_aspect:
 
         elif CWHAT in [ 'sishea', 'sishea-t', 'sishea-f' ]:
             cv_in = CWHAT  ; cv_out = cv_in ; color_top_cb='w'
-            rmult = 3600.*24. ; color_top_cb='k'
-            cpal_fld='inferno' ; tmin=0. ;  tmax=5.
+            rmult = 3600.*24.
+            cpal_fld='inferno' ; tmin=0. ;  tmax=1. ; cb_extend = 'max'
             l_pow_field=True ; pow_field=0.25 ;  vc_fld_powlog= [tmin, 0.1, 0.5, 1., 3., tmax ]
             cunit = 'Shear of sea-ice velocity [day$^{-1}$]'
 

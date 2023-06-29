@@ -612,7 +612,8 @@ for jt in range(jt0,Nt):
         if nemo_box.l_show_cb:
             ax2 = plt.axes(nemo_box.vcb)
             if fa.l_pow_field or fa.l_log_field:
-                clb = mpl.colorbar.ColorbarBase(ax=ax2, ticks=fa.vc_fld_powlog, cmap=pal_fld, norm=norm_fld, orientation='horizontal', extend='neither')
+                clb = mpl.colorbar.ColorbarBase(ax=ax2, ticks=fa.vc_fld_powlog, cmap=pal_fld, norm=norm_fld,
+                                                orientation='horizontal', extend=fa.cb_extend)
                 #cb_labs = clb.ax.get_xticklabels()
                 cb_labs = np.array( [ str(i) for i in fa.vc_fld_powlog ], dtype='U16' )
                 cb_labs[(cb_labs=='0.0')]  = '0'
@@ -620,7 +621,8 @@ for jt in range(jt0,Nt):
                 #print(" fa.vc_fld_powlog = ", fa.vc_fld_powlog )
                 #print(" cb_labs =", cb_labs) ; exit(0)
             else:
-                clb = mpl.colorbar.ColorbarBase(ax=ax2, ticks=vc_fld, cmap=pal_fld, norm=norm_fld, orientation='horizontal', extend=fa.cb_extend)
+                clb = mpl.colorbar.ColorbarBase(ax=ax2, ticks=vc_fld, cmap=pal_fld, norm=norm_fld,
+                                                orientation='horizontal', extend=fa.cb_extend)
                 cb_labs = []
                 cpt = 0
                 for rr in vc_fld:
