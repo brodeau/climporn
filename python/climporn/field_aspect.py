@@ -170,8 +170,9 @@ class field_aspect:
             cunit = r'Phase (deg.)'
 
         elif CWHAT == 'siconc':
-            cv_in = 'siconc'  ; cv_out = cv_in ; color_top_cb='k'
+            cv_in = 'siconc'  ; cv_out = cv_in ; color_top_cb='w'
             cpal_fld='ncview_ice' ; tmin=0. ;  tmax=1. ;  df = 0.1 ; cb_jump = 1 ; cb_extend = 'neither'
+            l_pow_field=True ; pow_field=7. ; vc_fld_powlog = [ 0., 0.7, 0.8, 0.9, 0.95, 1. ]
             cunit = 'Sea-ice concentration'
 
         elif CWHAT == 'sivolu':
@@ -180,8 +181,10 @@ class field_aspect:
             cunit = 'Sea-ice volume [m]'
 
         elif CWHAT == 'sithic':
-            cv_in = 'sithic'  ; cv_out = cv_in ; color_top_cb='k'
-            cpal_fld='magma' ; tmin=0. ;  tmax=4. ;  df=1 ; cb_jump = 1; cb_extend = 'max'
+            cv_in = 'sithic'  ; cv_out = cv_in
+            cpal_fld='magma' ; color_top_cb='w'
+            #cpal_fld='viridis' ; color_top_cb='w'
+            tmin=0. ;  tmax=4. ;  df=1 ; cb_jump = 1; cb_extend = 'max'
             cunit = 'Sea-ice thickness [m]'
 
         elif CWHAT in [ 'damage', 'damage-t', 'damage-f' ]:
