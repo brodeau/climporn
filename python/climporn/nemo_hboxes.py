@@ -144,7 +144,7 @@ class nemo_hbox:
             pt_sz_track = 1
             #
         elif [ config, box ] == [ 'NANUK4', 'ALLS']:
-            i1=0 ; j1=70  ;  i2=Ni0 ; j2=Nj0  ; rfact_zoom=2. ; font_rat=0.4*rfact_zoom
+            i1=0 ; j1=74  ;  i2=Ni0 ; j2=Nj0  ; rfact_zoom=2. ; font_rat=0.4*rfact_zoom
             l_show_cb  = True ; vcb=[0.2, 0.085, 0.6, 0.02]
             l_show_clock=True ; x_clock = 310.*rfact_zoom ; y_clock = 460*rfact_zoom
             l_add_logo=False

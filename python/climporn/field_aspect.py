@@ -194,7 +194,7 @@ class field_aspect:
             #cpal_fld='Greys' ; color_top_cb='k'
             cpal_fld='gray_r' ; color_top_cb='k'
             #tmin=0. ;  tmax=1. ; l_pow_field=True ; pow_field=7. ; cb_extend = 'neither'
-            tmin=0. ;  tmax=1. ; l_pow_field=True ; pow_field=4. ; cb_extend = 'neither'
+            tmin=0. ;  tmax=1. ; l_pow_field=True ; pow_field=5. ; cb_extend = 'neither'
             vc_fld_powlog = [ 0., 0.7, 0.8, 0.9, 0.95, 1. ]
             cunit = 'Damage@T'
 
