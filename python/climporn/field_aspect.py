@@ -184,14 +184,17 @@ class field_aspect:
             cv_in = 'sithic'  ; cv_out = cv_in
             cpal_fld='magma' ; color_top_cb='w'
             #cpal_fld='viridis' ; color_top_cb='w'
-            tmin=0. ;  tmax=4. ;  df=1 ; cb_jump = 1; cb_extend = 'max'
+            tmin=0. ;  tmax=5. ;  df=1 ; cb_jump = 1; cb_extend = 'max'
             cunit = 'Sea-ice thickness [m]'
 
         elif CWHAT in [ 'damage', 'damage-t', 'damage-f' ]:
             cv_in = CWHAT  ; cv_out = cv_in
             #cpal_fld='magma' ; color_top_cb='w'
-            cpal_fld='bone_r' ; color_top_cb='k'
-            tmin=0. ;  tmax=1. ; l_pow_field=True ; pow_field=7. ; cb_extend = 'neither'
+            #cpal_fld='bone_r' ; color_top_cb='k'
+            #cpal_fld='Greys' ; color_top_cb='k'
+            cpal_fld='gray_r' ; color_top_cb='k'
+            #tmin=0. ;  tmax=1. ; l_pow_field=True ; pow_field=7. ; cb_extend = 'neither'
+            tmin=0. ;  tmax=1. ; l_pow_field=True ; pow_field=4. ; cb_extend = 'neither'
             vc_fld_powlog = [ 0., 0.7, 0.8, 0.9, 0.95, 1. ]
             cunit = 'Damage@T'
 
