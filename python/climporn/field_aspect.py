@@ -183,7 +183,7 @@ class field_aspect:
         elif CWHAT == 'sithic':
             cv_in = 'sithic'  ; cv_out = cv_in
             #cpal_fld='magma' ; color_top_cb='w'
-            cpal_fld='ncview_tofino' ; color_top_cb='w'
+            cpal_fld='ncview_tofino' ; color_top_cb='k'
             #cpal_fld='viridis' ; color_top_cb='w'
             tmin=0. ;  tmax=5. ;  df=1 ; cb_jump = 1; cb_extend = 'max'
             cunit = 'Sea-ice thickness [m]'
