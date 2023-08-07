@@ -576,8 +576,6 @@ for jt in range(jt0,Nt):
                                                 orientation='horizontal', extend=fa.cb_extend)
                 #cb_labs = clb.ax.get_xticklabels()
                 cb_labs = np.array( [ str(i) for i in fa.vc_fld_powlog ], dtype='U16' )
-                cb_labs[(cb_labs=='0.0')]  = '0'
-                cb_labs[(cb_labs=='1.0')]  = '1'
                 #print(" fa.vc_fld_powlog = ", fa.vc_fld_powlog )
                 #print(" cb_labs =", cb_labs) ; exit(0)
             else:
@@ -593,14 +591,17 @@ for jt in range(jt0,Nt):
                         cb_labs.append(' ')
                     cpt = cpt + 1
             #            
+            cb_labs[(cb_labs=='0.0')]  = '0'
+            cb_labs[(cb_labs=='1.0')]  = '1'
             
             
             clb.set_label(fa.cunit, **fsm.cfont_clb)
             clb.ax.set_xticklabels(cb_labs, **fsm.cfont_clb_tcks)            
             clb.ax.yaxis.set_tick_params(color=fa.color_top_cb) ; # set colorbar tick color
             clb.outline.set_edgecolor(fa.color_top_cb) ; # set colorbar edgecolor
-            clb.ax.tick_params(which = 'minor', length = 2, color = fa.color_top_cb )
-            clb.ax.tick_params(which = 'major', length = 4, color = fa.color_top_cb )
+            clb.outline.set_linewidth(0.3*rfz)
+            clb.ax.tick_params(which = 'minor', length=1*rfz, width=0.3*rfz, color=fa.color_top_cb )
+            clb.ax.tick_params(which = 'major', length=2*rfz, width=0.3*rfz, color=fa.color_top_cb )
         
         if nemo_box.l_show_clock:
             xl = float(x_clock)/rfz

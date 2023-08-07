@@ -199,6 +199,11 @@ class field_aspect:
             vc_fld_powlog = [ 0., 0.7, 0.8, 0.9, 0.95, 1. ]
             cunit = 'Damage@T'
 
+        elif CWHAT in [ 'sivelo', 'sivelo-t', 'sivelo-f' ]:
+            cv_in = CWHAT  ; cv_out = 'sivelo'
+            cpal_fld='magma' ; tmin=0. ; tmax=0.4 ; df=0.05 ; color_top_cb='w'            
+            cunit = 'Sea-ice velocity [m/s]'
+
         elif CWHAT in [ 'sidive', 'sidive-t', 'sidive-f' ]:
             cv_in = CWHAT  ; cv_out = cv_in ; color_top_cb='k'
             rmult = 3600.*24.
