@@ -246,16 +246,19 @@ cp.chck4f(cf_in)
 l_notime=False
 id_f = Dataset(cf_in)
 list_var = id_f.variables.keys()
-if 'time_counter' in list_var:
-    vtime = id_f.variables['time_counter'][:]
+if 'time_instant' in list_var:
+    cv_time = 'time_instant'    
+elif 'time_counter' in list_var:
+    cv_time = 'time_counter'
 elif 'time' in list_var:
-    vtime = id_f.variables['time'][:]
+    cv_time = 'time'
 else:
     l_notime=True
     print('Did not find a time variable! Assuming no time and Nt=1')
     if not lForceD0:
         print('    ==> then use the `-s` switch to specify an initial date!!!')
         exit(0)
+vtime = id_f.variables[cv_time][:]
 id_f.close()
 
 Nt = 1
@@ -404,7 +407,7 @@ id_f = Dataset(cf_in)
 
 for jt in range(jt0,Nt):
 
-    itime = int( id_f.variables['time_counter'][jt] )
+    itime = int( id_f.variables[cv_time][jt] )
 
     cdate = cp.epoch2clock(itime, precision='h')
     cdats = cp.epoch2clock(itime)
