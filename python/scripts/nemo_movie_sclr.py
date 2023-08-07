@@ -578,6 +578,8 @@ for jt in range(jt0,Nt):
                 cb_labs = np.array( [ str(i) for i in fa.vc_fld_powlog ], dtype='U16' )
                 #print(" fa.vc_fld_powlog = ", fa.vc_fld_powlog )
                 #print(" cb_labs =", cb_labs) ; exit(0)
+                cb_labs[(cb_labs=='0.0')]  = '0'
+                cb_labs[(cb_labs=='1.0')]  = '1'                
             else:
                 clb = mpl.colorbar.ColorbarBase(ax=ax2, ticks=vc_fld, cmap=pal_fld, norm=norm_fld,
                                                 orientation='horizontal', extend=fa.cb_extend)
@@ -590,11 +592,7 @@ for jt in range(jt0,Nt):
                     else:
                         cb_labs.append(' ')
                     cpt = cpt + 1
-            #            
-            cb_labs[(cb_labs=='0.0')]  = '0'
-            cb_labs[(cb_labs=='1.0')]  = '1'
-            
-            
+            #                                    
             clb.set_label(fa.cunit, **fsm.cfont_clb)
             clb.ax.set_xticklabels(cb_labs, **fsm.cfont_clb_tcks)            
             clb.ax.yaxis.set_tick_params(color=fa.color_top_cb) ; # set colorbar tick color

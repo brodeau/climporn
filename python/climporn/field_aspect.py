@@ -201,7 +201,7 @@ class field_aspect:
 
         elif CWHAT in [ 'sivelo', 'sivelo-t', 'sivelo-f' ]:
             cv_in = CWHAT  ; cv_out = 'sivelo'
-            cpal_fld='magma' ; tmin=0. ; tmax=0.4 ; df=0.05 ; color_top_cb='w'            
+            cpal_fld='magma' ; tmin=0. ; tmax=0.5 ; df=0.05 ; color_top_cb='w'            
             cunit = 'Sea-ice velocity [m/s]'
 
         elif CWHAT in [ 'sidive', 'sidive-t', 'sidive-f' ]:
