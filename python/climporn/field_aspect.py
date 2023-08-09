@@ -36,7 +36,7 @@ class field_aspect:
         df   = 0.1
         cpal_fld = 'viridis'
         cb_jump = 1
-        cb_extend = 'both'        
+        cb_extend = 'both'
         cunit = ''
 
         l_apply_geov  = False
@@ -127,7 +127,7 @@ class field_aspect:
                 color_top    = 'k'
                 color_top_cb = 'k'
 
-            
+
 
         elif CWHAT == 'CURLOF':
             cv_in = 'socurloverf' ; cv_out = CWHAT ;
@@ -201,7 +201,7 @@ class field_aspect:
 
         elif CWHAT in [ 'sivelo', 'sivelo-t', 'sivelo-f' ]:
             cv_in = CWHAT  ; cv_out = CWHAT
-            cpal_fld='magma' ; tmin=0. ; tmax=0.5 ; df=0.05 ; color_top_cb='w'            
+            cpal_fld='magma' ; tmin=0. ; tmax=0.5 ; df=0.05 ; color_top_cb='w'
             cunit = 'Sea-ice velocity [m/s]'
 
         elif CWHAT in [ 'sidive', 'sidive-t', 'sidive-f' ]:
@@ -228,11 +228,19 @@ class field_aspect:
             l_pow_field=True ; pow_field=0.25 ;  vc_fld_powlog= [tmin, 0.1, 0.5, 1., 3., tmax ]
             cunit = 'Shear of sea-ice velocity [day$^{-1}$]'
 
+        elif CWHAT in [ 'dadvs12t', 'dadvs12f' ]:
+            cv_in = CWHAT  ; cv_out = CWHAT
+            cpal_fld='RdBu_r' ; tmin=-500. ; tmax=-tmin ; df=50. ; color_top_cb='k'
+            cunit = 'Prather increment for stress [Pa]'
+
+
+
+
         else:
             print('ERROR: we do not know field '+str(CWHAT)+' !')
             exit(0)
 
-            
+
         self.color_top     = color_top
         self.color_top_cb  = color_top_cb
 
