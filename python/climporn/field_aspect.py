@@ -230,7 +230,12 @@ class field_aspect:
 
         elif CWHAT in [ 'dadvs12t', 'dadvs12f' ]:
             cv_in = CWHAT  ; cv_out = CWHAT
-            cpal_fld='RdBu_r' ; tmin=-500. ; tmax=-tmin ; df=50. ; color_top_cb='k'
+            cpal_fld='RdBu_r' ; tmin=-500. ; tmax=-tmin ; df=100. ; color_top_cb='k'
+            cunit = 'Prather increment for stress [Pa]'
+
+        elif CWHAT in [ 'dadvdmgt', 'dadvdmgf' ]:
+            cv_in = CWHAT  ; cv_out = CWHAT
+            cpal_fld='RdBu_r' ; tmin=-0.005 ; tmax=-tmin ; df=--0.005 ; color_top_cb='k'
             cunit = 'Prather increment for stress [Pa]'
 
 
