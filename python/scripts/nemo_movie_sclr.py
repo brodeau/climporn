@@ -233,7 +233,7 @@ if fa.l_show_ice:
     pal_ice = cp.chose_colmap(cpal_ice)
     norm_ice = colors.Normalize(vmin = rmin_ice, vmax = 0.95, clip = False)
 
-if imask_no_ice_pc > 0:
+if fa.imask_no_ice_pc > 0:
     # => going to read variable `fa.nm_ice_conc` into the same file 
     cf_ice = cf_in
 
@@ -459,7 +459,7 @@ for jt in range(jt0,Nt):
     
     
         # Ice
-        if fa.l_show_ice or imask_no_ice_pc>0:
+        if fa.l_show_ice or fa.imask_no_ice_pc>0:
             print('Reading record #'+str(jt)+' of '+fa.nm_ice_conc+' in '+cf_ice)
             id_ice = Dataset(cf_ice)
             XICE  = id_ice.variables[fa.nm_ice_conc][jt,j1:j2,i1:i2] ; # t, y, x
@@ -548,9 +548,9 @@ for jt in range(jt0,Nt):
             print('')
 
 
-        if imask_no_ice_pc > 0:
+        if fa.imask_no_ice_pc > 0:
             # masking field where too litle sea-ice:
-            Xplot = np.ma.masked_where( XICE < float(imask_no_ice_pc)/100., Xplot )
+            Xplot = np.ma.masked_where( XICE < float(fa.imask_no_ice_pc)/100., Xplot )
             
 
         cf = plt.imshow( Xplot[:,:], cmap=pal_fld, norm=norm_fld, interpolation=nemo_box.c_imshow_interp )

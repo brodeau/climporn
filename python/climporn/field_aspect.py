@@ -237,14 +237,18 @@ class field_aspect:
 
         elif CWHAT in [ 'dadvdmgt', 'dadvdmgf' ]:
             cv_in = CWHAT  ; cv_out = CWHAT
-            cpal_fld='RdBu_r' ; tmin=-0.005 ; tmax=-tmin ; df=--0.005 ; color_top_cb='k'
+            cpal_fld='RdBu_r' ; tmin=-0.005 ; tmax=-tmin ; df=0.005 ; color_top_cb='k'
             cunit = 'Prather increment for stress [Pa]'
 
         elif CWHAT in [ 'Qns', 'nshfls', 'qns_oce', 'qns_oce_si' ]:
             cv_in = CWHAT ; cv_out = 'qns_oce'
-            imask_no_ice_pc = 10 ; # we hide the field where A<10%
-            cpal_fld = 'inferno_r'; pow_field=9.; tmin=-100.; tmax=0.; df=25.
-            vc_fld_powlog = [ tmin, -50., -25., tmax ]
+            imask_no_ice_pc = 15 ; # we hide the field where A<10%
+            #cpal_fld = 'ncview_parula_r'; color_top_cb='k'
+            #cpal_fld = 'viridis_r'; color_top_cb='k'
+            cpal_fld = 'magma_r'; color_top_cb='k'
+            tmin=-100.; tmax=0.; df=25.
+            #l_pow_field=True; pow_field=5.
+            vc_fld_powlog = [ tmin, -75., -50., -25., tmax ]
             cunit = r'Non-solar heat flux to the ocean [$W/m^{2}$]'
 
 
