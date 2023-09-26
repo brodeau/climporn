@@ -174,7 +174,7 @@ class field_aspect:
         elif CWHAT == 'siconc':
             cv_in = 'siconc'  ; cv_out = cv_in ; color_top_cb='w'
             cpal_fld='ncview_ice' ; tmin=0. ;  tmax=1. ;  df = 0.1 ; cb_jump = 1 ; cb_extend = 'neither'
-            l_pow_field=True ; pow_field=5. ; vc_fld_powlog = [ 0., 0.7, 0.8, 0.9, 0.95, 1. ]
+            l_pow_field=True ; pow_field=2. ; vc_fld_powlog = [ 0., 0.5, 0.7, 0.8, 0.9, 0.95, 1. ]
             cunit = 'Sea-ice concentration'
 
         elif CWHAT == 'sivolu':
@@ -203,7 +203,8 @@ class field_aspect:
 
         elif CWHAT in [ 'sivelo', 'sivelo-t', 'sivelo-f' ]:
             cv_in = CWHAT  ; cv_out = CWHAT
-            cpal_fld='magma' ; tmin=0. ; tmax=0.5 ; df=0.05 ; color_top_cb='w'
+            cpal_fld='magma' ; tmin=0. ; tmax=0.5 ; df=0.05 ; color_top_cb='k'
+            imask_no_ice_pc = 5 ; # we hide the field where A<10%
             cunit = 'Sea-ice velocity [m/s]'
 
         elif CWHAT in [ 'sidive', 'sidive-t', 'sidive-f' ]:
