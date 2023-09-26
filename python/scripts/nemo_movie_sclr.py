@@ -248,6 +248,7 @@ cp.chck4f(cf_mm)
 cp.chck4f(cf_in)
 
 l_notime=False
+
 id_f = Dataset(cf_in)
 list_var = id_f.variables.keys()
 if 'time_instant' in list_var:
@@ -408,6 +409,7 @@ jm = int(cmn0)
 
 # Opening netCDF files:
 id_f = Dataset(cf_in)
+id_f.set_auto_mask(False) ;# prevent the application of `valid_min` and `valid_max`....
 
 for jt in range(jt0,Nt):
 
