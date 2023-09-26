@@ -29,6 +29,8 @@ class field_aspect:
         pow_field=0.5
         vc_fld_powlog = [ ]
 
+        imask_no_ice_pc = 0 ; # integer, ice concntration in % below which we hide the field...
+        nm_ice_conc = 'siconc'   ; # => in this case we need to find the ice concentration bearing this name !
 
         rmult = 1.  ; # multiplicator to apply to field read into netCDF file
         tmin = 0.
@@ -238,7 +240,12 @@ class field_aspect:
             cpal_fld='RdBu_r' ; tmin=-0.005 ; tmax=-tmin ; df=--0.005 ; color_top_cb='k'
             cunit = 'Prather increment for stress [Pa]'
 
-
+        elif CWHAT in [ 'Qns', 'nshfls', 'qns_oce', 'qns_oce_si' ]:
+            cv_in = CWHAT ; cv_out = 'qns_oce'
+            imask_no_ice_pc = 10 ; # we hide the field where A<10%
+            cpal_fld = 'inferno_r'; pow_field=9.; tmin=-100.; tmax=0.; df=25.
+            vc_fld_powlog = [ tmin, -50., -25., tmax ]
+            cunit = r'Non-solar heat flux to the ocean [$W/m^{2}$]'
 
 
         else:
@@ -261,6 +268,9 @@ class field_aspect:
         self.pow_field     = pow_field
         self.vc_fld_powlog = vc_fld_powlog
 
+        self.imask_no_ice_pc = imask_no_ice_pc
+        self.nm_ice_conc     = nm_ice_conc
+        
         self.rmult         = rmult
         self.tmin          = tmin
         self.tmax          = tmax
