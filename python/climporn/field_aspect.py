@@ -196,10 +196,10 @@ class field_aspect:
             #cpal_fld='bone_r' ; color_top_cb='k'
             #cpal_fld='Greys' ; color_top_cb='k'
             cpal_fld='gray_r' ; color_top_cb='k'
-            tmin=0. ;  tmax=1. ; l_pow_field=True ; pow_field=9. ; cb_extend = 'neither'
+            tmin=0. ;  tmax=1. ; l_pow_field=True ; pow_field=7. ; cb_extend = 'neither'
             #tmin=0. ;  tmax=1. ; l_pow_field=True ; pow_field=5. ; cb_extend = 'neither'
             vc_fld_powlog = [ 0., 0.7, 0.8, 0.9, 0.95, 1. ]
-            cunit = 'Damage@T'
+            cunit = 'Damage of sea-ice'
 
         elif CWHAT in [ 'sivelo', 'sivelo-t', 'sivelo-f' ]:
             cv_in = CWHAT  ; cv_out = CWHAT
@@ -224,12 +224,12 @@ class field_aspect:
             cpal_fld='turbo_r' ; tmin=-50000. ;  tmax=10000. ;  df=10000.
             cunit = r'$\sigma_{I}$ [Pa]'
 
-        elif CWHAT in [ 'sishea', 'sishea-t', 'sishea-f' ]:
+        elif CWHAT in [ 'sishea', 'sishea-t', 'sishea-f', 'simxshr-t' ]:
             cv_in = CWHAT  ; cv_out = cv_in ; color_top_cb='w'
             rmult = 3600.*24.
             cpal_fld='inferno' ; tmin=0. ;  tmax=1. ; cb_extend = 'max'
-            l_pow_field=True ; pow_field=0.25 ;  vc_fld_powlog= [tmin, 0.1, 0.5, 1., 3., tmax ]
-            cunit = 'Shear of sea-ice velocity [day$^{-1}$]'
+            l_pow_field=True ; pow_field=0.3 ;  vc_fld_powlog= [tmin, 0.01, 0.1, 0.5, tmax ]
+            cunit = 'Maximum shear of sea-ice velocity [day$^{-1}$]'
 
         elif CWHAT in [ 'dadvs12t', 'dadvs12f' ]:
             cv_in = CWHAT  ; cv_out = CWHAT
