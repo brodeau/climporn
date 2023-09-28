@@ -203,7 +203,9 @@ class field_aspect:
 
         elif CWHAT in [ 'sivelo', 'sivelo-t', 'sivelo-f' ]:
             cv_in = CWHAT  ; cv_out = CWHAT
-            cpal_fld='magma' ; tmin=0. ; tmax=0.5 ; df=0.05 ; color_top_cb='k'
+            #cpal_fld='magma'
+            cpal_fld='gnuplot2'
+            tmin=0. ; tmax=0.5 ; df=0.05 ; color_top_cb='k'
             imask_no_ice_pc = 5 ; # we hide the field where A<10%
             cunit = 'Sea-ice velocity [m/s]'
 
