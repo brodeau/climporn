@@ -180,7 +180,7 @@ class field_aspect:
             cunit = 'Sea-ice concentration'
 
         elif CWHAT in [ 'sithic', 'sivolu' ]:
-            cv_in = 'sithic'  ; cv_out = cv_in
+            cv_in = CWHAT  ; cv_out = cv_in
             #cpal_fld='magma' ; color_top_cb='w'
             #cpal_fld='ncview_tofino' ; color_top_cb='k'
             cpal_fld='viridis' ; color_top_cb='w'
