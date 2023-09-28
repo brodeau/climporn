@@ -184,7 +184,7 @@ class field_aspect:
             cpal_fld='magma' ; tmin=0. ;  tmax=4. ;  df=1 ; cb_jump = 1; cb_extend = 'max'
             cunit = 'Sea-ice volume [m]'
 
-        elif CWHAT == 'sithic':
+        elif CWHAT in [ 'sithic', 'sivolu' ]:
             cv_in = 'sithic'  ; cv_out = cv_in
             #cpal_fld='magma' ; color_top_cb='w'
             cpal_fld='ncview_tofino' ; color_top_cb='k'
