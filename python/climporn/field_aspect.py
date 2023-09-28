@@ -179,28 +179,19 @@ class field_aspect:
             l_pow_field=True ; pow_field=2. ; vc_fld_powlog = [ 0., 0.5, 0.7, 0.8, 0.9, 0.95, 1. ]
             cunit = 'Sea-ice concentration'
 
-        elif CWHAT == 'sivolu':
-            cv_in = 'sivolu'  ; cv_out = cv_in ; color_top_cb='k'
-            cpal_fld='magma' ; tmin=0. ;  tmax=4. ;  df=1 ; cb_jump = 1; cb_extend = 'max'
-            cunit = 'Sea-ice volume [m]'
-
         elif CWHAT in [ 'sithic', 'sivolu' ]:
             cv_in = 'sithic'  ; cv_out = cv_in
             #cpal_fld='magma' ; color_top_cb='w'
-            cpal_fld='ncview_tofino' ; color_top_cb='k'
-            #cpal_fld='viridis' ; color_top_cb='w'
+            #cpal_fld='ncview_tofino' ; color_top_cb='k'
+            cpal_fld='viridis' ; color_top_cb='w'
             tmin=0. ;  tmax=5. ;  df=1 ; cb_jump = 1; cb_extend = 'max'
             cunit = 'Sea-ice thickness [m]'
 
         elif CWHAT in [ 'damage', 'damage-t', 'damage-f' ]:
             cv_in = CWHAT  ; cv_out = cv_in
-            #cpal_fld='magma' ; color_top_cb='w'
-            #cpal_fld='bone_r' ; color_top_cb='k'
-            #cpal_fld='Greys' ; color_top_cb='k'
             cpal_fld='gray_r' ; color_top_cb='k'
             imask_no_ice_pc = 50 ; color_missing = '#2D4B87' ; # we hide the field where A<15%
             tmin=0. ;  tmax=1. ; l_pow_field=True ; pow_field=7. ; cb_extend = 'neither'
-            #tmin=0. ;  tmax=1. ; l_pow_field=True ; pow_field=5. ; cb_extend = 'neither'
             vc_fld_powlog = [ 0., 0.7, 0.8, 0.9, 0.95, 1. ]
             cunit = 'Damage of sea-ice'
 
