@@ -253,7 +253,7 @@ class field_aspect:
             imask_no_ice_pc = 15 ; # we hide the field where A<10%
             #cpal_fld = 'ncview_parula'; color_top_cb='k'
             #cpal_fld = 'viridis'; color_top_cb='k'
-            cpal_fld = 'magma'; color_top_cb='k'
+            cpal_fld = 'inferno'; color_top_cb='k'
             tmin=0.; tmax=100.; df=25.
             #l_pow_field=True; pow_field=5.
             vc_fld_powlog = [ tmin, 25., 50., 75., tmax ]
