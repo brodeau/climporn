@@ -32,6 +32,8 @@ class field_aspect:
         imask_no_ice_pc = 0 ; # integer, ice concntration in % below which we hide the field...
         nm_ice_conc = 'siconc'   ; # => in this case we need to find the ice concentration bearing this name !
 
+        color_missing = '0.7'
+        
         rmult = 1.  ; # multiplicator to apply to field read into netCDF file
         tmin = 0.
         tmax = 1.
@@ -196,6 +198,7 @@ class field_aspect:
             #cpal_fld='bone_r' ; color_top_cb='k'
             #cpal_fld='Greys' ; color_top_cb='k'
             cpal_fld='gray_r' ; color_top_cb='k'
+            imask_no_ice_pc = 50 ; color_missing = '#2D4B87' ; # we hide the field where A<15%
             tmin=0. ;  tmax=1. ; l_pow_field=True ; pow_field=7. ; cb_extend = 'neither'
             #tmin=0. ;  tmax=1. ; l_pow_field=True ; pow_field=5. ; cb_extend = 'neither'
             vc_fld_powlog = [ 0., 0.7, 0.8, 0.9, 0.95, 1. ]
@@ -206,7 +209,7 @@ class field_aspect:
             #cpal_fld='magma'
             cpal_fld='gnuplot2'
             tmin=0. ; tmax=0.5 ; df=0.05 ; color_top_cb='k'
-            imask_no_ice_pc = 5 ; # we hide the field where A<10%
+            imask_no_ice_pc = 10 ; # we hide the field where A<10%
             cunit = 'Sea-ice velocity [m/s]'
 
         elif CWHAT in [ 'sidive', 'sidive-t', 'sidive-f' ]:
@@ -288,6 +291,8 @@ class field_aspect:
 
         self.imask_no_ice_pc = imask_no_ice_pc
         self.nm_ice_conc     = nm_ice_conc
+
+        self.color_missing   = color_missing
         
         self.rmult         = rmult
         self.tmin          = tmin

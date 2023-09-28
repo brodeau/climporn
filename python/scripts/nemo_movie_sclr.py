@@ -432,7 +432,7 @@ for jt in range(jt0,Nt):
 
         fig = plt.figure(num = 1, figsize=(rw_fig, rh_fig), dpi=rDPI, facecolor='w', edgecolor='0.5')
     
-        ax  = plt.axes([0., 0., 1., 1.], facecolor = '0.7') # missing seas will be in 'facecolor' !
+        ax  = plt.axes([0., 0., 1., 1.], facecolor=fa.color_missing) # missing seas will be in 'facecolor' !
     
         vc_fld = np.arange(fa.tmin, fa.tmax + fa.df, fa.df)
     
