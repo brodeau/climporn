@@ -143,7 +143,7 @@ class nemo_hbox:
             l_show_name=True  ; x_name  = rfact_zoom*100 ; y_name  = rfact_zoom*1250
             l_show_exp=False  ; x_exp   = rfact_zoom*140 ; y_exp   = rfact_zoom*1250 
             l_add_logo=False  ; l_fill_holes_k=False
-            l_show_sign=True  ; x_sign = 1170*rfact_zoom ; y_sign = rfact_zoom*15
+            l_show_sign=True  ; x_sign = 1174*rfact_zoom ; y_sign = rfact_zoom*15
             pt_sz_track = 1
             #
             
