@@ -35,6 +35,9 @@ class nemo_hbox:
         elif config == 'CALEDO60':
             Ni0 = 788
             Nj0 = 853
+        elif config == 'NANUK12':
+            Ni0 = 1475
+            Nj0 = 1682
         elif config == 'NANUK4':
             Ni0 = 492
             Nj0 = 566
@@ -132,6 +135,18 @@ class nemo_hbox:
             l_show_exp=False ; x_exp = 50 ; y_exp = 800
             l_fill_holes_k=True
 
+            ####   NANUK12   ####
+        elif [ config, box ] == [ 'NANUK12', 'ALLS']:
+            i1=0 ; j1=Nj0-Ni0+40  ;  i2=Ni0-75 ; j2=Nj0-35  ; rfact_zoom=1. ; font_rat=0.9*rfact_zoom
+            l_show_cb  = True ; vcb=[0.18, 0.075, 0.64, 0.02]
+            l_show_clock=True ; x_clock = rfact_zoom*950 ; y_clock = rfact_zoom*1300
+            l_show_name=True  ; x_name  = rfact_zoom*100 ; y_name  = rfact_zoom*1250
+            l_show_exp=False  ; x_exp   = rfact_zoom*140 ; y_exp   = rfact_zoom*1250 
+            l_add_logo=False  ; l_fill_holes_k=False
+            l_show_sign=True  ; x_sign = 1170*rfact_zoom ; y_sign = rfact_zoom*15
+            pt_sz_track = 1
+            #
+            
             ####   NANUK4   ####
         elif [ config, box ] == [ 'NANUK4', 'ALL']:
             i1=0 ; j1=0  ;  i2=Ni0 ; j2=Nj0  ; rfact_zoom=2. ; font_rat=0.4*rfact_zoom
