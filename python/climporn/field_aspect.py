@@ -197,10 +197,10 @@ class field_aspect:
 
         elif CWHAT in [ 'sivelo', 'sivelo-t', 'sivelo-f' ]:
             cv_in = CWHAT  ; cv_out = CWHAT
-            #cpal_fld='magma'
-            cpal_fld='gnuplot2' ; color_top_cb='k' 
+            cpal_fld='magma' ; color_top_cb='k' 
+            #cpal_fld='gnuplot2' ; color_top_cb='k' 
             tmin=0. ; tmax=0.5 ; df=0.05 ; cb_extend = 'max'
-            imask_no_ice_pc = 10 ; # we hide the field where A<10%
+            imask_no_ice_pc = 50 ; # we hide the field where A<10%
             cunit = 'Sea-ice velocity [m/s]'
 
         elif CWHAT in [ 'sidive', 'sidive-t', 'sidive-f' ]:
@@ -220,7 +220,7 @@ class field_aspect:
             cpal_fld='turbo_r' ; tmin=-50000. ;  tmax=10000. ;  df=10000.
             cunit = r'$\sigma_{I}$ [Pa]'
 
-        elif CWHAT in [ 'sishea', 'sishea-t', 'sishea-f', 'simxshr-t' ]:
+        elif CWHAT in [ 'sishea', 'sishea-t', 'sishea-f', 'simxshr-t', 'simxshr-f' ]:
             cv_in = CWHAT  ; cv_out = cv_in ; color_top_cb='w'
             rmult = 3600.*24.
             cpal_fld='inferno' ; tmin=0. ;  tmax=1. ; cb_extend = 'max'
