@@ -136,7 +136,7 @@ class nemo_hbox:
             l_fill_holes_k=True
 
             ####   NANUK12   ####
-        elif [ config, box ] == [ 'NANUK12', 'ALLS']:
+        elif [ config, box ] == [ 'NANUK12', 'ALLs']:
             i1=0 ; j1=Nj0-Ni0+40  ;  i2=Ni0-75 ; j2=Nj0-35  ; rfact_zoom=1. ; font_rat=0.9*rfact_zoom
             l_show_cb  = True ; vcb=[0.18, 0.075, 0.64, 0.02]
             l_show_clock=True ; x_clock = rfact_zoom*950 ; y_clock = rfact_zoom*1300
