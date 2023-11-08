@@ -208,6 +208,12 @@ class field_aspect:
             cpal_fld='RdBu_r' ; tmin=-0.2 ;  tmax=-tmin ;  df=0.05
             cunit = 'Divergence of sea-ice velocity [day$^{-1}$]'
 
+        elif CWHAT in [ 'sishear', 'sishear-t', 'sishear-f' ]:
+            cv_in = CWHAT  ; cv_out = cv_in ; color_top_cb='k'
+            rmult = 3600.*24.
+            cpal_fld='RdBu_r' ; tmin=-0.2 ;  tmax=-tmin ;  df=0.05
+            cunit = 'Shear of sea-ice velocity [day$^{-1}$]'
+
         elif CWHAT in [ 'zfUu'  ]:
             cv_in = CWHAT  ; cv_out = cv_in ; color_top_cb='k'
             #rmult = 3600.*24.
