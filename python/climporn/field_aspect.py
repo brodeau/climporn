@@ -32,7 +32,7 @@ class field_aspect:
         imask_no_ice_pc = 0 ; # integer, ice concntration in % below which we hide the field...
         nm_ice_conc = 'siconc'   ; # => in this case we need to find the ice concentration bearing this name !
 
-        color_missing = '0.7'
+        color_missing = '0.8'
         
         rmult = 1.  ; # multiplicator to apply to field read into netCDF file
         tmin = 0.
@@ -182,7 +182,7 @@ class field_aspect:
         elif CWHAT in [ 'sithic', 'sivolu' ]:
             cv_in = CWHAT  ; cv_out = cv_in
             cpal_fld='ncview_tofino' ; color_top_cb='k'
-            imask_no_ice_pc = 10 ; color_missing = 'k' ; # we hide the field where A<`imask_no_ice_pc`%
+            imask_no_ice_pc = 10 ; #color_missing = 'k' ; # we hide the field where A<`imask_no_ice_pc`%
             tmin=0. ;  tmax=5. ;  df=1 ; cb_jump = 1; cb_extend = 'max'
             cunit = 'Sea-ice thickness [m]'
 
