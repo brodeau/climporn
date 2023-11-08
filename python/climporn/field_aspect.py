@@ -188,7 +188,8 @@ class field_aspect:
 
         elif CWHAT in [ 'damage', 'damage-t', 'damage-f' ]:
             cv_in = CWHAT  ; cv_out = cv_in
-            cpal_fld='gray_r' ; color_top_cb='w'
+            #cpal_fld='gray_r' ; color_top_cb='w'
+            cpal_fld='bone_r' ; color_top_cb='w'
             imask_no_ice_pc = 50 ; color_missing = '#2D4B87' ; # we hide the field where A<`imask_no_ice_pc`%
             tmin=0. ;  tmax=1. ; l_pow_field=True ; pow_field=5. ; cb_extend = 'neither'
             vc_fld_powlog = [ 0., 0.7, 0.8, 0.9, 0.95, 1. ]

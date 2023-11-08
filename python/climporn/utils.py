@@ -892,7 +892,7 @@ def fig_style_mov( pzoom, clr_top='k', clr_top_cb='k' ):
     fig_style_mov.cfont_exp      = { 'fontname':'Open Sans'  , 'fontweight':'light', 'fontsize':int(9.*pzoom), 'color':clr_top }
     fig_style_mov.cfont_mail     = { 'fontname':'Times New Roman', 'fontweight':'normal', 'fontstyle':'italic', 'fontsize':int(14.*pzoom), 'color':'0.8'}
     fig_style_mov.cfont_titl     = { 'fontname':'Open Sans'  , 'fontweight':'light', 'fontsize':int(14.*pzoom), 'color':clr_top }
-    fig_style_mov.cfont_sign     = { 'fontname':'Open Sans'  , 'fontweight':'normal', 'fontstyle':'italic','fontsize':int(8.*pzoom), 'color':'0.75' }
+    fig_style_mov.cfont_sign     = { 'fontname':'Open Sans'  , 'fontweight':'normal', 'fontstyle':'italic','fontsize':int(7.*pzoom), 'color':'0.9' }
     #
     return 0
 
