@@ -196,8 +196,8 @@ class field_aspect:
 
         elif CWHAT in [ 'sivelo', 'sivelo-t', 'sivelo-f' ]:
             cv_in = CWHAT  ; cv_out = CWHAT
-            cpal_fld='magma' ; color_top_cb='k' 
-            #cpal_fld='gnuplot2' ; color_top_cb='k' 
+            #cpal_fld='magma' ; color_top_cb='k' 
+            cpal_fld='gnuplot2' ; color_top_cb='k'            
             tmin=0. ; tmax=0.5 ; df=0.05 ; cb_extend = 'max'
             imask_no_ice_pc = 50 ; # we hide the field where A<10%
             cunit = 'Sea-ice velocity [m/s]'
@@ -212,7 +212,15 @@ class field_aspect:
             cv_in = CWHAT  ; cv_out = cv_in ; color_top_cb='k'
             rmult = 3600.*24.
             cpal_fld='RdBu_r' ; tmin=-0.2 ;  tmax=-tmin ;  df=0.05
+            imask_no_ice_pc = 50 ; #color_missing = 'k' ; # we hide the field where A<`imask_no_ice_pc`%
             cunit = 'Shear of sea-ice velocity [day$^{-1}$]'
+
+        elif CWHAT in [ 'sivort', 'sivort-t', 'sivort-f' ]:
+            cv_in = CWHAT  ; cv_out = cv_in ; color_top_cb='k'
+            rmult = 3600.*24.
+            cpal_fld='RdBu_r' ; tmin=-0.2 ;  tmax=-tmin ;  df=0.05
+            imask_no_ice_pc = 50 ; #color_missing = 'k' ; # we hide the field where A<`imask_no_ice_pc`%
+            cunit = 'Vorticity of sea-ice velocity [day$^{-1}$]'
 
         elif CWHAT in [ 'zfUu'  ]:
             cv_in = CWHAT  ; cv_out = cv_in ; color_top_cb='k'
@@ -229,6 +237,7 @@ class field_aspect:
             cv_in = CWHAT  ; cv_out = cv_in ; color_top_cb='w'
             rmult = 3600.*24.
             cpal_fld='inferno' ; tmin=0. ;  tmax=1. ; cb_extend = 'max'
+            imask_no_ice_pc = 50 ; #color_missing = 'k' ; # we hide the field where A<`imask_no_ice_pc`%
             l_pow_field=True ; pow_field=0.3 ;  vc_fld_powlog= [tmin, 0.01, 0.1, 0.5, tmax ]
             cunit = 'Maximum shear of sea-ice velocity [day$^{-1}$]'
 
