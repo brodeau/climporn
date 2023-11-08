@@ -181,16 +181,15 @@ class field_aspect:
 
         elif CWHAT in [ 'sithic', 'sivolu' ]:
             cv_in = CWHAT  ; cv_out = cv_in
-            #cpal_fld='magma' ; color_top_cb='w'
             cpal_fld='ncview_tofino' ; color_top_cb='k'
-            #cpal_fld='viridis' ; color_top_cb='w'
+            imask_no_ice_pc = 10 ; color_missing = 'k' ; # we hide the field where A<`imask_no_ice_pc`%
             tmin=0. ;  tmax=5. ;  df=1 ; cb_jump = 1; cb_extend = 'max'
             cunit = 'Sea-ice thickness [m]'
 
         elif CWHAT in [ 'damage', 'damage-t', 'damage-f' ]:
             cv_in = CWHAT  ; cv_out = cv_in
             cpal_fld='gray_r' ; color_top_cb='w'
-            imask_no_ice_pc = 50 ; color_missing = '#2D4B87' ; # we hide the field where A<15%
+            imask_no_ice_pc = 50 ; color_missing = '#2D4B87' ; # we hide the field where A<`imask_no_ice_pc`%
             tmin=0. ;  tmax=1. ; l_pow_field=True ; pow_field=5. ; cb_extend = 'neither'
             vc_fld_powlog = [ 0., 0.7, 0.8, 0.9, 0.95, 1. ]
             cunit = 'Damage of sea-ice'
