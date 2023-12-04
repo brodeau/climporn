@@ -346,14 +346,16 @@ if l_add_topo_land:
     if np.shape(xtopo) != (nj,ni):
         print('ERROR: topo and mask do not agree in shape!'); sys.exit(0)
     xtopo = xtopo*(1. - XMSK)
-    xtopo = np.max( xtopo, 1.e-6 )
-    #cp.dump_2d_field('topo_'+CBOX+'.nc', xtopo, name='z')    
     if l3d: xtopo = xtopo + rof_dpt
-    xtopo[np.where( XMSK > 0.01)] = np.nan
+    xtopo = np.max( xtopo, 1.e-6 )
+    xtopo = np.log10(xtopo+rof_log) ; #lili
+    #
+    xtopo[np.where(XMSK > 0.01)] = np.nan
     if nemo_box.l_fill_holes_k and not l3d:
         XLSM[np.where( xtopo < 0.0)] = 1
-        xtopo[np.where( xtopo < 0.0)] = np.nan
-
+        #xtopo[np.where( xtopo < 0.0)] = np.nan
+    #cp.dump_2d_field('topo_'+CBOX+'.nc', xtopo, name='z')
+    
 XLSM[np.where( XMSK > 0.5)] = 1
 
 
@@ -373,7 +375,6 @@ else:
 
 if fa.l_show_lsm or l_add_topo_land:
     if l_add_topo_land:
-        xtopo = np.log10(xtopo+rof_log) ; #lili
         pal_lsm = cp.chose_colmap('gray_r')
         #norm_lsm = colors.Normalize(vmin = np.log10(min(-100.+rof_dpt/3.,0.) + rof_log), vmax = np.log10(4000.+rof_dpt + rof_log), clip = False)
         norm_lsm = colors.Normalize(vmin = np.log10(-100. + rof_log), vmax = np.log10(4000.+rof_dpt + rof_log), clip = False)
