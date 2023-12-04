@@ -346,6 +346,7 @@ if l_add_topo_land:
     if np.shape(xtopo) != (nj,ni):
         print('ERROR: topo and mask do not agree in shape!'); sys.exit(0)
     xtopo = xtopo*(1. - XMSK)
+    xtopo = np.max( xtopo, 1.e-6 )
     #cp.dump_2d_field('topo_'+CBOX+'.nc', xtopo, name='z')    
     if l3d: xtopo = xtopo + rof_dpt
     xtopo[np.where( XMSK > 0.01)] = np.nan
@@ -372,7 +373,7 @@ else:
 
 if fa.l_show_lsm or l_add_topo_land:
     if l_add_topo_land:
-        xtopo = np.log10(xtopo+rof_log)
+        xtopo = np.log10(xtopo+rof_log) ; #lili
         pal_lsm = cp.chose_colmap('gray_r')
         #norm_lsm = colors.Normalize(vmin = np.log10(min(-100.+rof_dpt/3.,0.) + rof_log), vmax = np.log10(4000.+rof_dpt + rof_log), clip = False)
         norm_lsm = colors.Normalize(vmin = np.log10(-100. + rof_log), vmax = np.log10(4000.+rof_dpt + rof_log), clip = False)
