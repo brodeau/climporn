@@ -1,4 +1,5 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3 -W ignore
+#
 # -*- Mode: Python; coding: utf-8; indent-tabs-mode: nil; tab-width: 4 -*-
 #
 ##################################################################
@@ -347,13 +348,13 @@ if l_add_topo_land:
         print('ERROR: topo and mask do not agree in shape!'); sys.exit(0)
     xtopo = xtopo*(1. - XMSK)
     if l3d: xtopo = xtopo + rof_dpt
-    xtopo = np.max( xtopo, 1.e-6 )
-    xtopo = np.log10(xtopo+rof_log) ; #lili
-    #
+    xtopo[np.where( xtopo <= 0 )] = 0
+    xtopo = np.log10(xtopo+rof_log)
     xtopo[np.where(XMSK > 0.01)] = np.nan
-    if nemo_box.l_fill_holes_k and not l3d:
-        XLSM[np.where( xtopo < 0.0)] = 1
-        #xtopo[np.where( xtopo < 0.0)] = np.nan
+    #
+    #if nemo_box.l_fill_holes_k and not l3d:
+    #    XLSM[np.where( xtopo < 0.0)] = 1
+    #    #xtopo[np.where( xtopo < 0.0)] = np.nan
     #cp.dump_2d_field('topo_'+CBOX+'.nc', xtopo, name='z')
     
 XLSM[np.where( XMSK > 0.5)] = 1
