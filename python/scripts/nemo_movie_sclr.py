@@ -1,4 +1,4 @@
-#!/usr/bin/env python3 -W ignore
+#!/usr/bin/env python3
 #
 # -*- Mode: Python; coding: utf-8; indent-tabs-mode: nil; tab-width: 4 -*-
 #
@@ -32,6 +32,10 @@ from re import split
 
 import climporn as cp
 from climporn import fig_style_mov as fsm
+
+import warnings
+warnings.filterwarnings("ignore")
+
 
 cwd = getcwd()
 
