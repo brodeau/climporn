@@ -148,9 +148,10 @@ if __name__ == '__main__':
     rLat0 = 68.
     # White:
     if l_add_res_km:
-        if np.shape(XVF[id_glamf,:,:]) == (566, 492):
-            # nanuk4
-            zmsk = np.ones( np.shape(XVF[id_glamf,:,:]), dtype='i1')
+        zshp = np.shape(XVF[id_glamf,:,:])
+        if zshp == (566, 492) or zshp == (4184, 4248) :
+            # nanuk*
+            zmsk = np.ones( zshp, dtype='i1')
             zlon = np.mod( XVF[id_glamf,:,:], 360. )
             idx0 = np.where( (zlon>0.) & (zlon<100.) & (XVF[id_gphif,:,:]<48.) )   ; zmsk[idx0] = 0 ; # MedSea #1
             idx0 = np.where( (zlon<360.) & (zlon>355.) & (XVF[id_gphif,:,:]<43.) ) ; zmsk[idx0] = 0 ; # MedSea #2
