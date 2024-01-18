@@ -10,7 +10,7 @@
 import sys
 from os import path, getcwd, mkdir
 import argparse as ap
-import numpy as nmp
+import numpy as np
 
 from netCDF4 import Dataset
 
@@ -18,16 +18,11 @@ import matplotlib as mpl
 mpl.use('Agg')
 import matplotlib.pyplot as plt
 import matplotlib.colors as colors
-#import matplotlib.image as image
-#import matplotlib.cbook as cbook
-
-#from mpl_toolkits.basemap import Basemap
-#from mpl_toolkits.basemap import shiftgrid
 
 from calendar import isleap
 import datetime
 
-#from re import split
+from re import split
 #import warnings
 #warnings.filterwarnings("ignore")
 
@@ -70,16 +65,18 @@ jt0 = 0
 parser = ap.ArgumentParser(description='Shows the normal and shear invariants of the stress tensor w.r.t Mohr-Coulomb line')
 
 requiredNamed = parser.add_argument_group('required arguments')
-requiredNamed.add_argument('-i', '--fin' , required=True,   default="file.nc",             help='specify the NEMO netCDF file to read from...')
+requiredNamed.add_argument('-i', '--fin' , required=True, help='specify the NEMO netCDF file to read from...')
+requiredNamed.add_argument('-m', '--fmm' , required=True, help='specify the NEMO mesh_mask file (ex: mesh_mask.nc)')
+
 #requiredNamed.add_argument('-w', '--what', required=True, default="sst", help='specify the field/diagnostic to plot (ex: sst)')
 #parser.add_argument('-C', '--conf', default="NANUK025",     help='specify NEMO config (ex: eNATL60)')
 #parser.add_argument('-N', '--name', default="X",            help='specify experiment name')
-parser.add_argument('-m', '--fmm' , default="mesh_mask.nc", help='specify the NEMO mesh_mask file (ex: mesh_mask.nc)')
 parser.add_argument('-s', '--sd0' , default="20160101",     help='specify initial date as <YYYYMMDD>')
 #parser.add_argument('-l', '--lev' , type=int, default=0,    help='specify the level to use if 3D field (default: 0 => 2D)')
 #parser.add_argument('-I', '--ice' , action='store_true',    help='draw sea-ice concentration layer onto the field')
 #parser.add_argument('-T', '--title', default="",            help='specify experiment title')
-parser.add_argument('-f', '--freq',  default="1h",          help='specify output frequency in input file')
+parser.add_argument('-f', '--freq',  default="1h",          help='specify output frequency in input file (1h,3h,6h,1d, etc.)')
+parser.add_argument('-B', '--box',   default=None,             help='specify rectangular box to focus => "-B i1,j1,i2,j2"')
 
 args = parser.parse_args()
 
@@ -87,7 +84,13 @@ cf_in = args.fin
 cf_mm = args.fmm
 cfreq = args.freq
 csd0  = args.sd0
+cbox  = args.box
 
+lbox = False
+if cbox:
+    lbox = True
+    [i1,j1,i2,j2]   = np.array( split(',',cbox), dtype=int )
+    print(" *** Box to restric diag to: i1,j1,i2,j2 =",i1,j1,i2,j2)
 
 print('')
 print(' *** cf_in = ', cf_in)
@@ -128,7 +131,7 @@ Xlon = id_lsm.variables['glamt'][0,:,:]
 Xlat = id_lsm.variables['gphit'][0,:,:]
 id_lsm.close()
 
-(nj,ni) = nmp.shape(XMSK)  ; print('Shape Arrays => ni,nj =', ni,nj)
+(nj,ni) = np.shape(XMSK)  ; print('Shape Arrays => ni,nj =', ni,nj)
 print('Done!\n')
 
 
@@ -152,7 +155,7 @@ cfont_titl2 = { 'fontname':'Open Sans', 'fontweight':'normal','fontsize':int(12.
 
 
 # for colorbar:
-vc_fld = nmp.arange(tmin, tmax + df, df)
+vc_fld = np.arange(tmin, tmax + df, df)
 
 
 # For movie
@@ -224,8 +227,8 @@ for jt in range(jt0,Nt):
     fig = plt.figure(num = 1, figsize=(vfig_size), dpi=None, facecolor=col_bg, edgecolor=col_bg)
     ax  = plt.axes(vsporg, facecolor = col_bg)
 
-    XS1 = nmp.ma.masked_where(XMSK <= 0.1, XS1)
-    XS2 = nmp.ma.masked_where(XMSK <= 0.1, XS2)
+    XS1 = np.ma.masked_where(XMSK <= 0.1, XS1)
+    XS2 = np.ma.masked_where(XMSK <= 0.1, XS2)
 
     #ft = carte.pcolormesh(x0, y0, XS1, cmap = pal_fld, norm = nrm_fld )
 
@@ -234,7 +237,7 @@ for jt in range(jt0,Nt):
     
     sp = plt.scatter( XS1, XS2, s=1., c='k', alpha=0.5)
 
-    vx = nmp.arange(xmin,xmax+1000.,1000.)
+    vx = np.arange(xmin,xmax+1000.,1000.)
     vy = -0.7 * vx[:] + 6000.
     #print(" vx =", vx[:] )
     #sys.exit(0)
@@ -253,7 +256,7 @@ for jt in range(jt0,Nt):
     #for rr in vc_fld:
     #    if cpt % cb_jump == 0 or ( (tmin == -tmax) and (int(rr) == 0 ) ):
     #        if df >= 1.: cb_labs.append(str(int(rr)))
-    #        if df <  1.: cb_labs.append(str(round(rr,int(nmp.ceil(nmp.log10(1./df)))+1) ))
+    #        if df <  1.: cb_labs.append(str(round(rr,int(np.ceil(np.log10(1./df)))+1) ))
     #    else:
     #        cb_labs.append(' ')
     #    cpt = cpt + 1
