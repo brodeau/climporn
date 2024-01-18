@@ -27,13 +27,14 @@ from re import split
 #warnings.filterwarnings("ignore")
 
 import climporn as cp
+from climporn import fig_style_mov as fsm
 
 vmn = [ 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ]
 vml = [ 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ]
 
 fig_type='png'
 rDPI = 100
-rfig_fact=1.
+rfig_fact=1.2
 
 color_top = 'k'
 #color_top_cb = 'white'
@@ -50,8 +51,6 @@ ymin = 0.      ; ymax = 30000
 
 cv_in1 = 'ice_sigI-t'
 cv_in2 = 'ice_sigII-t'
-
-jt0 = 0
 
 #l_get_name_of_run = True
 
@@ -106,6 +105,8 @@ if not path.exists(cdir_figs): mkdir(cdir_figs)
 l_notime=False
 cp.chck4f(cf_in)
 id_in = Dataset(cf_in)
+Nj, Ni = id_in.dimensions['y'].size, id_in.dimensions['x'].size
+print(' *** Ni, Nj = ',Ni, Nj,'\n')
 list_var = id_in.variables.keys()
 if 'time_counter' in list_var:
     vtime = id_in.variables['time_counter'][:]
@@ -120,38 +121,137 @@ if not l_notime: Nt = len(vtime)
 print(' Nt =', Nt)
 
 
+if not lbox:
+    # Use the whole domain
+    i1, i2 = 0, Ni
+    j1, j2 = 0, Nj
+
+
 id_lsm = Dataset(cf_mm)
+n2, n1 = id_lsm.dimensions['y'].size, id_lsm.dimensions['x'].size
+if n2!=Nj and n1!=Ni:
+    print('ERROR: fields in meshmask file do not have the same shape as those in input file!'); exit(0)
 nb_dim = len(id_lsm.variables['tmask'].dimensions)
 print(' The mesh_mask has '+str(nb_dim)+' dimmensions!')
 print(' *** Reading '+'tmask'+' !')
-if nb_dim==4: XMSK = id_lsm.variables['tmask'][0,0,:,:]
-if nb_dim==3: XMSK = id_lsm.variables['tmask'][0,:,:]
-if nb_dim==2: XMSK = id_lsm.variables['tmask'][:,:]
-Xlon = id_lsm.variables['glamt'][0,:,:]
-Xlat = id_lsm.variables['gphit'][0,:,:]
+if nb_dim==4: XMSK = id_lsm.variables['tmask'][0,0,j1:j2,i1:i2]
+if nb_dim==3: XMSK = id_lsm.variables['tmask'][0,j1:j2,i1:i2]
+if nb_dim==2: XMSK = id_lsm.variables['tmask'][j1:j2,i1:i2]
+Xlon = id_lsm.variables['glamt'][0,j1:j2,i1:i2]
+Xlat = id_lsm.variables['gphit'][0,j1:j2,i1:i2]
 id_lsm.close()
 
-(nj,ni) = np.shape(XMSK)  ; print('Shape Arrays => ni,nj =', ni,nj)
-print('Done!\n')
+
+
+
+(Nj,Ni) = np.shape(XMSK) ; # update with shape of box we read...
+
+
+VSIG1 = []
+VSIG2 = []
+
+id_in = Dataset(cf_in)
+
+# A/ store everything in arrays for all the time steps and plot the result:
+for jt in range(Nt):
+
+    XS1 = id_in.variables[cv_in1][jt,j1:j2,i1:i2]
+    XS2 = id_in.variables[cv_in2][jt,j1:j2,i1:i2]
+
+    for jj in range(0,Nj):
+        for ji in range(0,Ni):
+            zS1, zS2 = XS1[jj,ji], XS2[jj,ji]
+            if zS2<0:
+                print('ERROR: WTF?'); exit(0)
+            if XMSK[jj,ji]>0.5 and (zS2>0. and abs(zS1)>0):
+                VSIG1.append(zS1)
+                VSIG2.append(zS2)
+    
+id_in.close()
+
+VSIG1 = np.array(VSIG1)
+VSIG2 = np.array(VSIG2)
+
+(Np,) = np.shape(VSIG1)
+
+
+print(' *** Selected valid '+str(Np)+' points out of '+str(Nj*Ni*Nt)+'!')
+
+
+# Font style:
+font_ratio = 1.7*rfig_fact
+
+kk = fsm( font_ratio );#r_top=fa.color_top, clr_top_cb=fa.color_top_cb )
+
+col_bg = 'w'
+vfig_size = [ 10.*rfig_fact, 7.2*rfig_fact ]
+vsporg = [0.13, 0.13, 0.8, 0.8]
+
+cfig = 'test.png'
+
+fig = plt.figure(num = 1, figsize=(vfig_size), dpi=None, facecolor=col_bg, edgecolor=col_bg)
+ax  = plt.axes(vsporg, facecolor = col_bg)
+
+#XS1 = np.ma.masked_where(XMSK <= 0.1, XS1)
+#XS2 = np.ma.masked_where(XMSK <= 0.1, XS2)
+
+#ft = carte.pcolormesh(x0, y0, XS1, cmap = pal_fld, norm = nrm_fld )
+
+
+plt.axis([ xmin, xmax, ymin, ymax])
+
+sp = plt.scatter( VSIG1, VSIG2, s=1., c='k', alpha=0.1)
+
+vx = np.arange(xmin,xmax+1000.,1000.)
+vy = -0.7 * vx[:] + 6000.
+#print(" vx =", vx[:] )
+#sys.exit(0)
+
+mc = plt.plot( vx, vy, color='#041a4d', linewidth=4. )
+
+plt.xlabel(r'$\sigma_{I}$')
+plt.ylabel(r'$\sigma_{II}$')
+
+#ax.annotate('Date: '+cday+' '+chour+':00', xy=(0.785, 0.015), xycoords='figure fraction', **fsm.cfont_clock)
+#ax.annotate('Date: '+cday+' '+chour+':00', xy=(0.5, 0.95), xycoords='figure fraction', **fsm.cfont_clock)
+
+#ry0 = 0.78
+#ax.annotate(cxtra_info1, xy=(0.02, ry0+0.05), xycoords='figure fraction', **fsm.cfont_titl1)
+
+#if ctitle != "":
+#    ax.annotate(ctitle, xy=(0.03, ry0-0.01), xycoords='figure fraction', **fsm.cfont_titl2)
+
+
+print(' Saving figure: '+cfig+'\n\n')
+
+plt.savefig(cfig, dpi=rDPI, orientation='portrait', transparent=False)
+
+plt.close(1)
+
+
+exit(0)
 
 
 
 
-fontr=1.2*rfig_fact
-params = { 'font.family':'Open Sans',
-           'font.weight':    'normal',
-           'font.size':       int(12.*fontr),
-           'legend.fontsize': int(12.*fontr),
-           'xtick.labelsize': int(12.*fontr),
-           'ytick.labelsize': int(12.*fontr),
-           'axes.labelsize':  int(15.*fontr) }
-mpl.rcParams.update(params)
-#cfont_clb  =  { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(10*fontr), 'color':color_top_cb}
-cfont_clock = { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(13*fontr) , 'color':color_top }
-#cfont_exp= { 'fontname':'Open Sans'  , 'fontweight':'light', 'fontsize':int(9.*fontr), 'color':color_top }
-#cfont_mail  =  { 'fontname':'Times New Roman', 'fontweight':'normal', 'fontstyle':'italic', 'fontsize':int(14.*fontr), 'color':'0.8'}
-cfont_titl1 = { 'fontname':'Open Sans', 'fontweight':'light', 'fontsize':int(18.*fontr), 'color':color_top }
-cfont_titl2 = { 'fontname':'Open Sans', 'fontweight':'normal','fontsize':int(12.*fontr), 'color':color_top }
+
+
+
+#fontr=1.2*rfig_fact
+#params = { 'font.family':'Open Sans',
+#           'font.weight':    'normal',
+#           'font.size':       int(12.*fontr),
+#           'legend.fontsize': int(12.*fontr),
+#           'xtick.labelsize': int(12.*fontr),
+#           'ytick.labelsize': int(12.*fontr),
+#           'axes.labelsize':  int(15.*fontr) }
+#mpl.rcParams.update(params)
+###cfont_clb  =  { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(10*fontr), 'color':color_top_cb}
+#cfont_clock = { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(13*fontr) , 'color':color_top }
+##cfont_exp= { 'fontname':'Open Sans'  , 'fontweight':'light', 'fontsize':int(9.*fontr), 'color':color_top }
+##cfont_mail  =  { 'fontname':'Times New Roman', 'fontweight':'normal', 'fontstyle':'italic', 'fontsize':int(14.*fontr), 'color':'0.8'}
+#cfont_titl1 = { 'fontname':'Open Sans', 'fontweight':'light', 'fontsize':int(18.*fontr), 'color':color_top }
+#cfont_titl2 = { 'fontname':'Open Sans', 'fontweight':'normal','fontsize':int(12.*fontr), 'color':color_top }
 
 
 # for colorbar:
@@ -193,7 +293,8 @@ jm = int(cmn0)
 
 
 
-for jt in range(jt0,Nt):
+
+for jt in range(Nt):
 
     jh = (jt*dt)%24
     jdc = (jt*dt)/24 + 1
@@ -213,11 +314,12 @@ for jt in range(jt0,Nt):
     cfig = cdir_figs+'/MC_SI3-BBM_'+cday+'_'+chour+'.'+fig_type
 
     # Getting field and sea-ice concentration at time record "jt":
-    id_in = Dataset(cf_in)
-    XS1 = id_in.variables[cv_in1][jt,:,:]
-    XS2 = id_in.variables[cv_in2][jt,:,:]
-    id_in.close()
 
+    for jj in range(0,Nj):
+        VSIG1.append(XS1[jj,:])
+        VSIG2.append(XS2[jj,:])
+
+    
     cjt = '%4.4i'%(jt)
 
     #######################################################################################################
@@ -260,8 +362,8 @@ for jt in range(jt0,Nt):
     #    else:
     #        cb_labs.append(' ')
     #    cpt = cpt + 1
-    #clb.ax.set_xticklabels(cb_labs, **cfont_clb)
-    #clb.set_label(cunit, **cfont_clb)
+    #clb.ax.set_xticklabels(cb_labs, **fsm.cfont_clb)
+    #clb.set_label(cunit, **fsm.cfont_clb)
     #clb.ax.yaxis.set_tick_params(color=color_top_cb) ; # set colorbar tick color
     #clb.outline.set_edgecolor(color_top_cb) ; # set colorbar edgecolor
     #clb.ax.tick_params(which = 'minor', length = 2, color = color_top_cb )
@@ -269,14 +371,14 @@ for jt in range(jt0,Nt):
     #del clb
 
 
-    #ax.annotate('Date: '+cday+' '+chour+':00', xy=(0.785, 0.015), xycoords='figure fraction', **cfont_clock)
-    ax.annotate('Date: '+cday+' '+chour+':00', xy=(0.5, 0.95), xycoords='figure fraction', **cfont_clock)
+    #ax.annotate('Date: '+cday+' '+chour+':00', xy=(0.785, 0.015), xycoords='figure fraction', **fsm.cfont_clock)
+    ax.annotate('Date: '+cday+' '+chour+':00', xy=(0.5, 0.95), xycoords='figure fraction', **fsm.cfont_clock)
 
     #ry0 = 0.78
-    #ax.annotate(cxtra_info1, xy=(0.02, ry0+0.05), xycoords='figure fraction', **cfont_titl1)
+    #ax.annotate(cxtra_info1, xy=(0.02, ry0+0.05), xycoords='figure fraction', **fsm.cfont_titl1)
 
     #if ctitle != "":
-    #    ax.annotate(ctitle, xy=(0.03, ry0-0.01), xycoords='figure fraction', **cfont_titl2)
+    #    ax.annotate(ctitle, xy=(0.03, ry0-0.01), xycoords='figure fraction', **fsm.cfont_titl2)
 
 
     print(' Saving figure: '+cfig+'\n\n')
