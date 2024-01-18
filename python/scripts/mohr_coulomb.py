@@ -69,7 +69,7 @@ requiredNamed.add_argument('-m', '--fmm' , required=True, help='specify the NEMO
 
 #requiredNamed.add_argument('-w', '--what', required=True, default="sst", help='specify the field/diagnostic to plot (ex: sst)')
 #parser.add_argument('-C', '--conf', default="NANUK025",     help='specify NEMO config (ex: eNATL60)')
-#parser.add_argument('-N', '--name', default="X",            help='specify experiment name')
+parser.add_argument('-N', '--name', default="X",            help='specify experiment name')
 parser.add_argument('-s', '--sd0' , default="20160101",     help='specify initial date as <YYYYMMDD>')
 #parser.add_argument('-l', '--lev' , type=int, default=0,    help='specify the level to use if 3D field (default: 0 => 2D)')
 #parser.add_argument('-I', '--ice' , action='store_true',    help='draw sea-ice concentration layer onto the field')
@@ -84,6 +84,7 @@ cf_mm = args.fmm
 cfreq = args.freq
 csd0  = args.sd0
 cbox  = args.box
+cexp  = args.name
 
 lbox = False
 if cbox:
@@ -187,7 +188,7 @@ col_bg = 'w'
 vfig_size = [ 10.*rfig_fact, 7.2*rfig_fact ]
 vsporg = [0.13, 0.13, 0.8, 0.8]
 
-cfig = 'test.png'
+cfig = 'MC_'+cexp+'_i'+str(i1)+'_j'+str(j1)+'_i'+str(i2)+'_j'+str(j2)+'.png'
 
 fig = plt.figure(num = 1, figsize=(vfig_size), dpi=None, facecolor=col_bg, edgecolor=col_bg)
 ax  = plt.axes(vsporg, facecolor = col_bg)
