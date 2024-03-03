@@ -244,6 +244,15 @@ class field_aspect:
             l_pow_field=True ; pow_field=0.3 ;  vc_fld_powlog= [tmin, 0.01, 0.1, 0.5, tmax ]
             cunit = 'Maximum shear of sea-ice velocity [day$^{-1}$]'
 
+        elif CWHAT in [ 'sidefo', 'sidefo-t', 'sidefo-f' ]:
+            cv_in = CWHAT  ; cv_out = cv_in ; color_top_cb='w'
+            rmult = 3600.*24.
+            cpal_fld='inferno' ; tmin=0. ;  tmax=1. ; cb_extend = 'max'
+            #cpal_fld='viridis' ; tmin=0. ;  tmax=1. ; cb_extend = 'max'
+            #imask_no_ice_pc = 50 ; #color_missing = 'k' ; # we hide the field where A<`imask_no_ice_pc`%
+            l_pow_field=True ; pow_field=0.3 ;  vc_fld_powlog= [tmin, 0.01, 0.1, 0.5, tmax ]
+            cunit = 'Total deformation of sea-ice velocity [day$^{-1}$]'
+
         elif CWHAT in [ 'dadvs12t', 'dadvs12f' ]:
             cv_in = CWHAT  ; cv_out = CWHAT
             cpal_fld='RdBu_r' ; tmin=-500. ; tmax=-tmin ; df=100. ; color_top_cb='k'
