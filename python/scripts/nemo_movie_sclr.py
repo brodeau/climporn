@@ -12,7 +12,7 @@
 ##################################################################
 
 import sys
-from os import path, getcwd, mkdir
+from os import path, getcwd, makedirs
 import argparse as ap
 import numpy as np
 
@@ -139,9 +139,8 @@ l_add_sign = ( CSIGN != '' )
 
 ##########################################################################################
 
-if not path.exists(cd_out): mkdir(cd_out)
 cdir_figs = cd_out+'/'+CWHAT
-if not path.exists(cdir_figs): mkdir(cdir_figs)
+makedirs( cdir_figs, exist_ok=True )
 
 if l_save_nc and not path.exists('nc'): mkdir('nc')
 
