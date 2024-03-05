@@ -140,13 +140,13 @@ class nemo_hbox:
 
             ####   NANUK36   ####
         elif [ config, box ] == [ 'NANUK36', 'EGrnLnd']:
-            i1=2452 ; j1=1290 ; i2=3164 ; j2=1731  ; rfact_zoom=1. ; font_rat=0.9*rfact_zoom
-            l_show_cb  = True ; vcb=[0.18, 0.075, 0.64, 0.02]
+            i1=2300 ; j1=1000 ; i2=i1+1200 ; j2=j1+900  ; rfact_zoom=1. ; font_rat=0.6*rfact_zoom
+            l_show_cb  = True ; vcb=[0.333, 0.08, 0.45, 0.02]
             l_show_clock=True ; x_clock = rfact_zoom*950 ; y_clock = rfact_zoom*1300
             l_show_name=True  ; x_name  = rfact_zoom*100 ; y_name  = rfact_zoom*1250
             l_show_exp=False  ; x_exp   = rfact_zoom*140 ; y_exp   = rfact_zoom*1250 
             l_add_logo=False  ; l_fill_holes_k=False
-            l_show_sign=True  ; x_sign = 1174*rfact_zoom ; y_sign = rfact_zoom*15
+            l_show_sign=True  ; x_sign = 1000*rfact_zoom ; y_sign = rfact_zoom*15
             pt_sz_track = 1
             #
             
