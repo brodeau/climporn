@@ -84,14 +84,14 @@ class field_aspect:
             cv_in = 'votemper' ; cv_out = CWHAT ;
             tmin=0. ;  tmax=14.   ;  df = 1. ; cpal_fld='ncview_nrl' ; cb_jump = 1
             cunit = r'Potential temperature at 60 m'
-            if CBOX == 'BlackSea' : tmin=0. ; tmax=20. ;  df = 1.   ; cb_jump = 1 ; #cpal_fld='gist_stern_r'
+            if CBOX == 'BlackSea' : tmin=0. ; tmax=20. ;  df = 1.   ; #cpal_fld='gist_stern_r'
 
         elif CWHAT == 'SSS':
             cv_in = 'sosaline' ; cv_out = CWHAT ; #in ['sosstsst','tos']:
             tmin=20. ;  tmax=40.   ;  df = 2. ; cpal_fld='ncview_ssec' ; cb_jump = 2
             cunit = r'Sea surface salinity'
             if CBOX == 'Med' :    tmin=33. ; tmax=39.5 ;  df = 0.25 ; cpal_fld='magma'
-            if CBOX == 'LabSea' : tmin=28. ; tmax=35.5 ;  df = 1.   ; cb_jump = 1 ; cpal_fld='gist_stern_r'
+            if CBOX == 'LabSea' : tmin=28. ; tmax=35.5 ;  df = 1.   ; cpal_fld='gist_stern_r'
 
         elif CWHAT == 'S_1000':
             cv_in = 'vosaline' ; cv_out = CWHAT ;
@@ -175,9 +175,9 @@ class field_aspect:
 
         elif CWHAT == 'siconc':
             cv_in = 'siconc'  ; cv_out = cv_in
-            #cpal_fld='ncview_ice' ; tmin=0. ;  tmax=1. ;  df = 0.1 ; cb_jump = 1 ; cb_extend = 'neither' ; color_top_cb='w'
             #l_pow_field=True ; pow_field=2. ; vc_fld_powlog = [ 0., 0.5, 0.7, 0.8, 0.9, 0.95, 1. ]
-            cpal_fld='gray' ; tmin=0. ;  tmax=1. ;  df = 0.1 ; cb_jump = 1 ; cb_extend = 'neither' ; color_top_cb='k'; color_top='k'
+            cpal_fld='ncview_ice' ; tmin=0. ;  tmax=1. ;  df = 0.1 ; cb_extend = 'neither' ; color_top_cb='k'; color_top='k'
+            #cpal_fld='gray' ; tmin=0. ;  tmax=1. ;  df = 0.1 ; cb_extend = 'neither' ; color_top_cb='k'; color_top='k'
             l_pow_field=True ; pow_field=6. ; vc_fld_powlog = [ 0., 0.7, 0.8, 0.9, 0.95, 1. ]
             cunit = 'Sea-ice concentration'
 
