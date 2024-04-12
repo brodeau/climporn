@@ -673,7 +673,7 @@ for jt in range(jt0,Nt):
 
         if fa.l_show_lsm: del clsm
         del cf, fig, ax
-        if nemo_box.l_show_cb: del clb
+        if nemo_box.l_show_cb and lcb: del clb
 
     else:
         print('\n Figure '+cfig+' already there!\n')
