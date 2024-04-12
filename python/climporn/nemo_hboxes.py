@@ -186,11 +186,11 @@ class nemo_hbox:
             #
         elif [ config, box ] == [ 'NANUK4', 'ALLs']:
             # => just smaller by a factor 2 than `ALLS`
-            i1=0 ; j1=74  ;  i2=Ni0 ; j2=Nj0  ; rfact_zoom=1. ; font_rat=0.4*rfact_zoom
+            i1=0 ; j1=100  ;  i2=Ni0-46 ; j2=Nj0-20  ; rfact_zoom=2. ; font_rat=0.35*rfact_zoom
             l_show_cb  = True ; vcb=[0.15, 0.115, 0.7, 0.022]
-            l_show_clock=True ; x_clock = 310.*rfact_zoom ; y_clock = 460*rfact_zoom
+            l_show_clock=True ; x_clock = 283.*rfact_zoom ; y_clock = 428*rfact_zoom
             l_add_logo=False
-            l_show_name=True ; x_name = rfact_zoom*15 ; y_name = rfact_zoom*430
+            l_show_name=True ; x_name = rfact_zoom*15 ; y_name = rfact_zoom*420
             l_show_exp=False ; x_exp = 50 ; y_exp = 80
             l_fill_holes_k=False
             l_show_sign=True; x_sign = 398*rfact_zoom ; y_sign = 7*rfact_zoom
