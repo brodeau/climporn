@@ -86,6 +86,12 @@ parser.add_argument('-o', '--outdir', default="./figs",       help='path to dire
 parser.add_argument('-f', '--fignm',  default="",             help='common string in name of figure to create')
 parser.add_argument('-T', '--addSST', default="",             help='add this SST field if showing a sea-ice field')
 parser.add_argument('-S', '--sign',   default="",             help='sign the image with some text')
+#
+# Colorbar or not ?
+parser.add_argument('--cb',    action='store_true')
+parser.add_argument('--no-cb', dest='cb', action='store_false')
+parser.set_defaults(cb=True)
+
 
 args = parser.parse_args()
 
@@ -104,7 +110,7 @@ cd_out = args.outdir
 cn_fig = args.fignm
 caSST  = args.addSST
 CSIGN  = args.sign
-
+lcb    = args.cb
 
 print('')
 print(' *** CNEMO = ', CNEMO)
@@ -112,6 +118,8 @@ print(' *** CBOX  = ', CBOX)
 print(' *** CWHAT = ', CWHAT)
 print(' *** cf_in = ', cf_in)
 print(' *** cf_mm = ', cf_mm)
+print(' *** show colorbar:', lcb)
+exit(0)
 
 lForceD0 = False
 if csd0:
@@ -174,7 +182,7 @@ if l_add_sign and nemo_box.l_show_sign:  (x_sign,y_sign)   = nemo_box.sign
 
 
 
-    
+
 rfz   = nemo_box.rfact_zoom
 fontr = nemo_box.font_rat
 
@@ -238,11 +246,11 @@ if fa.l_show_ice:
     norm_ice = colors.Normalize(vmin = rmin_ice, vmax = 0.95, clip = False)
 
 if fa.imask_no_ice_pc > 0:
-    # => going to read variable `fa.nm_ice_conc` into the same file 
+    # => going to read variable `fa.nm_ice_conc` into the same file
     cf_ice = cf_in
 
 
-    
+
 
 
 
@@ -256,7 +264,7 @@ l_notime=False
 id_f = Dataset(cf_in)
 list_var = id_f.variables.keys()
 if 'time_instant' in list_var:
-    cv_time = 'time_instant'    
+    cv_time = 'time_instant'
 elif 'time_counter' in list_var:
     cv_time = 'time_counter'
 elif 'time' in list_var:
@@ -283,7 +291,7 @@ if fa.l_show_lsm:
     if nb_dim==3: XMSK = id_lsm.variables[fa.cv_msk][jk,j1:j2,i1:i2]
     if nb_dim==2: XMSK = id_lsm.variables[fa.cv_msk][j1:j2,i1:i2]
     (nj,ni) = np.shape(XMSK)
-    
+
     if fa.l_apply_lap:
         print(' *** Reading e1t and e2t !')
         XE1T2 = id_lsm.variables['e1t'][0,j1:j2,i1:i2]
@@ -304,8 +312,8 @@ if fa.l_show_lsm:
         if nb_dim==2:
             UMSK = id_lsm.variables['umask'][j1:j2,i1:i2]
             VMSK = id_lsm.variables['vmask'][j1:j2,i1:i2]
-    
-    if fa.l_apply_geov:        
+
+    if fa.l_apply_geov:
         ## Coriolis Parameter:
         ff  = id_lsm.variables['gphif'][0,j1:j2,i1:i2]
         ff[:,:] = 2.*romega*np.sin(ff[:,:]*np.pi/180.0)
@@ -313,7 +321,7 @@ if fa.l_show_lsm:
     if l_save_nc:
         Xlon = id_lsm.variables['glamt'][0,j1:j2,i1:i2]
         Xlat = id_lsm.variables['gphit'][0,j1:j2,i1:i2]
-        
+
     if l3d:
         vdepth = id_lsm.variables['gdept_1d'][0,:]
         zdepth = vdepth[jk]
@@ -359,7 +367,7 @@ if l_add_topo_land:
     #    XLSM[np.where( xtopo < 0.0)] = 1
     #    #xtopo[np.where( xtopo < 0.0)] = np.nan
     #cp.dump_2d_field('topo_'+CBOX+'.nc', xtopo, name='z')
-    
+
 XLSM[np.where( XMSK > 0.5)] = 1
 
 
@@ -423,7 +431,7 @@ for jt in range(jt0,Nt):
 
     cdate = cp.epoch2clock(itime, precision='h')
     cdats = cp.epoch2clock(itime)
-    
+
     if cn_fig != "":
         cfig = cdir_figs+'/'+fa.cv_out+'_'+cn_fig+'_'+cdate+'.'+fig_type
     else:
@@ -437,15 +445,15 @@ for jt in range(jt0,Nt):
     ###### FIGURE ##############
 
         fig = plt.figure(num = 1, figsize=(rw_fig, rh_fig), dpi=rDPI, facecolor='w', edgecolor='0.5')
-    
+
         ax  = plt.axes([0., 0., 1., 1.], facecolor=fa.color_missing) # missing seas will be in 'facecolor' !
-    
+
         vc_fld = np.arange(fa.tmin, fa.tmax + fa.df, fa.df)
-    
-    
+
+
         print('Reading record #'+str(jt)+' of '+fa.cv_in+' in '+cf_in)
         if l3d: print('            => at level #'+str(jk)+' ('+cdepth+')!')
-    
+
         if l_notime:
             if l3d:
                 Xplot  = id_f.variables[fa.cv_in][jk,j1:j2,i1:i2]
@@ -453,19 +461,19 @@ for jt in range(jt0,Nt):
                 Xplot  = id_f.variables[fa.cv_in][j1:j2,i1:i2]
         else:
             if l3d:
-                Xplot  = id_f.variables[fa.cv_in][jt,jk,j1:j2,i1:i2] ; # t, y, x        
+                Xplot  = id_f.variables[fa.cv_in][jt,jk,j1:j2,i1:i2] ; # t, y, x
             else:
-                Xplot  = id_f.variables[fa.cv_in][jt,j1:j2,i1:i2] ; # t, y, x        
+                Xplot  = id_f.variables[fa.cv_in][jt,j1:j2,i1:i2] ; # t, y, x
 
         if l_add_SST_to_ice_field:
             Xpsic = id_f.variables['siconc'][jt,j1:j2,i1:i2] ; # t, y, x  => we need it to separate open ocean from sea-ice !
-            Xpsst = id_f.variables[caSST][jt,j1:j2,i1:i2] ; # t, y, x        
-                
+            Xpsst = id_f.variables[caSST][jt,j1:j2,i1:i2] ; # t, y, x
+
         print('Done!\n')
 
         if fa.rmult != 1.: Xplot[:,:] = fa.rmult * Xplot[:,:]
-    
-    
+
+
         # Ice
         if fa.l_show_ice or fa.imask_no_ice_pc>0:
             print('Reading record #'+str(jt)+' of '+fa.nm_ice_conc+' in '+cf_ice)
@@ -473,8 +481,8 @@ for jt in range(jt0,Nt):
             XICE  = id_ice.variables[fa.nm_ice_conc][jt,j1:j2,i1:i2] ; # t, y, x
             id_ice.close()
             print('Done!\n')
-    
-    
+
+
         if fa.l_apply_lap:
             print(' *** Computing Laplacian of "'+fa.cv_in+'"!')
             lx = np.zeros((nj,ni))
@@ -483,14 +491,14 @@ for jt in range(jt0,Nt):
             ly[1:nj-1,:] = 1.E9*(Xplot[2:nj,:] -2.*Xplot[1:nj-1,:] + Xplot[0:nj-2,:])/XE2T2[1:nj-1,:]
             Xplot[:,:] = lx[:,:] + ly[:,:]
             del lx, ly
-    
+
         if fa.l_apply_hgrad:
             print(' *** Computing gradient of "'+fa.cv_in+'"!')
             lx = np.zeros((nj,ni))
             ly = np.zeros((nj,ni))
-    
+
             if fa.l_smooth: cp.smoother(Xplot, XMSK, nb_smooth=fa.nb_smooth)
-            
+
             # Zonal gradient on T-points:
             lx[:,1:ni-1] = (Xplot[:,2:ni] - Xplot[:,0:ni-2]) / (e1u[:,1:ni-1] + e1u[:,0:ni-2]) * UMSK[:,1:ni-1] * UMSK[:,0:ni-2]
             lx[:,:] = XMSK[:,:]*lx[:,:]
@@ -500,17 +508,17 @@ for jt in range(jt0,Nt):
             ly[:,:] = XMSK[:,:]*ly[:,:]
             #cp.dump_2d_field('dsst_dy_gridT.nc', ly, xlon=Xlon, xlat=Xlat, name='dsst_dy')
             Xplot[:,:] = 0.0
-            # Modulus of vector gradient:        
+            # Modulus of vector gradient:
             Xplot[:,:] = np.sqrt(  lx[:,:]*lx[:,:] + ly[:,:]*ly[:,:] )
             #cp.dump_2d_field('mod_grad_sst.nc', Xplot, xlon=Xlon, xlat=Xlat, name='dsst')
             del lx, ly
-    
-    
+
+
         if fa.l_apply_geov:
             print(' *** Computing gradient of "'+fa.cv_in+'"!')
             lx = np.zeros((nj,ni))
             ly = np.zeros((nj,ni))
-    
+
             # Zonal gradient on T-points:
             lx[:,1:ni-1] = (Xplot[:,2:ni] - Xplot[:,0:ni-2]) / (e1u[:,1:ni-1] + e1u[:,0:ni-2]) * UMSK[:,1:ni-1] * UMSK[:,0:ni-2]
             lx[:,:] = XMSK[:,:]*lx[:,:]
@@ -520,7 +528,7 @@ for jt in range(jt0,Nt):
             ly[:,:] = XMSK[:,:]*ly[:,:]
             #cp.dump_2d_field('dsst_dy_gridT.nc', ly, xlon=Xlon, xlat=Xlat, name='dsst_dy')
             Xplot[:,:] = 0.0
-            # Modulus of vector gradient:        
+            # Modulus of vector gradient:
             Xplot[:,:] = grav/ff * np.sqrt( lx[:,:]*lx[:,:] + ly[:,:]*ly[:,:] )
             #cp.dump_2d_field('mod_grad_sst.nc', Xplot, xlon=Xlon, xlat=Xlat, name='dsst')
             del lx, ly
@@ -528,24 +536,24 @@ for jt in range(jt0,Nt):
         if fa.lSubstractMean:
             zmean = np.sum( Xplot[:,:]*XMSK[:,:])/np.sum(XMSK[:,:])
             Xplot[:,:] = Xplot[:,:] - zmean
-            
-    
-            
+
+
+
         print('')
         if not fa.l_show_lsm and jt == jt0: ( nj , ni ) = np.shape(Xplot)
         print('  *** dimension of array => ', ni, nj, np.shape(Xplot))
-        
+
 
         print('Ploting')
-    
+
         plt.axis([ 0, ni, 0, nj])
-        
+
         if nemo_box.c_imshow_interp == 'none':
             Xplot[idx_land] = np.nan
         else:
             print(" *** drowning array `Xplot`....\n")
             cp.drown(Xplot, XMSK, k_ew=-1, nb_max_inc=10, nb_smooth=10)
-    
+
         if l_save_nc:
             if l3d:
                 cf_out = 'nc/'+CWHAT+'_NEMO_'+CNEMO+CRUN+'_lev'+str(jk)+'_'+CBOX+'_'+cdate+'.nc'
@@ -559,7 +567,7 @@ for jt in range(jt0,Nt):
         if fa.imask_no_ice_pc > 0:
             # masking field where too litle sea-ice:
             Xplot = np.ma.masked_where( XICE < float(fa.imask_no_ice_pc)/100., Xplot )
-            
+
 
         cf = plt.imshow( Xplot[:,:], cmap=pal_fld, norm=norm_fld, interpolation=nemo_box.c_imshow_interp )
         #cf = plt.pcolormesh( Xplot[:,:], cmap=pal_fld, norm=norm_fld )
@@ -569,12 +577,12 @@ for jt in range(jt0,Nt):
             psst = np.ma.masked_where(Xpsic > 0.05, Xpsst)
             ct   = plt.imshow(psst, cmap=pal_sst, norm=norm_sst, interpolation='none')
             del psst, ct
-            
+
         # Add Sea-Ice onto a open ocean field:
         if fa.l_show_ice:
             pice = np.ma.masked_where(XICE < rmin_ice, XICE)
             ci = plt.imshow(pice, cmap=pal_ice, norm=norm_ice, interpolation='none') ; del pice, ci
-    
+
         if fa.l_show_lsm or l_add_topo_land:
             if l_add_topo_land:
                 clsm = plt.imshow( np.ma.masked_where(XLSM>0.0001, xtopo), cmap=pal_lsm, norm=norm_lsm, interpolation='none' )
@@ -582,9 +590,9 @@ for jt in range(jt0,Nt):
                     plt.contour(XLSM, [0.9], colors='k', linewidths=0.5)
             else:
                 pmsk = np.ma.masked_where(XLSM[:,:] > 0.2, XLSM[:,:])
-                clsm = plt.imshow( pmsk, cmap=pal_lsm, norm=norm_lsm, interpolation='none' )                
+                clsm = plt.imshow( pmsk, cmap=pal_lsm, norm=norm_lsm, interpolation='none' )
                 del pmsk
-    
+
         ##### COLORBAR ######
         if nemo_box.l_show_cb:
             ax2 = plt.axes(nemo_box.vcb)
@@ -596,7 +604,7 @@ for jt in range(jt0,Nt):
                 #print(" fa.vc_fld_powlog = ", fa.vc_fld_powlog )
                 #print(" cb_labs =", cb_labs) ; exit(0)
                 cb_labs[(cb_labs=='0.0')]  = '0'
-                cb_labs[(cb_labs=='1.0')]  = '1'                
+                cb_labs[(cb_labs=='1.0')]  = '1'
             else:
                 clb = mpl.colorbar.ColorbarBase(ax=ax2, ticks=vc_fld, cmap=pal_fld, norm=norm_fld,
                                                 orientation='horizontal', extend=fa.cb_extend)
@@ -609,20 +617,20 @@ for jt in range(jt0,Nt):
                     else:
                         cb_labs.append(' ')
                     cpt = cpt + 1
-            #                                    
+            #
             clb.set_label(fa.cunit, **fsm.cfont_clb)
-            clb.ax.set_xticklabels(cb_labs, **fsm.cfont_clb_tcks)            
+            clb.ax.set_xticklabels(cb_labs, **fsm.cfont_clb_tcks)
             clb.ax.yaxis.set_tick_params(color=fa.color_top_cb) ; # set colorbar tick color
             clb.outline.set_edgecolor(fa.color_top_cb) ; # set colorbar edgecolor
             clb.outline.set_linewidth(0.3*rfz)
             clb.ax.tick_params(which = 'minor', length=1*rfz, width=0.3*rfz, color=fa.color_top_cb )
             clb.ax.tick_params(which = 'major', length=2*rfz, width=0.3*rfz, color=fa.color_top_cb )
-        
+
         if nemo_box.l_show_clock:
             xl = float(x_clock)/rfz
             yl = float(y_clock)/rfz
             ax.annotate('Date: '+cdats, xy=(1, 4), xytext=(xl,yl), **fsm.cfont_clock)
-    
+
         if nemo_box.l_show_exp:
             xl = float(x_exp)/rfz
             yl = float(y_exp)/rfz
@@ -632,14 +640,14 @@ for jt in range(jt0,Nt):
             xl = float(x_sign)/rfz
             yl = float(y_sign)/rfz
             ax.annotate(CSIGN, xy=(1, 4), xytext=(xl,yl), **fsm.cfont_sign)
-    
+
         if nemo_box.l_show_name:
             cbla = CNEMO
             if CONAME != "": cbla = CONAME
             xl = float(x_name)/rfz
             yl = float(y_name)/rfz
             ax.annotate(cbla, xy=(1, 4), xytext=(xl, yl), **fsm.cfont_titl)
-    
+
         if nemo_box.l_add_logo:
             datafile = cbook.get_sample_data(dir_logos+'/'+nemo_box.cf_logo_on, asfileobj=False)
             im = image.imread(datafile)
@@ -658,7 +666,7 @@ for jt in range(jt0,Nt):
                 im = image.imread(datafile)
                 fig.figimage(im, x_logo-77, y_logo-140., zorder=9)
                 del datafile, im
-    
+
         plt.savefig(cfig, dpi=rDPI, orientation='portrait', facecolor='k')
         print(cfig+' created!\n')
         plt.close(1)
