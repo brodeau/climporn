@@ -119,7 +119,7 @@ print(' *** CWHAT = ', CWHAT)
 print(' *** cf_in = ', cf_in)
 print(' *** cf_mm = ', cf_mm)
 print(' *** show colorbar:', lcb)
-exit(0)
+
 
 lForceD0 = False
 if csd0:
@@ -594,7 +594,7 @@ for jt in range(jt0,Nt):
                 del pmsk
 
         ##### COLORBAR ######
-        if nemo_box.l_show_cb:
+        if nemo_box.l_show_cb and lcb:
             ax2 = plt.axes(nemo_box.vcb)
             if fa.l_pow_field or fa.l_log_field:
                 clb = mpl.colorbar.ColorbarBase(ax=ax2, ticks=fa.vc_fld_powlog, cmap=pal_fld, norm=norm_fld,
