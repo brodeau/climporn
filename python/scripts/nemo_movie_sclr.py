@@ -610,7 +610,7 @@ for jt in range(jt0,Nt):
                 clb = mpl.colorbar.ColorbarBase(ax=ax2, ticks=vc_fld, cmap=pal_fld, norm=norm_fld,
                                                 orientation='horizontal', extend=fa.cb_extend)
                 if len(fa.vc_fld_force)>0:
-                    cb_labs = np.array( [ str(i) for i in fa.vc_fld_powlog ], dtype='U16' )
+                    cb_labs = np.array( [ str(i) for i in fa.vc_fld_force ], dtype='U16' )
                     cb_labs[(cb_labs=='0.0')]  = '0'
                     cb_labs[(cb_labs=='1.0')]  = '1'
                 else:                    

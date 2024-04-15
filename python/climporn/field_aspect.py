@@ -311,6 +311,8 @@ class field_aspect:
         self.l_show_lsm    = l_show_lsm
         self.l_show_ice    = l_show_ice
 
+        self.vc_fld_force = vc_fld_force
+        
         self.l_log_field   = l_log_field
         self.l_pow_field   = l_pow_field
         self.pow_field     = pow_field
