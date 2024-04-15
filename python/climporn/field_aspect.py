@@ -24,6 +24,8 @@ class field_aspect:
         l_show_lsm = True
         l_show_ice = False ; #??? keep?
 
+        vc_fld_force = []
+        
         l_log_field = False
         l_pow_field = False
         pow_field=0.5
@@ -192,13 +194,16 @@ class field_aspect:
         elif CWHAT in [ 'damage', 'damage-t', 'damage-f' ]:
             cv_in = CWHAT  ; cv_out = cv_in            
             #
-            imask_no_ice_pc = 50 ; color_missing = '#2D4B87' ; # we hide the field where A<`imask_no_ice_pc`%
+            #imask_no_ice_pc = 50 ; color_missing = '#2D4B87' ; # we hide the field where A<`imask_no_ice_pc`%
+            imask_no_ice_pc = 50 ; color_missing = 'w' ; # we hide the field where A<`imask_no_ice_pc`%
             #cpal_fld='bone_r' ; color_top_cb='w'; tmin=0. ;  tmax=1. ; l_pow_field=True ; pow_field=5.; vc_fld_powlog=[ 0., 0.7, 0.8, 0.9, 0.95, 1. ]
             #cpal_fld='gray_r' ; color_top_cb='w'; tmin=0. ;  tmax=1. ; l_pow_field=True ; pow_field=7.; vc_fld_powlog=[ 0., 0.8, 0.9, 0.95, 1. ]; color_missing = None
             #cpal_fld='ncview_ice' ; color_top_cb='w'; tmin=0. ;  tmax=1. ; l_pow_field=True ; pow_field=5.; vc_fld_powlog=[ 0., 0.7, 0.8, 0.9, 0.95, 1. ]
-            cpal_fld='gray_r' ; color_top_cb='k'; color_top='k'; tmin=0. ;  tmax=1. ; l_pow_field=True ; pow_field=5.; vc_fld_powlog=[ 0., 0.7, 0.8, 0.9, 0.95, 1. ]
+            #
+            #cpal_fld='gray_r' ; color_top_cb='k'; color_top='k'; tmin=0. ;  tmax=1. ; l_pow_field=True ; pow_field=5.; vc_fld_powlog=[ 0., 0.7, 0.8, 0.9, 0.95, 1. ]
+            cpal_fld='gray_r' ; color_top_cb='k'; color_top='k'; tmin=0.78 ;  tmax=1. ; l_pow_field=False ; pow_field=10.; vc_fld_force=[  0.8, 0.9, 1. ]
             cb_extend = 'neither'
-            
+            #
             cunit = 'Damage'
 
         elif CWHAT in [ 'sivelo', 'sivelo-t', 'sivelo-f' ]:

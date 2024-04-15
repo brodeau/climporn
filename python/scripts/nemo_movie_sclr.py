@@ -448,8 +448,12 @@ for jt in range(jt0,Nt):
 
         ax  = plt.axes([0., 0., 1., 1.], facecolor=fa.color_missing) # missing seas will be in 'facecolor' !
 
-        vc_fld = np.arange(fa.tmin, fa.tmax + fa.df, fa.df)
+        if len(fa.vc_fld_force)>0:
+            vc_fld = fa.vc_fld_force
+        else:
+            vc_fld = np.arange(fa.tmin, fa.tmax + fa.df, fa.df)
 
+        
 
         print('Reading record #'+str(jt)+' of '+fa.cv_in+' in '+cf_in)
         if l3d: print('            => at level #'+str(jk)+' ('+cdepth+')!')
@@ -599,24 +603,25 @@ for jt in range(jt0,Nt):
             if fa.l_pow_field or fa.l_log_field:
                 clb = mpl.colorbar.ColorbarBase(ax=ax2, ticks=fa.vc_fld_powlog, cmap=pal_fld, norm=norm_fld,
                                                 orientation='horizontal', extend=fa.cb_extend)
-                #cb_labs = clb.ax.get_xticklabels()
                 cb_labs = np.array( [ str(i) for i in fa.vc_fld_powlog ], dtype='U16' )
-                #print(" fa.vc_fld_powlog = ", fa.vc_fld_powlog )
-                #print(" cb_labs =", cb_labs) ; exit(0)
                 cb_labs[(cb_labs=='0.0')]  = '0'
                 cb_labs[(cb_labs=='1.0')]  = '1'
             else:
                 clb = mpl.colorbar.ColorbarBase(ax=ax2, ticks=vc_fld, cmap=pal_fld, norm=norm_fld,
                                                 orientation='horizontal', extend=fa.cb_extend)
-                cb_labs = []
-                cpt = 0
-                for rr in vc_fld:
-                    if cpt % fa.cb_jump == 0:
-                        if fa.df >= 1.: cb_labs.append(str(int(rr)))
-                        if fa.df <  1.: cb_labs.append(str(round(rr,int(np.ceil(np.log10(1./fa.df)))+1) ))
-                    else:
-                        cb_labs.append(' ')
-                    cpt = cpt + 1
+                if len(fa.vc_fld_force)>0:
+                    cb_labs = np.array( [ str(i) for i in fa.vc_fld_powlog ], dtype='U16' )
+                    cb_labs[(cb_labs=='0.0')]  = '0'
+                    cb_labs[(cb_labs=='1.0')]  = '1'
+                else:                    
+                    cpt = 0 ; cb_labs = []
+                    for rr in vc_fld:
+                        if cpt % fa.cb_jump == 0:
+                            if fa.df >= 1.: cb_labs.append(str(int(rr)))
+                            if fa.df <  1.: cb_labs.append(str(round(rr,int(np.ceil(np.log10(1./fa.df)))+1) ))
+                        else:
+                            cb_labs.append(' ')
+                        cpt = cpt + 1
             #
             clb.set_label(fa.cunit, **fsm.cfont_clb)
             clb.ax.set_xticklabels(cb_labs, **fsm.cfont_clb_tcks)
