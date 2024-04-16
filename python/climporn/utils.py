@@ -872,6 +872,7 @@ def fig_style( pzoom, clr_top='k', clr_top_cb='k' ):
     fig_style.cfont_axis = { 'fontname':'Open Sans',       'fontweight':'medium', 'fontsize':int(18.*pzoom), 'color':clr_top }
     fig_style.cfont_ttl  = { 'fontname':'Open Sans',       'fontweight':'medium', 'fontsize':int(20.*pzoom), 'color':clr_top }
     fig_style.cfont_clck = { 'fontname':'Ubuntu Mono',     'fontweight':'normal', 'fontsize':int(12.*pzoom), 'color':clr_top }
+    fig_style.cfont_letter = { 'fontname':'Open Sans',       'fontweight':'medium', 'fontsize':int(18.*pzoom), 'color':clr_top_cb }    
     #
     return 0
 
@@ -894,7 +895,7 @@ def fig_style_mov( pzoom, clr_top='k', clr_top_cb='k' ):
     fig_style_mov.cfont_titl     = { 'fontname':'Open Sans'  , 'fontweight':'light', 'fontsize':int(14.*pzoom), 'color':clr_top }
     fig_style_mov.cfont_label    = { 'fontname':'Open Sans'  , 'fontweight':'normal', 'fontsize':int(14.*pzoom), 'color':clr_top }
     fig_style_mov.cfont_sign     = { 'fontname':'Open Sans'  , 'fontweight':'normal', 'fontstyle':'italic','fontsize':int(7.*pzoom), 'color':'w' }
-    fig_style_mov.cfont_letter   = { 'fontname':'Open Sans',   'fontweight':'semibold', 'fontsize':int(18.*pzoom), 'color':clr_top_cb}
+    fig_style_mov.cfont_letter   = { 'fontname':'Open Sans',   'fontweight':'semibold', 'fontsize':int(16.*pzoom), 'color':clr_top_cb}
     #
     return 0
 

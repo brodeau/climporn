@@ -92,7 +92,8 @@ class nemo_hbox:
         x_logo = 2200  ; y_logo  = 50
         x_exp = 40     ; y_exp = 980
         x_name = 100   ; y_name = 100
-
+        #x_exp = 40     ; y_exp = 980
+        
         pt_sz_track = 5
         
         if   [ config, box ] == [ 'ORCA36', 'ALL']:
@@ -185,12 +186,11 @@ class nemo_hbox:
             pt_sz_track = 1
             #
         elif [ config, box ] == [ 'NANUK4', 'ALLs']:
-            # => just smaller by a factor 2 than `ALLS`
-            i1=0 ; j1=100  ;  i2=Ni0-46 ; j2=Nj0-20  ; rfact_zoom=2. ; font_rat=0.35*rfact_zoom
+            i1=0 ; j1=100  ;  i2=Ni0-46 ; j2=Nj0-20  ; rfact_zoom=2. ; font_rat=0.5*rfact_zoom
             l_show_cb  = True ; vcb=[0.15, 0.115, 0.7, 0.022]
-            l_show_clock=True ; x_clock = 283.*rfact_zoom ; y_clock = 428*rfact_zoom
+            l_show_clock=True ; x_clock = 275.*rfact_zoom ; y_clock = 425*rfact_zoom
             l_add_logo=False
-            l_show_name=True ; x_name = rfact_zoom*15 ; y_name = rfact_zoom*420
+            l_show_name=True ; x_name = rfact_zoom*220 ; y_name = rfact_zoom*15
             l_show_exp=False ; x_exp = 50 ; y_exp = 80
             l_fill_holes_k=False
             l_show_sign=True; x_sign = 398*rfact_zoom ; y_sign = 7*rfact_zoom
