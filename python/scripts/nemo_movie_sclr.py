@@ -74,10 +74,10 @@ requiredNamed.add_argument('-i', '--fin' , required=True,                help='N
 requiredNamed.add_argument('-w', '--what', required=True, help='field/diagnostic to plot (ex: CSPEED,CURLOF,ect.)')
 
 parser.add_argument('-C', '--conf', default="none",           help='name of NEMO config (ex: eNATL60) (defined into `nemo_hboxes.py`)')
-parser.add_argument('-E', '--exp',  default="none",           help='name of experiment')
+parser.add_argument('-E', '--exp',  default="none",           help='name of experiment (shows up in figure name)')
 parser.add_argument('-b', '--box' , default="ALL",            help='extraction box name (ex: ALL) (defined into `nemo_hboxes.py`)')
 parser.add_argument('-m', '--fmm' , default="mesh_mask.nc",   help='NEMO mesh_mask file (ex: mesh_mask.nc)')
-parser.add_argument('-s', '--sd0' , default=None,       help='initial date as <YYYYMMDD>')
+parser.add_argument('-s', '--sd0' , default=None,             help='initial date as <YYYYMMDD>')
 parser.add_argument('-l', '--lev' , type=int, default=0,      help='level to use if 3D field (default: 0 => 2D)')
 parser.add_argument('-z', '--zld' ,                           help='topography netCDF file to use (field="z")')
 parser.add_argument('-t', '--tstep',  default="1h",           help='time step ("1h","2h",..,up to "1d") in input file')
@@ -86,6 +86,7 @@ parser.add_argument('-o', '--outdir', default="./figs",       help='path to dire
 parser.add_argument('-f', '--fignm',  default="",             help='common string in name of figure to create')
 parser.add_argument('-T', '--addSST', default="",             help='add this SST field if showing a sea-ice field')
 parser.add_argument('-S', '--sign',   default="",             help='sign the image with some text')
+parser.add_argument('-L', '--ltr' ,   default=None,           help='letter as in "a)" for figures in paper')
 #
 # Colorbar or not ?
 parser.add_argument('--cb',    action='store_true')
@@ -111,6 +112,7 @@ cn_fig = args.fignm
 caSST  = args.addSST
 CSIGN  = args.sign
 lcb    = args.cb
+cltr   = args.ltr
 
 print('')
 print(' *** CNEMO = ', CNEMO)
@@ -178,6 +180,9 @@ if nemo_box.l_show_clock: (x_clock,y_clock) = nemo_box.clock
 if nemo_box.l_show_exp:   (x_exp,y_exp)     = nemo_box.exp
 if nemo_box.l_add_logo:   (x_logo,y_logo)   = nemo_box.logo
 if l_add_sign and nemo_box.l_show_sign:  (x_sign,y_sign)   = nemo_box.sign
+#if cltr:                  (x_ltr,y_ltr)     = nemo_box.ltr
+
+
 #---------------------------------------------------------------
 
 
@@ -421,6 +426,10 @@ if isleap(int(cyr0)): vm = vml
 jd = int(cdd0) - 1
 jm = int(cmn0)
 
+
+if CEXP != "": CEXP = CEXP+'_'
+
+
 # Opening netCDF files:
 id_f = Dataset(cf_in)
 id_f.set_auto_mask(False) ;# prevent the application of `valid_min` and `valid_max`....
@@ -432,13 +441,15 @@ for jt in range(jt0,Nt):
     cdate = cp.epoch2clock(itime, precision='h')
     cdats = cp.epoch2clock(itime)
 
+
+    
     if cn_fig != "":
-        cfig = cdir_figs+'/'+fa.cv_out+'_'+cn_fig+'_'+cdate+'.'+fig_type
+        cfig = cdir_figs+'/'+fa.cv_out+'_'+CEXP+cn_fig+'_'+cdate+'.'+fig_type
     else:
         if l3d:
-            cfig = cdir_figs+'/'+fa.cv_out+'_'+CNEMO+CRUN+'_lev'+str(jk)+'_'+CBOX+'_'+cdate+'.'+fig_type
+            cfig = cdir_figs+'/'+fa.cv_out+'_'+CEXP+CNEMO+CRUN+'_lev'+str(jk)+'_'+CBOX+'_'+cdate+'.'+fig_type
         else:
-            cfig = cdir_figs+'/'+fa.cv_out+'_'+CNEMO+CRUN+'_'+CBOX+'_'+cdate+'.'+fig_type
+            cfig = cdir_figs+'/'+fa.cv_out+'_'+CEXP+CNEMO+CRUN+'_'+CBOX+'_'+cdate+'.'+fig_type
 
 
     if not path.exists(cfig):
@@ -634,7 +645,8 @@ for jt in range(jt0,Nt):
         if nemo_box.l_show_clock:
             xl = float(x_clock)/rfz
             yl = float(y_clock)/rfz
-            ax.annotate('Date: '+cdats, xy=(1, 4), xytext=(xl,yl), **fsm.cfont_clock)
+            #ax.annotate('Date: '+cdats, xy=(1, 4), xytext=(xl,yl), **fsm.cfont_clock)
+            ax.annotate(cdats, xy=(1, 4), xytext=(xl,yl), **fsm.cfont_clock)
 
         if nemo_box.l_show_exp:
             xl = float(x_exp)/rfz
@@ -672,6 +684,10 @@ for jt in range(jt0,Nt):
                 fig.figimage(im, x_logo-77, y_logo-140., zorder=9)
                 del datafile, im
 
+        if cltr:
+            ax.annotate(cltr+')', xy=(0.02, 0.93), xycoords='figure fraction', **fsm.cfont_letter )
+
+                
         plt.savefig(cfig, dpi=rDPI, orientation='portrait', facecolor='k')
         print(cfig+' created!\n')
         plt.close(1)
