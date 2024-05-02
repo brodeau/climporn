@@ -184,9 +184,10 @@ class field_aspect:
             cunit = 'Sea-ice concentration'
 
         elif CWHAT in [ 'sithic', 'sivolu' ]:
+            #lili
             cv_in = CWHAT  ; cv_out = cv_in
-            imask_no_ice_pc = 50 ; color_missing = '#202D6B';#'#2D4B87' ; # we hide the field where A<`imask_no_ice_pc`%
-            cpal_fld='ncview_tofino' ; color_top_cb='w'
+            imask_no_ice_pc = 50 ; color_missing = '0.9';#'#2D4B87' ; # we hide the field where A<`imask_no_ice_pc`%
+            cpal_fld='ncview_tofino' ; color_top_cb='k' ; color_top = 'k'
             imask_no_ice_pc = 10 ; #color_missing = 'k' ; # we hide the field where A<`imask_no_ice_pc`%
             tmin=0. ;  tmax=5. ;  df=1 ; cb_jump = 1; cb_extend = 'max'
             cunit = 'Sea-ice thickness [m]'
@@ -209,7 +210,7 @@ class field_aspect:
             #
             cb_extend = 'neither'
             #
-            cunit = 'Damage'
+            cunit = 'Sea-ice damage'
 
         elif CWHAT in [ 'sivelo', 'sivelo-t', 'sivelo-f' ]:
             cv_in = CWHAT  ; cv_out = CWHAT
