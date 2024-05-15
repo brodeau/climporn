@@ -253,7 +253,7 @@ if fa.l_show_ice:
 if fa.imask_no_ice_pc > 0:
     # => going to read variable `fa.nm_ice_conc` into the same file
     cf_ice = cf_in
-
+    rt_io = float(fa.imask_no_ice_pc)/100.
 
 
 
@@ -581,7 +581,7 @@ for jt in range(jt0,Nt):
 
         if fa.imask_no_ice_pc > 0:
             # masking field where too litle sea-ice:
-            Xplot = np.ma.masked_where( XICE < float(fa.imask_no_ice_pc)/100., Xplot )
+            Xplot = np.ma.masked_where( XICE <= rt_io, Xplot )
 
 
         cf = plt.imshow( Xplot[:,:], cmap=pal_fld, norm=norm_fld, interpolation=nemo_box.c_imshow_interp )
@@ -589,7 +589,7 @@ for jt in range(jt0,Nt):
 
         # Add SST onto a sea-ice field:
         if l_add_SST_to_ice_field:
-            psst = np.ma.masked_where(Xpsic > 0.05, Xpsst)
+            psst = np.ma.masked_where(Xpsic > rt_io, Xpsst)
             ct   = plt.imshow(psst, cmap=pal_sst, norm=norm_sst, interpolation='none')
             del psst, ct
 
