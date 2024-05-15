@@ -82,7 +82,7 @@ def comp_LapOfSSH_bad( cvar, pe1t2, pe2t2, pSSH ):
     #
     return lx[:,:] + ly[:,:]
 
-def comp_LapOfSSH( cvar, pe1t, pe2t pe1u, pe2u, pe1v, pe2v, pSSH ):
+def comp_LapOfSSH( cvar, pe1t, pe2t, pe1u, pe2u, pe1v, pe2v, pSSH ):
     #
     print(' *** Computing curvilinear Laplacian of SSH "'+cvar+'" !')
     (nj,ni) = np.shape( pSSH )
