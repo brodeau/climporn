@@ -236,7 +236,7 @@ class field_aspect:
             cv_in = CWHAT  ; cv_out = cv_in ; color_top_cb='k'
             rmult = 3600.*24.
             #cpal_fld='RdBu_r' ; tmin=-0.3 ;  tmax=-tmin ;  df=0.05
-            cpal_fld='BrBG_r' ; tmin=-0.3 ;  tmax=-tmin ;  df=0.05
+            cpal_fld='BrBG_r' ; tmin=-0.3 ;  tmax=-tmin ;  df=0.1
             imask_no_ice_pc = 50 ; #color_missing = 'k' ; # we hide the field where A<`imask_no_ice_pc`%
             cunit = 'Vorticity of sea-ice velocity [day$^{-1}$]'
 
