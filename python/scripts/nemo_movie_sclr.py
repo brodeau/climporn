@@ -69,22 +69,38 @@ print("\n --- logos found into : "+dir_logos+" !\n")
 
 
 
-def comp_LapOfSSH( cvar, pe1t2, pe2t2, pSSH ):
+def comp_LapOfSSH_bad( cvar, pe1t2, pe2t2, pSSH ):
     #
     print(' *** Computing Laplacian of SSH "'+cvar+'" !')
     (nj,ni) = np.shape( pSSH )
     #
     lx = np.zeros((nj,ni))
     ly = np.zeros((nj,ni))
+    #    
     lx[:,1:ni-1] = 1.E9*(pSSH[:,2:ni] -2.*pSSH[:,1:ni-1] + pSSH[:,0:ni-2])/pe1t2[:,1:ni-1]
-    ly[1:nj-1,:] = 1.E9*(pSSH[2:nj,:] -2.*pSSH[1:nj-1,:] + pSSH[0:nj-2,:])/pe2t2[1:nj-1,:]
+    ly[1:nj-1,:] = 1.E9*(pSSH[2:nj,:] -2.*pSSH[1:nj-1,:] + pSSH[0:nj-2,:])/pe2t2[1:nj-1,:]    
     #
     return lx[:,:] + ly[:,:]
 
-
-
-
-
+def comp_LapOfSSH( cvar, pe1t, pe2t pe1u, pe2u, pe1v, pe2v, pSSH ):
+    #
+    print(' *** Computing curvilinear Laplacian of SSH "'+cvar+'" !')
+    (nj,ni) = np.shape( pSSH )
+    #
+    zL         = np.zeros((nj,ni))
+    zx, zy     = np.zeros((nj,ni)), np.zeros((nj,ni))
+    dFdx, dFdy = np.zeros((nj,ni)), np.zeros((nj,ni))
+    #
+    dFdx[:,:ni-1] = ( pSSH[:,1:ni] - pSSH[:,:ni-1] ) / pe1u[:,:ni-1]  ; # => at U-point `i`
+    dFdy[:nj-1,:] = ( pSSH[1:nj,:] - pSSH[:nj-1,:] ) / pe2v[:nj-1,:]  ; # => at V-point `j`
+    #
+    zx[:,:] = pe2u[:,:]/pe1u[:,:]*dFdx[:,:]
+    zy[:,:] = pe1v[:,:]/pe2v[:,:]*dFdy[:,:]
+    #
+    zL[1:nj,1:ni] = (  (zx[1:nj,1:ni]-zx[1:nj,:ni-1])/pe1t[1:nj,1:ni] \
+                     + (zy[1:nj,1:ni]-zy[:nj-1,1:ni])/pe2t[1:nj,1:ni]) ) / ( pe1t[1:nj,1:ni]*pe2t[1:nj,1:ni])
+    #
+    return zL
 
 
 
@@ -355,10 +371,14 @@ if fa.l_show_lsm:
 
     if fa.l_apply_lap or l_add_VOR_to_ice_field:
         print(' *** Reading e1t and e2t !')
-        XE1T2 = id_lsm.variables['e1t'][0,j1:j2,i1:i2]
-        XE2T2 = id_lsm.variables['e2t'][0,j1:j2,i1:i2]
-        XE1T2 = XE1T2*XE1T2
-        XE2T2 = XE2T2*XE2T2
+        XE1T  = id_lsm.variables['e1t'][0,j1:j2,i1:i2]
+        XE2T  = id_lsm.variables['e2t'][0,j1:j2,i1:i2]
+        XE1U  = id_lsm.variables['e1u'][0,j1:j2,i1:i2]
+        XE2U  = id_lsm.variables['e2u'][0,j1:j2,i1:i2]
+        XE1V  = id_lsm.variables['e1v'][0,j1:j2,i1:i2]
+        XE2V  = id_lsm.variables['e2v'][0,j1:j2,i1:i2]
+        #XE1T2 = XE1T*XE1T
+        #XE2T2 = XE2T*XE2T
     if fa.l_apply_hgrad or fa.l_apply_geov:
         print(' *** Reading e1u and e2v !')
         e1u = id_lsm.variables['e1u'][0,j1:j2,i1:i2]
@@ -555,7 +575,8 @@ for jt in range(jt0,Nt):
             if not l_i_need_A:
                 XICE = id_f.variables['siconc'][jt,j1:j2,i1:i2] ; # t, y, x  => we need it to separate open ocean from sea-ice !
             Xpssh = id_f.variables[caVOR][jt,j1:j2,i1:i2] ; # t, y, x
-            Xpvor = comp_LapOfSSH( caVOR, XE1T2, XE2T2, Xpssh )
+            #Xpvor = comp_LapOfSSH_bad( caVOR, XE1T2, XE2T2, Xpssh )
+            Xpvor = comp_LapOfSSH( caVOR, XE1T, XE2T, XE1U, XE2U, XE1V, XE2V, Xpssh )
             del Xpssh
 
         print('Done!\n')
