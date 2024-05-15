@@ -577,7 +577,7 @@ for jt in range(jt0,Nt):
             Xpssh = id_f.variables[caVOR][jt,j1:j2,i1:i2] ; # t, y, x
             #Xpvor = comp_LapOfSSH_bad( caVOR, XE1T2, XE2T2, Xpssh )
             Xpvor = comp_LapOfSSH( caVOR, XE1T, XE2T, XE1U, XE2U, XE1V, XE2V, Xpssh )
-            print(Xpvor[::100,::100]); exit(0)
+            print(Xpvor[::100,::100]) #; exit(0)
             del Xpssh
 
         print('Done!\n')
