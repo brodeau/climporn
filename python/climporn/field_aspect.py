@@ -184,9 +184,8 @@ class field_aspect:
             cunit = 'Sea-ice concentration'
 
         elif CWHAT in [ 'sithic', 'sivolu' ]:
-            #lili
             cv_in = CWHAT  ; cv_out = cv_in
-            imask_no_ice_pc = 50 ; color_missing = '0.9';#'#2D4B87' ; # we hide the field where A<`imask_no_ice_pc`%
+            imask_no_ice_pc = 10 ; color_missing = '0.9';#'#2D4B87' ; # we hide the field where A<`imask_no_ice_pc`%
             cpal_fld='ncview_tofino' ; color_top_cb='k' ; color_top = 'k'
             imask_no_ice_pc = 10 ; #color_missing = 'k' ; # we hide the field where A<`imask_no_ice_pc`%
             tmin=0. ;  tmax=5. ;  df=1 ; cb_jump = 1; cb_extend = 'max'
@@ -195,7 +194,7 @@ class field_aspect:
         elif CWHAT in [ 'damage', 'damage-t', 'damage-f' ]:
             cv_in = CWHAT  ; cv_out = cv_in            
             #
-            imask_no_ice_pc = 70 ; color_missing = '#2D4B87' ; # we hide the field where A<`imask_no_ice_pc`%
+            imask_no_ice_pc = 10 ; color_missing = '#2D4B87' ; # we hide the field where A<`imask_no_ice_pc`%
             #
             #cpal_fld='bone_r' ; color_top_cb='w'; tmin=0. ;  tmax=1. ; l_pow_field=True ; pow_field=5.; vc_fld_powlog=[ 0., 0.7, 0.8, 0.9, 0.95, 1. ]
             #cpal_fld='gray_r' ; color_top_cb='w'; tmin=0. ;  tmax=1. ; l_pow_field=True ; pow_field=7.; vc_fld_powlog=[ 0., 0.8, 0.9, 0.95, 1. ]; color_missing = None
