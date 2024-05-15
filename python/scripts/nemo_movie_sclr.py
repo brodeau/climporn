@@ -98,7 +98,7 @@ def comp_LapOfSSH( cvar, pe1t, pe2t pe1u, pe2u, pe1v, pe2v, pSSH ):
     zy[:,:] = pe1v[:,:]/pe2v[:,:]*dFdy[:,:]
     #
     zL[1:nj,1:ni] = (  (zx[1:nj,1:ni]-zx[1:nj,:ni-1])/pe1t[1:nj,1:ni] \
-                     + (zy[1:nj,1:ni]-zy[:nj-1,1:ni])/pe2t[1:nj,1:ni]) ) / ( pe1t[1:nj,1:ni]*pe2t[1:nj,1:ni])
+                     + (zy[1:nj,1:ni]-zy[:nj-1,1:ni])/pe2t[1:nj,1:ni] ) / ( pe1t[1:nj,1:ni]*pe2t[1:nj,1:ni] )
     #
     return zL
 
