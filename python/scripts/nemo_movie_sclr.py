@@ -94,8 +94,8 @@ def comp_LapOfSSH( cvar, pe1t, pe2t, pe1u, pe2u, pe1v, pe2v, pSSH ):
     dFdx[:,:ni-1] = 1.E9*( pSSH[:,1:ni] - pSSH[:,:ni-1] ) / pe1u[:,:ni-1]  ; # => at U-point `i`
     dFdy[:nj-1,:] = 1.E9*( pSSH[1:nj,:] - pSSH[:nj-1,:] ) / pe2v[:nj-1,:]  ; # => at V-point `j`
     #
-    zx[:,:] = pe2u[:,:]/pe1u[:,:]*dFdx[:,:]
-    zy[:,:] = pe1v[:,:]/pe2v[:,:]*dFdy[:,:]
+    zx[:,:] = 1.E9*pe2u[:,:]/pe1u[:,:]*dFdx[:,:]
+    zy[:,:] = 1.E9*pe1v[:,:]/pe2v[:,:]*dFdy[:,:]
     #
     zL[1:nj,1:ni] = (  (zx[1:nj,1:ni]-zx[1:nj,:ni-1])/pe1t[1:nj,1:ni] \
                      + (zy[1:nj,1:ni]-zy[:nj-1,1:ni])/pe2t[1:nj,1:ni] ) / ( pe1t[1:nj,1:ni]*pe2t[1:nj,1:ni] )
