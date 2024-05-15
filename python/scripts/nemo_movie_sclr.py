@@ -69,15 +69,15 @@ print("\n --- logos found into : "+dir_logos+" !\n")
 
 
 
-def comp_LapOfSSH( cvar, pSSH ):
+def comp_LapOfSSH( cvar, pe1t2, pe2t2, pSSH ):
     #
     print(' *** Computing Laplacian of SSH "'+cvar+'" !')
     (nj,ni) = np.shape( pSSH )
     #
     lx = np.zeros((nj,ni))
     ly = np.zeros((nj,ni))
-    lx[:,1:ni-1] = 1.E9*(pSSH[:,2:ni] -2.*pSSH[:,1:ni-1] + pSSH[:,0:ni-2])/XE1T2[:,1:ni-1]
-    ly[1:nj-1,:] = 1.E9*(pSSH[2:nj,:] -2.*pSSH[1:nj-1,:] + pSSH[0:nj-2,:])/XE2T2[1:nj-1,:]
+    lx[:,1:ni-1] = 1.E9*(pSSH[:,2:ni] -2.*pSSH[:,1:ni-1] + pSSH[:,0:ni-2])/pe1t2[:,1:ni-1]
+    ly[1:nj-1,:] = 1.E9*(pSSH[2:nj,:] -2.*pSSH[1:nj-1,:] + pSSH[0:nj-2,:])/pe2t2[1:nj-1,:]
     #
     return lx[:,:] + ly[:,:]
 
@@ -353,7 +353,7 @@ if fa.l_show_lsm:
     if nb_dim==2: XMSK = id_lsm.variables[fa.cv_msk][j1:j2,i1:i2]
     (nj,ni) = np.shape(XMSK)
 
-    if fa.l_apply_lap:
+    if fa.l_apply_lap or l_add_VOR_to_ice_field:
         print(' *** Reading e1t and e2t !')
         XE1T2 = id_lsm.variables['e1t'][0,j1:j2,i1:i2]
         XE2T2 = id_lsm.variables['e2t'][0,j1:j2,i1:i2]
@@ -555,7 +555,7 @@ for jt in range(jt0,Nt):
             if not l_i_need_A:
                 XICE = id_f.variables['siconc'][jt,j1:j2,i1:i2] ; # t, y, x  => we need it to separate open ocean from sea-ice !
             Xpssh = id_f.variables[caVOR][jt,j1:j2,i1:i2] ; # t, y, x
-            Xpvor = comp_LapOfSSH( caVOR, Xpssh )
+            Xpvor = comp_LapOfSSH( caVOR, XE1T2, XE2T2, Xpssh )
             del Xpssh
 
         print('Done!\n')
