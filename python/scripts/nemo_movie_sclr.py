@@ -303,8 +303,8 @@ if l_add_SST_to_ice_field:
 
 # VOR over open ocean:
 if l_add_VOR_to_ice_field:
-    #cpal_vor = 'RdBu_r'
-    cpal_vor = 'BrBG_r'
+    cpal_vor = 'RdBu_r'
+    #cpal_vor = 'BrBG_r'
     rmin_vor = -0.02 ; rmax_vor = -rmin_vor ; dvor = 0.0001
     pal_vor = cp.chose_colmap(cpal_vor)
     norm_vor = colors.Normalize(vmin=rmin_vor, vmax=rmax_vor , clip = False)
@@ -578,7 +578,7 @@ for jt in range(jt0,Nt):
             Xpssh = id_f.variables[caVOR][jt,j1:j2,i1:i2] ; # t, y, x
             #Xpvor = comp_LapOfSSH_bad( caVOR, XE1T2, XE2T2, Xpssh )
             Xpvor = comp_LapOfSSH( caVOR, XE1T, XE2T, XE1U, XE2U, XE1V, XE2V, Xpssh )
-            print(Xpvor[::100,::100]) #; exit(0)
+            #print(Xpvor[::100,::100]) #; exit(0)
             del Xpssh
 
         print('Done!\n')
