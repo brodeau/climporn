@@ -234,7 +234,7 @@ fa = cp.field_aspect( CWHAT, cbox=CBOX )
 # SST under sea-ice field:
 if l_add_SST_to_ice_field:
     cpal_sst = 'YlGnBu_r'
-    rmin_sst = -2. ; rmax_sst = 22. ; dsst = 2.
+    rmin_sst = -2. ; rmax_sst = 14. ; dsst = 2.
     pal_sst = cp.chose_colmap(cpal_sst)
     norm_sst = colors.Normalize(vmin=rmin_sst, vmax=rmax_sst , clip = False)
 
