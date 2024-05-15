@@ -303,7 +303,8 @@ if l_add_SST_to_ice_field:
 
 # VOR over open ocean:
 if l_add_VOR_to_ice_field:
-    cpal_vor = 'RdBu_r'
+    #cpal_vor = 'RdBu_r'
+    cpal_vor = 'BrBG_r'
     rmin_vor = -0.02 ; rmax_vor = -rmin_vor ; dvor = 0.0001
     pal_vor = cp.chose_colmap(cpal_vor)
     norm_vor = colors.Normalize(vmin=rmin_vor, vmax=rmax_vor , clip = False)
