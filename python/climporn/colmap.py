@@ -15,7 +15,7 @@ list_climporn = [ 'blk', 'land', 'landm', 'land_dark', 'terre', 'cb1', 'eke', 'b
 
 # There are also NCVIEW colormaps, and the default Matplotlib colormaps...
 
-l_debug = False
+l_debug = True
 
 def chose_colmap( cname, log_ctrl=0, exp_ctrl=0 ):
 
@@ -25,12 +25,20 @@ def chose_colmap( cname, log_ctrl=0, exp_ctrl=0 ):
         if lr: cname = cname[:-2]
         M = ncview_ncmap_to_array( cname, l_rev=lr )
         ColorMap = __build_colormap__(M, log_ctrl=log_ctrl, exp_ctrl=exp_ctrl)
-
+        #
+    elif cname[:8] == 'cmocean_':
+        # `cmocean` https://matplotlib.org/cmocean/#installation
+        ccm = cname[8:]
+        if l_debug: print('\n *** Getting `cmocean` colormap "'+ccm+'" !')
+        import cmocean.cm as cmo
+        ColorMap = getattr(cmo, ccm)
+        
         # Maybe a climporn colormap ?
     elif cname in list_climporn or ( cname[-2:] == '_r' and cname[:-2] in list_climporn):
         if l_debug: print('\n *** Getting Climporn colormap "'+cname+'" !')
         x = brkd_cmap(cname)
         ColorMap = x.clrmp(log_ctrl=log_ctrl, exp_ctrl=exp_ctrl)
+        #
     else:
         # Then it must be a Matplotlib colormap:
         if log_ctrl or exp_ctrl > 0: print('WARNING: cannot use LOG or EXP colormap with Matplotlib colormaps...')

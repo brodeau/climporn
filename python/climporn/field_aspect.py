@@ -185,8 +185,9 @@ class field_aspect:
 
         elif CWHAT in [ 'sithic', 'sivolu' ]:
             cv_in = CWHAT  ; cv_out = cv_in
-            imask_no_ice_pc = 5 ; color_missing = '0.9';#'#2D4B87' ; # we hide the field where A<`imask_no_ice_pc`%
-            cpal_fld='ncview_tofino' ; color_top_cb='k' ; color_top = 'k'
+            #imask_no_ice_pc = 5 ; color_missing = '0.9';#'#2D4B87' ; # we hide the field where A<`imask_no_ice_pc`%
+            #cpal_fld='ncview_tofino' ; color_top_cb='k' ; color_top = 'k'
+            cpal_fld='cmocean_ice' ; color_top_cb='w' ; color_top = 'w'
             imask_no_ice_pc = 5 ; #color_missing = 'k' ; # we hide the field where A<`imask_no_ice_pc`%
             tmin=0. ;  tmax=5. ;  df=1 ; cb_jump = 1; cb_extend = 'max'
             cunit = 'Sea-ice thickness [m]'
@@ -235,8 +236,9 @@ class field_aspect:
         elif CWHAT in [ 'sivort', 'sivort-t', 'sivort-f' ]:
             cv_in = CWHAT  ; cv_out = cv_in ; color_top_cb='k'
             rmult = 3600.*24.
-            #cpal_fld='RdBu_r' ; tmin=-0.3 ;  tmax=-tmin ;  df=0.05
-            cpal_fld='BrBG_r' ; tmin=-0.3 ;  tmax=-tmin ;  df=0.1
+            cpal_fld='RdBu_r' ; tmin=-0.3 ;  tmax=-tmin ;  df=0.1
+            #cpal_fld='cmocean_balance_r' ; tmin=-0.3 ;  tmax=-tmin ;  df=0.1
+            #cpal_fld='BrBG_r' ; tmin=-0.3 ;  tmax=-tmin ;  df=0.1
             imask_no_ice_pc = 5 ; #color_missing = 'k' ; # we hide the field where A<`imask_no_ice_pc`%
             cunit = 'Vorticity of sea-ice velocity [day$^{-1}$]'
 
@@ -295,7 +297,8 @@ class field_aspect:
             imask_no_ice_pc = 5 ; # we hide the field where A<10%
             #cpal_fld = 'ncview_parula'; color_top_cb='k'
             #cpal_fld = 'viridis'; color_top_cb='k'
-            cpal_fld = 'inferno'; color_top_cb='k'
+            #cpal_fld = 'inferno'; color_top_cb='k'
+            cpal_fld = 'cmocean_haline'; color_top='w' ; color_top_cb='w' ; color_missing ='k'
             tmin=0.; tmax=100.; df=25.
             #l_pow_field=True; pow_field=5.
             vc_fld_powlog = [ tmin, 25., 50., 75., tmax ]

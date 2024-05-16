@@ -68,20 +68,6 @@ print("\n --- logos found into : "+dir_logos+" !\n")
 
 
 
-
-def comp_LapOfSSH_bad( cvar, pe1t2, pe2t2, pSSH ):
-    #
-    print(' *** Computing Laplacian of SSH "'+cvar+'" !')
-    (nj,ni) = np.shape( pSSH )
-    #
-    lx = np.zeros((nj,ni))
-    ly = np.zeros((nj,ni))
-    #    
-    lx[:,1:ni-1] = 1.E9*(pSSH[:,2:ni] -2.*pSSH[:,1:ni-1] + pSSH[:,0:ni-2])/pe1t2[:,1:ni-1]
-    ly[1:nj-1,:] = 1.E9*(pSSH[2:nj,:] -2.*pSSH[1:nj-1,:] + pSSH[0:nj-2,:])/pe2t2[1:nj-1,:]    
-    #
-    return lx[:,:] + ly[:,:]
-
 def comp_LapOfSSH( cvar, pe1t, pe2t, pe1u, pe2u, pe1v, pe2v, pSSH ):
     #
     print(' *** Computing curvilinear Laplacian of SSH "'+cvar+'" !')
@@ -136,6 +122,7 @@ parser.add_argument('-N', '--oname',  default="",             help='a name that 
 parser.add_argument('-o', '--outdir', default="./figs",       help='path to directory where to save figures')
 parser.add_argument('-f', '--fignm',  default="",             help='common string in name of figure to create')
 parser.add_argument('-T', '--addSST', default="",             help='show the SST over open ocean!')
+parser.add_argument('-H', '--addSSH', default="",             help='show the SSH over open ocean!')
 parser.add_argument('-V', '--addVOR', default="",             help='show the vorticity (laplacian of SSH) over open ocean!')
 parser.add_argument('-S', '--sign',   default="",             help='sign the image with some text')
 parser.add_argument('-L', '--ltr' ,   default=None,           help='letter as in "a)" for figures in paper')
@@ -163,6 +150,7 @@ cd_out = args.outdir
 cn_fig = args.fignm
 caSST  = args.addSST
 caVOR  = args.addVOR
+caSSH  = args.addSSH
 CSIGN  = args.sign
 lcb    = args.cb
 cltr   = args.ltr
@@ -198,14 +186,20 @@ if caSST != "":
     l_add_SST_to_ice_field = True
     print(' *** We shall add following SST field below ice: ', caSST)
 
+l_add_SSH_to_ice_field = False
+if caSSH != "":
+    l_add_SSH_to_ice_field = True
+    print(' *** We shall add following SSH field below ice: ', caSSH)
+
 l_add_VOR_to_ice_field = False
 if caVOR != "":
     l_add_VOR_to_ice_field = True
     print(' *** We shall show the vorticity over open ocean based on Laplacian of : ', caVOR)
 
 
-if l_add_SST_to_ice_field and l_add_VOR_to_ice_field:
-    print(' ERROR: chose between the `-T` and `-V` options !!!'); exit(0)
+if int(l_add_SST_to_ice_field) + int(l_add_SSH_to_ice_field) + int(l_add_VOR_to_ice_field) > 1:
+    #if l_add_SST_to_ice_field and l_add_VOR_to_ice_field:
+    print(' ERROR: chose between the `-T`, `-H`, & `-V` options, only 1 !!!'); exit(0)
     
     
 l_add_sign = ( CSIGN != '' )
@@ -301,9 +295,18 @@ if l_add_SST_to_ice_field:
     pal_sst = cp.chose_colmap(cpal_sst)
     norm_sst = colors.Normalize(vmin=rmin_sst, vmax=rmax_sst , clip = False)
 
+# SSH over open ocean:
+if l_add_SSH_to_ice_field:
+    #cpal_ssh = 'cmocean_deep'
+    cpal_ssh = 'cmocean_matter'
+    rmin_ssh = -1.4 ; rmax_ssh = 0.9 ; dssh = 0.1
+    pal_ssh = cp.chose_colmap(cpal_ssh)
+    norm_ssh = colors.Normalize(vmin=rmin_ssh, vmax=rmax_ssh , clip = False)
+
 # VOR over open ocean:
 if l_add_VOR_to_ice_field:
-    cpal_vor = 'RdBu_r'
+    #cpal_vor = 'cmocean_curl'
+    cpal_vor = 'PiYG_r'
     #cpal_vor = 'BrBG_r'
     rmin_vor = -0.02 ; rmax_vor = -rmin_vor ; dvor = 0.0001
     pal_vor = cp.chose_colmap(cpal_vor)
@@ -572,6 +575,11 @@ for jt in range(jt0,Nt):
                 XICE = id_f.variables['siconc'][jt,j1:j2,i1:i2] ; # t, y, x  => we need it to separate open ocean from sea-ice !
             Xpsst = id_f.variables[caSST][jt,j1:j2,i1:i2] ; # t, y, x
 
+        if l_add_SSH_to_ice_field:
+            if not l_i_need_A:
+                XICE = id_f.variables['siconc'][jt,j1:j2,i1:i2] ; # t, y, x  => we need it to separate open ocean from sea-ice !
+            Xpssh = id_f.variables[caSSH][jt,j1:j2,i1:i2] ; # t, y, x
+
         if l_add_VOR_to_ice_field:
             if not l_i_need_A:
                 XICE = id_f.variables['siconc'][jt,j1:j2,i1:i2] ; # t, y, x  => we need it to separate open ocean from sea-ice !
@@ -599,15 +607,15 @@ for jt in range(jt0,Nt):
             # Zonal gradient on T-points:
             lx[:,1:ni-1] = (Xplot[:,2:ni] - Xplot[:,0:ni-2]) / (e1u[:,1:ni-1] + e1u[:,0:ni-2]) * UMSK[:,1:ni-1] * UMSK[:,0:ni-2]
             lx[:,:] = XMSK[:,:]*lx[:,:]
-            #cp.dump_2d_field('dsst_dx_gridT.nc', lx, xlon=Xlon, xlat=Xlat, name='dsst_dx')
+            
             # Meridional gradient on T-points:
             ly[1:nj-1,:] = (Xplot[2:nj,:] - Xplot[0:nj-2,:]) / (e2v[1:nj-1,:] + e2v[0:nj-2,:]) * VMSK[1:nj-1,:] * VMSK[0:nj-2,:]
             ly[:,:] = XMSK[:,:]*ly[:,:]
-            #cp.dump_2d_field('dsst_dy_gridT.nc', ly, xlon=Xlon, xlat=Xlat, name='dsst_dy')
+            
             Xplot[:,:] = 0.0
             # Modulus of vector gradient:
             Xplot[:,:] = np.sqrt(  lx[:,:]*lx[:,:] + ly[:,:]*ly[:,:] )
-            #cp.dump_2d_field('mod_grad_sst.nc', Xplot, xlon=Xlon, xlat=Xlat, name='dsst')
+            
             del lx, ly
 
 
@@ -619,15 +627,15 @@ for jt in range(jt0,Nt):
             # Zonal gradient on T-points:
             lx[:,1:ni-1] = (Xplot[:,2:ni] - Xplot[:,0:ni-2]) / (e1u[:,1:ni-1] + e1u[:,0:ni-2]) * UMSK[:,1:ni-1] * UMSK[:,0:ni-2]
             lx[:,:] = XMSK[:,:]*lx[:,:]
-            #cp.dump_2d_field('dsst_dx_gridT.nc', lx, xlon=Xlon, xlat=Xlat, name='dsst_dx')
+            
             # Meridional gradient on T-points:
             ly[1:nj-1,:] = (Xplot[2:nj,:] - Xplot[0:nj-2,:]) / (e2v[1:nj-1,:] + e2v[0:nj-2,:]) * VMSK[1:nj-1,:] * VMSK[0:nj-2,:]
             ly[:,:] = XMSK[:,:]*ly[:,:]
-            #cp.dump_2d_field('dsst_dy_gridT.nc', ly, xlon=Xlon, xlat=Xlat, name='dsst_dy')
+            
             Xplot[:,:] = 0.0
             # Modulus of vector gradient:
             Xplot[:,:] = grav/ff * np.sqrt( lx[:,:]*lx[:,:] + ly[:,:]*ly[:,:] )
-            #cp.dump_2d_field('mod_grad_sst.nc', Xplot, xlon=Xlon, xlat=Xlat, name='dsst')
+            
             del lx, ly
 
         if fa.lSubstractMean:
@@ -674,6 +682,12 @@ for jt in range(jt0,Nt):
             psst = np.ma.masked_where(XICE > rt_io, Xpsst)
             ct   = plt.imshow(psst, cmap=pal_sst, norm=norm_sst, interpolation='none')
             del psst, ct
+
+        # Add SSH over open ocean:
+        if l_add_SSH_to_ice_field:
+            pssh = np.ma.masked_where(XICE > rt_io, Xpssh)
+            ct   = plt.imshow(pssh, cmap=pal_ssh, norm=norm_ssh, interpolation='none')
+            del pssh, ct
 
         # Add vorticity aka Laplacian of SSH over open ocean:
         if l_add_VOR_to_ice_field:
