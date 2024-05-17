@@ -327,7 +327,7 @@ if l_add_SSH_to_ice_field:
 
 # SSU over open ocean:
 if l_add_SSU_to_ice_field:
-    cpal_ssu = 'cmocean_dense'
+    cpal_ssu = 'cmocean_haline'
     rmin_ssu = -1. ; rmax_ssu = -rmin_ssu ; dssu = 0.25
     pal_ssu = cp.chose_colmap(cpal_ssu)
     norm_ssu = colors.Normalize(vmin=rmin_ssu, vmax=rmax_ssu , clip = False)
