@@ -67,6 +67,20 @@ print("\n --- logos found into : "+dir_logos+" !\n")
 
 
 
+def moduleOfVelocity( cvar_u, cvar_v, pSSU, pSSV ):
+    #
+    print(' *** Computing module of surface velocity "'+cvar_u+','+cvar_v+'" !')
+    #
+    (nj,ni) = np.shape( pSSU )
+    #
+    zu, zv     = np.zeros((nj,ni)), np.zeros((nj,ni))
+    #
+    zu[:,1:] = 0.5 * ( pSSU[:,1:] + pSSU[:,:ni-1] ) ; # U @T
+    zv[1:,:] = 0.5 * ( pSSV[1:,:] + pSSV[:ni-1,:] ) ; # U @T
+    #
+    return np.sqrt( zu*zu + zv*zv )
+
+
 
 def comp_LapOfSSH( cvar, pe1t, pe2t, pe1u, pe2u, pe1v, pe2v, pSSH ):
     #
@@ -123,6 +137,7 @@ parser.add_argument('-o', '--outdir', default="./figs",       help='path to dire
 parser.add_argument('-f', '--fignm',  default="",             help='common string in name of figure to create')
 parser.add_argument('-T', '--addSST', default="",             help='show the SST over open ocean!')
 parser.add_argument('-H', '--addSSH', default="",             help='show the SSH over open ocean!')
+parser.add_argument('-U', '--addSSU', default="",             help='show the module of ocean surface velocity over open ocean!')
 parser.add_argument('-V', '--addVOR', default="",             help='show the vorticity (laplacian of SSH) over open ocean!')
 parser.add_argument('-S', '--sign',   default="",             help='sign the image with some text')
 parser.add_argument('-L', '--ltr' ,   default=None,           help='letter as in "a)" for figures in paper')
@@ -149,8 +164,9 @@ CONAME = args.oname
 cd_out = args.outdir
 cn_fig = args.fignm
 caSST  = args.addSST
-caVOR  = args.addVOR
 caSSH  = args.addSSH
+caSSU  = args.addSSU
+caVOR  = args.addVOR
 CSIGN  = args.sign
 lcb    = args.cb
 cltr   = args.ltr
@@ -191,17 +207,23 @@ if caSSH != "":
     l_add_SSH_to_ice_field = True
     print(' *** We shall add following SSH field below ice: ', caSSH)
 
+l_add_SSU_to_ice_field = False
+if caSSU != "":
+    l_add_SSU_to_ice_field = True
+    caSSV = str.replace(caSSU, 'u', 'v')
+    print(' *** We shall add following SSU field below ice: ', caSSU,caSSV)
+
 l_add_VOR_to_ice_field = False
 if caVOR != "":
     l_add_VOR_to_ice_field = True
     print(' *** We shall show the vorticity over open ocean based on Laplacian of : ', caVOR)
 
 
-if int(l_add_SST_to_ice_field) + int(l_add_SSH_to_ice_field) + int(l_add_VOR_to_ice_field) > 1:
+if int(l_add_SST_to_ice_field) + int(l_add_SSH_to_ice_field) + int(l_add_SSU_to_ice_field) + int(l_add_VOR_to_ice_field) > 1:
     #if l_add_SST_to_ice_field and l_add_VOR_to_ice_field:
     print(' ERROR: chose between the `-T`, `-H`, & `-V` options, only 1 !!!'); exit(0)
-    
-    
+
+
 l_add_sign = ( CSIGN != '' )
 
 ##########################################################################################
@@ -303,6 +325,13 @@ if l_add_SSH_to_ice_field:
     pal_ssh = cp.chose_colmap(cpal_ssh)
     norm_ssh = colors.Normalize(vmin=rmin_ssh, vmax=rmax_ssh , clip = False)
 
+# SSU over open ocean:
+if l_add_SSU_to_ice_field:
+    cpal_ssu = 'cmocean_dense'
+    rmin_ssu = -1. ; rmax_ssu = -rmin_ssu ; dssu = 0.25
+    pal_ssu = cp.chose_colmap(cpal_ssu)
+    norm_ssu = colors.Normalize(vmin=rmin_ssu, vmax=rmax_ssu , clip = False)
+
 # VOR over open ocean:
 if l_add_VOR_to_ice_field:
     #cpal_vor = 'cmocean_curl'
@@ -313,7 +342,7 @@ if l_add_VOR_to_ice_field:
     norm_vor = colors.Normalize(vmin=rmin_vor, vmax=rmax_vor , clip = False)
 
 
-    
+
 # Ice over ocean field:
 if fa.l_show_ice:
     cf_ice = str.replace(cf_in, 'gridT-2D', 'icemod')
@@ -522,7 +551,7 @@ for jt in range(jt0,Nt):
     cdats = cp.epoch2clock(itime)
 
 
-    
+
     if cn_fig != "":
         cfig = cdir_figs+'/'+fa.cv_out+'_'+CEXP+cn_fig+'_'+cdate+'.'+fig_type
     else:
@@ -544,7 +573,7 @@ for jt in range(jt0,Nt):
         else:
             vc_fld = np.arange(fa.tmin, fa.tmax + fa.df, fa.df)
 
-        
+
 
         print('Reading record #'+str(jt)+' of '+fa.cv_in+' in '+cf_in)
         if l3d: print('            => at level #'+str(jk)+' ('+cdepth+')!')
@@ -562,14 +591,14 @@ for jt in range(jt0,Nt):
 
         # Ice
         l_i_need_A = ( fa.l_show_ice or fa.imask_no_ice_pc>0 )
-        
+
         if l_i_need_A:
             print('Reading record #'+str(jt)+' of '+fa.nm_ice_conc+' in '+cf_ice)
             id_ice = Dataset(cf_ice)
             XICE  = id_ice.variables[fa.nm_ice_conc][jt,j1:j2,i1:i2] ; # t, y, x
             id_ice.close()
             print('Done!\n')
-                
+
         if l_add_SST_to_ice_field:
             if not l_i_need_A:
                 XICE = id_f.variables['siconc'][jt,j1:j2,i1:i2] ; # t, y, x  => we need it to separate open ocean from sea-ice !
@@ -579,6 +608,14 @@ for jt in range(jt0,Nt):
             if not l_i_need_A:
                 XICE = id_f.variables['siconc'][jt,j1:j2,i1:i2] ; # t, y, x  => we need it to separate open ocean from sea-ice !
             Xpssh = id_f.variables[caSSH][jt,j1:j2,i1:i2] ; # t, y, x
+
+        if l_add_SSU_to_ice_field:
+            if not l_i_need_A:
+                XICE = id_f.variables['siconc'][jt,j1:j2,i1:i2] ; # t, y, x  => we need it to separate open ocean from sea-ice !
+            Xpssu = id_f.variables[caSSU][jt,j1:j2,i1:i2] ; # t, y, x
+            Xpssv = id_f.variables[caSSV][jt,j1:j2,i1:i2] ; # t, y, x
+            Xpssu = moduleOfVelocity( caSSU, caSSV, Xpssu, Xpssv )
+            del Xpssv
 
         if l_add_VOR_to_ice_field:
             if not l_i_need_A:
@@ -607,15 +644,15 @@ for jt in range(jt0,Nt):
             # Zonal gradient on T-points:
             lx[:,1:ni-1] = (Xplot[:,2:ni] - Xplot[:,0:ni-2]) / (e1u[:,1:ni-1] + e1u[:,0:ni-2]) * UMSK[:,1:ni-1] * UMSK[:,0:ni-2]
             lx[:,:] = XMSK[:,:]*lx[:,:]
-            
+
             # Meridional gradient on T-points:
             ly[1:nj-1,:] = (Xplot[2:nj,:] - Xplot[0:nj-2,:]) / (e2v[1:nj-1,:] + e2v[0:nj-2,:]) * VMSK[1:nj-1,:] * VMSK[0:nj-2,:]
             ly[:,:] = XMSK[:,:]*ly[:,:]
-            
+
             Xplot[:,:] = 0.0
             # Modulus of vector gradient:
             Xplot[:,:] = np.sqrt(  lx[:,:]*lx[:,:] + ly[:,:]*ly[:,:] )
-            
+
             del lx, ly
 
 
@@ -627,15 +664,15 @@ for jt in range(jt0,Nt):
             # Zonal gradient on T-points:
             lx[:,1:ni-1] = (Xplot[:,2:ni] - Xplot[:,0:ni-2]) / (e1u[:,1:ni-1] + e1u[:,0:ni-2]) * UMSK[:,1:ni-1] * UMSK[:,0:ni-2]
             lx[:,:] = XMSK[:,:]*lx[:,:]
-            
+
             # Meridional gradient on T-points:
             ly[1:nj-1,:] = (Xplot[2:nj,:] - Xplot[0:nj-2,:]) / (e2v[1:nj-1,:] + e2v[0:nj-2,:]) * VMSK[1:nj-1,:] * VMSK[0:nj-2,:]
             ly[:,:] = XMSK[:,:]*ly[:,:]
-            
+
             Xplot[:,:] = 0.0
             # Modulus of vector gradient:
             Xplot[:,:] = grav/ff * np.sqrt( lx[:,:]*lx[:,:] + ly[:,:]*ly[:,:] )
-            
+
             del lx, ly
 
         if fa.lSubstractMean:
@@ -689,6 +726,12 @@ for jt in range(jt0,Nt):
             ct   = plt.imshow(pssh, cmap=pal_ssh, norm=norm_ssh, interpolation='none')
             del pssh, ct
 
+        # Add SSU over open ocean:
+        if l_add_SSU_to_ice_field:
+            pssu = np.ma.masked_where(XICE > rt_io, Xpssu)
+            ct   = plt.imshow(pssu, cmap=pal_ssu, norm=norm_ssu, interpolation='none')
+            del pssu, ct
+
         # Add vorticity aka Laplacian of SSH over open ocean:
         if l_add_VOR_to_ice_field:
             pvor = np.ma.masked_where(XICE > rt_io, Xpvor)
@@ -726,7 +769,7 @@ for jt in range(jt0,Nt):
                     cb_labs = np.array( [ str(i) for i in fa.vc_fld_force ], dtype='U16' )
                     cb_labs[(cb_labs=='0.0')]  = '0'
                     cb_labs[(cb_labs=='1.0')]  = '1'
-                else:                    
+                else:
                     cpt = 0 ; cb_labs = []
                     for rr in vc_fld:
                         if cpt % fa.cb_jump == 0:
@@ -789,7 +832,7 @@ for jt in range(jt0,Nt):
         if cltr:
             ax.annotate(cltr+')', xy=(0.02, 0.93), xycoords='figure fraction', **fsm.cfont_letter )
 
-                
+
         plt.savefig(cfig, dpi=rDPI, orientation='portrait', facecolor='k')
         print(cfig+' created!\n')
         plt.close(1)
