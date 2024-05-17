@@ -217,7 +217,7 @@ class field_aspect:
             #cpal_fld='magma' ; color_top_cb='k' 
             #cpal_fld='gnuplot2' ; color_top_cb='k'
             #cpal_fld='cmocean_tempo' ; color_top_cb='w'
-            cpal_fld='cmocean_dense' ; color_top_cb='w'            
+            cpal_fld='cmocean_dense' ; color_top_cb='k'            
             tmin=0. ; tmax=0.6 ; df=0.1 ; cb_extend = 'max'
             imask_no_ice_pc = 5 ; # we hide the field where A<10%
             cunit = 'Sea-ice velocity [m/s]'
