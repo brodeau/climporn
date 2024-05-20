@@ -191,7 +191,14 @@ class field_aspect:
             imask_no_ice_pc = 5 ; #color_missing = 'k' ; # we hide the field where A<`imask_no_ice_pc`%
             tmin=0. ;  tmax=5. ;  df=1 ; cb_jump = 1; cb_extend = 'max'
             cunit = 'Sea-ice thickness [m]'
+            if CBOX in ["Baffin"]:
+                #lili
+                tmin=0.; tmax=2.;  df=0.5
+                #l_pow_field=True ; pow_field=0.8 ;  vc_fld_powlog= [tmin, 0.01, 0.1, 0.5, tmax ]
+                
 
+
+            
         elif CWHAT in [ 'damage', 'damage-t', 'damage-f' ]:
             cv_in = CWHAT  ; cv_out = cv_in            
             #

@@ -140,13 +140,25 @@ class nemo_hbox:
             l_fill_holes_k=True
 
             ####   NANUK36   ####
+        elif [ config, box ] == [ 'NANUK36', 'Baffin']:
+            i1=1160 ; j1=850 ; i2=i1+720 ; j2=j1+1200  ; rfact_zoom=1. ; font_rat=0.6*rfact_zoom
+            l_show_cb  = True ; vcb=[0.2, 0.96, 0.6, 0.02]
+            l_show_clock=True ; x_clock = rfact_zoom*1640 ; y_clock = rfact_zoom*1050
+            l_show_sign=True  ; x_sign = rfact_zoom*550 ; y_sign = rfact_zoom*15
+            pt_sz_track = 1
+            #
         elif [ config, box ] == [ 'NANUK36', 'Spitzberg']:
             i1=2280 ; j1=1320 ; i2=i1+1920 ; j2=j1+1080  ; rfact_zoom=1. ; font_rat=0.8*rfact_zoom
             l_show_cb  = True ; vcb=[0.31, 0.08, 0.3, 0.02]
             l_show_clock=True ; x_clock = rfact_zoom*1640 ; y_clock = rfact_zoom*1050
-            #l_show_name=True  ; x_name  = rfact_zoom*100 ; y_name  = rfact_zoom*1250
-            l_show_exp=False  ; x_exp   = rfact_zoom*140 ; y_exp   = rfact_zoom*1250 
             l_show_sign=True  ; x_sign = rfact_zoom*1400 ; y_sign = rfact_zoom*15
+            pt_sz_track = 1
+            #
+        elif [ config, box ] == [ 'NANUK36', 'Baffin-Nare']:
+            i1=1120 ; j1=1400 ; i2=i1+1080 ; j2=j1+1080  ; rfact_zoom=1. ; font_rat=0.6*rfact_zoom
+            l_show_cb  = True ; vcb=[0.6, 0.26, 0.37, 0.02]
+            l_show_clock=True ; x_clock = rfact_zoom*1640 ; y_clock = rfact_zoom*1050
+            l_show_sign=True  ; x_sign = rfact_zoom*900 ; y_sign = rfact_zoom*15
             pt_sz_track = 1
             #
         elif [ config, box ] == [ 'NANUK36', 'EGrnLnd']:
