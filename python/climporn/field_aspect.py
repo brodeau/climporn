@@ -193,6 +193,7 @@ class field_aspect:
             cunit = 'Sea-ice thickness [m]'
             if CBOX in ["Baffin"]:
                 #lili
+                imask_no_ice_pc=0.1 ; color_missing='k'
                 tmin=0.; tmax=2.;  df=0.5
                 #l_pow_field=True ; pow_field=0.8 ;  vc_fld_powlog= [tmin, 0.01, 0.1, 0.5, tmax ]
                 
