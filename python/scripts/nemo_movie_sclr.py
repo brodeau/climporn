@@ -76,7 +76,7 @@ def moduleOfVelocity( cvar_u, cvar_v, pSSU, pSSV ):
     zu, zv     = np.zeros((nj,ni)), np.zeros((nj,ni))
     #
     zu[:,1:] = 0.5 * ( pSSU[:,1:] + pSSU[:,:ni-1] ) ; # U @T
-    zv[1:,:] = 0.5 * ( pSSV[1:,:] + pSSV[:ni-1,:] ) ; # U @T
+    zv[1:,:] = 0.5 * ( pSSV[1:,:] + pSSV[:nj-1,:] ) ; # U @T
     #
     return np.sqrt( zu*zu + zv*zv )
 
