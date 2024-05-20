@@ -713,9 +713,9 @@ for jt in range(jt0,Nt):
             # masking field where too litle sea-ice:
             Xplot = np.ma.masked_where( XICE <= rt_io, Xplot )
 
-
-        cf = plt.imshow( Xplot[:,:], cmap=pal_fld, norm=norm_fld, interpolation=nemo_box.c_imshow_interp )
-        #cf = plt.pcolormesh( Xplot[:,:], cmap=pal_fld, norm=norm_fld )
+        #cf = plt.figimage( np.flipud(Xplot[:,:]), cmap=pal_fld, norm=norm_fld,zorder=10 )
+        #cf = plt.imshow( Xplot[:,:], cmap=pal_fld, norm=norm_fld, interpolation=nemo_box.c_imshow_interp, zorder=10 )
+        cf = plt.pcolormesh( Xplot[:,:], cmap=pal_fld, norm=norm_fld, zorder=10 )
 
         # Add SST over open ocean:
         if l_add_SST_to_ice_field:
@@ -748,9 +748,10 @@ for jt in range(jt0,Nt):
 
         if fa.l_show_lsm or l_add_topo_land:
             if l_add_topo_land:
-                clsm = plt.imshow( np.ma.masked_where(XLSM>0.0001, xtopo), cmap=pal_lsm, norm=norm_lsm, interpolation='none' )
-                if nemo_box.c_imshow_interp == 'none':
-                    plt.contour(XLSM, [0.9], colors='k', linewidths=0.5)
+                #clsm = plt.imshow( np.ma.masked_where(XLSM>0.0001, xtopo), cmap=pal_lsm, norm=norm_lsm, interpolation='none',zorder=1 )
+                clsm = plt.pcolormesh( np.ma.masked_where(XLSM>0.0001, xtopo), cmap=pal_lsm, norm=norm_lsm, zorder=5 )
+                #if nemo_box.c_imshow_interp == 'none':
+                plt.contour(XLSM, [0.5], colors='k', linewidths=0.5, zorder=100)
             else:
                 pmsk = np.ma.masked_where(XLSM[:,:] > 0.2, XLSM[:,:])
                 clsm = plt.imshow( pmsk, cmap=pal_lsm, norm=norm_lsm, interpolation='none' )
@@ -794,7 +795,7 @@ for jt in range(jt0,Nt):
             xl = float(x_clock)/rfz
             yl = float(y_clock)/rfz
             #ax.annotate('Date: '+cdats, xy=(1, 4), xytext=(xl,yl), **fsm.cfont_clock)
-            ax.annotate(cdats, xy=(1, 4), xytext=(xl,yl), **fsm.cfont_clock)
+            ax.annotate(cdats, xy=(1, 4), xytext=(xl,yl), zorder=150, **fsm.cfont_clock)
 
         if nemo_box.l_show_exp:
             xl = float(x_exp)/rfz
@@ -804,7 +805,7 @@ for jt in range(jt0,Nt):
         if l_add_sign and nemo_box.l_show_sign:
             xl = float(x_sign)/rfz
             yl = float(y_sign)/rfz
-            ax.annotate(CSIGN, xy=(1, 4), xytext=(xl,yl), **fsm.cfont_sign)
+            ax.annotate(CSIGN, xy=(1, 4), xytext=(xl,yl), zorder=150, **fsm.cfont_sign)
 
         if nemo_box.l_show_name:
             cbla = CNEMO
