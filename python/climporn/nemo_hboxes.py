@@ -143,9 +143,9 @@ class nemo_hbox:
         elif [ config, box ] == [ 'NANUK36', 'CentralArctic']:
             ## Full-screen 2560x1440:
             i1=950 ; j1=2240 ; i2=i1+2560 ; j2=j1+1440  ; rfact_zoom=1. ; font_rat=0.6*rfact_zoom
-            l_show_cb  = True ; vcb=[0.2, 0.96, 0.6, 0.02]
-            l_show_clock=True ; x_clock = rfact_zoom*500 ; y_clock = rfact_zoom*80
-            l_show_sign=True  ; x_sign = rfact_zoom*540 ; y_sign = rfact_zoom*15
+            l_show_cb  = True ; vcb=[0.3, 0.96, 0.4, 0.02]
+            l_show_clock=True ; x_clock = rfact_zoom*2400 ; y_clock = rfact_zoom*1400
+            l_show_sign=True  ; x_sign = rfact_zoom*2400 ; y_sign = rfact_zoom*15
             pt_sz_track = 1
             #
         elif [ config, box ] == [ 'NANUK36', 'Baffin']:
