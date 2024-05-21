@@ -143,8 +143,8 @@ class nemo_hbox:
         elif [ config, box ] == [ 'NANUK36', 'CentralArctic']:
             ## Full-screen 2560x1440:
             i1=950 ; j1=2240 ; i2=i1+2560 ; j2=j1+1440  ; rfact_zoom=1. ; font_rat=0.75*rfact_zoom
-            l_show_cb  = True ; vcb=[0.3, 0.96, 0.4, 0.02]
-            l_show_clock=True ; x_clock = rfact_zoom*2300 ; y_clock = rfact_zoom*1280
+            l_show_cb  = True ; vcb=[0.3, 0.96, 0.4, 0.016]
+            l_show_clock=True ; x_clock = rfact_zoom*2310 ; y_clock = rfact_zoom*1275
             l_show_sign=True  ; x_sign = rfact_zoom*2320 ; y_sign = rfact_zoom*15
             pt_sz_track = 1
             #
