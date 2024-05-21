@@ -145,6 +145,7 @@ class nemo_hbox:
             l_show_cb  = True ; vcb=[0.65, 0.965, 0.34, 0.016]
             l_show_clock=True ; x_clock = rfact_zoom*3500 ; y_clock = rfact_zoom*3000
             l_show_sign=True  ; x_sign = rfact_zoom*3600 ; y_sign = rfact_zoom*40
+            l_show_name=True  ; x_name  = rfact_zoom*100 ; y_name  = rfact_zoom*3000
             pt_sz_track = 1
             #
         elif [ config, box ] == [ 'NANUK36', 'CentralArctic']:
