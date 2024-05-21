@@ -212,7 +212,11 @@ class field_aspect:
             cb_extend = 'neither'
             #
             cunit = 'Sea-ice damage'
+            #
+            if CBOX in ["CentralArctic"]: color_top_cb='k'
 
+
+            
         elif CWHAT in [ 'sivelo', 'sivelo-t', 'sivelo-f' ]:
             cv_in = CWHAT  ; cv_out = CWHAT
             #cpal_fld='magma' ; color_top_cb='k' 
