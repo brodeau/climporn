@@ -213,7 +213,7 @@ class field_aspect:
             #
             cunit = 'Sea-ice damage'
             #
-            if CBOX in ["CentralArctic"]: pal_fld='cmocean_gray_r', color_top='k'; color_top_cb='k'
+            if CBOX in ["CentralArctic"]: pal_fld='cmocean_gray_r'; color_top='k'; color_top_cb='k'
 
 
             
