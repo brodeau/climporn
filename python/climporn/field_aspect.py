@@ -213,7 +213,6 @@ class field_aspect:
             #
             cunit = 'Sea-ice damage'
             #
-            print('LOLO: BOX = ', CBOX);exit(0)
             if CBOX=="CentralArctic": cpal_fld='cmocean_gray_r'; pow_field=3.; color_top='k'; color_top_cb='k'
 
 
