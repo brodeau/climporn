@@ -331,7 +331,7 @@ if l_add_SSU_to_ice_field:
     #cpal_ssu = 'cmocean_deep_r'
     cpal_ssu = 'cmocean_tempo'
     #cpal_ssu = 'cmocean_ice_r'
-    if CBOX in ["Spitzberg"]: cpal_ssu = 'cmocean_amp'
+    if CWHAT in ['sivolu']: cpal_ssu = 'cmocean_thermal' ; #lili
     rmin_ssu = 0. ; rmax_ssu = 1. ; dssu = 0.1
     pal_ssu = cp.chose_colmap(cpal_ssu)
     norm_ssu = colors.Normalize(vmin=rmin_ssu, vmax=rmax_ssu , clip = False)
