@@ -142,9 +142,9 @@ class nemo_hbox:
             ####   NANUK36   ####
         elif [ config, box ] == [ 'NANUK36', 'ALL']:
             i1=0 ; j1=54 ; i2=Ni0-20 ; j2=Nj0-100  ; rfact_zoom=1 ; font_rat=2.*rfact_zoom
-            l_show_cb  = True ; vcb=[0.6, 0.96, 0.35, 0.016]
-            l_show_clock=True ; x_clock = rfact_zoom*3800 ; y_clock = rfact_zoom*3000
-            l_show_sign=True  ; x_sign = rfact_zoom*3800 ; y_sign = rfact_zoom*15
+            l_show_cb  = True ; vcb=[0.65, 0.96, 0.34, 0.016]
+            l_show_clock=True ; x_clock = rfact_zoom*3600 ; y_clock = rfact_zoom*3000
+            l_show_sign=True  ; x_sign = rfact_zoom*3700 ; y_sign = rfact_zoom*40
             pt_sz_track = 1
             #
         elif [ config, box ] == [ 'NANUK36', 'CentralArctic']:
