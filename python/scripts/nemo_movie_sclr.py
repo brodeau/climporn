@@ -125,7 +125,7 @@ requiredNamed.add_argument('-i', '--fin' , required=True,                help='N
 requiredNamed.add_argument('-w', '--what', required=True, help='field/diagnostic to plot (ex: CSPEED,CURLOF,ect.)')
 
 parser.add_argument('-C', '--conf', default="none",           help='name of NEMO config (ex: eNATL60) (defined into `nemo_hboxes.py`)')
-parser.add_argument('-E', '--exp',  default="none",           help='name of experiment (shows up in figure name)')
+parser.add_argument('-E', '--nexp', default=None,             help='name of experiment (shows up in figure name)')
 parser.add_argument('-b', '--box' , default="ALL",            help='extraction box name (ex: ALL) (defined into `nemo_hboxes.py`)')
 parser.add_argument('-m', '--fmm' , default="mesh_mask.nc",   help='NEMO mesh_mask file (ex: mesh_mask.nc)')
 parser.add_argument('-s', '--sd0' , default=None,             help='initial date as <YYYYMMDD>')
@@ -151,7 +151,7 @@ parser.set_defaults(cb=True)
 args = parser.parse_args()
 
 CNEMO = args.conf
-CEXP  = args.exp
+CEXP  = args.nexp
 CBOX  = args.box
 CWHAT = args.what
 cf_in = args.fin
@@ -539,9 +539,6 @@ jd = int(cdd0) - 1
 jm = int(cmn0)
 
 
-if CEXP != "": CEXP = CEXP+'_'
-
-
 # Opening netCDF files:
 id_f = Dataset(cf_in)
 id_f.set_auto_mask(False) ;# prevent the application of `valid_min` and `valid_max`....
@@ -557,15 +554,14 @@ for jt in range(jt0,Nt):
 
     # Name of figure to generate:
     cstr = CBOX
-    if CEXP != 'none':
-        cstr += '_'+CEXP
+    if CEXP: cstr += '_'+CEXP
     if cn_fig != "":
-        cfig = cdir_figs+'/'+fa.cv_out+'_'+cstr+cn_fig+'_'+cdate+'.'+fig_type
+        cfig = cdir_figs+'/'+fa.cv_out+'_'+cstr+'_'+cn_fig+'_'+cdate+'.'+fig_type
     else:
         if l3d:
-            cfig = cdir_figs+'/'+fa.cv_out+'_'+cstr+CNEMO+CRUN+'_lev'+str(jk)+'_'+CBOX+'_'+cdate+'.'+fig_type
+            cfig = cdir_figs+'/'+fa.cv_out+'_'+cstr+'_'+CNEMO+CRUN+'_lev'+str(jk)+'_'+CBOX+'_'+cdate+'.'+fig_type
         else:
-            cfig = cdir_figs+'/'+fa.cv_out+'_'+cstr+CNEMO+CRUN+'_'+CBOX+'_'+cdate+'.'+fig_type
+            cfig = cdir_figs+'/'+fa.cv_out+'_'+cstr+'_'+CNEMO+CRUN+'_'+CBOX+'_'+cdate+'.'+fig_type
 
 
     if not path.exists(cfig):
