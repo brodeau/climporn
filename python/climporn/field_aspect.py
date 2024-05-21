@@ -189,8 +189,9 @@ class field_aspect:
             imask_no_ice_pc = 5 ; #color_missing = 'k' ; # we hide the field where A<`imask_no_ice_pc`%
             tmin=0. ;  tmax=5. ;  df=1 ; cb_jump = 1; cb_extend = 'max'
             cunit = 'Sea-ice thickness [m]'
-            if CBOX in ["Baffin"]:    tmin=0; tmax=2;  df=0.5; imask_no_ice_pc=0.1 ; color_missing='k'
-            if CBOX in ["Spitzberg"]: tmin=0; tmax=4;  df=1;   imask_no_ice_pc=0.1 ; color_top_cb='k'
+            if CBOX in ["CentralArctic"]: imask_no_ice_pc=0.1 ; color_missing='k'
+            if CBOX in ["Baffin"]:        tmin=0; tmax=2;  df=0.5; imask_no_ice_pc=0.1 ; color_missing='k'
+            if CBOX in ["Spitzberg"]:     tmin=0; tmax=4;  df=1;   imask_no_ice_pc=0.1 ; color_top_cb='k'
             
         elif CWHAT in [ 'damage', 'damage-t', 'damage-f' ]:
             cv_in = CWHAT  ; cv_out = cv_in            
