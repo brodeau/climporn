@@ -202,7 +202,7 @@ class field_aspect:
             #cpal_fld='gray_r' ; color_top_cb='w'; tmin=0. ;  tmax=1. ; l_pow_field=True ; pow_field=7.; vc_fld_powlog=[ 0., 0.8, 0.9, 0.95, 1. ]; color_missing = None
             #cpal_fld='ncview_ice' ; color_top_cb='w'; tmin=0. ;  tmax=1. ; l_pow_field=True ; pow_field=5.; vc_fld_powlog=[ 0., 0.7, 0.8, 0.9, 0.95, 1. ]
             #
-            cpal_fld='bone_r' ; color_top_cb='w'; color_top='w'; tmin=0. ;  tmax=1. ; l_pow_field=True ; pow_field=5.; vc_fld_powlog=[ 0., 0.7, 0.8, 0.9, 0.95, 1. ]
+            cpal_fld='cmocean_gray_r' ; color_top_cb='w'; color_top='w'; tmin=0. ;  tmax=1. ; l_pow_field=True ; pow_field=5.; vc_fld_powlog=[ 0., 0.7, 0.8, 0.9, 0.95, 1. ]
             #cpal_fld='gray_r' ; color_top_cb='k'; color_top='k'; tmin=0.78 ;  tmax=1. ; l_pow_field=False ; pow_field=10.; vc_fld_force=[  0.8, 0.85, 0.9, 0.95, 1. ]
             #
             # Paper:
@@ -213,7 +213,7 @@ class field_aspect:
             #
             cunit = 'Sea-ice damage'
             #
-            if CBOX=="CentralArctic": cpal_fld='cmocean_gray_r'; pow_field=3.; color_top='k'; color_top_cb='k'
+            if CBOX=="CentralArctic": pow_field=3.; color_top='k'; color_top_cb='k'
 
 
             
