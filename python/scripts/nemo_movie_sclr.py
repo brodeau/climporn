@@ -555,13 +555,17 @@ for jt in range(jt0,Nt):
 
 
 
+    # Name of figure to generate:
+    cstr = CBOX
+    if CEXP != 'none':
+        cstr += '_'+CEXP
     if cn_fig != "":
-        cfig = cdir_figs+'/'+fa.cv_out+'_'+CEXP+cn_fig+'_'+cdate+'.'+fig_type
+        cfig = cdir_figs+'/'+fa.cv_out+'_'+cstr+cn_fig+'_'+cdate+'.'+fig_type
     else:
         if l3d:
-            cfig = cdir_figs+'/'+fa.cv_out+'_'+CEXP+CNEMO+CRUN+'_lev'+str(jk)+'_'+CBOX+'_'+cdate+'.'+fig_type
+            cfig = cdir_figs+'/'+fa.cv_out+'_'+cstr+CNEMO+CRUN+'_lev'+str(jk)+'_'+CBOX+'_'+cdate+'.'+fig_type
         else:
-            cfig = cdir_figs+'/'+fa.cv_out+'_'+CEXP+CNEMO+CRUN+'_'+CBOX+'_'+cdate+'.'+fig_type
+            cfig = cdir_figs+'/'+fa.cv_out+'_'+cstr+CNEMO+CRUN+'_'+CBOX+'_'+cdate+'.'+fig_type
 
 
     if not path.exists(cfig):
