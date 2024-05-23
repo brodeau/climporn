@@ -157,7 +157,7 @@ class nemo_hbox:
             pt_sz_track = 1
             #
         elif [ config, box ] == [ 'NANUK36', 'ZoomCenter']:
-            i1=1700 ; j1=2550 ; i2=i1+900 ; j2=j1+900  ; rfact_zoom=1. ; font_rat=0.5*rfact_zoom
+            i1=1800 ; j1=2400 ; i2=i1+900 ; j2=j1+900  ; rfact_zoom=1. ; font_rat=0.5*rfact_zoom
             l_show_cb  = True ; vcb=[0.3, 0.96, 0.4, 0.016]
             l_show_clock=True ; x_clock = rfact_zoom*720 ; y_clock = rfact_zoom*15
             #l_show_sign=True  ; x_sign = rfact_zoom*2320 ; y_sign = rfact_zoom*15
