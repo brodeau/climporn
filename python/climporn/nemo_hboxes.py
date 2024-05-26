@@ -148,6 +148,15 @@ class nemo_hbox:
             l_show_name=True  ; x_name  = rfact_zoom*100 ; y_name  = rfact_zoom*3700
             pt_sz_track = 1
             #
+        elif [ config, box ] == [ 'NANUK36', 'DEBUG']:
+            i1=2575 ; j1=2073 ; i2=i1+480 ; j2=j1+480  ; rfact_zoom=3. ; font_rat=0.15*rfact_zoom
+            l_show_cb  = True ; vcb=[0.3, 0.96, 0.4, 0.016]
+            l_show_clock=True ; x_clock = rfact_zoom*400 ; y_clock = rfact_zoom*15
+            #l_show_sign=True  ; x_sign = rfact_zoom*2320 ; y_sign = rfact_zoom*15
+            #l_show_exp=True  ; x_exp  = rfact_zoom*30 ; y_exp  = rfact_zoom*15 ; #lili
+            #l_show_name=True  ; x_name  = rfact_zoom*30 ; y_name  = rfact_zoom*15 ; #lili
+            pt_sz_track = 1
+            #
         elif [ config, box ] == [ 'NANUK36', 'CentralArctic']:
             ## Full-screen 2560x1440:
             i1=950 ; j1=2240 ; i2=i1+2560 ; j2=j1+1440  ; rfact_zoom=1. ; font_rat=0.75*rfact_zoom
