@@ -39,6 +39,7 @@ warnings.filterwarnings("ignore")
 
 cwd = getcwd()
 
+
 vmn = [ 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ]
 vml = [ 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ]
 
@@ -445,7 +446,7 @@ if fa.l_show_lsm:
             UMSK = id_lsm.variables['umask'][j1:j2,i1:i2]
             VMSK = id_lsm.variables['vmask'][j1:j2,i1:i2]
 
-    if fa.l_apply_geov:
+    if fa.l_apply_geov or fa.l_apply_lap or l_add_VOR_to_ice_field:
         ## Coriolis Parameter:
         ff  = id_lsm.variables['gphif'][0,j1:j2,i1:i2]
         ff[:,:] = 2.*romega*np.sin(ff[:,:]*np.pi/180.0)
@@ -629,9 +630,8 @@ for jt in range(jt0,Nt):
 
         if l_add_VOR_to_ice_field:
             Xpssh = id_f.variables[caVOR][jt,j1:j2,i1:i2] ; # t, y, x
-            #Xpvor = comp_LapOfSSH_bad( caVOR, XE1T2, XE2T2, Xpssh )
-            Xpvor = comp_LapOfSSH( caVOR, XE1T, XE2T, XE1U, XE2U, XE1V, XE2V, Xpssh )
-            #print(Xpvor[::100,::100]) #; exit(0)
+            Xpvor = comp_LapOfSSH( caVOR, XE1T, XE2T, XE1U, XE2U, XE1V, XE2V, Xpssh ) / ff
+            Xpvor[:,:] = Xpvor[:,:] / ff[:,:]
             del Xpssh
 
         print('Done!\n')
