@@ -219,7 +219,10 @@ if caVOR != "":
     print(' *** We shall show the vorticity over open ocean based on Laplacian of : ', caVOR)
 
 
-if int(l_add_SST_to_ice_field) + int(l_add_SSH_to_ice_field) + int(l_add_SSU_to_ice_field) + int(l_add_VOR_to_ice_field) > 1:
+
+i_add_something = int(l_add_SST_to_ice_field) + int(l_add_SSH_to_ice_field) + int(l_add_SSU_to_ice_field) + int(l_add_VOR_to_ice_field)
+    
+if i_add_something > 1:
     #if l_add_SST_to_ice_field and l_add_VOR_to_ice_field:
     print(' ERROR: chose between the `-T`, `-H`, & `-V` options, only 1 !!!'); exit(0)
 
@@ -331,7 +334,7 @@ if l_add_SSU_to_ice_field:
     #cpal_ssu = 'cmocean_deep_r'
     cpal_ssu = 'cmocean_tempo'
     #cpal_ssu = 'cmocean_ice_r'
-    if CWHAT in ['sivolu']: cpal_ssu = 'cmocean_thermal'
+    if CWHAT in ['sivolu','siconc']: cpal_ssu = 'cmocean_thermal'
     rmin_ssu = 0. ; rmax_ssu = 1. ; dssu = 0.1
     pal_ssu = cp.chose_colmap(cpal_ssu)
     norm_ssu = colors.Normalize(vmin=rmin_ssu, vmax=rmax_ssu , clip = False)
@@ -345,7 +348,7 @@ if l_add_VOR_to_ice_field:
     pal_vor = cp.chose_colmap(cpal_vor)
     norm_vor = colors.Normalize(vmin=rmin_vor, vmax=rmax_vor , clip = False)
 
-
+    
 
 # Ice over ocean field:
 if fa.l_show_ice:
@@ -359,7 +362,17 @@ if fa.l_show_ice:
     pal_ice = cp.chose_colmap(cpal_ice)
     norm_ice = colors.Normalize(vmin = rmin_ice, vmax = 0.95, clip = False)
 
-if fa.imask_no_ice_pc > 0:
+
+# Ice
+l_i_need_A = ( fa.l_show_ice or fa.imask_no_ice_pc>0 or i_add_something>0 )
+
+
+#print('LOLO: cv_in =',fa.cv_in,' fa.imask_no_ice_pc =',fa.imask_no_ice_pc)
+#exit(0)
+
+rt_io = 0.0
+#if fa.imask_no_ice_pc > 0:
+if l_i_need_A:
     # => going to read variable `fa.nm_ice_conc` into the same file
     cf_ice = cf_in
     rt_io = float(fa.imask_no_ice_pc)/100.
@@ -593,8 +606,6 @@ for jt in range(jt0,Nt):
             else:
                 Xplot  = id_f.variables[fa.cv_in][jt,j1:j2,i1:i2] ; # t, y, x
 
-        # Ice
-        l_i_need_A = ( fa.l_show_ice or fa.imask_no_ice_pc>0 )
 
         if l_i_need_A:
             print('Reading record #'+str(jt)+' of '+fa.nm_ice_conc+' in '+cf_ice)
@@ -604,26 +615,18 @@ for jt in range(jt0,Nt):
             print('Done!\n')
 
         if l_add_SST_to_ice_field:
-            if not l_i_need_A:
-                XICE = id_f.variables['siconc'][jt,j1:j2,i1:i2] ; # t, y, x  => we need it to separate open ocean from sea-ice !
             Xpsst = id_f.variables[caSST][jt,j1:j2,i1:i2] ; # t, y, x
 
         if l_add_SSH_to_ice_field:
-            if not l_i_need_A:
-                XICE = id_f.variables['siconc'][jt,j1:j2,i1:i2] ; # t, y, x  => we need it to separate open ocean from sea-ice !
             Xpssh = id_f.variables[caSSH][jt,j1:j2,i1:i2] ; # t, y, x
 
         if l_add_SSU_to_ice_field:
-            if not l_i_need_A:
-                XICE = id_f.variables['siconc'][jt,j1:j2,i1:i2] ; # t, y, x  => we need it to separate open ocean from sea-ice !
             Xpssu = id_f.variables[caSSU][jt,j1:j2,i1:i2] ; # t, y, x
             Xpssv = id_f.variables[caSSV][jt,j1:j2,i1:i2] ; # t, y, x
             Xpssu = moduleOfVelocity( caSSU, caSSV, Xpssu, Xpssv )
             del Xpssv
 
         if l_add_VOR_to_ice_field:
-            if not l_i_need_A:
-                XICE = id_f.variables['siconc'][jt,j1:j2,i1:i2] ; # t, y, x  => we need it to separate open ocean from sea-ice !
             Xpssh = id_f.variables[caVOR][jt,j1:j2,i1:i2] ; # t, y, x
             #Xpvor = comp_LapOfSSH_bad( caVOR, XE1T2, XE2T2, Xpssh )
             Xpvor = comp_LapOfSSH( caVOR, XE1T, XE2T, XE1U, XE2U, XE1V, XE2V, Xpssh )
@@ -710,7 +713,7 @@ for jt in range(jt0,Nt):
             print('')
 
 
-        if fa.imask_no_ice_pc > 0:
+        if l_i_need_A:
             # masking field where too litle sea-ice:
             Xplot = np.ma.masked_where( XICE <= rt_io, Xplot )
 
