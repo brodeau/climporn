@@ -630,7 +630,7 @@ for jt in range(jt0,Nt):
 
         if l_add_VOR_to_ice_field:
             Xpssh = id_f.variables[caVOR][jt,j1:j2,i1:i2] ; # t, y, x
-            Xpvor[:,:] = comp_LapOfSSH( caVOR, XE1T, XE2T, XE1U, XE2U, XE1V, XE2V, Xpssh )
+            Xpvor = comp_LapOfSSH( caVOR, XE1T, XE2T, XE1U, XE2U, XE1V, XE2V, Xpssh )
             Xpvor[:,:] = Xpvor[:,:] / ff[:,:]
             del Xpssh
 
