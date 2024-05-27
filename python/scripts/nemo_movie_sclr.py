@@ -835,7 +835,7 @@ for jt in range(jt0,Nt):
             if CONAME != "": cbla = CONAME
             xl = float(x_name)/rfz
             yl = float(y_name)/rfz
-            ax.annotate(cbla, xy=(1, 4), xytext=(xl, yl), **fsm.cfont_titl)
+            ax.annotate(cbla, xy=(1, 4), xytext=(xl, yl), zorder=52,  **fsm.cfont_titl)
 
         if nemo_box.l_add_logo:
             datafile = cbook.get_sample_data(dir_logos+'/'+nemo_box.cf_logo_on, asfileobj=False)
