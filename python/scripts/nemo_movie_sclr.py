@@ -344,7 +344,8 @@ if l_add_VOR_to_ice_field:
     #cpal_vor = 'cmocean_curl'
     cpal_vor = 'PiYG_r'
     #cpal_vor = 'BrBG_r'
-    rmin_vor = -0.02 ; rmax_vor = -rmin_vor ; dvor = 0.0001
+    #rmin_vor = -0.02 ; rmax_vor = -rmin_vor ; dvor = 0.0001 ; # NANUK12
+    rmin_vor = -0.05 ; rmax_vor = -rmin_vor ; dvor = 0.001 ; # NANUK36
     pal_vor = cp.chose_colmap(cpal_vor)
     norm_vor = colors.Normalize(vmin=rmin_vor, vmax=rmax_vor , clip = False)
 
