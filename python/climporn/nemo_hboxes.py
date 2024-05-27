@@ -141,7 +141,7 @@ class nemo_hbox:
 
             ####   NANUK36   ####
         elif [ config, box ] == [ 'NANUK36', 'ALL']:
-            i1=0 ; j1=54 ; i2=Ni0-20 ; j2=Nj0-100  ; rfact_zoom=1 ; font_rat=2.*rfact_zoom
+            i1=0 ; j1=54 ; i2=Ni0-20 ; j2=Nj0-100  ; rfact_zoom=0.3572 ; font_rat=2.*rfact_zoom ; # rfact_zoom=0.3572 => 1440p in height!
             l_show_cb  = True ; vcb=[0.65, 0.965, 0.34, 0.016]
             l_show_clock=True ; x_clock = rfact_zoom*3500 ; y_clock = rfact_zoom*3000
             l_show_sign=True  ; x_sign = rfact_zoom*3600 ; y_sign = rfact_zoom*40

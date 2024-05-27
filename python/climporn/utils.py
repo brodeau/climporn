@@ -887,12 +887,12 @@ def fig_style_mov( pzoom, clr_top='k', clr_top_cb='k' ):
                'ytick.labelsize': int(9.*pzoom),
                'axes.labelsize':  int(9.*pzoom) }
     rcParams.update(params)
-    fig_style_mov.cfont_clb_tcks = { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(11.5*pzoom), 'color':clr_top_cb}
-    fig_style_mov.cfont_clb      = { 'fontname':'Open Sans',   'fontweight':'normal', 'fontsize':int(11.5*pzoom), 'color':clr_top_cb}
+    fig_style_mov.cfont_clb_tcks = { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(11*pzoom), 'color':clr_top_cb}
+    fig_style_mov.cfont_clb      = { 'fontname':'Open Sans',   'fontweight':'normal', 'fontsize':int(11*pzoom), 'color':clr_top_cb}
     fig_style_mov.cfont_clock    = { 'fontname':'Ubuntu Mono', 'fontweight':'normal', 'fontsize':int(10.*pzoom), 'color':clr_top }
     fig_style_mov.cfont_exp      = { 'fontname':'Open Sans'  , 'fontweight':'light', 'fontsize':int(9.*pzoom), 'color':clr_top }
     fig_style_mov.cfont_mail     = { 'fontname':'Times New Roman', 'fontweight':'normal', 'fontstyle':'italic', 'fontsize':int(14.*pzoom), 'color':'0.8'}
-    fig_style_mov.cfont_titl     = { 'fontname':'Open Sans'  , 'fontweight':'light', 'fontsize':int(14.*pzoom), 'color':clr_top }
+    fig_style_mov.cfont_titl     = { 'fontname':'Open Sans'  , 'fontweight':'normal', 'fontsize':int(16.*pzoom), 'color':clr_top }
     fig_style_mov.cfont_label    = { 'fontname':'Open Sans'  , 'fontweight':'normal', 'fontsize':int(14.*pzoom), 'color':clr_top }
     fig_style_mov.cfont_sign     = { 'fontname':'Open Sans'  , 'fontweight':'normal', 'fontstyle':'italic','fontsize':int(7.*pzoom), 'color':'w' }
     fig_style_mov.cfont_letter   = { 'fontname':'Open Sans',   'fontweight':'semibold', 'fontsize':int(16.*pzoom), 'color':clr_top_cb}

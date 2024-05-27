@@ -697,11 +697,19 @@ for jt in range(jt0,Nt):
 
         plt.axis([ 0, ni, 0, nj])
 
-        if nemo_box.c_imshow_interp == 'none':
-            Xplot[idx_land] = np.nan
-        else:
-            print(" *** drowning array `Xplot`....\n")
-            cp.drown(Xplot, XMSK, k_ew=-1, nb_max_inc=10, nb_smooth=10)
+
+        cinterp = nemo_box.c_imshow_interp ; # should be 'none' normally...
+        if rfz<1.:
+            cinterp = 'antialiased'
+        #cintdat = 'rgba' ; # data/rgba
+        cintdat = 'data' ; # data/rgba
+
+        if not l_add_topo_land:            
+            if cinterp == 'none':
+                Xplot[idx_land] = np.nan
+            else:
+                print(" *** drowning array `Xplot`....\n")
+                cp.drown(Xplot, XMSK, k_ew=-1, nb_max_inc=10, nb_smooth=10)
 
         if l_save_nc:
             if l3d:
@@ -713,52 +721,63 @@ for jt in range(jt0,Nt):
             print('')
 
 
-        if l_i_need_A:
-            # masking field where too litle sea-ice:
-            Xplot = np.ma.masked_where( XICE <= rt_io, Xplot )
-
+        # if not i_add_something !!
+        #lili!
+        #if not l_add_topo_land and l_i_need_A and rfz>=1.:
+        #    # masking field where too litle sea-ice:
+        #    Xplot = np.ma.masked_where( XICE <= rt_io, Xplot )
+                    
         #cf = plt.figimage( np.flipud(Xplot[:,:]), cmap=pal_fld, norm=norm_fld,zorder=10 )
-        #cf = plt.imshow( Xplot[:,:], cmap=pal_fld, norm=norm_fld, interpolation=nemo_box.c_imshow_interp, zorder=10 )
-        cf = plt.pcolormesh( Xplot[:,:], cmap=pal_fld, norm=norm_fld, zorder=10 )
+        #cf = plt.imshow( Xplot[:,:], cmap=pal_fld, norm=norm_fld, interpolation=cinterp, zorder=10 )
+        if rfz<1.:
+            print(' *** Using `imshow()` with `interpolation='+cinterp+'` & `interpolation_stage='+cintdat+'`')
+            # Field is subsampled, better to use a dealiasing => ... interpolation=interp, interpolation_stage=data/rgba,
+            cf = plt.imshow(     Xplot[:,:], cmap=pal_fld, norm=norm_fld, interpolation=cinterp, interpolation_stage=cintdat, zorder=10 )
+        else:
+            print(' *** Using `pcolormesh()` with `interpolation='+cinterp+'` & `interpolation_stage='+cintdat+'`')
+            cf = plt.pcolormesh( Xplot[:,:], cmap=pal_fld, norm=norm_fld, zorder=10 )
 
+            
         # Add SST over open ocean:
         if l_add_SST_to_ice_field:
             psst = np.ma.masked_where(XICE > rt_io, Xpsst)
-            ct   = plt.imshow(psst, cmap=pal_sst, norm=norm_sst, interpolation='none')
+            ct   = plt.imshow(psst, cmap=pal_sst, norm=norm_sst, interpolation=cinterp, interpolation_stage=cintdat, zorder=12)
             del psst, ct
 
         # Add SSH over open ocean:
         if l_add_SSH_to_ice_field:
             pssh = np.ma.masked_where(XICE > rt_io, Xpssh)
-            ct   = plt.imshow(pssh, cmap=pal_ssh, norm=norm_ssh, interpolation='none')
+            ct   = plt.imshow(pssh, cmap=pal_ssh, norm=norm_ssh, interpolation=cinterp, interpolation_stage=cintdat, zorder=12)
             del pssh, ct
 
         # Add SSU over open ocean:
         if l_add_SSU_to_ice_field:
             pssu = np.ma.masked_where(XICE > rt_io, Xpssu)
-            ct   = plt.imshow(pssu, cmap=pal_ssu, norm=norm_ssu, interpolation='none')
+            ct   = plt.imshow(pssu, cmap=pal_ssu, norm=norm_ssu, interpolation=cinterp, interpolation_stage=cintdat, zorder=12)
             del pssu, ct
 
         # Add vorticity aka Laplacian of SSH over open ocean:
         if l_add_VOR_to_ice_field:
             pvor = np.ma.masked_where(XICE > rt_io, Xpvor)
-            ct   = plt.imshow(pvor, cmap=pal_vor, norm=norm_vor, interpolation='none')
+            ct   = plt.imshow(pvor, cmap=pal_vor, norm=norm_vor, interpolation=cinterp, interpolation_stage=cintdat, zorder=12)
             del pvor, ct
 
         # Add Sea-Ice onto a open ocean field:
         if fa.l_show_ice:
             pice = np.ma.masked_where(XICE < rmin_ice, XICE)
-            ci = plt.imshow(pice, cmap=pal_ice, norm=norm_ice, interpolation='none') ; del pice, ci
+            ci = plt.imshow(pice, cmap=pal_ice, norm=norm_ice, interpolation=cinterp, interpolation_stage=cintdat, zorder=12) ; del pice, ci
 
         if fa.l_show_lsm or l_add_topo_land:
             if l_add_topo_land:
-                #clsm = plt.imshow( np.ma.masked_where(XLSM>0.0001, xtopo), cmap=pal_lsm, norm=norm_lsm, interpolation='none',zorder=1 )
-                clsm = plt.pcolormesh( np.ma.masked_where(XLSM>0.0001, xtopo), cmap=pal_lsm, norm=norm_lsm, zorder=5 )
-                #if nemo_box.c_imshow_interp == 'none':
-                plt.contour(XLSM, [0.5], colors='k', linewidths=0.5, zorder=100)
+                if rfz<1.:
+                    clsm = plt.imshow(     np.ma.masked_where(XLSM>0.0001, xtopo), cmap=pal_lsm, norm=norm_lsm, interpolation=cinterp, interpolation_stage=cintdat,zorder=50 )
+                else:
+                    clsm = plt.pcolormesh( np.ma.masked_where(XLSM>0.0001, xtopo), cmap=pal_lsm, norm=norm_lsm, zorder=50 )
+                #if cinterp == 'none':
+                plt.contour(XLSM, [0.5], colors='k', linewidths=rfz*0.6, zorder=100)
             else:
                 pmsk = np.ma.masked_where(XLSM[:,:] > 0.2, XLSM[:,:])
-                clsm = plt.imshow( pmsk, cmap=pal_lsm, norm=norm_lsm, interpolation='none' )
+                clsm = plt.imshow( pmsk, cmap=pal_lsm, norm=norm_lsm, interpolation=cinterp, interpolation_stage=cintdat )
                 del pmsk
 
         ##### COLORBAR ######
