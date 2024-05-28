@@ -189,7 +189,6 @@ class nemo_hbox:
             pt_sz_track = 1
             #
         elif [ config, box ] == [ 'NANUK36', 'Hudson']:
-            # -d x,0,719 -d y,62,1341
             i1=0 ; j1=62 ; i2=i1+720 ; j2=j1+1280  ; rfact_zoom=1. ; font_rat=0.72*rfact_zoom
             l_show_cb  = True ; vcb=[0.033, 0.08, 0.5, 0.015]
             l_show_clock=True ; x_clock = rfact_zoom*15 ; y_clock = rfact_zoom*1240
@@ -202,6 +201,13 @@ class nemo_hbox:
             l_show_cb  = True ; vcb=[0.35, 0.95, 0.6, 0.015]
             l_show_clock=True ; x_clock = rfact_zoom*900 ; y_clock = rfact_zoom*975
             l_show_sign=True  ; x_sign = rfact_zoom*980 ; y_sign = rfact_zoom*750
+            pt_sz_track = 1
+            #
+        elif [ config, box ] == [ 'NANUK36', 'Beaufort']:
+            i1=850 ; j1=2750 ; i2=i1+1200 ; j2=j1+1200  ; rfact_zoom=1. ; font_rat=0.72*rfact_zoom
+            l_show_cb  = True ; vcb=[0.08, 0.95, 0.6, 0.015]
+            l_show_clock=True ; x_clock = rfact_zoom*200 ; y_clock = rfact_zoom*900
+            l_show_sign=True  ; x_sign = rfact_zoom*980 ; y_sign = rfact_zoom*15
             pt_sz_track = 1
             #
         elif [ config, box ] == [ 'NANUK36', 'Baffin-Nare']:
