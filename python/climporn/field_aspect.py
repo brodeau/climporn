@@ -192,7 +192,7 @@ class field_aspect:
             tmin=0. ;  tmax=4. ;  df=1 ; cb_jump = 1; cb_extend = 'max'
             cunit = 'Sea-ice thickness [m]'
             if CBOX in ["CentralArctic"]: imask_no_ice_pc=0.1 ; color_missing='k'
-            if CBOX in ["Baffin",]:        tmin=0; tmax=2;  df=0.5; imask_no_ice_pc=0.1 ; color_missing='k'
+            if CBOX in ["Baffin",]:        tmin=0; tmax=2;  df=0.5; imask_no_ice_pc=0.1 ; color_missing='k' ; color_top='w' ; color_top_cb='w'
             if CBOX in ["Spitzberg"]:     tmin=0; tmax=4;  df=1;   imask_no_ice_pc=0.1 ; color_top_cb='w'
             if CBOX in ["ZoomCenter"]:    tmin=1; tmax=4;  df=1;   imask_no_ice_pc=0.1 ; color_top_cb='w'; #vc_fld_force=[0.5,1,2,3,4]
             
