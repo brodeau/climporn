@@ -825,14 +825,11 @@ for jt in range(jt0,Nt):
             clb.ax.tick_params(which = 'major', length=2*rfz, width=0.3*rfz, color=col_cb )
 
         if nemo_box.l_show_clock:
-            col_clock = fa.color_top
             if nemo_box.loc_clock=='land':
-                col_clock = 'w'
-            #
+                fsm.cfont_clock['color'] = 'w' ; # update font color in font dictionary
             xl = float(x_clock)/rfz
             yl = float(y_clock)/rfz
-            #ax.annotate('Date: '+cdats, xy=(1, 4), xytext=(xl,yl), **fsm.cfont_clock)
-            ax.annotate(cdats, xy=(1, 4), xytext=(xl,yl), zorder=150, fc=col_clock,  **fsm.cfont_clock)
+            ax.annotate(cdats, xy=(1, 4), xytext=(xl,yl), zorder=150,  **fsm.cfont_clock)
 
         if nemo_box.l_show_exp:
             xl = float(x_exp)/rfz
