@@ -356,7 +356,7 @@ if l_add_VOR_to_ice_field:
     if CNEMO=='NANUK36':
         rmin_vor = -2500. ; rmax_vor = -rmin_vor ; dvor = 250. ; # NANUK36
     elif CNEMO=='NANUK12':
-        rmin_vor = -500. ; rmax_vor = -rmin_vor ; dvor = 50. ; # NANUK36
+        rmin_vor = -100. ; rmax_vor = -rmin_vor ; dvor = 10. ; # NANUK36
     else:
         rmin_vor = -500. ; rmax_vor = -rmin_vor ; dvor = 50.
     pal_vor = cp.chose_colmap(cpal_vor)
