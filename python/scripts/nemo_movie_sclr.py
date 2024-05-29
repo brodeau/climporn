@@ -311,7 +311,7 @@ print('\n================================================================\n\n\n'
 
 # Field-specific information (colormaps, bounds, etc): lilo
 fa = cp.field_aspect( CWHAT, cbox=CBOX )
-
+#lili
 
 
 # SST over open ocean:
@@ -391,6 +391,10 @@ l_notime=False
 
 id_f = Dataset(cf_in)
 list_var = id_f.variables.keys()
+#
+if not fa.cv_in in list_var:
+    print(' PROBLEM [nemo_movie_sclr.py]: variable `'+fa.cv_in+'` not present in input file! => exiting!'); exit(0)
+#
 if 'time_instant' in list_var:
     cv_time = 'time_instant'
 elif 'time_counter' in list_var:
@@ -404,6 +408,7 @@ else:
         print('    ==> then use the `-s` switch to specify an initial date!!!')
         exit(0)
 vtime = id_f.variables[cv_time][:]
+#
 id_f.close()
 
 Nt = 1
