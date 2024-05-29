@@ -304,14 +304,14 @@ class field_aspect:
 
         elif CWHAT in [ 'qns_atmo' ]:
             cv_in = CWHAT ; cv_out = 'qns_atmo'
-            imask_no_ice_pc = 5 ; # we hide the field where A<10%
+            imask_no_ice_pc = 10 ; # we hide the field where A<10%
             #cpal_fld = 'ncview_parula'; color_top_cb='k'
             #cpal_fld = 'viridis'; color_top_cb='k'
             #cpal_fld = 'inferno'; color_top_cb='k'
-            cpal_fld = 'cmocean_haline'; color_top='w' ; color_top_cb='w' ; color_missing ='k'
-            tmin=0.; tmax=100.; df=25.
+            cpal_fld = 'cmocean_haline'; color_top='w' ; color_top_cb='w' ; color_missing ='w'
+            tmin=0.; tmax=200.; df=25.
             #l_pow_field=True; pow_field=5.
-            vc_fld_powlog = [ tmin, 25., 50., 75., tmax ]
+            vc_fld_powlog = [ tmin, 25., 50., 75., 150. , tmax ]
             cunit = r'Non-solar heat flux to the atmosphere [$W/m^{2}$]'
 
 
