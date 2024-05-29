@@ -741,7 +741,7 @@ for jt in range(jt0,Nt):
         #    # masking field where too litle sea-ice:
         #    Xplot = np.ma.masked_where( XICE <= rt_io, Xplot )
 
-        if imask_no_ice_pc>0 and not i_add_something:
+        if fa.imask_no_ice_pc>0 and not i_add_something:
             Xplot = np.ma.masked_where( XICE <= rt_io, Xplot )
 
 
