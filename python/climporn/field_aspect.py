@@ -182,7 +182,7 @@ class field_aspect:
             cpal_fld='ncview_ice' ; tmin=0. ;  tmax=1. ;  df = 0.2 ; cb_extend = 'neither' ; color_top_cb='k'; color_top='k'
             #cpal_fld='gray' ; tmin=0. ;  tmax=1. ;  df = 0.1 ; cb_extend = 'neither' ; color_top_cb='k'; color_top='k'
             #l_pow_field=True ; pow_field=6. ; vc_fld_powlog = [ 0., 0.7, 0.8, 0.9, 0.95, 1. ]
-            l_pow_field=True ; pow_field=0.4 ; vc_fld_powlog = [ 0., 0.05, 0.1, 0.25, 0.5, 0.75, 1. ]
+            l_pow_field=True ; pow_field=0.4 ; vc_fld_powlog = [ 0, 0.01, 0.05, 0.1, 0.25, 0.5, 0.75, 1 ]
             cunit = 'Sea-ice concentration'
             #if CBOX=='DEBUG': l_pow_field=False
 
