@@ -740,7 +740,12 @@ for jt in range(jt0,Nt):
         #if not l_add_topo_land and l_i_need_A and rfz>=1.:
         #    # masking field where too litle sea-ice:
         #    Xplot = np.ma.masked_where( XICE <= rt_io, Xplot )
-                    
+
+        if imask_no_ice_pc>0 and not i_add_something:
+            Xplot = np.ma.masked_where( XICE <= rt_io, Xplot )
+
+
+        
         #cf = plt.figimage( np.flipud(Xplot[:,:]), cmap=pal_fld, norm=norm_fld,zorder=10 )
         #cf = plt.imshow( Xplot[:,:], cmap=pal_fld, norm=norm_fld, interpolation=cinterp, zorder=10 )
         if rfz<1.:
