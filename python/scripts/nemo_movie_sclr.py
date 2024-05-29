@@ -313,6 +313,8 @@ print('\n================================================================\n\n\n'
 fa = cp.field_aspect( CWHAT, cbox=CBOX )
 #lili
 
+col_cb = fa.color_top_cb
+
 
 # SST over open ocean:
 if l_add_SST_to_ice_field:
@@ -321,6 +323,7 @@ if l_add_SST_to_ice_field:
     pal_sst = cp.chose_colmap(cpal_sst)
     norm_sst = colors.Normalize(vmin=rmin_sst, vmax=rmax_sst , clip = False)
 
+    
 # SSH over open ocean:
 if l_add_SSH_to_ice_field:
     #cpal_ssh = 'cmocean_deep'
@@ -331,15 +334,14 @@ if l_add_SSH_to_ice_field:
 
 # SSU over open ocean:
 if l_add_SSU_to_ice_field:
-    #cpal_ssu = 'cmocean_amp'
-    #cpal_ssu = 'cmocean_deep_r'
-    cpal_ssu = 'cmocean_tempo'
-    #cpal_ssu = 'cmocean_ice_r'
-    if CWHAT in ['sivolu','siconc']: cpal_ssu = 'cmocean_thermal'
+    cpal_ssu = 'cmocean_thermal'
     rmin_ssu = 0. ; rmax_ssu = 1. ; dssu = 0.1
     pal_ssu = cp.chose_colmap(cpal_ssu)
     norm_ssu = colors.Normalize(vmin=rmin_ssu, vmax=rmax_ssu , clip = False)
-
+    # If colorbar located over ocean, then need to updated to a color that can be seen over `cpal_ssu`:
+    if nemo_box.loc_cb=='ocean':
+        col_cb = 'w'
+    
 # VOR over open ocean:
 if l_add_VOR_to_ice_field:
     #cpal_vor = 'cmocean_curl'
@@ -509,7 +511,7 @@ XLSM[np.where( XMSK > 0.5)] = 1
 
 
 # Font style:
-kk = fsm( fontr, clr_top=fa.color_top, clr_top_cb=fa.color_top_cb )
+kk = fsm( fontr, clr_top=fa.color_top, clr_top_cb=col_cb )
 
 
 # Colormaps for fields:
@@ -786,12 +788,7 @@ for jt in range(jt0,Nt):
                 del pmsk
 
         ##### COLORBAR ######
-        if nemo_box.l_show_cb and lcb:
-
-            col_cb = fa.color_top_cb
-            if nemo_box.loc_cb=='land':
-                col_cb = 'w'
-            
+        if nemo_box.l_show_cb and lcb:            
             ax2 = plt.axes(nemo_box.vcb)
             if fa.l_pow_field or fa.l_log_field:
                 clb = mpl.colorbar.ColorbarBase(ax=ax2, ticks=fa.vc_fld_powlog, cmap=pal_fld, norm=norm_fld,
@@ -840,7 +837,7 @@ for jt in range(jt0,Nt):
 
         if l_add_sign and nemo_box.l_show_sign:
             if nemo_box.loc_sign=='land':
-                fsm.cfont_sign['color'] = '0.8' ; # update font color in font dictionary            
+                fsm.cfont_sign['color'] = 'w' ; # update font color in font dictionary            
             xl = float(x_sign)/rfz
             yl = float(y_sign)/rfz
             ax.annotate(CSIGN, xy=(1, 4), xytext=(xl,yl), zorder=150, **fsm.cfont_sign)
