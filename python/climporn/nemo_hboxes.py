@@ -87,12 +87,15 @@ class nemo_hbox:
         cf_logo_ige = 'IGE_blanc_notext.png'
         cf_logo_prc = 'PRACE_blanc.png'
 
-        x_clock = 1600 ; y_clock = 200
-        x_sign = 1600  ; y_sign = 200
+        x_clock = 1600 ; y_clock = 200 ; loc_clock = 'land'
+        x_sign = 1600  ; y_sign = 200  ; loc_sign  = 'land'
         x_logo = 2200  ; y_logo  = 50
-        x_exp = 40     ; y_exp = 980
-        x_name = 100   ; y_name = 100
-        #x_exp = 40     ; y_exp = 980
+        x_exp = 40     ; y_exp = 980   ; loc_exp   = 'land'
+        x_name = 100   ; y_name = 100  ; loc_name  = 'land'
+
+        # Color bar:
+        vcb = []
+        loc_cb = 'ocean'
         
         pt_sz_track = 5
         
@@ -560,20 +563,32 @@ class nemo_hbox:
         print(' *** CONF: "'+config+'", BOX: "'+box+'" ==> i1,j1,i2,j2 = ',i1,j1,i2,j2,'\n')
             
         self.rfact_zoom      = rfact_zoom
-        self.vcb             = vcb
         self.font_rat        = font_rat
-        self.l_show_name     = l_show_name
-        self.name             = (x_name,y_name)
+        #
+        self.vcb             = vcb
+        self.loc_cb          = loc_cb
+        #
         self.l_show_clock    = l_show_clock
         self.clock           = (x_clock,y_clock)
+        self.loc_clock       = loc_clock
+        #
         self.l_show_sign     = l_show_sign
         self.sign            = (x_sign,y_sign)
+        self.loc_sign       = loc_sign
+        #
         self.l_add_logo      = l_add_logo
         self.logo            = (x_logo,y_logo)
         self.l_add_logo_ige  = l_add_logo_ige
         self.l_add_logo_prc  = l_add_logo_prc
+        #
         self.l_show_exp      = l_show_exp
         self.exp             = (x_exp,y_exp)
+        self.loc_exp         = loc_exp
+        #
+        self.l_show_name     = l_show_name
+        self.name            = (x_name,y_name)
+        self.loc_name        = loc_name
+        #
         self.l_fill_holes_k  = l_fill_holes_k
         self.l_show_cb       = l_show_cb
 

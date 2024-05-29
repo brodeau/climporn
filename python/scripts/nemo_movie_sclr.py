@@ -503,7 +503,7 @@ if l_add_topo_land:
     #if nemo_box.l_fill_holes_k and not l3d:
     #    XLSM[np.where( xtopo < 0.0)] = 1
     #    #xtopo[np.where( xtopo < 0.0)] = np.nan
-    #cp.dump_2d_field('topo_'+CBOX+'.nc', xtopo, name='z')
+    #cp.dump_2d_field('topo_'+CBOX+'.c', xtopo, name='z')
 
 XLSM[np.where( XMSK > 0.5)] = 1
 
@@ -787,6 +787,11 @@ for jt in range(jt0,Nt):
 
         ##### COLORBAR ######
         if nemo_box.l_show_cb and lcb:
+
+            col_cb = fa.color_top_cb
+            if nemo_box.loc_cb=='land':
+                col_cb = 'w'
+            
             ax2 = plt.axes(nemo_box.vcb)
             if fa.l_pow_field or fa.l_log_field:
                 clb = mpl.colorbar.ColorbarBase(ax=ax2, ticks=fa.vc_fld_powlog, cmap=pal_fld, norm=norm_fld,
@@ -813,17 +818,21 @@ for jt in range(jt0,Nt):
             #
             clb.set_label(fa.cunit, **fsm.cfont_clb)
             clb.ax.set_xticklabels(cb_labs, **fsm.cfont_clb_tcks)
-            clb.ax.yaxis.set_tick_params(color=fa.color_top_cb) ; # set colorbar tick color
-            clb.outline.set_edgecolor(fa.color_top_cb) ; # set colorbar edgecolor
+            clb.ax.yaxis.set_tick_params(color=col_cb) ; # set colorbar tick color
+            clb.outline.set_edgecolor(col_cb) ; # set colorbar edgecolor
             clb.outline.set_linewidth(0.3*rfz)
-            clb.ax.tick_params(which = 'minor', length=1*rfz, width=0.3*rfz, color=fa.color_top_cb )
-            clb.ax.tick_params(which = 'major', length=2*rfz, width=0.3*rfz, color=fa.color_top_cb )
+            clb.ax.tick_params(which = 'minor', length=1*rfz, width=0.3*rfz, color=col_cb )
+            clb.ax.tick_params(which = 'major', length=2*rfz, width=0.3*rfz, color=col_cb )
 
         if nemo_box.l_show_clock:
+            col_clock = fa.color_top
+            if nemo_box.loc_clock=='land':
+                col_clock = 'w'
+            #
             xl = float(x_clock)/rfz
             yl = float(y_clock)/rfz
             #ax.annotate('Date: '+cdats, xy=(1, 4), xytext=(xl,yl), **fsm.cfont_clock)
-            ax.annotate(cdats, xy=(1, 4), xytext=(xl,yl), zorder=150, **fsm.cfont_clock)
+            ax.annotate(cdats, xy=(1, 4), xytext=(xl,yl), zorder=150, fc=col_clock,  **fsm.cfont_clock)
 
         if nemo_box.l_show_exp:
             xl = float(x_exp)/rfz
