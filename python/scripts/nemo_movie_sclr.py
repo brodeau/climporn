@@ -352,7 +352,13 @@ if l_add_VOR_to_ice_field:
     #cpal_vor = 'cmocean_curl'
     cpal_vor = 'PiYG_r'
     #cpal_vor = 'BrBG_r'
-    rmin_vor = -2500. ; rmax_vor = -rmin_vor ; dvor = 250. ; # NANUK36
+    #LILI
+    if CNEMO=='NANUK36':
+        rmin_vor = -2500. ; rmax_vor = -rmin_vor ; dvor = 250. ; # NANUK36
+    elif CNEMO=='NANUK12':
+        rmin_vor = -500. ; rmax_vor = -rmin_vor ; dvor = 50. ; # NANUK36
+    else:
+        rmin_vor = -500. ; rmax_vor = -rmin_vor ; dvor = 50.
     pal_vor = cp.chose_colmap(cpal_vor)
     norm_vor = colors.Normalize(vmin=rmin_vor, vmax=rmax_vor , clip = False)
     # If colorbar located over ocean, then need to updated to a color that can be seen over `cpal_vor`:
