@@ -150,6 +150,7 @@ class nemo_hbox:
             l_show_sign=True  ; x_sign = rfact_zoom*3600 ; y_sign = rfact_zoom*40
             l_show_name=True  ; x_name  = rfact_zoom*100 ; y_name  = rfact_zoom*3700
             pt_sz_track = 1
+            loc_cb = 'land'
             #
         elif [ config, box ] == [ 'NANUK36', 'DEBUG']:
             i1=2575 ; j1=2073 ; i2=i1+480 ; j2=j1+480  ; rfact_zoom=3. ; font_rat=0.15*rfact_zoom
@@ -183,6 +184,7 @@ class nemo_hbox:
             l_show_clock=True ; x_clock = rfact_zoom*500 ; y_clock = rfact_zoom*80
             l_show_sign=True  ; x_sign = rfact_zoom*540 ; y_sign = rfact_zoom*15
             pt_sz_track = 1
+            loc_cb = 'land'
             #
         elif [ config, box ] == [ 'NANUK36', 'Spitzberg']:
             i1=2280 ; j1=1320 ; i2=i1+1920 ; j2=j1+1080  ; rfact_zoom=1. ; font_rat=0.8*rfact_zoom
@@ -197,6 +199,7 @@ class nemo_hbox:
             l_show_clock=True ; x_clock = rfact_zoom*15 ; y_clock = rfact_zoom*1240
             l_show_sign=True  ; x_sign = rfact_zoom*510 ; y_sign = rfact_zoom*15
             pt_sz_track = 1
+            loc_cb = 'land'
             #
         elif [ config, box ] == [ 'NANUK36', 'Laptev']:
             #i2=3632 ; i1=i2-1920 ; j1=2800 ; j2=j1+1200 ; rfact_zoom=1. ; font_rat=0.72*rfact_zoom

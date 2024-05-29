@@ -382,6 +382,8 @@ if fa.l_show_ice:
 # Ice
 l_i_need_A = ( fa.l_show_ice or fa.imask_no_ice_pc>0 or i_add_something>0 )
 
+if nemo_box.loc_cb=='land':
+    col_cb = 'w'
 
 #print('LOLO: cv_in =',fa.cv_in,' fa.imask_no_ice_pc =',fa.imask_no_ice_pc)
 #exit(0)
