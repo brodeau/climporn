@@ -267,9 +267,9 @@ class field_aspect:
         elif CWHAT in [ 'sishea', 'sishea-t', 'sishea-f', 'simxshr-t', 'simxshr-f' ]:
             cv_in = CWHAT  ; cv_out = cv_in ; color_top_cb='w'
             rmult = 3600.*24.
-            cpal_fld='inferno' ; tmin=0. ;  tmax=1. ; cb_extend = 'max'
+            cpal_fld='inferno' ; tmin=0. ;  tmax=1.5 ; cb_extend = 'max'
             imask_no_ice_pc = 5 ; #color_missing = 'k' ; # we hide the field where A<`imask_no_ice_pc`%
-            l_pow_field=True ; pow_field=0.3 ;  vc_fld_powlog= [tmin, 0.01, 0.1, 0.5, tmax ]
+            l_pow_field=True ; pow_field=0.3 ;  vc_fld_powlog= [tmin, 0.01, 0.1, 0.5, 1., tmax ]
             cunit = 'Maximum shear of sea-ice velocity [day$^{-1}$]'
 
         elif CWHAT in [ 'sidefo', 'sidefo-t', 'sidefo-f' ]:
