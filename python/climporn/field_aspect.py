@@ -305,7 +305,7 @@ class field_aspect:
 
         elif CWHAT in [ 'qns_atmo' ]:
             cv_in = CWHAT ; cv_out = 'qns_atmo'
-            imask_no_ice_pc = 10 ; # we hide the field where A<10%
+            imask_no_ice_pc = 1 ; # we hide the field where A<10%
             #cpal_fld = 'ncview_parula'; color_top_cb='k'
             #cpal_fld = 'viridis'; color_top_cb='k'
             #cpal_fld = 'inferno'; color_top_cb='k'
