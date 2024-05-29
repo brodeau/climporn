@@ -832,16 +832,22 @@ for jt in range(jt0,Nt):
             ax.annotate(cdats, xy=(1, 4), xytext=(xl,yl), zorder=150,  **fsm.cfont_clock)
 
         if nemo_box.l_show_exp:
+            if nemo_box.loc_exp=='land':
+                fsm.cfont_exp['color'] = 'w' ; # update font color in font dictionary
             xl = float(x_exp)/rfz
             yl = float(y_exp)/rfz
             ax.annotate('Experiment: '+CNEMO+CRUN, xy=(1, 4), xytext=(xl,yl), **fsm.cfont_exp)
 
         if l_add_sign and nemo_box.l_show_sign:
+            if nemo_box.loc_sign=='land':
+                fsm.cfont_sign['color'] = 'w' ; # update font color in font dictionary            
             xl = float(x_sign)/rfz
             yl = float(y_sign)/rfz
             ax.annotate(CSIGN, xy=(1, 4), xytext=(xl,yl), zorder=150, **fsm.cfont_sign)
 
         if nemo_box.l_show_name:
+            if nemo_box.loc_name=='land':
+                fsm.cfont_titl['color'] = 'w' ; # update font color in font dictionary            
             cbla = CNEMO
             if CONAME != "": cbla = CONAME
             xl = float(x_name)/rfz
