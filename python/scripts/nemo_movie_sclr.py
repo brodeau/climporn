@@ -322,7 +322,9 @@ if l_add_SST_to_ice_field:
     rmin_sst = -2. ; rmax_sst = 14. ; dsst = 2.
     pal_sst = cp.chose_colmap(cpal_sst)
     norm_sst = colors.Normalize(vmin=rmin_sst, vmax=rmax_sst , clip = False)
-
+    # If colorbar located over ocean, then need to updated to a color that can be seen over `cpal_sst`:
+    if nemo_box.loc_cb=='ocean':
+        col_cb = 'k'
     
 # SSH over open ocean:
 if l_add_SSH_to_ice_field:
@@ -331,7 +333,10 @@ if l_add_SSH_to_ice_field:
     rmin_ssh = -1.4 ; rmax_ssh = 0.9 ; dssh = 0.1
     pal_ssh = cp.chose_colmap(cpal_ssh)
     norm_ssh = colors.Normalize(vmin=rmin_ssh, vmax=rmax_ssh , clip = False)
-
+# If colorbar located over ocean, then need to updated to a color that can be seen over `cpal_ssh`:    
+    if nemo_box.loc_cb=='ocean':
+        col_cb = 'w'
+    
 # SSU over open ocean:
 if l_add_SSU_to_ice_field:
     cpal_ssu = 'cmocean_thermal'
@@ -350,8 +355,10 @@ if l_add_VOR_to_ice_field:
     rmin_vor = -2500. ; rmax_vor = -rmin_vor ; dvor = 250. ; # NANUK36
     pal_vor = cp.chose_colmap(cpal_vor)
     norm_vor = colors.Normalize(vmin=rmin_vor, vmax=rmax_vor , clip = False)
+    # If colorbar located over ocean, then need to updated to a color that can be seen over `cpal_vor`:
+    if nemo_box.loc_cb=='ocean':
+        col_cb = 'k'
 
-    
 
 # Ice over ocean field:
 if fa.l_show_ice:
