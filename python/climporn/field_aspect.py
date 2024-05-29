@@ -189,8 +189,7 @@ class field_aspect:
         elif CWHAT in [ 'sithic', 'sivolu' ]:
             cv_in = CWHAT  ; cv_out = cv_in
             #cpal_fld='cmocean_ice' ; color_top_cb='w' ; color_top = 'w'
-            #cpal_fld='cmocean_dense' ; color_top_cb='k' ; color_top = 'k'
-            cpal_fld='cmocean_deep' ; color_top_cb='k' ; color_top = 'k'
+            cpal_fld='cmocean_dense' ; color_top_cb='k' ; color_top = 'k'
             imask_no_ice_pc = 1 ; #color_missing = 'k' ; # we hide the field where A<`imask_no_ice_pc`%
             tmin=0. ;  tmax=4. ;  df=1 ; cb_jump = 1; cb_extend = 'max'
             cunit = 'Sea-ice thickness [m]'
