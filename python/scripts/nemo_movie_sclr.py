@@ -647,13 +647,13 @@ for jt in range(jt0,Nt):
             Xpssu = id_f.variables[caSSU][jt,j1:j2,i1:i2] ; # t, y, x
             Xpssv = id_f.variables[caSSV][jt,j1:j2,i1:i2] ; # t, y, x
             Xpssu = moduleOfVelocity( caSSU, caSSV, Xpssu, Xpssv )
-            del Xpssv
+            #del Xpssv
 
         if l_add_VOR_to_ice_field:
             Xpssh = id_f.variables[caVOR][jt,j1:j2,i1:i2] ; # t, y, x
             Xpvor = comp_LapOfSSH( caVOR, XE1T, XE2T, XE1U, XE2U, XE1V, XE2V, Xpssh )
             Xpvor[:,:] = Xpvor[:,:] / ff[:,:]
-            del Xpssh
+            #del Xpssh
 
         print('Done!\n')
 
@@ -682,7 +682,7 @@ for jt in range(jt0,Nt):
             # Modulus of vector gradient:
             Xplot[:,:] = np.sqrt(  lx[:,:]*lx[:,:] + ly[:,:]*ly[:,:] )
 
-            del lx, ly
+            #del lx, ly
 
 
         if fa.l_apply_geov:
@@ -702,7 +702,7 @@ for jt in range(jt0,Nt):
             # Modulus of vector gradient:
             Xplot[:,:] = grav/ff * np.sqrt( lx[:,:]*lx[:,:] + ly[:,:]*ly[:,:] )
 
-            del lx, ly
+            #del lx, ly
 
         if fa.lSubstractMean:
             zmean = np.sum( Xplot[:,:]*XMSK[:,:])/np.sum(XMSK[:,:])
@@ -769,30 +769,30 @@ for jt in range(jt0,Nt):
         if l_add_SST_to_ice_field:
             psst = np.ma.masked_where(XICE > rt_io, Xpsst)
             ct   = plt.imshow(psst, cmap=pal_sst, norm=norm_sst, interpolation=cinterp, interpolation_stage=cintdat, zorder=12)
-            del psst, ct
+            #del psst, ct
 
         # Add SSH over open ocean:
         if l_add_SSH_to_ice_field:
             pssh = np.ma.masked_where(XICE > rt_io, Xpssh)
             ct   = plt.imshow(pssh, cmap=pal_ssh, norm=norm_ssh, interpolation=cinterp, interpolation_stage=cintdat, zorder=12)
-            del pssh, ct
+            #del pssh, ct
 
         # Add SSU over open ocean:
         if l_add_SSU_to_ice_field:
             pssu = np.ma.masked_where(XICE > rt_io, Xpssu)
             ct   = plt.imshow(pssu, cmap=pal_ssu, norm=norm_ssu, interpolation=cinterp, interpolation_stage=cintdat, zorder=12)
-            del pssu, ct
+            #del pssu, ct
 
         # Add vorticity aka Laplacian of SSH over open ocean:
         if l_add_VOR_to_ice_field:
             pvor = np.ma.masked_where(XICE > rt_io, Xpvor)
             ct   = plt.imshow(pvor, cmap=pal_vor, norm=norm_vor, interpolation=cinterp, interpolation_stage=cintdat, zorder=12)
-            del pvor, ct
+            #del pvor, ct
 
         # Add Sea-Ice onto a open ocean field:
         if fa.l_show_ice:
             pice = np.ma.masked_where(XICE < rmin_ice, XICE)
-            ci = plt.imshow(pice, cmap=pal_ice, norm=norm_ice, interpolation=cinterp, interpolation_stage=cintdat, zorder=12) ; del pice, ci
+            ci = plt.imshow(pice, cmap=pal_ice, norm=norm_ice, interpolation=cinterp, interpolation_stage=cintdat, zorder=12) ; #del pice, ci
 
         if fa.l_show_lsm or l_add_topo_land:
             if l_add_topo_land:
@@ -805,7 +805,7 @@ for jt in range(jt0,Nt):
             else:
                 pmsk = np.ma.masked_where(XLSM[:,:] > 0.2, XLSM[:,:])
                 clsm = plt.imshow( pmsk, cmap=pal_lsm, norm=norm_lsm, interpolation=cinterp, interpolation_stage=cintdat )
-                del pmsk
+                #del pmsk
 
         ##### COLORBAR ######
         if nemo_box.l_show_cb and lcb:            
@@ -876,19 +876,19 @@ for jt in range(jt0,Nt):
             im = image.imread(datafile)
             #im[:, :, -1] = 0.5  # set the alpha channel
             fig.figimage(im, x_logo, y_logo, zorder=9)
-            del datafile, im
+            #del datafile, im
             #
             if nemo_box.l_add_logo_ige:
                 datafile = cbook.get_sample_data(dir_logos+'/'+nemo_box.cf_logo_ige, asfileobj=False)
                 im = image.imread(datafile)
                 fig.figimage(im, x_logo+144, y_logo-150., zorder=9)
-                del datafile, im
+                #del datafile, im
                 #
             if nemo_box.l_add_logo_prc:
                 datafile = cbook.get_sample_data(dir_logos+'/'+nemo_box.cf_logo_prc, asfileobj=False)
                 im = image.imread(datafile)
                 fig.figimage(im, x_logo-77, y_logo-140., zorder=9)
-                del datafile, im
+                #del datafile, im
 
         if cltr:
             ax.annotate(cltr+')', xy=(0.02, 0.93), xycoords='figure fraction', **fsm.cfont_letter )
@@ -898,9 +898,9 @@ for jt in range(jt0,Nt):
         print(cfig+' created!\n')
         plt.close(1)
 
-        if fa.l_show_lsm: del clsm
-        del cf, fig, ax
-        if nemo_box.l_show_cb and lcb: del clb
+        #if fa.l_show_lsm: #del clsm
+        #del cf, fig, ax
+        #if nemo_box.l_show_cb and lcb: #del clb
 
     else:
         print('\n Figure '+cfig+' already there!\n')

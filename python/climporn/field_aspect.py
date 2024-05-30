@@ -302,7 +302,7 @@ class field_aspect:
             tmin=-100.; tmax=0.; df=25.
             #l_pow_field=True; pow_field=5.
             vc_fld_powlog = [ tmin, -75., -50., -25., tmax ]
-            cunit = r'Non-solar heat flux to the ocean [$W/m^{2}$]'
+            cunit = r'Non-solar HF to ocean [$W/m^{2}$]'
 
         elif CWHAT in [ 'qns_atmo' ]:
             cv_in = CWHAT ; cv_out = 'qns_atmo'
@@ -314,7 +314,7 @@ class field_aspect:
             tmin=0.; tmax=200.; df=25.
             #l_pow_field=True; pow_field=5.
             vc_fld_powlog = [ tmin, 25., 50., 75., 150. , tmax ]
-            cunit = r'Non-solar heat flux to the atmosphere [$W/m^{2}$]'
+            cunit = r'Non-solar HF to atmosphere [$W/m^{2}$]'
 
 
         else:
