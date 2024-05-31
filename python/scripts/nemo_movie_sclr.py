@@ -320,6 +320,7 @@ col_cb = fa.color_top_cb
 if l_add_SST_to_ice_field:
     cpal_sst = 'YlGnBu_r'
     rmin_sst = -2. ; rmax_sst = 14. ; dsst = 2.
+    #LAPTEV: rmin_sst = -2. ; rmax_sst = 4. ; dsst = 0.5
     pal_sst = cp.chose_colmap(cpal_sst)
     norm_sst = colors.Normalize(vmin=rmin_sst, vmax=rmax_sst , clip = False)
     # If colorbar located over ocean, then need to updated to a color that can be seen over `cpal_sst`:

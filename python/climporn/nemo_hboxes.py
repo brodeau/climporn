@@ -203,9 +203,10 @@ class nemo_hbox:
         elif [ config, box ] == [ 'NANUK36', 'Laptev']:
             #i2=3632 ; i1=i2-1920 ; j1=2800 ; j2=j1+1200 ; rfact_zoom=1. ; font_rat=0.72*rfact_zoom
             i2=3500 ; i1=i2-1200 ; j1=2760 ; j2=j1+1200 ; rfact_zoom=1. ; font_rat=0.72*rfact_zoom
-            l_show_cb  = True ; vcb=[0.35, 0.95, 0.6, 0.015]
+            l_show_cb  = True ; vcb=[0.35, 0.95, 0.6, 0.015] ; loc_cb = 'land'
             l_show_clock=True ; x_clock = rfact_zoom*900 ; y_clock = rfact_zoom*975
-            l_show_sign=True  ; x_sign = rfact_zoom*980 ; y_sign = rfact_zoom*750
+            #l_show_sign=False  ; x_sign = rfact_zoom*980 ; y_sign = rfact_zoom*750
+            l_show_sign=True  ; x_sign = rfact_zoom*980 ; y_sign = rfact_zoom*15
             pt_sz_track = 1
             #
         elif [ config, box ] == [ 'NANUK36', 'Beaufort']:
