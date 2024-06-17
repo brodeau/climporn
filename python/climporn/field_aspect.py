@@ -315,7 +315,7 @@ class field_aspect:
             tmin=0.; tmax=200.; df=25.
             #l_pow_field=True; pow_field=5.
             vc_fld_powlog = [ tmin, 25., 50., 75., 150. , tmax ]
-            cunit = r'Non-solar HF to atmosphere [$W/m^{2}$]'
+            cunit = r'Non-solar HF to atmo [$W/m^{2}$]'
 
 
         else:
