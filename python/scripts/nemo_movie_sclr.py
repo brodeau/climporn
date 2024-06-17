@@ -857,6 +857,7 @@ for jt in range(jt0,Nt):
             ax.annotate('Experiment: '+CNEMO+CRUN, xy=(1, 4), xytext=(xl,yl), **fsm.cfont_exp)
 
         if l_add_sign and nemo_box.l_show_sign:
+            CSIGN = CSIGN.replace(r'\n', '\n')
             if nemo_box.loc_sign=='land':
                 fsm.cfont_sign['color'] = 'w' ; # update font color in font dictionary            
             xl = float(x_sign)/rfz
