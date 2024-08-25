@@ -627,7 +627,7 @@ def Dump2DMultiField( cf_out, XFLD, vnames, vlnames=[], vunits=[], vndim=[], xlo
     l_add_units      = ( len(vunits)  == nbfld )
 
     vnbdim = nmp.zeros(nbfld)
-    if vndim == []:
+    if len(vndim) == 0:
         vnbdim[:] = 3 ; # default dim is 3 (time_counter,y,x)
     else:
         nn0 = len(vndim)
@@ -643,7 +643,7 @@ def Dump2DMultiField( cf_out, XFLD, vnames, vlnames=[], vunits=[], vndim=[], xlo
     cnm_dim_y = dim_nm[0]
     cnm_dim_x = dim_nm[1]
     
-    if (xlon != []) and (xlat != []):
+    if (len(xlon) > 0) and (len(xlat) > 0):
         if (xlon.shape == (nj,ni)) and (xlon.shape == xlat.shape):
             l_coord_2d = True
             cnm_dim_x = 'x'
@@ -654,7 +654,7 @@ def Dump2DMultiField( cf_out, XFLD, vnames, vlnames=[], vunits=[], vndim=[], xlo
     f_out.createDimension(cnm_dim_y, nj)
     if l_add_time: f_out.createDimension('time_counter', None)
 
-    if (xlon != []) and (xlat != []):
+    if (len(xlon) > 0) and (len(xlat) > 0):
         if l_coord_2d:
             id_lon  = f_out.createVariable(clon ,'f4',(cnm_dim_y,cnm_dim_x,), zlib=True, complevel=8)
             id_lat  = f_out.createVariable(clat ,'f4',(cnm_dim_y,cnm_dim_x,), zlib=True, complevel=8)
@@ -730,7 +730,7 @@ def dump_3d_multi_field( cf_out, XFLD, vnames, vndim=[], xlon=[], xlat=[], vdept
     cnm_dim_x = dim_nm[3]
 
     
-    if (xlon != []) and (xlat != []):
+    if (len(xlon) > 0) and (len(xlat) > 0):
         if (xlon.shape == (nj,ni)) and (xlon.shape == xlat.shape):
             l_coord_2d = True
             cnm_dim_x = 'x'
@@ -744,7 +744,7 @@ def dump_3d_multi_field( cf_out, XFLD, vnames, vndim=[], xlon=[], xlat=[], vdept
     f_out.createDimension(cnm_dim_z, nk)
     if l_add_time: f_out.createDimension('time_counter', None)
 
-    if (xlon != []) and (xlat != []):
+    if (len(xlon) > 0) and (len(xlat) > 0):
         if l_coord_2d:
             id_lon  = f_out.createVariable(clon ,'f4',(cnm_dim_y,cnm_dim_x,), zlib=True, complevel=8)
             id_lat  = f_out.createVariable(clat ,'f4',(cnm_dim_y,cnm_dim_x,), zlib=True, complevel=8)            
@@ -756,7 +756,7 @@ def dump_3d_multi_field( cf_out, XFLD, vnames, vndim=[], xlon=[], xlat=[], vdept
             id_lon[:] = xlon[:]
             id_lat[:] = xlat[:]
 
-    if (vdepth != []):
+    if (vdepth > 0):
         id_dep  = f_out.createVariable('deptht'  ,'f4',(cnm_dim_z,),           zlib=True, complevel=8)
         id_dep[:]   = vdepth[:]
         
