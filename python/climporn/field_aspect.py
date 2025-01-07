@@ -311,8 +311,8 @@ class field_aspect:
             #cpal_fld = 'ncview_parula'; color_top_cb='k'
             #cpal_fld = 'viridis'; color_top_cb='k'
             #cpal_fld = 'inferno'; color_top_cb='k'
-            #cpal_fld = 'cmocean_haline'; color_top='w' ; color_top_cb='w' ; color_missing ='0.5'
-            cpal_fld = 'cmocean_deep_r'; color_top='w' ; color_top_cb='w' ; color_missing ='0.5'
+            cpal_fld = 'cmocean_haline'; color_top='w' ; color_top_cb='w' ; color_missing ='0.5'
+            #cpal_fld = 'cmocean_deep_r'; color_top='w' ; color_top_cb='w' ; color_missing ='0.5'
             tmin=0.; tmax=200.; df=25.
             #l_pow_field=True; pow_field=5.
             vc_fld_powlog = [ tmin, 25., 50., 75., 150. , tmax ]
