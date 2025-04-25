@@ -175,7 +175,7 @@ class field_aspect:
             #
             cunit = r'Phase (deg.)'
 
-        elif CWHAT == 'siconc':
+        elif CWHAT = in [ 'siconc', 'siconc-t' ]:
             imask_no_ice_pc=0
             cv_in = 'siconc'  ; cv_out = cv_in
             #l_pow_field=True ; pow_field=2. ; vc_fld_powlog = [ 0., 0.5, 0.7, 0.8, 0.9, 0.95, 1. ]
