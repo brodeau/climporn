@@ -185,6 +185,7 @@ lForceD0 = False
 if csd0:
     lForceD0 = True
     print(' *** csd0 = ', csd0)
+    yyyy0 = csd0[0:4]
 
 print(' ***   jk  = ', jk)
 if CONAME != "": print(' *** CONAME = ', CONAME)
@@ -589,7 +590,10 @@ for jt in range(jt0,Nt):
     cdate = cp.epoch2clock(itime, precision='h')
     cdats = cp.epoch2clock(itime)
 
-
+    if lForceD0:
+        # overiding current year with forced one:
+        cdate = yyyy0+cdate[4:]
+        cdats = yyyy0+cdats[4:]
 
     # Name of figure to generate:
     cstr = CBOX
