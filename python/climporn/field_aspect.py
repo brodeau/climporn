@@ -32,7 +32,8 @@ class field_aspect:
         vc_fld_powlog = [ ]
 
         imask_no_ice_pc = 0 ; # integer, ice concntration in % below which we hide the field...
-        nm_ice_conc = 'siconc'   ; # => in this case we need to find the ice concentration bearing this name !
+        #nm_ice_conc = 'siconc'   ; # => in this case we need to find the ice concentration bearing this name !
+        nm_ice_conc = 'siconc-t'   ; # => in this case we need to find the ice concentration bearing this name !
 
         color_missing = '0.8'
         
@@ -186,11 +187,11 @@ class field_aspect:
             cunit = 'Sea-ice concentration'
             #if CBOX=='DEBUG': l_pow_field=False
 
-        elif CWHAT in [ 'sithic', 'sivolu' ]:
+        elif CWHAT in [ 'sithic', 'sivolu', 'sivolu-t' ]:
             cv_in = CWHAT  ; cv_out = cv_in
             #cpal_fld='cmocean_ice' ; color_top_cb='w' ; color_top = 'w'
+            imask_no_ice_pc = 1 ; color_missing = 'k' ; # we hide the field where A<`imask_no_ice_pc`%
             cpal_fld='cmocean_dense' ; color_top_cb='k' ; color_top = 'k'
-            imask_no_ice_pc = 1 ; #color_missing = 'k' ; # we hide the field where A<`imask_no_ice_pc`%
             tmin=0. ;  tmax=4. ;  df=1 ; cb_jump = 1; cb_extend = 'max'
             cunit = 'Sea-ice thickness [m]'
             if CBOX in ["CentralArctic"]: imask_no_ice_pc=0.1 ; color_missing='k'
@@ -202,7 +203,7 @@ class field_aspect:
         elif CWHAT in [ 'damage', 'damage-t', 'damage-f' ]:
             cv_in = CWHAT  ; cv_out = cv_in            
             #
-            imask_no_ice_pc = 5 ; color_missing = '#2D4B87' ; # we hide the field where A<`imask_no_ice_pc`%
+            imask_no_ice_pc = 1 ; color_missing = '#2D4B87' ; # we hide the field where A<`imask_no_ice_pc`%
             #
             #cpal_fld='bone_r' ; color_top_cb='w'; tmin=0. ;  tmax=1. ; l_pow_field=True ; pow_field=5.; vc_fld_powlog=[ 0., 0.7, 0.8, 0.9, 0.95, 1. ]
             #cpal_fld='gray_r' ; color_top_cb='w'; tmin=0. ;  tmax=1. ; l_pow_field=True ; pow_field=7.; vc_fld_powlog=[ 0., 0.8, 0.9, 0.95, 1. ]; color_missing = None
@@ -234,6 +235,7 @@ class field_aspect:
             cunit = 'Sea-ice velocity [m/s]'
 
         elif CWHAT in [ 'sidive', 'sidive-t', 'sidive-f' ]:
+            imask_no_ice_pc = 1 ; color_missing = 'k' ; # we hide the field where A<`imask_no_ice_pc`%
             cv_in = CWHAT  ; cv_out = cv_in ; color_top_cb='k'
             rmult = 3600.*24.
             cpal_fld='RdBu_r' ; tmin=-0.2 ;  tmax=-tmin ;  df=0.05
@@ -243,7 +245,7 @@ class field_aspect:
             cv_in = CWHAT  ; cv_out = cv_in ; color_top_cb='k'
             rmult = 3600.*24.
             cpal_fld='RdBu_r' ; tmin=-0.2 ;  tmax=-tmin ;  df=0.05
-            imask_no_ice_pc = 5 ; #color_missing = 'k' ; # we hide the field where A<`imask_no_ice_pc`%
+            imask_no_ice_pc = 1 ; #color_missing = 'k' ; # we hide the field where A<`imask_no_ice_pc`%
             cunit = 'Shear of sea-ice velocity [day$^{-1}$]'
 
         elif CWHAT in [ 'sivort', 'sivort-t', 'sivort-f' ]:
@@ -252,7 +254,7 @@ class field_aspect:
             cpal_fld='RdBu_r' ; tmin=-0.3 ;  tmax=-tmin ;  df=0.1
             #cpal_fld='cmocean_balance_r' ; tmin=-0.3 ;  tmax=-tmin ;  df=0.1
             #cpal_fld='BrBG_r' ; tmin=-0.3 ;  tmax=-tmin ;  df=0.1
-            imask_no_ice_pc = 5 ; #color_missing = 'k' ; # we hide the field where A<`imask_no_ice_pc`%
+            imask_no_ice_pc = 1 ; #color_missing = 'k' ; # we hide the field where A<`imask_no_ice_pc`%
             cunit = 'Vorticity of sea-ice velocity [day$^{-1}$]'
 
         elif CWHAT in [ 'zfUu'  ]:
@@ -267,20 +269,20 @@ class field_aspect:
             cunit = r'$\sigma_{I}$ [Pa]'
 
         elif CWHAT in [ 'sishea', 'sishea-t', 'sishea-f', 'simxshr-t', 'simxshr-f' ]:
+            imask_no_ice_pc = 1 ; color_missing = '#2D4B87'
             cv_in = CWHAT  ; cv_out = cv_in ; color_top_cb='w'
             rmult = 3600.*24.
             cpal_fld='inferno' ; tmin=0. ;  tmax=1.5 ; cb_extend = 'max'
-            imask_no_ice_pc = 5 ; #color_missing = 'k' ; # we hide the field where A<`imask_no_ice_pc`%
             l_pow_field=True ; pow_field=0.3 ;  vc_fld_powlog= [tmin, 0.01, 0.1, 0.5, 1., tmax ]
             cunit = 'Maximum shear of sea-ice velocity [day$^{-1}$]'
 
         elif CWHAT in [ 'sidefo', 'sidefo-t', 'sidefo-f' ]:
             cv_in = CWHAT  ; cv_out = cv_in ; color_top_cb='w'
+            imask_no_ice_pc = 1 ; color_missing = '#2D4B87' ; # we hide the field where A<`imask_no_ice_pc`%
             rmult = 3600.*24.
             #cpal_fld='inferno' ; tmin=0. ;  tmax=1.5 ; cb_extend = 'max'
             cpal_fld='gray_r' ; tmin=0. ;  tmax=1.5 ; cb_extend = 'max' ; color_top_cb='k'; color_top='k'
             #cpal_fld='viridis' ; tmin=0. ;  tmax=1. ; cb_extend = 'max'
-            #imask_no_ice_pc = 50 ; #color_missing = 'k' ; # we hide the field where A<`imask_no_ice_pc`%
             l_pow_field=True ; pow_field=0.3 ;  vc_fld_powlog= [tmin, 0.01, 0.1, 0.5, tmax ]
             cunit = 'Total deformation [day$^{-1}$]'
 

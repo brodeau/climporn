@@ -228,7 +228,7 @@ class nemo_hbox:
             
             ####   NANUK12   ####
         elif [ config, box ] == [ 'NANUK12', 'ALLs']:
-            i1=0 ; j1=Nj0-Ni0+20  ;  i2=Ni0-35 ; j2=Nj0-15  ; rfact_zoom=1. ; font_rat=0.9*rfact_zoom
+            i1=0 ; j1=Nj0-Ni0+20  ;  i2=Ni0-35 ; j2=Nj0-15  ; rfact_zoom=1. ; font_rat=0.8*rfact_zoom
             #l_show_cb  = True ; vcb=[0.18, 0.075, 0.64, 0.02]
             l_show_cb  = True ; vcb=[0.57, 0.965, 0.4, 0.016]; loc_cb = 'land'
             l_show_clock=True ; x_clock = rfact_zoom*1115 ; y_clock = rfact_zoom*1160
