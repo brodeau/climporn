@@ -460,7 +460,7 @@ XLSM[np.where( XMSK > 0.5)] = 1
 
 
 # Font style:
-kk = fsm( fontr, clr_top=fa.color_top, clr_top_cb=fa.color_top_cb )
+kk = fsm( fontr, clr_top=color_top, clr_top_cb=color_top_cb )
 
 
 # Colormaps for fields:
