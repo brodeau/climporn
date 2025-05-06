@@ -484,9 +484,14 @@ if l_show_lsm or l_add_topo_land:
         pal_lsm = cp.chose_colmap('landm')
         norm_lsm = colors.Normalize(vmin=0., vmax=1., clip=False)
 
+if not lForceD0:
+    csd0 = cp.epoch2clock( int(vtime[jt0]), frmt='nodash' )
+#
 cyr0=csd0[0:4]
 cmn0=csd0[4:6]
 cdd0=csd0[6:8]
+
+print(' ==> csd0, cyr0, cmn0, cdd0 = ',csd0, cyr0, cmn0, cdd0,'\n')
 
 # Time step as a string
 if not len(cdt)==2:
