@@ -621,10 +621,16 @@ for jt in range(jt0,Nt):
     print('\n Current date = ', cdats+' !\n')
     #-----------------------------------------------------------------------------------
 
-    if l3d:
-        cfig = cdir_figs+'/'+cv_out+'_'+CNEMO+'_lev'+str(jk)+'_'+CBOX+'_'+cdate+'.'+fig_type
+    # Name of figure to generate:
+    cstr = CBOX
+    if CEXP: cstr += '_'+CEXP
+    if cn_fig != "":
+        cfig = cdir_figs+'/'+cv_out+'_'+cstr+'_'+cn_fig+'_'+cdate+'.'+fig_type
     else:
-        cfig = cdir_figs+'/'+cv_out+'_'+CNEMO+'_'+CBOX+'_'+cdate+'.'+fig_type
+        if l3d:
+            cfig = cdir_figs+'/'+cv_out+'_'+cstr+'_'+CNEMO+CRUN+'_lev'+str(jk)+'_'+CBOX+'_'+cdate+'.'+fig_type
+        else:
+            cfig = cdir_figs+'/'+cv_out+'_'+cstr+'_'+CNEMO+CRUN+'_'+CBOX+'_'+cdate+'.'+fig_type
 
 
     if not path.exists(cfig):
