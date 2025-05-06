@@ -777,15 +777,17 @@ for jt in range(jt0,Nt):
         if l_add_sign and nemo_box.l_show_sign:
             xl = float(x_sign)/rfz
             yl = float(y_sign)/rfz
-            ax.annotate(CSIGN, xy=(1, 4), xytext=(xl,yl), **fsm.cfont_sign)
-    
+            ax.annotate(CSIGN, xy=(1, 4), xytext=(xl,yl), zorder=150, **fsm.cfont_sign)
+
         if nemo_box.l_show_name:
+            if nemo_box.loc_name=='land':
+                fsm.cfont_titl['color'] = 'w' ; # update font color in font dictionary            
             cbla = CNEMO
             if CONAME != "": cbla = CONAME
             xl = float(x_name)/rfz
             yl = float(y_name)/rfz
-            ax.annotate(cbla, xy=(1, 4), xytext=(xl, yl), **fsm.cfont_titl)
-    
+            ax.annotate(cbla, xy=(1, 4), xytext=(xl, yl), zorder=52,  **fsm.cfont_titl)
+
         if nemo_box.l_add_logo:
             datafile = cbook.get_sample_data(dir_logos+'/'+nemo_box.cf_logo_on, asfileobj=False)
             im = image.imread(datafile)
