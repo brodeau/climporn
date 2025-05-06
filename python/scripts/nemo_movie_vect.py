@@ -622,9 +622,9 @@ for jt in range(jt0,Nt):
     #-----------------------------------------------------------------------------------
 
     if l3d:
-        cfig = cdir_figs+'/'+cv_out+'_'+CNEMO+'-'+CRUN+'_lev'+str(jk)+'_'+CBOX+'_'+cdate+'_'+cpal_fld+'.'+fig_type
+        cfig = cdir_figs+'/'+cv_out+'_'+CNEMO+'-'+CRUN+'_lev'+str(jk)+'_'+CBOX+'_'+cdate+'.'+fig_type
     else:
-        cfig = cdir_figs+'/'+cv_out+'_'+CNEMO+'-'+CRUN+'_'+CBOX+'_'+cdate+'_'+cpal_fld+'.'+fig_type
+        cfig = cdir_figs+'/'+cv_out+'_'+CNEMO+'-'+CRUN+'_'+CBOX+'_'+cdate+'.'+fig_type
 
 
     if not path.exists(cfig):
