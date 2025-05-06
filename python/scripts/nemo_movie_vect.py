@@ -239,6 +239,13 @@ elif CWHAT == 'CSPEED':
     if CBOX in ['Brest']:  tmax=2.4 ; df = 0.1 ; cb_jump = 2
     if CNEMO in ['CALEDO60']: tmax=0.8 ; df = 0.1 ; cb_jump = 1
 
+elif CWHAT == 'sivelo-t':
+    l_do_cspd = True  ; # do current speed
+    tmin=0. ; tmax=0.6 ; df=0.1 ; cb_extend = 'max' ; cb_jump = 1
+    cpal_fld='cmocean_dense' ; color_top_cb='w'
+    imask_no_ice_pc = 5 ; # we hide the field where A<10%                                                                                                                                   
+    cunit = 'Sea-ice velocity [m/s]'
+
 elif CWHAT == 'CSPEED_1000':
     l_do_cspd = True  ; # do current speed
     tmin=0. ; tmax=0.6 ; df = 0.1 ; cpal_fld = 'on3' ; # Poster full-res!!!
