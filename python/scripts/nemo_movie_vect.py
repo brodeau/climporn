@@ -335,9 +335,9 @@ while rh_img < round(rnyr,0):
 print('\n================================================================\n\n\n')
 
 # Field-specific information (colormaps, bounds, etc): lilo
-fa = cp.field_aspect( CWHAT, cbox=CBOX )
+#fa = cp.field_aspect( CWHAT, cbox=CBOX )
 
-col_cb = fa.color_top_cb
+#col_cb = fa.color_top_cb
 
 l_3d_field = False
 
