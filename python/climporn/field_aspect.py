@@ -239,14 +239,14 @@ class field_aspect:
             cv_in = CWHAT  ; cv_out = cv_in ; color_top_cb='k'
             rmult = 3600.*24.
             cpal_fld='RdBu_r' ; tmin=-0.2 ;  tmax=-tmin ;  df=0.05
-            cunit = 'Divergence of sea-ice velocity [day$^{-1}$]'
+            cunit = 'Divergence of sea-ice velocity [d$^{-1}$]'
 
         elif CWHAT in [ 'sishear', 'sishear-t', 'sishear-f' ]:
             cv_in = CWHAT  ; cv_out = cv_in ; color_top_cb='k'
             rmult = 3600.*24.
             cpal_fld='RdBu_r' ; tmin=-0.2 ;  tmax=-tmin ;  df=0.05
             imask_no_ice_pc = 1 ; #color_missing = 'k' ; # we hide the field where A<`imask_no_ice_pc`%
-            cunit = 'Shear of sea-ice velocity [day$^{-1}$]'
+            cunit = 'Shear of sea-ice velocity [d$^{-1}$]'
 
         elif CWHAT in [ 'sivort', 'sivort-t', 'sivort-f' ]:
             cv_in = CWHAT  ; cv_out = cv_in ; color_top_cb='k'
@@ -255,7 +255,7 @@ class field_aspect:
             #cpal_fld='cmocean_balance_r' ; tmin=-0.3 ;  tmax=-tmin ;  df=0.1
             #cpal_fld='BrBG_r' ; tmin=-0.3 ;  tmax=-tmin ;  df=0.1
             imask_no_ice_pc = 1 ; #color_missing = 'k' ; # we hide the field where A<`imask_no_ice_pc`%
-            cunit = 'Vorticity of sea-ice velocity [day$^{-1}$]'
+            cunit = 'Vorticity of sea-ice velocity [d$^{-1}$]'
 
         elif CWHAT in [ 'zfUu'  ]:
             cv_in = CWHAT  ; cv_out = cv_in ; color_top_cb='k'
@@ -274,7 +274,7 @@ class field_aspect:
             rmult = 3600.*24.
             cpal_fld='inferno' ; tmin=0. ;  tmax=1.5 ; cb_extend = 'max'
             l_pow_field=True ; pow_field=0.3 ;  vc_fld_powlog= [tmin, 0.01, 0.1, 0.5, 1., tmax ]
-            cunit = 'Maximum shear of sea-ice velocity [day$^{-1}$]'
+            cunit = 'Maximum shear of sea-ice velocity [d$^{-1}$]'
 
         elif CWHAT in [ 'sidefo', 'sidefo-t', 'sidefo-f' ]:
             cv_in = CWHAT  ; cv_out = cv_in ; color_top_cb='w'
@@ -284,7 +284,7 @@ class field_aspect:
             cpal_fld='gray_r' ; tmin=0. ;  tmax=1.5 ; cb_extend = 'max' ; color_top_cb='k'; color_top='k'
             #cpal_fld='viridis' ; tmin=0. ;  tmax=1. ; cb_extend = 'max'
             l_pow_field=True ; pow_field=0.3 ;  vc_fld_powlog= [tmin, 0.01, 0.1, 0.5, tmax ]
-            cunit = 'Total deformation [day$^{-1}$]'
+            cunit = 'Total deformation [d$^{-1}$]'
 
         elif CWHAT in [ 'dadvs12t', 'dadvs12f' ]:
             cv_in = CWHAT  ; cv_out = CWHAT
