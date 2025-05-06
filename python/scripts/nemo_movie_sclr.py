@@ -122,7 +122,7 @@ def comp_LapOfSSH( cvar, pe1t, pe2t, pe1u, pe2u, pe1v, pe2v, pSSH ):
 parser = ap.ArgumentParser(description='Generate pixel maps of a given scalar.')
 
 requiredNamed = parser.add_argument_group('required arguments')
-requiredNamed.add_argument('-i', '--fin' , required=True,                help='NEMO netCDF file to read from...')
+requiredNamed.add_argument('-i', '--fin' , required=True, help='NEMO netCDF file to read from...')
 requiredNamed.add_argument('-w', '--what', required=True, help='field/diagnostic to plot (ex: CSPEED,CURLOF,ect.)')
 
 parser.add_argument('-C', '--conf', default="none",           help='name of NEMO config (ex: eNATL60) (defined into `nemo_hboxes.py`)')
@@ -250,7 +250,6 @@ if CNEMO == 'none':
 
 #---------------------------------------------------------------
 
-#print(CNEMO,CBOX)
 nemo_box = cp.nemo_hbox(CNEMO,CBOX)
 
 (Ni0,Nj0) = nemo_box.size()
@@ -264,8 +263,6 @@ if nemo_box.l_show_clock: (x_clock,y_clock) = nemo_box.clock
 if nemo_box.l_show_exp:   (x_exp,y_exp)     = nemo_box.exp
 if nemo_box.l_add_logo:   (x_logo,y_logo)   = nemo_box.logo
 if l_add_sign and nemo_box.l_show_sign:  (x_sign,y_sign)   = nemo_box.sign
-#if cltr:                  (x_ltr,y_ltr)     = nemo_box.ltr
-
 
 #---------------------------------------------------------------
 
@@ -312,7 +309,6 @@ print('\n================================================================\n\n\n'
 
 # Field-specific information (colormaps, bounds, etc): lilo
 fa = cp.field_aspect( CWHAT, cbox=CBOX )
-#lili
 
 col_cb = fa.color_top_cb
 

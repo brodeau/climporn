@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+#
 # -*- Mode: Python; coding: utf-8; indent-tabs-mode: nil; tab-width: 4 -*-
 #
 ##################################################################
@@ -11,9 +12,9 @@
 ##################################################################
 
 import sys
-from os import path, getcwd, mkdir
+from os import path, getcwd, makedirs
 import argparse as ap
-import numpy as nmp
+import numpy as np
 
 from netCDF4 import Dataset
 
@@ -32,6 +33,10 @@ from re import split
 import climporn as cp
 from climporn import fig_style_mov as fsm
 
+import warnings
+warnings.filterwarnings("ignore")
+
+
 cwd = getcwd()
 
 l_smooth = False
@@ -40,7 +45,7 @@ vmn = [ 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ]
 vml = [ 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ]
 
 fig_type='png'
-rDPI = 110
+rDPI = 240
 color_top = 'white'
 color_top_cb = 'white'
 #color_top = 'k'
@@ -48,7 +53,6 @@ color_top_cb = 'white'
 cv_out = 'unknown'
 
 jt0 = 0
-
 
 jk=0
 l_show_lsm = True
@@ -63,7 +67,7 @@ l_3d_field = False
 
 l_save_nc = False ; # save the field we built in a netcdf file !!!
 
-romega = 7.292115083046062E-005 # same as in NEMO 3.6 / #romega = 2.*nmp.pi/86400.0
+romega = 7.292115083046062E-005 # Coriolis [1/s] (same as in NEMO 3.6 / #romega = 2.*np.pi/86400.0)
 
 cb_extend = 'both' ;#colorbar extrema
 
@@ -83,10 +87,10 @@ requiredNamed.add_argument('-y', '--fldy', required=True, help='name of the NEMO
 requiredNamed.add_argument('-w', '--what', required=True, help='field/diagnostic to plot (ex: CSPEED,CURLOF,ect.)')
 
 parser.add_argument('-C', '--conf', default="none",           help='name of NEMO config (ex: eNATL60) (defined into `nemo_hboxes.py`)')
-parser.add_argument('-E', '--exp',  default="none",           help='name of experiment')
+parser.add_argument('-E', '--nexp', default=None,             help='name of experiment (shows up in figure name)')
 parser.add_argument('-b', '--box' , default="ALL",            help='extraction box name (ex: ALL) (defined into `nemo_hboxes.py`)')
 parser.add_argument('-m', '--fmm' , default="mesh_mask.nc",   help='NEMO mesh_mask file (ex: mesh_mask.nc)')
-parser.add_argument('-s', '--sd0' , default="20090101",       help='initial date as <YYYYMMDD>')
+parser.add_argument('-s', '--sd0' , default=None,             help='initial date as <YYYYMMDD>')
 parser.add_argument('-l', '--lev' , type=int, default=0,      help='level to use if 3D field (default: 0 => 2D)')
 parser.add_argument('-z', '--zld' ,                           help='topography netCDF file to use (field="z")')
 parser.add_argument('-t', '--tstep',  default="1h",           help='time step ("1h","2h",..,up to "1d") in input file')
@@ -94,11 +98,18 @@ parser.add_argument('-N', '--oname',  default="",             help='a name that 
 parser.add_argument('-o', '--outdir', default="./figs",       help='path to directory where to save figures')
 parser.add_argument('-f', '--fignm',  default="",             help='common string in name of figure to create')
 parser.add_argument('-S', '--sign',   default="",             help='sign the image with some text')
+parser.add_argument('-L', '--ltr' ,   default=None,           help='letter as in "a)" for figures in paper')
+#
+# Colorbar or not ?
+parser.add_argument('--cb',    action='store_true')
+parser.add_argument('--no-cb', dest='cb', action='store_false')
+parser.set_defaults(cb=True)
+
 
 args = parser.parse_args()
 
 CNEMO = args.conf
-CEXP  = args.exp
+CEXP  = args.nexp
 CBOX  = args.box
 CWHAT = args.what
 cfx_in = args.fiu
@@ -114,6 +125,8 @@ CONAME = args.oname
 cd_out = args.outdir
 cn_fig = args.fignm
 CSIGN  = args.sign
+lcb    = args.cb
+cltr   = args.ltr
 
 print('')
 print(' *** CNEMO = ', CNEMO)
@@ -121,10 +134,18 @@ print(' *** CBOX  = ', CBOX)
 print(' *** CWHAT = ', CWHAT)
 print(' *** cfx_in = ', cfx_in)
 print(' *** cvx_in = ', cvx_in)
-print(' *** cfx_in = ', cfy_in)
-print(' *** cvx_in = ', cvy_in)
+print(' *** cfy_in = ', cfy_in)
+print(' *** cvy_in = ', cvy_in)
 print(' *** cf_mm = ', cf_mm)
-print(' *** csd0 = ', csd0)
+print(' *** show colorbar:', lcb)
+
+
+lForceD0 = False
+if csd0:
+    lForceD0 = True
+    print(' *** csd0 = ', csd0)
+    yyyy0 = csd0[0:4]
+
 print(' ***   jk  = ', jk)
 if CONAME != "": print(' *** CONAME = ', CONAME)
 l_add_topo_land = False
@@ -141,9 +162,8 @@ l_add_sign = ( CSIGN != '' )
 
 ##########################################################################################
 
-if not path.exists(cd_out): mkdir(cd_out)
 cdir_figs = cd_out+'/'+CWHAT
-if not path.exists(cdir_figs): mkdir(cdir_figs)
+makedirs( cdir_figs, exist_ok=True )
 
 if l_save_nc and not path.exists('nc'): mkdir('nc')
 
@@ -172,6 +192,7 @@ if nemo_box.l_show_clock: (x_clock,y_clock) = nemo_box.clock
 if nemo_box.l_show_exp:   (x_exp,y_exp)     = nemo_box.exp
 if nemo_box.l_add_logo:   (x_logo,y_logo)   = nemo_box.logo
 if l_add_sign and nemo_box.l_show_sign:  (x_sign,y_sign)   = nemo_box.sign
+
 #---------------------------------------------------------------
 
 
@@ -328,16 +349,34 @@ cp.chck4f(cfx_in)
 cp.chck4f(cfy_in)
 
 l_notime=False
-id_f = Dataset(cfx_in)
-list_var = id_f.variables.keys()
-if 'time_counter' in list_var:
-    vtime = id_f.variables['time_counter'][:]
-elif 'time' in list_var:
-    vtime = id_f.variables['time'][:]
-else:
-    l_notime=True
-    print('Did not find a time variable! Assuming no time and Nt=1')
-id_f.close()
+
+with Dataset(cfx_in) as id_f:
+    list_var = id_f.variables.keys()
+    #
+    if not cvx_in  in list_var:
+        print(' PROBLEM [nemo_movie_vect.py]: variable `'+cvx_in+'` not present in X input file! => exiting!'); exit(0)
+        #
+    if 'time_instant' in list_var:
+        cv_time = 'time_instant'
+    elif 'time_counter' in list_var:
+        cv_time = 'time_counter'
+    elif 'time' in list_var:
+        cv_time = 'time'
+    else:
+        l_notime=True
+        print('Did not find a time variable! Assuming no time and Nt=1')
+        if not lForceD0:
+            print('    ==> then use the `-s` switch to specify an initial date!!!')
+            exit(0)
+    vtime = id_f.variables[cv_time][:]
+
+with Dataset(cfy_in) as id_f:
+    list_var = id_f.variables.keys()
+    #
+    if not cvy_in  in list_var:
+        print(' PROBLEM [nemo_movie_vect.py]: variable `'+cvy_in+'` not present in Y input file! => exiting!'); exit(0)
+
+
 
 Nt = 1
 if not l_notime: Nt = len(vtime)
@@ -354,7 +393,7 @@ if l_show_lsm or l_do_crl or l_do_cof or l_do_cspd or l_do_tke or l_do_eke:
         if nb_dim==4: XMSK = id_lsm.variables[cv_msk][0,jk,j1:j2,i1:i2]
         if nb_dim==3: XMSK = id_lsm.variables[cv_msk][0,j1:j2,i1:i2]
         if nb_dim==2: XMSK = id_lsm.variables[cv_msk][j1:j2,i1:i2]
-        (nj,ni) = nmp.shape(XMSK)
+        (nj,ni) = np.shape(XMSK)
     if l_do_crl or l_do_cof:
         # e2v, e1u, e1f, e2f
         e2v = id_lsm.variables['e2v'][0,j1:j2,i1:i2]
@@ -364,8 +403,8 @@ if l_show_lsm or l_do_crl or l_do_cof or l_do_cspd or l_do_tke or l_do_eke:
     if l_do_cof:
         ## Coriolis Parameter:
         ff  = id_lsm.variables['gphif'][0,j1:j2,i1:i2]
-        ff[:,:] = 2.*romega*nmp.sin(ff[:,:]*nmp.pi/180.0)
-        (nj,ni) = nmp.shape(XMSK)
+        ff[:,:] = 2.*romega*np.sin(ff[:,:]*np.pi/180.0)
+        (nj,ni) = np.shape(XMSK)
 
     if l_save_nc:
         Xlon = id_lsm.variables['glamt'][0,j1:j2,i1:i2]
@@ -385,8 +424,8 @@ if l_show_lsm or l_do_crl or l_do_cof or l_do_cspd or l_do_tke or l_do_eke:
 
 
 
-idx_land = nmp.where( XMSK <  0.5 )
-#idx_ocea = nmp.where( XMSK >= 0.5 )
+idx_land = np.where( XMSK <  0.5 )
+#idx_ocea = np.where( XMSK >= 0.5 )
 
 #(vjj_land, vji_land) = idx_land
 #print(idx_land
@@ -396,7 +435,7 @@ idx_land = nmp.where( XMSK <  0.5 )
 #sys.exit(0)
 
 
-XLSM = nmp.zeros((nj,ni)) ; # will define real continents not NEMO mask...
+XLSM = np.zeros((nj,ni)) ; # will define real continents not NEMO mask...
 
 if l_add_topo_land:
     cp.chck4f(cf_topo_land)
@@ -404,17 +443,17 @@ if l_add_topo_land:
     print(' *** Reading "z" into:\n'+cf_topo_land)
     xtopo = id_top.variables['z'][0,j1:j2,i1:i2]
     id_top.close()
-    if nmp.shape(xtopo) != (nj,ni):
+    if np.shape(xtopo) != (nj,ni):
         print('ERROR: topo and mask do not agree in shape!'); sys.exit(0)
     xtopo = xtopo*(1. - XMSK)
     #cp.dump_2d_field('topo_'+CBOX+'.nc', xtopo, name='z')    
     if l3d: xtopo = xtopo + rof_dpt
-    xtopo[nmp.where( XMSK > 0.01)] = nmp.nan
+    xtopo[np.where( XMSK > 0.01)] = np.nan
     if nemo_box.l_fill_holes_k and not l3d:
-        XLSM[nmp.where( xtopo < 0.0)] = 1
-        xtopo[nmp.where( xtopo < 0.0)] = nmp.nan
+        XLSM[np.where( xtopo < 0.0)] = 1
+        xtopo[np.where( xtopo < 0.0)] = np.nan
 
-XLSM[nmp.where( XMSK > 0.5)] = 1
+XLSM[np.where( XMSK > 0.5)] = 1
 
 
 # Font style:
@@ -433,10 +472,10 @@ else:
 
 if l_show_lsm or l_add_topo_land:
     if l_add_topo_land:
-        xtopo = nmp.log10(xtopo+rof_log)
+        xtopo = np.log10(xtopo+rof_log)
         pal_lsm = cp.chose_colmap('gray_r')
-        #norm_lsm = colors.Normalize(vmin = nmp.log10(min(-100.+rof_dpt/3.,0.) + rof_log), vmax = nmp.log10(4000.+rof_dpt + rof_log), clip = False)
-        norm_lsm = colors.Normalize(vmin = nmp.log10(-100. + rof_log), vmax = nmp.log10(4000.+rof_dpt + rof_log), clip = False)
+        #norm_lsm = colors.Normalize(vmin = np.log10(min(-100.+rof_dpt/3.,0.) + rof_log), vmax = np.log10(4000.+rof_dpt + rof_log), clip = False)
+        norm_lsm = colors.Normalize(vmin = np.log10(-100. + rof_log), vmax = np.log10(4000.+rof_dpt + rof_log), clip = False)
     else:
         #pal_lsm = cp.chose_colmap('land_dark')
         pal_lsm = cp.chose_colmap('landm')
@@ -458,7 +497,7 @@ else:
 
 vm = vmn
 if isleap(int(cyr0)): vm = vml
-#print(' year is ', vm, nmp.sum(vm)
+#print(' year is ', vm, np.sum(vm)
 
 jd = int(cdd0) - 1
 jm = int(cmn0)
@@ -471,8 +510,8 @@ jm = int(cmn0)
 
 
 if l_do_eke:
-    Umean = nmp.zeros((nj,ni))
-    Vmean = nmp.zeros((nj,ni))
+    Umean = np.zeros((nj,ni))
+    Vmean = np.zeros((nj,ni))
     # Need to go for the mean first!!!
     print('\n Goint for '+str(Nt)+' snaphots to compute the mean first!!!')
     for jt in range(jt0,Nt):
@@ -504,7 +543,7 @@ if l_do_eke:
 
 vm = vmn
 if isleap(int(cyr0)): vm = vml
-#print(' year is ', vm, nmp.sum(vm)
+#print(' year is ', vm, np.sum(vm)
 
 jd = int(cdd0) - 1
 jm = int(cmn0)
@@ -516,14 +555,14 @@ jm = int(cmn0)
 
 
 
-Xplot = nmp.zeros((nj,ni))
+Xplot = np.zeros((nj,ni))
 if nemo_box.l_add_quiver:
-    #VX = nmp.arange(0,ni,10)
-    #VY = nmp.arange(0,nj,10)
-    VX = nmp.arange(ni)
-    VY = nmp.arange(nj)
-    XU = nmp.zeros((nj,ni))
-    XV = nmp.zeros((nj,ni))
+    #VX = np.arange(0,ni,10)
+    #VY = np.arange(0,nj,10)
+    VX = np.arange(ni)
+    VY = np.arange(nj)
+    XU = np.zeros((nj,ni))
+    XV = np.zeros((nj,ni))
 
 
 
@@ -580,7 +619,7 @@ for jt in range(jt0,Nt):
     
         ax  = plt.axes([0., 0., 1., 1.], facecolor = '0.85') # missing seas will be in 'facecolor' !
     
-        vc_fld = nmp.arange(tmin, tmax + df, df)
+        vc_fld = np.arange(tmin, tmax + df, df)
     
     
         print('Reading record #'+str(jt)+' of '+cvx_in+' in '+cfx_in)
@@ -603,8 +642,8 @@ for jt in range(jt0,Nt):
         print('Done!')
     
     
-        lx = nmp.zeros((nj,ni))
-        ly = nmp.zeros((nj,ni))
+        lx = np.zeros((nj,ni))
+        ly = np.zeros((nj,ni))
     
         if l_do_crl or l_do_cof:
             print('\nComputing curl...')
@@ -617,7 +656,7 @@ for jt in range(jt0,Nt):
             print('\nComputing current speed at T-points ...')
             lx[:,2:ni] = 0.5*( XFLD[:,1:ni-1] + XFLD[:,2:ni] )
             ly[2:nj,:] = 0.5*( YFLD[1:nj-1,:] + YFLD[2:nj,:] )
-            Xplot[:,:] = nmp.sqrt( lx[:,:]*lx[:,:] + ly[:,:]*ly[:,:] ) * XMSK[:,:]
+            Xplot[:,:] = np.sqrt( lx[:,:]*lx[:,:] + ly[:,:]*ly[:,:] ) * XMSK[:,:]
             if nemo_box.l_add_quiver:
                 XU[:,:] = XFLD[:,:]
                 XV[:,:] = YFLD[:,:]
@@ -641,8 +680,8 @@ for jt in range(jt0,Nt):
         del XFLD,YFLD
     
         print('')
-        if not l_show_lsm and jt == jt0: ( nj , ni ) = nmp.shape(Xplot)
-        print('  *** dimension of array => ', ni, nj, nmp.shape(Xplot))
+        if not l_show_lsm and jt == jt0: ( nj , ni ) = np.shape(Xplot)
+        print('  *** dimension of array => ', ni, nj, np.shape(Xplot))
         
 
         print('Ploting')
@@ -650,7 +689,7 @@ for jt in range(jt0,Nt):
         plt.axis([ 0, ni, 0, nj])
         
         if nemo_box.c_imshow_interp == 'none':
-            Xplot[idx_land] = nmp.nan
+            Xplot[idx_land] = np.nan
         else:
             print(" *** drowning array `Xplot`....\n")
             cp.drown(Xplot, XMSK, k_ew=-1, nb_max_inc=10, nb_smooth=10)
@@ -668,10 +707,10 @@ for jt in range(jt0,Nt):
         cf = plt.imshow( Xplot[:,:], cmap=pal_fld, norm=norm_fld, interpolation=nemo_box.c_imshow_interp )
     
         if nemo_box.l_add_quiver:
-            idx_high = nmp.where(Xplot[:,:]>tmax)
-            XU[idx_high] = nmp.nan ; XV[idx_high] = nmp.nan
-            idx_miss = nmp.where(XLSM[:,:]<0.5)
-            XU[idx_miss] = nmp.nan ; XV[idx_miss] = nmp.nan
+            idx_high = np.where(Xplot[:,:]>tmax)
+            XU[idx_high] = np.nan ; XV[idx_high] = np.nan
+            idx_miss = np.where(XLSM[:,:]<0.5)
+            XU[idx_miss] = np.nan ; XV[idx_miss] = np.nan
             #XU = XU*XLSM ; XV = XV*XLSM 
             nss=nemo_box.n_subsamp_qvr
             cq = plt.quiver( VX[:ni:nss], VY[:nj:nss], XU[:nj:nss,:ni:nss], XV[:nj:nss,:ni:nss], scale=50, color='w', width=0.001, linewidth=0.1 )
@@ -679,11 +718,11 @@ for jt in range(jt0,Nt):
         #LOLO: rm ???
         if l_show_lsm or l_add_topo_land:
             if l_add_topo_land:
-                clsm = plt.imshow(nmp.ma.masked_where(XLSM>0.0001, xtopo), cmap = pal_lsm, norm = norm_lsm, interpolation='none')
+                clsm = plt.imshow(np.ma.masked_where(XLSM>0.0001, xtopo), cmap = pal_lsm, norm = norm_lsm, interpolation='none')
                 if nemo_box.c_imshow_interp == 'none':
                     plt.contour(XLSM, [0.9], colors='k', linewidths=0.5)
             else:
-                clsm = plt.imshow(nmp.ma.masked_where(XLSM>0.0001, XLSM), cmap = pal_lsm, norm = norm_lsm, interpolation='none')
+                clsm = plt.imshow(np.ma.masked_where(XLSM>0.0001, XLSM), cmap = pal_lsm, norm = norm_lsm, interpolation='none')
     
         ##### COLORBAR ######
         if nemo_box.l_show_cb:
@@ -695,12 +734,12 @@ for jt in range(jt0,Nt):
             for rr in vc_fld:
                 if cpt % cb_jump == 0:
                     if df >= 1.: cb_labs.append(str(int(rr)))
-                    if df <  1.: cb_labs.append(str(round(rr,int(nmp.ceil(nmp.log10(1./df)))+1) ))
+                    if df <  1.: cb_labs.append(str(round(rr,int(np.ceil(np.log10(1./df)))+1) ))
                 else:
                     cb_labs.append(' ')
                 cpt = cpt + 1
             #else:
-            #    for rr in vc_fld: cb_labs.append(str(round(rr,int(nmp.ceil(nmp.log10(1./df)))+1) ))
+            #    for rr in vc_fld: cb_labs.append(str(round(rr,int(np.ceil(np.log10(1./df)))+1) ))
     
             clb.ax.set_xticklabels(cb_labs, **fsm.cfont_clb_tcks)
             clb.set_label(cunit, **fsm.cfont_clb)
