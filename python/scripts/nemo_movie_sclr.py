@@ -557,8 +557,8 @@ if lForceD0:
 else:
     csd0 = num2date(vtime[0], time_units, time_caldr)
     cyr0=str(csd0.year)
-    cmn0=str(csd0.month)
-    cdd0=str(csd0.day)
+    cmn0 = '%2.2i'%(int(csd0.month))
+    cdd0 = '%2.2i'%(int(csd0.day))
 
 
 #lili
