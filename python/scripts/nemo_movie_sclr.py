@@ -129,7 +129,7 @@ parser.add_argument('-C', '--conf', default="none",           help='name of NEMO
 parser.add_argument('-E', '--nexp', default=None,             help='name of experiment (shows up in figure name)')
 parser.add_argument('-b', '--box' , default="ALL",            help='extraction box name (ex: ALL) (defined into `nemo_hboxes.py`)')
 parser.add_argument('-m', '--fmm' , default="mesh_mask.nc",   help='NEMO mesh_mask file (ex: mesh_mask.nc)')
-parser.add_argument('-s', '--sd0' , default=None,             help='initial date as <YYYY-MM-DD>')
+#parser.add_argument('-s', '--sd0' , default=None,             help='initial date as <YYYY-MM-DD>')
 parser.add_argument('-l', '--lev' , type=int, default=0,      help='level to use if 3D field (default: 0 => 2D)')
 parser.add_argument('-z', '--zld' ,                           help='topography netCDF file to use (field="z")')
 parser.add_argument('-t', '--tstep',  default="1h",           help='time step ("1h","2h",..,up to "1d") in input file')
@@ -157,7 +157,7 @@ CBOX  = args.box
 CWHAT = args.what
 cf_in = args.fin
 cf_mm = args.fmm
-csd0  = args.sd0
+#csd0  = args.sd0
 jk    = args.lev
 cf_topo_land = args.zld
 cdt    = args.tstep  ; # time step, in the form "1h", "2h", ..., "12h", ..., "1m", ..., "6m", ... "1y", ..., etc
@@ -181,11 +181,11 @@ print(' *** cf_mm = ', cf_mm)
 print(' *** show colorbar:', lcb)
 
 
-lForceD0 = False
-if csd0:
-    lForceD0 = True
-    print(' *** csd0 = ', csd0)
-    yyyy0 = csd0[0:4]
+#lForceD0 = False
+#if csd0:
+#    lForceD0 = True
+#    print(' *** csd0 = ', csd0)
+#    yyyy0 = csd0[0:4]
 
 print(' ***   jk  = ', jk)
 if CONAME != "": print(' *** CONAME = ', CONAME)
@@ -384,8 +384,6 @@ l_i_need_A = ( fa.l_show_ice or fa.imask_no_ice_pc>0 or i_add_something>0 )
 if nemo_box.loc_cb=='land':
     col_cb = 'w'
 
-#print('LOLO: cv_in =',fa.cv_in,' fa.imask_no_ice_pc =',fa.imask_no_ice_pc)
-#exit(0)
 
 rt_io = 0.0
 #if fa.imask_no_ice_pc > 0:
@@ -420,9 +418,9 @@ elif 'time' in list_var:
 else:
     l_notime=True
     print('Did not find a time variable! Assuming no time and Nt=1')
-    if not lForceD0:
-        print('    ==> then use the `-s` switch to specify an initial date!!!')
-        exit(0)
+    #if not lForceD0:
+    #    print('    ==> then use the `-s` switch to specify an initial date!!!')
+    exit(0)
 vtime      = id_f.variables[cv_time][:]
 time_units = id_f.variables[cv_time].units
 time_caldr = id_f.variables[cv_time].calendar
@@ -550,31 +548,17 @@ if fa.l_show_lsm or l_add_topo_land:
         pal_lsm = cp.chose_colmap('landm')
         norm_lsm = colors.Normalize(vmin=0., vmax=1., clip=False)
 
-if lForceD0:
-    cyr0=csd0[0:4]
-    cmn0=csd0[5:7]
-    cdd0=csd0[8:10]
-else:
-    csd0 = num2date(vtime[0], time_units, time_caldr)
-    cyr0=str(csd0.year)
-    cmn0 = '%2.2i'%(int(csd0.month))
-    cdd0 = '%2.2i'%(int(csd0.day))
 
-
-#lili
-#ncfile = netCDF4.Dataset('./foo.nc', 'r')
-#time = ncfile.variables['time'] # do not cast to numpy array yet
-#time_convert = netCDF4.num2date(time[:], time.units, time.calendar)
-
-
-print('LOLO: csd0 =',csd0)
-
-    
-#
-
+#if lForceD0:
+#    cyr0=csd0[0:4]
+#    cmn0=csd0[5:7]
+#    cdd0=csd0[8:10]
+#else:
+csd0 = num2date(vtime[0], time_units, time_caldr) ; #LOLOsolution
+cyr0=str(csd0.year)
+cmn0 = '%2.2i'%(int(csd0.month))
+cdd0 = '%2.2i'%(int(csd0.day))
 print(' ==> csd0, cyr0, cmn0, cdd0 = ',csd0, cyr0, cmn0, cdd0,'\n')
-
-exit(0)
 
 
 
@@ -592,27 +576,27 @@ vm = vmn
 if isleap(int(cyr0)): vm = vml
 #print(' year is ', vm, np.sum(vm)
 
-jd = int(cdd0) - 1
-jm = int(cmn0)
+
 
 
 # Opening netCDF files:
 id_f = Dataset(cf_in)
-id_f.set_auto_mask(False) ;# prevent the application of `valid_min` and `valid_max`....
+id_f.set_auto_mask(False) ;# prevent the application of `valid_min` and `valid_max`....  ; #LOLOsolution
 
 for jt in range(jt0,Nt):
 
     itime = int( id_f.variables[cv_time][jt] )
-    #lili
+    cdt = num2date(itime, time_units, time_caldr)
+    cyr, cmo, cdd = str(cdt.year), '%2.2i'%(int(cdt.month)), '%2.2i'%(int(cdt.day))
+    chh, cmn, csc = '%2.2i'%(int(cdt.hour)), '%2.2i'%(int(cdt.minute)), '%2.2i'%(int(cdt.second))
+    cdate = cyr+cmo+cdd
+    cdats = cdate+' '+chh+':'+cmn+':'+csc 
     
-    #cdate = cp.epoch2clock(itime, precision='h')
-    #cdats = cp.epoch2clock(itime)
-
-    if lForceD0:
-        # overiding current year with forced one:
-        cdate = yyyy0+cdate[4:]
-        cdats = yyyy0+cdats[4:]
-
+    
+    print('LOLO cdate =',cdate)
+    print('LOLO cdats =',cdats)
+    exit(0)
+    
     # Name of figure to generate:
     cstr = CBOX
     if CEXP: cstr += '_'+CEXP
