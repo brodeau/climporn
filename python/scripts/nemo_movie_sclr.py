@@ -550,8 +550,15 @@ if fa.l_show_lsm or l_add_topo_land:
         pal_lsm = cp.chose_colmap('landm')
         norm_lsm = colors.Normalize(vmin=0., vmax=1., clip=False)
 
-if not lForceD0:
+if lForceD0:
+    cyr0=csd0[0:4]
+    cmn0=csd0[5:7]
+    cdd0=csd0[8:10]
+else:
     csd0 = num2date(vtime[0], time_units, time_caldr)
+    cyr0=str(csd0.year)
+    cmn0=str(csd0.month)
+    cdd0=str(csd0.day)
 
 
 #lili
@@ -564,9 +571,6 @@ print('LOLO: csd0 =',csd0)
 
     
 #
-cyr0=csd0[0:4]
-cmn0=csd0[5:7]
-cdd0=csd0[8:10]
 
 print(' ==> csd0, cyr0, cmn0, cdd0 = ',csd0, cyr0, cmn0, cdd0,'\n')
 
