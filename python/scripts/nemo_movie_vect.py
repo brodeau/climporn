@@ -594,12 +594,12 @@ id_fy = Dataset(cfy_in)
 for jt in range(jt0,Nt):
 
     # Calendar stuff:
-    itime = int( id_fx.variables[cv_time][jt] )
+    itime = int( id_f.variables[cv_time][jt] )
     cdt = num2date(itime, time_units, time_caldr)
     cyr, cmo, cdd = str(cdt.year), '%2.2i'%(int(cdt.month)), '%2.2i'%(int(cdt.day))
     chh, cmn, csc = '%2.2i'%(int(cdt.hour)), '%2.2i'%(int(cdt.minute)), '%2.2i'%(int(cdt.second))
-    cdate = cyr+cmo+cdd
-    cdats = cdate+' '+chh+':'+cmn+':'+csc 
+    cdate = cyr+cmo+cdd_chh+cmn            ; # as in output figure name
+    cdats = cyr+'-'+cmo+'-'+cdd+' '+chh+':'+cmn #+':'+csc  ; # to display on figure
 
     # Name of figure to generate:
     cstr = CBOX
