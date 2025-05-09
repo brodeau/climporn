@@ -129,7 +129,7 @@ parser.add_argument('-C', '--conf', default="none",           help='name of NEMO
 parser.add_argument('-E', '--nexp', default=None,             help='name of experiment (shows up in figure name)')
 parser.add_argument('-b', '--box' , default="ALL",            help='extraction box name (ex: ALL) (defined into `nemo_hboxes.py`)')
 parser.add_argument('-m', '--fmm' , default="mesh_mask.nc",   help='NEMO mesh_mask file (ex: mesh_mask.nc)')
-parser.add_argument('-s', '--sd0' , default=None,             help='initial date as <YYYYMMDD>')
+parser.add_argument('-s', '--sd0' , default=None,             help='initial date as <YYYY-MM-DD>')
 parser.add_argument('-l', '--lev' , type=int, default=0,      help='level to use if 3D field (default: 0 => 2D)')
 parser.add_argument('-z', '--zld' ,                           help='topography netCDF file to use (field="z")')
 parser.add_argument('-t', '--tstep',  default="1h",           help='time step ("1h","2h",..,up to "1d") in input file')
@@ -551,27 +551,29 @@ if fa.l_show_lsm or l_add_topo_land:
         norm_lsm = colors.Normalize(vmin=0., vmax=1., clip=False)
 
 if not lForceD0:
-    csd0 = cp.epoch2clock( int(vtime[jt0]), frmt='nodash' )
+    csd0 = num2date(vtime[0], time_units, time_caldr)
+
+
+#lili
+#ncfile = netCDF4.Dataset('./foo.nc', 'r')
+#time = ncfile.variables['time'] # do not cast to numpy array yet
+#time_convert = netCDF4.num2date(time[:], time.units, time.calendar)
 
 
 
-#lili                                                                                                                                                                                               
-#ncfile = netCDF4.Dataset('./foo.nc', 'r')                                                                                                                                                          
-#time = ncfile.variables['time'] # do not cast to numpy array yet                                                                                                                                   
-#time_convert = netCDF4.num2date(time[:], time.units, time.calendar)                                                                                                                                
-clili = num2date(vtime[0], time_units, time_caldr)
 
-
-
-print('LOLO: csd0, clili =',csd0,'  ',clili)
-exit(0)
     
 #
 cyr0=csd0[0:4]
-cmn0=csd0[4:6]
-cdd0=csd0[6:8]
+cmn0=csd0[5:7]
+cdd0=csd0[8:10]
 
 print(' ==> csd0, cyr0, cmn0, cdd0 = ',csd0, cyr0, cmn0, cdd0,'\n')
+
+print('LOLO: csd0 =',csd0)
+exit(0)
+
+
 
 # Time step as a string
 if not len(cdt)==2:
