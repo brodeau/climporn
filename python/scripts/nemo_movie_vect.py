@@ -379,6 +379,8 @@ with Dataset(cfx_in) as id_f:
         #    print('    ==> then use the `-s` switch to specify an initial date!!!')
         exit(0)
     vtime = id_f.variables[cv_time][:]
+    time_units = id_f.variables[cv_time].units
+    time_caldr = id_f.variables[cv_time].calendar
 
 with Dataset(cfy_in) as id_f:
     list_var = id_f.variables.keys()
