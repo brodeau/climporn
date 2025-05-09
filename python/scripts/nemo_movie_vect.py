@@ -598,7 +598,7 @@ for jt in range(jt0,Nt):
     cdt = num2date(itime, time_units, time_caldr)
     cyr, cmo, cdd = str(cdt.year), '%2.2i'%(int(cdt.month)), '%2.2i'%(int(cdt.day))
     chh, cmn, csc = '%2.2i'%(int(cdt.hour)), '%2.2i'%(int(cdt.minute)), '%2.2i'%(int(cdt.second))
-    cdate = cyr+cmo+cdd_chh+cmn            ; # as in output figure name
+    cdate = cyr+cmo+cdd+'_'+chh+cmn            ; # as in output figure name
     cdats = cyr+'-'+cmo+'-'+cdd+' '+chh+':'+cmn #+':'+csc  ; # to display on figure
 
     # Name of figure to generate:
