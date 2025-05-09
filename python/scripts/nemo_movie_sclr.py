@@ -560,7 +560,7 @@ if not lForceD0:
 #time_convert = netCDF4.num2date(time[:], time.units, time.calendar)
 
 
-
+print('LOLO: csd0 =',csd0)
 
     
 #
@@ -570,7 +570,6 @@ cdd0=csd0[8:10]
 
 print(' ==> csd0, cyr0, cmn0, cdd0 = ',csd0, cyr0, cmn0, cdd0,'\n')
 
-print('LOLO: csd0 =',csd0)
 exit(0)
 
 
