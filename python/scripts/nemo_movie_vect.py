@@ -16,7 +16,7 @@ from os import path, getcwd, makedirs
 import argparse as ap
 import numpy as np
 
-from netCDF4 import Dataset
+from netCDF4 import Dataset, num2date
 
 import matplotlib as mpl
 mpl.use('Agg')
@@ -90,7 +90,7 @@ parser.add_argument('-C', '--conf', default="none",           help='name of NEMO
 parser.add_argument('-E', '--nexp', default=None,             help='name of experiment (shows up in figure name)')
 parser.add_argument('-b', '--box' , default="ALL",            help='extraction box name (ex: ALL) (defined into `nemo_hboxes.py`)')
 parser.add_argument('-m', '--fmm' , default="mesh_mask.nc",   help='NEMO mesh_mask file (ex: mesh_mask.nc)')
-parser.add_argument('-s', '--sd0' , default=None,             help='initial date as <YYYYMMDD>')
+#parser.add_argument('-s', '--sd0' , default=None,             help='initial date as <YYYY-MM-DD>')
 parser.add_argument('-l', '--lev' , type=int, default=0,      help='level to use if 3D field (default: 0 => 2D)')
 parser.add_argument('-z', '--zld' ,                           help='topography netCDF file to use (field="z")')
 parser.add_argument('-t', '--tstep',  default="1h",           help='time step ("1h","2h",..,up to "1d") in input file')
@@ -117,7 +117,7 @@ cfy_in = args.fiv
 cvx_in = args.fldx
 cvy_in = args.fldy
 cf_mm = args.fmm
-csd0  = args.sd0
+#csd0  = args.sd0
 jk    = args.lev
 cf_topo_land = args.zld
 cdt    = args.tstep  ; # time step, in the form "1h", "2h", ..., "12h", ..., "1m", ..., "6m", ... "1y", ..., etc
@@ -140,11 +140,11 @@ print(' *** cf_mm = ', cf_mm)
 print(' *** show colorbar:', lcb)
 
 
-lForceD0 = False
-if csd0:
-    lForceD0 = True
-    print(' *** csd0 = ', csd0)
-    yyyy0 = csd0[0:4]
+#lForceD0 = False
+#if csd0:
+#    lForceD0 = True
+#    print(' *** csd0 = ', csd0)
+#    yyyy0 = csd0[0:4]
 
 print(' ***   jk  = ', jk)
 if CONAME != "": print(' *** CONAME = ', CONAME)
@@ -375,9 +375,9 @@ with Dataset(cfx_in) as id_f:
     else:
         l_notime=True
         print('Did not find a time variable! Assuming no time and Nt=1')
-        if not lForceD0:
-            print('    ==> then use the `-s` switch to specify an initial date!!!')
-            exit(0)
+        #if not lForceD0:
+        #    print('    ==> then use the `-s` switch to specify an initial date!!!')
+        exit(0)
     vtime = id_f.variables[cv_time][:]
 
 with Dataset(cfy_in) as id_f:
@@ -491,14 +491,19 @@ if l_show_lsm or l_add_topo_land:
         pal_lsm = cp.chose_colmap('landm')
         norm_lsm = colors.Normalize(vmin=0., vmax=1., clip=False)
 
-if not lForceD0:
-    csd0 = cp.epoch2clock( int(vtime[jt0]), frmt='nodash' )
-#
-cyr0=csd0[0:4]
-cmn0=csd0[4:6]
-cdd0=csd0[6:8]
 
+#if lForceD0:
+#    cyr0=csd0[0:4]
+#    cmn0=csd0[5:7]
+#    cdd0=csd0[8:10]
+#else:
+csd0 = num2date(vtime[0], time_units, time_caldr) ; #LOLOsolution
+cyr0=str(csd0.year)
+cmn0 = '%2.2i'%(int(csd0.month))
+cdd0 = '%2.2i'%(int(csd0.day))
 print(' ==> csd0, cyr0, cmn0, cdd0 = ',csd0, cyr0, cmn0, cdd0,'\n')
+
+
 
 # Time step as a string
 if not len(cdt)==2:
@@ -588,38 +593,13 @@ id_fy = Dataset(cfy_in)
 
 for jt in range(jt0,Nt):
 
-    #---------------------- Calendar stuff --------------------------------------------    
-    jh   = (jt*dt)%24
-    rjh  = ((float(jt)+0.5)*dt)%24
-    if jt%ntpd == 0: jd = jd + 1
-    if jd == vm[jm-1]+1 and (jt)%ntpd == 0 :
-        jd = 1
-        jm = jm + 1
-    ch  = '%2.2i'%(jh)
-    crh = '%2.2i'%(rjh)
-    cd  = '%3.3i'%(jd)
-    cm  = '%2.2i'%(jm)
-    #
-    jhou = int(rjh)
-    jmin = int((rjh-jhou)*60)
-    chou = '%2.2i'%(jhou)
-    cmin = '%2.2i'%(jmin)
-    #
-    ct  = str(datetime.datetime.strptime(cyr0+'-'+cm+'-'+cd+' '+ch, '%Y-%m-%j %H'))    
-    ct  = ct[:5]+cm+ct[7:] #lolo bug !!! need to do that to get the month and not '01    
-    cday  = ct[:10]   ; #print(' *** cday  :', cday        
-    if dt >= 24:
-        cdate = cday
-        cdats = cday
-    else:
-        chour = ct[11:13] ; #print(' *** chour :', chour
-        cdate = cday+'_'+chour
-        if jmin==0:
-            cdats = cday+' '+chour+':00'
-        else:
-            cdats = cday+' '+chou+':'+cmin
-    print('\n Current date = ', cdats+' !\n')
-    #-----------------------------------------------------------------------------------
+    # Calendar stuff:
+    itime = int( id_fx.variables[cv_time][jt] )
+    cdt = num2date(itime, time_units, time_caldr)
+    cyr, cmo, cdd = str(cdt.year), '%2.2i'%(int(cdt.month)), '%2.2i'%(int(cdt.day))
+    chh, cmn, csc = '%2.2i'%(int(cdt.hour)), '%2.2i'%(int(cdt.minute)), '%2.2i'%(int(cdt.second))
+    cdate = cyr+cmo+cdd
+    cdats = cdate+' '+chh+':'+cmn+':'+csc 
 
     # Name of figure to generate:
     cstr = CBOX

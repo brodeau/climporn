@@ -585,17 +585,13 @@ id_f.set_auto_mask(False) ;# prevent the application of `valid_min` and `valid_m
 
 for jt in range(jt0,Nt):
 
+    # Calendar stuff:
     itime = int( id_f.variables[cv_time][jt] )
     cdt = num2date(itime, time_units, time_caldr)
     cyr, cmo, cdd = str(cdt.year), '%2.2i'%(int(cdt.month)), '%2.2i'%(int(cdt.day))
     chh, cmn, csc = '%2.2i'%(int(cdt.hour)), '%2.2i'%(int(cdt.minute)), '%2.2i'%(int(cdt.second))
     cdate = cyr+cmo+cdd
     cdats = cdate+' '+chh+':'+cmn+':'+csc 
-    
-    
-    print('LOLO cdate =',cdate)
-    print('LOLO cdats =',cdats)
-    exit(0)
     
     # Name of figure to generate:
     cstr = CBOX
