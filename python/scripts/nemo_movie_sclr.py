@@ -16,7 +16,7 @@ from os import path, getcwd, makedirs
 import argparse as ap
 import numpy as np
 
-from netCDF4 import Dataset
+from netCDF4 import Dataset, num2date
 
 import matplotlib as mpl
 mpl.use('Agg')
@@ -423,7 +423,9 @@ else:
     if not lForceD0:
         print('    ==> then use the `-s` switch to specify an initial date!!!')
         exit(0)
-vtime = id_f.variables[cv_time][:]
+vtime      = id_f.variables[cv_time][:]
+time_units = id_f.variables[cv_time].units
+time_caldr = id_f.variables[cv_time].calendar
 #
 id_f.close()
 
@@ -550,6 +552,20 @@ if fa.l_show_lsm or l_add_topo_land:
 
 if not lForceD0:
     csd0 = cp.epoch2clock( int(vtime[jt0]), frmt='nodash' )
+
+
+
+#lili                                                                                                                                                                                               
+#ncfile = netCDF4.Dataset('./foo.nc', 'r')                                                                                                                                                          
+#time = ncfile.variables['time'] # do not cast to numpy array yet                                                                                                                                   
+#time_convert = netCDF4.num2date(time[:], time.units, time.calendar)                                                                                                                                
+clili = num2date(vtime[0], time_units, time_caldr)
+
+
+
+print('LOLO: csd0, clili =',csd0,'  ',clili)
+exit(0)
+    
 #
 cyr0=csd0[0:4]
 cmn0=csd0[4:6]
@@ -582,9 +598,10 @@ id_f.set_auto_mask(False) ;# prevent the application of `valid_min` and `valid_m
 for jt in range(jt0,Nt):
 
     itime = int( id_f.variables[cv_time][jt] )
-
-    cdate = cp.epoch2clock(itime, precision='h')
-    cdats = cp.epoch2clock(itime)
+    #lili
+    
+    #cdate = cp.epoch2clock(itime, precision='h')
+    #cdats = cp.epoch2clock(itime)
 
     if lForceD0:
         # overiding current year with forced one:
