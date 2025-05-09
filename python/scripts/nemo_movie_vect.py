@@ -755,7 +755,7 @@ for jt in range(jt0,Nt):
         if nemo_box.l_show_clock:
             xl = float(x_clock)/rfz
             yl = float(y_clock)/rfz
-            ax.annotate('Date: '+cdats, xy=(1, 4), xytext=(xl,yl), **fsm.cfont_clock)
+            ax.annotate(cdats, xy=(1, 4), xytext=(xl,yl), **fsm.cfont_clock)
     
         if nemo_box.l_show_exp:
             xl = float(x_exp)/rfz
