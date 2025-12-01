@@ -461,9 +461,9 @@ def drown(X, mask, k_ew=-1, nb_max_inc=5, nb_smooth=5):
         else:
             Xtemp[:,:] = X[:,:]
 
-        maskv = nmp.zeros((nj,ni), dtype=nmp.int)
-        dold = nmp.zeros((nj,ni))
-        xtmp = nmp.zeros((nj,ni))
+        maskv = nmp.zeros((nj,ni), dtype=nmp.int32)
+        dold  = nmp.zeros((nj,ni))
+        xtmp  = nmp.zeros((nj,ni))
         mask_coast = nmp.zeros((nj,ni))
 
         jinc = 0
