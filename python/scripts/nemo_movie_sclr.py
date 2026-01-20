@@ -506,10 +506,12 @@ if l_add_topo_land:
     cp.chck4f(cf_topo_land)
     id_top = Dataset(cf_topo_land)
     print(' *** Reading "z" into:\n'+cf_topo_land)
-    xtopo = id_top.variables['z'][0,j1:j2,i1:i2]
+    xtopo_orig = id_top.variables['z'][0,j1:j2,i1:i2]
     id_top.close()
-    if np.shape(xtopo) != (nj,ni):
+    if np.shape(xtopo_orig) != (nj,ni):
         print('ERROR: topo and mask do not agree in shape!'); sys.exit(0)
+    xtopo = np.zeros((nj,ni))
+    xtopo[:,:] = xtopo_orig[:,:]
     xtopo = xtopo*(1. - XMSK)
     if l3d: xtopo = xtopo + rof_dpt
     xtopo[np.where( xtopo <= 0 )] = 0
@@ -805,7 +807,10 @@ for jt in range(jt0,Nt):
                 else:
                     clsm = plt.pcolormesh( np.ma.masked_where(XLSM>0.0001, xtopo), cmap=pal_lsm, norm=norm_lsm, zorder=50 )
                 #if cinterp == 'none':
-                plt.contour(XLSM, [0.5], colors='k', linewidths=0.3, zorder=100)
+                if l_add_topo_land:
+                    plt.contour( xtopo_orig, [0.], colors='k', linewidths=0.5, zorder=100)
+                else:
+                    plt.contour(   XLSM,    [0.5], colors='k', linewidths=0.5, zorder=100)                
             else:
                 pmsk = np.ma.masked_where(XLSM[:,:] > 0.2, XLSM[:,:])
                 clsm = plt.imshow( pmsk, cmap=pal_lsm, norm=norm_lsm, interpolation=cinterp, interpolation_stage=cintdat )
