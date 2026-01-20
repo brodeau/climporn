@@ -805,7 +805,7 @@ for jt in range(jt0,Nt):
                 else:
                     clsm = plt.pcolormesh( np.ma.masked_where(XLSM>0.0001, xtopo), cmap=pal_lsm, norm=norm_lsm, zorder=50 )
                 #if cinterp == 'none':
-                plt.contour(XLSM, [0.5], colors='k', linewidths=rfz*0.6, zorder=100)
+                plt.contour(XLSM, [0.5], colors='k', linewidths=0.3, zorder=100)
             else:
                 pmsk = np.ma.masked_where(XLSM[:,:] > 0.2, XLSM[:,:])
                 clsm = plt.imshow( pmsk, cmap=pal_lsm, norm=norm_lsm, interpolation=cinterp, interpolation_stage=cintdat )
