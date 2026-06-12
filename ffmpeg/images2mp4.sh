@@ -10,7 +10,8 @@ FPS_O=25
 FIMG="png"
 HEIGHT="1080"
 CODEC="x264"
-FPS_I=25 ; # INPUT framerate !!!
+#FPS_I=25 ; # INPUT framerate !!!
+FPS_I=${FPS_O} ; # INPUT framerate !!!
 CRF=20
 PRESET="medium"
 FVID="mp4"
@@ -65,6 +66,9 @@ while getopts i:t:h:c:f:C:p:v:d:D:n:Ph option; do
         \?) usage ;;
     esac
 done
+
+
+FPS_O=${FPS_I}
 
 fprf=`basename ${FPREF}`
 
