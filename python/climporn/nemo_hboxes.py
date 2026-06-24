@@ -258,7 +258,8 @@ class nemo_hbox:
         elif [ config, box ] == [ 'NANUK4', 'ALL']:
             i1=0 ; j1=0  ;  i2=Ni0 ; j2=Nj0  ; rfact_zoom=1.5 ; font_rat=0.33*rfact_zoom
             l_show_cb  = True ; vcb=[0.58, 0.965, 0.41, 0.016]; loc_cb = 'land'
-            l_show_clock=True ; x_clock = 392.*rfact_zoom ; y_clock = 460*rfact_zoom
+            #l_show_clock=True ; x_clock = 392.*rfact_zoom ; y_clock = 460*rfact_zoom
+            l_show_clock=True ; x_clock = 100*rfact_zoom ; y_clock = 100*rfact_zoom
             l_add_logo=False
             l_show_name=False ; x_name = rfact_zoom*20 ; y_name = rfact_zoom*450
             l_show_exp=False ; x_exp = 50 ; y_exp = 80
@@ -301,12 +302,11 @@ class nemo_hbox:
             l_show_name=False ; x_name = 240 ; y_name = 525
             l_show_exp=False ; x_exp = 50 ; y_exp = 80
             l_fill_holes_k=False
-
-            
+            #
         elif [ config, box ] == [ 'NANUK4', 'ZAw']:
-            i1=55 ; j1=230  ;  i2=450 ; j2=550  ; rfact_zoom=2. ; font_rat=0.25*rfact_zoom
+            i1=55 ; j1=230  ;  i2=450 ; j2=550  ; rfact_zoom=2. ; font_rat=0.3*rfact_zoom
             l_show_cb  = True ; vcb=[0.635, 0.96, 0.35, 0.02]
-            l_show_clock=False ; x_clock = 90.*rfact_zoom ; y_clock = 143*rfact_zoom
+            l_show_clock=True ; x_clock = 10.*rfact_zoom ; y_clock = 300.*rfact_zoom
             l_add_logo=False
             l_show_name=False ; x_name = 240 ; y_name = 525
             l_show_exp=False ; x_exp = 50 ; y_exp = 80
